@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+	<metadata>
+		<id>Primo.MIA</id>
+		<version>1.0.0</version>
+		<authors>Your Team</authors>
+		<description>Централизованное хранилище для глобальных переменных и конфигураций MIA</description>
+		<projectUrl>https://gitlab.com/chelslava/Primo.MIA</projectUrl>
+		<license type="expression">MIT</license>
+		<requireLicenseAcceptance>false</requireLicenseAcceptance>
+		<readme>README.md</readme>
+		<dependencies>
+			<group targetFramework=".NETFramework4.6.1">
+				<dependency id="Hjson" version="3.0.0" />
+			</group>
+		</dependencies>
+	</metadata>
+	<files>
+		<file src="bin\    <file src="README.md" target="" />
+  </files>imo.MIA.dll" target="lib\net461" />
+		<file src="README.md" target="" />
+	</files>
+</package>
