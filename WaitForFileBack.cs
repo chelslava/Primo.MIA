@@ -14,11 +14,48 @@ using static LTools.Common.Helpers.WFHelper.PropertiesItem;
 namespace Primo.MIA
 {
     /// <summary>
-    /// Активность для ожидания появления НОВОГО файла в директории:
-    /// - Ожидание появления файла, которого не было в начале работы активности
-    /// - Поддержка wildcard и regex паттернов для фильтрации файлов
+    /// Режим работы активности
+    /// </summary>
+    public enum WaitFileMode
+    {
+        /// <summary>
+        /// Ожидать появления нового файла (которого не было при запуске)
+        /// </summary>
+        WaitForNewFile,
+
+        /// <summary>
+        /// Ожидать файл независимо от того, был он или нет
+        /// </summary>
+        WaitForAnyFile
+    }
+
+    /// <summary>
+    /// Тип фильтрации файлов
+    /// </summary>
+    public enum FileFilterType
+    {
+        /// <summary>
+        /// Точное совпадение имени файла
+        /// </summary>
+        Exact,
+
+        /// <summary>
+        /// Wildcard фильтрация (*, ?)
+        /// </summary>
+        Wildcard,
+
+        /// <summary>
+        /// Regex фильтрация
+        /// </summary>
+        Regex
+    }
+
+    /// <summary>
+    /// Активность для ожидания появления файла в директории:
+    /// - Два режима: ожидание нового файла или любого файла по маске
+    /// - Три типа фильтрации: точное совпадение, wildcard, regex
     /// - Ожидание стабильности размера файла (завершение записи)
-    /// - Возврат информации о первом найденном новом файле
+    /// - Возврат информации о найденном файле
     /// </summary>
     public class WaitForFileBack : PrimoComponentSimple<WaitForFile>
     {
@@ -38,26 +75,50 @@ namespace Primo.MIA
 
         // ============== INPUT PROPERTIES ==============
 
+        private WaitFileMode _waitMode = WaitFileMode.WaitForNewFile;
+        /// <summary>
+        /// Режим работы активности
+        /// </summary>
+        [LTools.Common.Model.Serialization.StoringProperty]
+        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Режим ожидания")]
+        public WaitFileMode WaitMode
+        {
+            get => this._waitMode;
+            set { this._waitMode = value; this.InvokePropertyChanged(this, "WaitMode"); }
+        }
+
         private string prop_DirectoryPath;
         /// <summary>
         /// Путь к директории для мониторинга
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
-        [System.ComponentModel.Category("Input"), System.ComponentModel.DisplayName("Путь к директории")]
+        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Путь к директории")]
         public string Prop_DirectoryPath
         {
             get { return this.prop_DirectoryPath; }
             set { this.prop_DirectoryPath = value; this.InvokePropertyChanged(this, "Prop_DirectoryPath"); }
         }
 
+        private FileFilterType _filterType = FileFilterType.Wildcard;
+        /// <summary>
+        /// Тип фильтрации файлов
+        /// </summary>
+        [LTools.Common.Model.Serialization.StoringProperty]
+        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Тип фильтрации")]
+        public FileFilterType FilterType
+        {
+            get => this._filterType;
+            set { this._filterType = value; this.InvokePropertyChanged(this, "FilterType"); }
+        }
+
         private string prop_FilePattern;
         /// <summary>
-        /// Маска файла (wildcard: *.txt или regex паттерн)
+        /// Маска/паттерн файла
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
-        [System.ComponentModel.Category("Input"), System.ComponentModel.DisplayName("Маска файла")]
+        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Маска файла")]
         public string Prop_FilePattern
         {
             get { return this.prop_FilePattern; }
@@ -70,7 +131,7 @@ namespace Primo.MIA
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
-        [System.ComponentModel.Category("Input"), System.ComponentModel.DisplayName("Таймаут (сек)")]
+        [System.ComponentModel.Category("Настройки"), System.ComponentModel.DisplayName("Таймаут (сек)")]
         public string Prop_Timeout
         {
             get { return this.prop_Timeout; }
@@ -83,24 +144,23 @@ namespace Primo.MIA
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
-        [System.ComponentModel.Category("Input"), System.ComponentModel.DisplayName("Интервал проверки (мс)")]
+        [System.ComponentModel.Category("Настройки"), System.ComponentModel.DisplayName("Интервал проверки (мс)")]
         public string Prop_CheckInterval
         {
             get { return this.prop_CheckInterval; }
             set { this.prop_CheckInterval = value; this.InvokePropertyChanged(this, "Prop_CheckInterval"); }
         }
 
-        private string prop_WaitForStability;
+        private bool _waitForStability = false;
         /// <summary>
         /// Ожидать стабильности размера файла (файл полностью записан)
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
-        [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(bool))]
-        [System.ComponentModel.Category("Input"), System.ComponentModel.DisplayName("Ожидать завершения записи")]
-        public string Prop_WaitForStability
+        [System.ComponentModel.Category("Настройки"), System.ComponentModel.DisplayName("Ожидать завершения записи")]
+        public bool Prop_WaitForStability
         {
-            get { return this.prop_WaitForStability; }
-            set { this.prop_WaitForStability = value; this.InvokePropertyChanged(this, "Prop_WaitForStability"); }
+            get { return this._waitForStability; }
+            set { this._waitForStability = value; this.InvokePropertyChanged(this, "Prop_WaitForStability"); }
         }
 
         private string prop_StabilityTimeout;
@@ -109,57 +169,30 @@ namespace Primo.MIA
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
-        [System.ComponentModel.Category("Input"), System.ComponentModel.DisplayName("Время стабильности (мс)")]
+        [System.ComponentModel.Category("Настройки"), System.ComponentModel.DisplayName("Время стабильности (мс)")]
         public string Prop_StabilityTimeout
         {
             get { return this.prop_StabilityTimeout; }
             set { this.prop_StabilityTimeout = value; this.InvokePropertyChanged(this, "Prop_StabilityTimeout"); }
         }
 
-        private string prop_UseWildcard;
-        /// <summary>
-        /// Использовать wildcard поиск (*, ?)
-        /// </summary>
-        [LTools.Common.Model.Serialization.StoringProperty]
-        [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(bool))]
-        [System.ComponentModel.Category("Input"), System.ComponentModel.DisplayName("Использовать wildcard")]
-        public string Prop_UseWildcard
-        {
-            get { return this.prop_UseWildcard; }
-            set { this.prop_UseWildcard = value; this.InvokePropertyChanged(this, "Prop_UseWildcard"); }
-        }
-
-        private string prop_UseRegex;
-        /// <summary>
-        /// Использовать regex поиск
-        /// </summary>
-        [LTools.Common.Model.Serialization.StoringProperty]
-        [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(bool))]
-        [System.ComponentModel.Category("Input"), System.ComponentModel.DisplayName("Использовать regex")]
-        public string Prop_UseRegex
-        {
-            get { return this.prop_UseRegex; }
-            set { this.prop_UseRegex = value; this.InvokePropertyChanged(this, "Prop_UseRegex"); }
-        }
-
-        private string prop_ThrowOnTimeout;
+        private bool _throwOnTimeout = false;
         /// <summary>
         /// Выбрасывать исключение при таймауте
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
-        [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(bool))]
-        [System.ComponentModel.Category("Input"), System.ComponentModel.DisplayName("Ошибка при таймауте")]
-        public string Prop_ThrowOnTimeout
+        [System.ComponentModel.Category("Настройки"), System.ComponentModel.DisplayName("Ошибка при таймауте")]
+        public bool Prop_ThrowOnTimeout
         {
-            get { return this.prop_ThrowOnTimeout; }
-            set { this.prop_ThrowOnTimeout = value; this.InvokePropertyChanged(this, "Prop_ThrowOnTimeout"); }
+            get { return this._throwOnTimeout; }
+            set { this._throwOnTimeout = value; this.InvokePropertyChanged(this, "Prop_ThrowOnTimeout"); }
         }
 
         // ============== OUTPUT PROPERTIES ==============
 
         private string prop_FileFound;
         /// <summary>
-        /// Флаг обнаружения нового файла
+        /// Флаг обнаружения файла
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(bool))]
@@ -247,31 +280,82 @@ namespace Primo.MIA
         /// </summary>
         public WaitForFileBack(IWFContainer container) : base(container)
         {
-            sdkComponentName = "Ожидание нового файла";
-            sdkComponentHelp = "Активность ожидает появления нового файла в директории, соответствующего заданной маске";
+            sdkComponentName = "Ожидание файла";
+            sdkComponentHelp = @"Компонент ""Ожидание файла""
+Компонент для ожидания появления файла в директории с поддержкой различных режимов фильтрации и мониторинга.
+                
+Основные:
+Режим ожидания: [WaitFileMode] Режим работы компонента
+WaitForNewFile - Ожидать появления нового файла (которого не было при запуске активности)
+WaitForAnyFile - Ожидать файл независимо от того, существовал он ранее или нет
+Путь к директории*: [String] Полный путь к директории для мониторинга (например: C:\Downloads)
+Тип фильтрации: [FileFilterType] Способ фильтрации файлов по имени
+Exact - Точное совпадение имени файла
+Wildcard - Использование wildcard символов (* и ?). Например: *.xlsx, report_*.pdf
+Regex - Использование регулярных выражений. Например: ^report_\d{8}\.xlsx$
+Маска файла*: [String] Маска или паттерн для поиска файлов в зависимости от выбранного типа фильтрации
+Для Exact: report.xlsx
+Для Wildcard: *.txt, data_*.csv
+Для Regex: ^file_\d{4}\.log$
+
+Настройки:
+Таймаут (сек)*: [Int32] Максимальное время ожидания файла в секундах. По умолчанию: 30
+Интервал проверки (мс)*: [Int32] Интервал между проверками наличия файла в миллисекундах. По умолчанию: 500
+Ожидать завершения записи: [Boolean] Если включено, компонент будет ждать стабилизации размера файла (файл полностью записан). По умолчанию: false
+Время стабильности (мс)*: [Int32] Время в миллисекундах, в течение которого размер файла должен оставаться неизменным для считывания файла полностью записанным. По умолчанию: 2000
+Ошибка при таймауте: [Boolean] Если включено, при достижении таймаута будет выброшено исключение TimeoutException. По умолчанию: false
+
+Выходные данные:
+Файл найден: [Boolean] Флаг успешного обнаружения файла. true - файл найден, false - таймаут истек
+Путь к файлу: [String] Полный путь к найденному файлу (например: C:\Downloads\report_20250215.xlsx). Пустая строка, если файл не найден
+Имя файла: [String] Имя найденного файла без пути (например: report_20250215.xlsx). Пустая строка, если файл не найден
+Размер файла (байт): [Int64] Размер найденного файла в байтах. 0, если файл не найден
+Время ожидания (мс): [Int64] Фактическое время ожидания в миллисекундах";
             sdkComponentIcon = "pack://application:,,/Primo.SDKSample;component/Images/sample.png";
 
             sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
-                // Input свойства
+                // Режим работы (enum с выпадающим списком)
+                new LTools.Common.Helpers.WFHelper.PropertiesItem()
+                {
+                    PropName = "WaitMode",
+                    PropertyType = PropertyTypes.OBJECT,
+                    EditorType = ScriptEditorTypes.NONE,
+                    DataType = typeof(WaitFileMode),
+                    ToolTip = "Режим работы: ожидать новый файл или любой файл по маске",
+                    IsReadOnly = false
+                },
+                // Путь к директории
                 new LTools.Common.Helpers.WFHelper.PropertiesItem()
                 {
                     PropName = "Prop_DirectoryPath",
                     PropertyType = PropertyTypes.SCRIPT,
                     EditorType = ScriptEditorTypes.FOLDER_SELECTOR,
                     DataType = typeof(string),
-                    ToolTip = "Путь к директории для мониторинга появления новых файлов",
+                    ToolTip = "Путь к директории для мониторинга появления файлов",
                     IsReadOnly = false
                 },
+                // Тип фильтрации (enum с выпадающим списком)
+                new LTools.Common.Helpers.WFHelper.PropertiesItem()
+                {
+                    PropName = "FilterType",
+                    PropertyType = PropertyTypes.OBJECT,
+                    EditorType = ScriptEditorTypes.NONE,
+                    DataType = typeof(FileFilterType),
+                    ToolTip = "Тип фильтрации: точное совпадение, wildcard (*.txt) или regex паттерн",
+                    IsReadOnly = false
+                },
+                // Маска файла
                 new LTools.Common.Helpers.WFHelper.PropertiesItem()
                 {
                     PropName = "Prop_FilePattern",
                     PropertyType = PropertyTypes.SCRIPT,
                     EditorType = ScriptEditorTypes.NONE,
                     DataType = typeof(string),
-                    ToolTip = "Маска файла (wildcard: *.txt, report_*.xlsx или regex паттерн)",
+                    ToolTip = "Маска/паттерн файла в зависимости от выбранного типа фильтрации",
                     IsReadOnly = false
                 },
+                // Таймаут
                 new LTools.Common.Helpers.WFHelper.PropertiesItem()
                 {
                     PropName = "Prop_Timeout",
@@ -281,6 +365,7 @@ namespace Primo.MIA
                     ToolTip = "Таймаут ожидания в секундах (по умолчанию 30)",
                     IsReadOnly = false
                 },
+                // Интервал проверки
                 new LTools.Common.Helpers.WFHelper.PropertiesItem()
                 {
                     PropName = "Prop_CheckInterval",
@@ -290,15 +375,7 @@ namespace Primo.MIA
                     ToolTip = "Интервал проверки в миллисекундах (по умолчанию 500)",
                     IsReadOnly = false
                 },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_WaitForStability",
-                    PropertyType = PropertyTypes.SCRIPT,
-                    EditorType = ScriptEditorTypes.NONE,
-                    DataType = typeof(bool),
-                    ToolTip = "Ожидать стабильности размера файла (файл полностью записан)",
-                    IsReadOnly = false
-                },
+                // Время стабильности
                 new LTools.Common.Helpers.WFHelper.PropertiesItem()
                 {
                     PropName = "Prop_StabilityTimeout",
@@ -308,33 +385,6 @@ namespace Primo.MIA
                     ToolTip = "Время стабильности размера файла в миллисекундах (по умолчанию 2000)",
                     IsReadOnly = false
                 },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_UseWildcard",
-                    PropertyType = PropertyTypes.SCRIPT,
-                    EditorType = ScriptEditorTypes.NONE,
-                    DataType = typeof(bool),
-                    ToolTip = "Использовать wildcard поиск (* и ?) - по умолчанию включено",
-                    IsReadOnly = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_UseRegex",
-                    PropertyType = PropertyTypes.SCRIPT,
-                    EditorType = ScriptEditorTypes.NONE,
-                    DataType = typeof(bool),
-                    ToolTip = "Использовать regex поиск (имеет приоритет над wildcard)",
-                    IsReadOnly = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_ThrowOnTimeout",
-                    PropertyType = PropertyTypes.SCRIPT,
-                    EditorType = ScriptEditorTypes.NONE,
-                    DataType = typeof(bool),
-                    ToolTip = "Выбрасывать исключение при достижении таймаута",
-                    IsReadOnly = false
-                },
                 // Output свойства
                 new LTools.Common.Helpers.WFHelper.PropertiesItem()
                 {
@@ -342,7 +392,7 @@ namespace Primo.MIA
                     PropertyType = PropertyTypes.VARIABLE,
                     EditorType = ScriptEditorTypes.NONE,
                     DataType = typeof(bool),
-                    ToolTip = "Флаг обнаружения нового файла",
+                    ToolTip = "Флаг обнаружения файла",
                     IsReadOnly = false
                 },
                 new LTools.Common.Helpers.WFHelper.PropertiesItem()
@@ -390,10 +440,6 @@ namespace Primo.MIA
             this.Prop_Timeout = "30";
             this.Prop_CheckInterval = "500";
             this.Prop_StabilityTimeout = "2000";
-            this.Prop_WaitForStability = "false";
-            this.Prop_UseWildcard = "true"; // По умолчанию включено
-            this.Prop_UseRegex = "false";
-            this.Prop_ThrowOnTimeout = "false";
         }
 
         /// <summary>
@@ -403,122 +449,20 @@ namespace Primo.MIA
         {
             try
             {
-                // Получение входных параметров
-                string directoryPath = GetPropertyValue<string>(this.Prop_DirectoryPath, "Prop_DirectoryPath", sd);
-                string filePattern = GetPropertyValue<string>(this.Prop_FilePattern, "Prop_FilePattern", sd);
-
-                // Проверка обязательных полей
-                if (string.IsNullOrWhiteSpace(directoryPath))
-                {
-                    throw new ArgumentException("Путь к директории не может быть пустым");
-                }
-
-                if (string.IsNullOrWhiteSpace(filePattern))
-                {
-                    throw new ArgumentException("Маска файла не может быть пустой");
-                }
-
-                // Проверка существования директории
-                if (!Directory.Exists(directoryPath))
-                {
-                    throw new DirectoryNotFoundException($"Директория не найдена: {directoryPath}");
-                }
-
-                int timeoutSec = Convert.ToInt32(GetPropertyValue(this.Prop_Timeout, "Prop_Timeout", sd));
-                int checkInterval = Convert.ToInt32(GetPropertyValue(this.Prop_CheckInterval, "Prop_CheckInterval", sd));
-                bool waitForStability = Convert.ToBoolean(GetPropertyValue(this.Prop_WaitForStability, "Prop_WaitForStability", sd));
-                int stabilityTimeout = Convert.ToInt32(GetPropertyValue(this.Prop_StabilityTimeout, "Prop_StabilityTimeout", sd));
-                bool useWildcard = Convert.ToBoolean(GetPropertyValue(this.Prop_UseWildcard, "Prop_UseWildcard", sd));
-                bool useRegex = Convert.ToBoolean(GetPropertyValue(this.Prop_UseRegex, "Prop_UseRegex", sd));
-                bool throwOnTimeout = Convert.ToBoolean(GetPropertyValue(this.Prop_ThrowOnTimeout, "Prop_ThrowOnTimeout", sd));
-
-                // Валидация числовых значений
-                if (timeoutSec <= 0)
-                {
-                    throw new ArgumentException("Таймаут должен быть больше нуля");
-                }
-                if (checkInterval <= 0)
-                {
-                    throw new ArgumentException("Интервал проверки должен быть больше нуля");
-                }
-                if (stabilityTimeout <= 0)
-                {
-                    throw new ArgumentException("Время стабильности должно быть больше нуля");
-                }
-
-                // Конвертация таймаута в миллисекунды
-                int timeoutMs = timeoutSec * 1000;
+                // Получение и валидация входных параметров
+                var parameters = GetAndValidateParameters(sd);
 
                 // Начало отсчета времени
                 var startTime = DateTime.UtcNow;
 
-                // Получение списка существующих файлов ПЕРЕД началом ожидания
-                var dirInfo = new DirectoryInfo(directoryPath);
-                var existingFiles = new HashSet<string>(
-                    dirInfo.GetFiles().Select(f => f.FullName),
-                    StringComparer.OrdinalIgnoreCase
-                );
-
-                // Ожидание появления нового файла
-                FileInfo newFile = null;
-
-                if (useRegex)
-                {
-                    // Использование regex для фильтрации
-                    newFile = WaitForNewFileWithRegex(directoryPath, filePattern, existingFiles,
-                        timeoutMs, checkInterval, waitForStability, stabilityTimeout);
-                }
-                else if (useWildcard)
-                {
-                    // Использование wildcard для фильтрации
-                    newFile = WaitForNewFileWithWildcard(directoryPath, filePattern, existingFiles,
-                        timeoutMs, checkInterval, waitForStability, stabilityTimeout);
-                }
-                else
-                {
-                    // Точное совпадение имени файла
-                    newFile = WaitForNewFileExact(directoryPath, filePattern, existingFiles,
-                        timeoutMs, checkInterval, waitForStability, stabilityTimeout);
-                }
+                // Поиск файла в зависимости от режима
+                FileInfo foundFile = FindFile(parameters);
 
                 // Расчет фактического времени ожидания
                 long actualWaitTime = (long)(DateTime.UtcNow - startTime).TotalMilliseconds;
 
-                // Установка выходных параметров
-                if (newFile != null)
-                {
-                    newFile.Refresh();
-                    SetVariableValue(this.Prop_FileFound, true, sd);
-                    SetVariableValue(this.Prop_FilePath, newFile.FullName, sd);
-                    SetVariableValue(this.Prop_FileName, newFile.Name, sd);
-                    SetVariableValue(this.Prop_FileSize, newFile.Length, sd);
-                    SetVariableValue(this.Prop_WaitTime, actualWaitTime, sd);
-
-                    return new ExecutionResult()
-                    {
-                        IsSuccess = true,
-                        SuccessMessage = $"Новый файл обнаружен: {newFile.Name}"
-                    };
-                }
-                else
-                {
-                    SetVariableValue(this.Prop_FileFound, false, sd);
-                    SetVariableValue(this.Prop_FilePath, string.Empty, sd);
-                    SetVariableValue(this.Prop_FileName, string.Empty, sd);
-                    SetVariableValue(this.Prop_FileSize, 0L, sd);
-                    SetVariableValue(this.Prop_WaitTime, actualWaitTime, sd);
-
-                    if (throwOnTimeout)
-                    {
-                        throw new TimeoutException($"Таймаут ожидания нового файла истек. Директория: {directoryPath}, Маска: {filePattern}, Таймаут: {timeoutSec} сек.");
-                    }
-
-                    return new ExecutionResult()
-                    {
-                        IsSuccess = true,
-                        SuccessMessage = $"Таймаут ожидания нового файла истек после {timeoutSec} секунд"
-                    };
-                }
+                // Установка выходных параметров и возврат результата
+                return ProcessResult(foundFile, actualWaitTime, parameters, sd);
             }
             catch (Exception ex)
             {
@@ -530,79 +474,202 @@ namespace Primo.MIA
             }
         }
 
+        #region Вспомогательные классы и методы
+
         /// <summary>
-        /// Ожидает появления нового файла с точным именем
+        /// Параметры для поиска файла
         /// </summary>
-        /// <param name="directoryPath">Путь к директории</param>
-        /// <param name="fileName">Точное имя файла</param>
-        /// <param name="existingFiles">Набор существующих файлов</param>
-        /// <param name="timeoutMs">Таймаут в миллисекундах</param>
-        /// <param name="checkInterval">Интервал проверки в миллисекундах</param>
-        /// <param name="waitForStability">Ожидать стабильности размера</param>
-        /// <param name="stabilityTimeout">Время стабильности в миллисекундах</param>
-        /// <returns>Информация о новом файле или null</returns>
-        private FileInfo WaitForNewFileExact(string directoryPath, string fileName,
-            HashSet<string> existingFiles, int timeoutMs, int checkInterval,
-            bool waitForStability, int stabilityTimeout)
+        private class SearchParameters
         {
-            var startTime = DateTime.UtcNow;
-            var filePath = Path.Combine(directoryPath, fileName);
-            var fileInfo = new FileInfo(filePath);
+            public string DirectoryPath { get; set; }
+            public string FilePattern { get; set; }
+            public int TimeoutMs { get; set; }
+            public int CheckInterval { get; set; }
+            public bool WaitForStability { get; set; }
+            public int StabilityTimeout { get; set; }
+            public bool ThrowOnTimeout { get; set; }
+            public WaitFileMode Mode { get; set; }
+            public FileFilterType FilterType { get; set; }
+        }
 
-            // Ожидание появления нового файла
-            while (true)
+        /// <summary>
+        /// Получает и валидирует все входные параметры
+        /// </summary>
+        private SearchParameters GetAndValidateParameters(ScriptingData sd)
+        {
+            // Получение параметров
+            string directoryPath = GetPropertyValue<string>(this.Prop_DirectoryPath, "Prop_DirectoryPath", sd);
+            string filePattern = GetPropertyValue<string>(this.Prop_FilePattern, "Prop_FilePattern", sd);
+            int timeoutSec = Convert.ToInt32(GetPropertyValue(this.Prop_Timeout, "Prop_Timeout", sd));
+            int checkInterval = Convert.ToInt32(GetPropertyValue(this.Prop_CheckInterval, "Prop_CheckInterval", sd));
+            int stabilityTimeout = Convert.ToInt32(GetPropertyValue(this.Prop_StabilityTimeout, "Prop_StabilityTimeout", sd));
+
+            // Валидация строковых параметров
+            ValidateStringParameter(directoryPath, "Путь к директории");
+            ValidateStringParameter(filePattern, "Маска файла");
+            ValidateDirectoryExists(directoryPath);
+
+            // Валидация числовых параметров
+            ValidatePositiveNumber(timeoutSec, "Таймаут");
+            ValidatePositiveNumber(checkInterval, "Интервал проверки");
+            ValidatePositiveNumber(stabilityTimeout, "Время стабильности");
+
+            return new SearchParameters
             {
-                // Проверка таймаута
-                if ((DateTime.UtcNow - startTime).TotalMilliseconds > timeoutMs)
-                {
-                    return null;
-                }
+                DirectoryPath = directoryPath,
+                FilePattern = filePattern,
+                TimeoutMs = timeoutSec * 1000,
+                CheckInterval = checkInterval,
+                WaitForStability = this.Prop_WaitForStability,
+                StabilityTimeout = stabilityTimeout,
+                ThrowOnTimeout = this.Prop_ThrowOnTimeout,
+                Mode = this.WaitMode,
+                FilterType = this.FilterType
+            };
+        }
 
-                fileInfo.Refresh();
-
-                // Проверяем: файл существует И его не было в списке существующих
-                if (fileInfo.Exists && !existingFiles.Contains(fileInfo.FullName))
-                {
-                    // Если требуется ожидание стабильности
-                    if (waitForStability)
-                    {
-                        int remainingTimeout = timeoutMs - (int)(DateTime.UtcNow - startTime).TotalMilliseconds;
-                        if (WaitForFileStability(fileInfo, stabilityTimeout, remainingTimeout, checkInterval))
-                        {
-                            return fileInfo;
-                        }
-                        else
-                        {
-                            return null; // Таймаут при ожидании стабильности
-                        }
-                    }
-
-                    return fileInfo;
-                }
-
-                Thread.Sleep(checkInterval);
+        /// <summary>
+        /// Валидация строкового параметра
+        /// </summary>
+        private void ValidateStringParameter(string value, string parameterName)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                throw new ArgumentException($"{parameterName} не может быть пустым");
             }
         }
 
         /// <summary>
-        /// Ожидает появления нового файла по wildcard маске
+        /// Проверка существования директории
         /// </summary>
-        /// <param name="directoryPath">Путь к директории</param>
-        /// <param name="pattern">Wildcard паттерн (*.txt, report_*.xlsx)</param>
-        /// <param name="existingFiles">Набор существующих файлов</param>
-        /// <param name="timeoutMs">Таймаут в миллисекундах</param>
-        /// <param name="checkInterval">Интервал проверки в миллисекундах</param>
-        /// <param name="waitForStability">Ожидать стабильности размера</param>
-        /// <param name="stabilityTimeout">Время стабильности в миллисекундах</param>
-        /// <returns>Информация о новом файле или null</returns>
-        private FileInfo WaitForNewFileWithWildcard(string directoryPath, string pattern,
-            HashSet<string> existingFiles, int timeoutMs, int checkInterval,
-            bool waitForStability, int stabilityTimeout)
+        private void ValidateDirectoryExists(string directoryPath)
+        {
+            if (!Directory.Exists(directoryPath))
+            {
+                throw new DirectoryNotFoundException($"Директория не найдена: {directoryPath}");
+            }
+        }
+
+        /// <summary>
+        /// Валидация положительного числа
+        /// </summary>
+        private void ValidatePositiveNumber(int value, string parameterName)
+        {
+            if (value <= 0)
+            {
+                throw new ArgumentException($"{parameterName} должен быть больше нуля");
+            }
+        }
+
+        /// <summary>
+        /// Поиск файла в зависимости от режима работы
+        /// </summary>
+        private FileInfo FindFile(SearchParameters parameters)
+        {
+            if (parameters.Mode == WaitFileMode.WaitForNewFile)
+            {
+                return FindNewFile(parameters);
+            }
+            else
+            {
+                return FindAnyFile(parameters);
+            }
+        }
+
+        /// <summary>
+        /// Поиск нового файла (которого не было при запуске)
+        /// </summary>
+        private FileInfo FindNewFile(SearchParameters parameters)
+        {
+            // Получение списка существующих файлов
+            var existingFiles = GetExistingFiles(parameters.DirectoryPath);
+
+            // Поиск в зависимости от типа фильтрации
+            return ExecuteSearch(
+                parameters,
+                (pattern, timeout, interval) => SearchForFile(
+                    parameters.DirectoryPath,
+                    pattern,
+                    parameters.FilterType,
+                    timeout,
+                    interval,
+                    file => !existingFiles.Contains(file.FullName)
+                )
+            );
+        }
+
+        /// <summary>
+        /// Поиск любого файла по маске
+        /// </summary>
+        private FileInfo FindAnyFile(SearchParameters parameters)
+        {
+            return ExecuteSearch(
+                parameters,
+                (pattern, timeout, interval) => SearchForFile(
+                    parameters.DirectoryPath,
+                    pattern,
+                    parameters.FilterType,
+                    timeout,
+                    interval,
+                    file => true // Любой файл подходит
+                )
+            );
+        }
+
+        /// <summary>
+        /// Получает набор существующих файлов в директории
+        /// </summary>
+        private HashSet<string> GetExistingFiles(string directoryPath)
+        {
+            var dirInfo = new DirectoryInfo(directoryPath);
+            return new HashSet<string>(
+                dirInfo.GetFiles().Select(f => f.FullName),
+                StringComparer.OrdinalIgnoreCase
+            );
+        }
+
+        /// <summary>
+        /// Выполняет поиск с учетом стабильности файла
+        /// </summary>
+        private FileInfo ExecuteSearch(
+            SearchParameters parameters,
+            Func<string, int, int, FileInfo> searchFunc)
+        {
+            var file = searchFunc(
+                parameters.FilePattern,
+                parameters.TimeoutMs,
+                parameters.CheckInterval
+            );
+
+            if (file != null && parameters.WaitForStability)
+            {
+                int remainingTimeout = parameters.TimeoutMs;
+                if (!WaitForFileStability(file, parameters.StabilityTimeout, remainingTimeout, parameters.CheckInterval))
+                {
+                    return null;
+                }
+            }
+
+            return file;
+        }
+
+        /// <summary>
+        /// Универсальный метод поиска файла с фильтром
+        /// </summary>
+        private FileInfo SearchForFile(
+            string directoryPath,
+            string pattern,
+            FileFilterType filterType,
+            int timeoutMs,
+            int checkInterval,
+            Func<FileInfo, bool> additionalFilter)
         {
             var startTime = DateTime.UtcNow;
             var dirInfo = new DirectoryInfo(directoryPath);
 
-            // Ожидание появления нового файла
+            // Создание фильтра файлов на основе типа
+            Func<FileInfo, bool> fileFilter = CreateFileFilter(pattern, filterType);
+
             while (true)
             {
                 // Проверка таймаута
@@ -611,35 +678,15 @@ namespace Primo.MIA
                     return null;
                 }
 
-                // Получение файлов по паттерну
-                var matchedFiles = dirInfo.GetFiles(pattern);
-
-                // Фильтрация: оставляем только новые файлы (которых не было в existingFiles)
-                var newFiles = matchedFiles
-                    .Where(f => !existingFiles.Contains(f.FullName))
-                    .OrderBy(f => f.CreationTime) // Сортируем по времени создания (самый старый первый)
+                // Поиск подходящих файлов
+                var matchedFiles = dirInfo.GetFiles()
+                    .Where(f => fileFilter(f) && additionalFilter(f))
+                    .OrderBy(f => f.CreationTime)
                     .ToList();
 
-                // Если найден хотя бы один новый файл
-                if (newFiles.Any())
+                if (matchedFiles.Any())
                 {
-                    var newFile = newFiles.First();
-
-                    // Если требуется ожидание стабильности
-                    if (waitForStability)
-                    {
-                        int remainingTimeout = timeoutMs - (int)(DateTime.UtcNow - startTime).TotalMilliseconds;
-                        if (WaitForFileStability(newFile, stabilityTimeout, remainingTimeout, checkInterval))
-                        {
-                            return newFile;
-                        }
-                        else
-                        {
-                            return null; // Таймаут при ожидании стабильности
-                        }
-                    }
-
-                    return newFile;
+                    return matchedFiles.First();
                 }
 
                 Thread.Sleep(checkInterval);
@@ -647,88 +694,64 @@ namespace Primo.MIA
         }
 
         /// <summary>
-        /// Ожидает появления нового файла по regex паттерну
+        /// Создает функцию фильтрации файлов на основе типа фильтрации
         /// </summary>
-        /// <param name="directoryPath">Путь к директории</param>
-        /// <param name="regexPattern">Regex паттерн для имени файла</param>
-        /// <param name="existingFiles">Набор существующих файлов</param>
-        /// <param name="timeoutMs">Таймаут в миллисекундах</param>
-        /// <param name="checkInterval">Интервал проверки в миллисекундах</param>
-        /// <param name="waitForStability">Ожидать стабильности размера</param>
-        /// <param name="stabilityTimeout">Время стабильности в миллисекундах</param>
-        /// <returns>Информация о новом файле или null</returns>
-        private FileInfo WaitForNewFileWithRegex(string directoryPath, string regexPattern,
-            HashSet<string> existingFiles, int timeoutMs, int checkInterval,
-            bool waitForStability, int stabilityTimeout)
+        private Func<FileInfo, bool> CreateFileFilter(string pattern, FileFilterType filterType)
         {
-            var startTime = DateTime.UtcNow;
-            var dirInfo = new DirectoryInfo(directoryPath);
+            switch (filterType)
+            {
+                case FileFilterType.Exact:
+                    return file => file.Name.Equals(pattern, StringComparison.OrdinalIgnoreCase);
 
-            // Компиляция regex паттерна
-            Regex regex;
+                case FileFilterType.Wildcard:
+                    return CreateWildcardFilter(pattern);
+
+                case FileFilterType.Regex:
+                    return CreateRegexFilter(pattern);
+
+                default:
+                    throw new ArgumentException($"Неизвестный тип фильтрации: {filterType}");
+            }
+        }
+
+        /// <summary>
+        /// Создает wildcard фильтр
+        /// </summary>
+        private Func<FileInfo, bool> CreateWildcardFilter(string pattern)
+        {
+            // Преобразование wildcard паттерна в regex
+            string regexPattern = "^" + Regex.Escape(pattern)
+                .Replace("\\*", ".*")
+                .Replace("\\?", ".") + "$";
+
+            var regex = new Regex(regexPattern, RegexOptions.IgnoreCase | RegexOptions.Compiled);
+            return file => regex.IsMatch(file.Name);
+        }
+
+        /// <summary>
+        /// Создает regex фильтр
+        /// </summary>
+        private Func<FileInfo, bool> CreateRegexFilter(string pattern)
+        {
             try
             {
-                regex = new Regex(regexPattern, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+                var regex = new Regex(pattern, RegexOptions.IgnoreCase | RegexOptions.Compiled);
+                return file => regex.IsMatch(file.Name);
             }
             catch (ArgumentException ex)
             {
-                throw new ArgumentException($"Некорректный regex паттерн: {regexPattern}. Ошибка: {ex.Message}");
-            }
-
-            // Ожидание появления нового файла
-            while (true)
-            {
-                // Проверка таймаута
-                if ((DateTime.UtcNow - startTime).TotalMilliseconds > timeoutMs)
-                {
-                    return null;
-                }
-
-                // Получение всех файлов в директории
-                var allFiles = dirInfo.GetFiles();
-
-                // Фильтрация по regex и проверка на новизну
-                var newFiles = allFiles
-                    .Where(f => regex.IsMatch(f.Name) && !existingFiles.Contains(f.FullName))
-                    .OrderBy(f => f.CreationTime) // Сортируем по времени создания (самый старый первый)
-                    .ToList();
-
-                // Если найден хотя бы один новый файл
-                if (newFiles.Any())
-                {
-                    var newFile = newFiles.First();
-
-                    // Если требуется ожидание стабильности
-                    if (waitForStability)
-                    {
-                        int remainingTimeout = timeoutMs - (int)(DateTime.UtcNow - startTime).TotalMilliseconds;
-                        if (WaitForFileStability(newFile, stabilityTimeout, remainingTimeout, checkInterval))
-                        {
-                            return newFile;
-                        }
-                        else
-                        {
-                            return null; // Таймаут при ожидании стабильности
-                        }
-                    }
-
-                    return newFile;
-                }
-
-                Thread.Sleep(checkInterval);
+                throw new ArgumentException($"Некорректный regex паттерн: {pattern}. Ошибка: {ex.Message}");
             }
         }
 
         /// <summary>
         /// Ожидает стабильности размера файла (завершения записи)
         /// </summary>
-        /// <param name="fileInfo">Информация о файле</param>
-        /// <param name="stabilityTimeout">Время стабильности в миллисекундах</param>
-        /// <param name="remainingTimeout">Оставшееся время таймаута</param>
-        /// <param name="checkInterval">Интервал проверки в миллисекундах</param>
-        /// <returns>True, если размер стабилен, иначе false</returns>
-        private bool WaitForFileStability(FileInfo fileInfo, int stabilityTimeout,
-            int remainingTimeout, int checkInterval)
+        private bool WaitForFileStability(
+            FileInfo fileInfo,
+            int stabilityTimeout,
+            int remainingTimeout,
+            int checkInterval)
         {
             var stabilityStart = DateTime.UtcNow;
             long previousSize = -1;
@@ -740,24 +763,23 @@ namespace Primo.MIA
                 // Проверка существования файла
                 if (!fileInfo.Exists)
                 {
-                    return false; // Файл исчез
+                    return false;
                 }
 
                 long currentSize = fileInfo.Length;
 
-                // Проверка на таймаут
+                // Проверка общего таймаута
                 if ((DateTime.UtcNow - stabilityStart).TotalMilliseconds > remainingTimeout)
                 {
                     return false;
                 }
 
-                // Если размер изменился, сбрасываем счетчик стабильности
+                // Проверка стабильности размера
                 if (currentSize != previousSize)
                 {
                     previousSize = currentSize;
                     stabilityStart = DateTime.UtcNow;
                 }
-                // Если размер стабилен в течение требуемого времени
                 else if ((DateTime.UtcNow - stabilityStart).TotalMilliseconds >= stabilityTimeout)
                 {
                     return true;
@@ -768,100 +790,97 @@ namespace Primo.MIA
         }
 
         /// <summary>
+        /// Обрабатывает результат поиска и устанавливает выходные параметры
+        /// </summary>
+        private ExecutionResult ProcessResult(
+            FileInfo foundFile,
+            long waitTime,
+            SearchParameters parameters,
+            ScriptingData sd)
+        {
+            if (foundFile != null)
+            {
+                // Файл найден
+                foundFile.Refresh();
+                SetOutputParameters(foundFile, waitTime, true, sd);
+
+                return new ExecutionResult()
+                {
+                    IsSuccess = true,
+                    SuccessMessage = $"Файл обнаружен: {foundFile.Name}"
+                };
+            }
+            else
+            {
+                // Таймаут
+                SetOutputParameters(null, waitTime, false, sd);
+
+                if (parameters.ThrowOnTimeout)
+                {
+                    throw new TimeoutException(
+                        $"Таймаут ожидания файла истек. " +
+                        $"Директория: {parameters.DirectoryPath}, " +
+                        $"Маска: {parameters.FilePattern}, " +
+                        $"Таймаут: {parameters.TimeoutMs / 1000} сек."
+                    );
+                }
+
+                return new ExecutionResult()
+                {
+                    IsSuccess = true,
+                    SuccessMessage = $"Таймаут ожидания файла истек после {parameters.TimeoutMs / 1000} секунд"
+                };
+            }
+        }
+
+        /// <summary>
+        /// Устанавливает выходные параметры
+        /// </summary>
+        private void SetOutputParameters(
+            FileInfo file,
+            long waitTime,
+            bool found,
+            ScriptingData sd)
+        {
+            SetVariableValue(this.Prop_FileFound, found, sd);
+            SetVariableValue(this.Prop_FilePath, file?.FullName ?? string.Empty, sd);
+            SetVariableValue(this.Prop_FileName, file?.Name ?? string.Empty, sd);
+            SetVariableValue(this.Prop_FileSize, file?.Length ?? 0L, sd);
+            SetVariableValue(this.Prop_WaitTime, waitTime, sd);
+        }
+
+        #endregion
+
+        /// <summary>
         /// Проверка корректности введенных данных
         /// </summary>
         public override ValidationResult Validate()
         {
             ValidationResult ret = new ValidationResult();
 
-            // Проверка обязательного поля "Путь к директории"
-            if (string.IsNullOrWhiteSpace(this.Prop_DirectoryPath))
-            {
-                ret.Items.Add(new ValidationResult.ValidationItem()
-                {
-                    PropertyName = "Путь к директории",
-                    Error = "Путь к директории не может быть пустым"
-                });
-            }
-
-            // Проверка обязательного поля "Маска файла"
-            if (string.IsNullOrWhiteSpace(this.Prop_FilePattern))
-            {
-                ret.Items.Add(new ValidationResult.ValidationItem()
-                {
-                    PropertyName = "Маска файла",
-                    Error = "Маска файла не может быть пустой"
-                });
-            }
-
-            // Проверка обязательного поля "Таймаут"
-            if (string.IsNullOrWhiteSpace(this.Prop_Timeout))
-            {
-                ret.Items.Add(new ValidationResult.ValidationItem()
-                {
-                    PropertyName = "Таймаут (сек)",
-                    Error = "Таймаут должен быть указан"
-                });
-            }
-
-            // Проверка обязательного поля "Интервал проверки"
-            if (string.IsNullOrWhiteSpace(this.Prop_CheckInterval))
-            {
-                ret.Items.Add(new ValidationResult.ValidationItem()
-                {
-                    PropertyName = "Интервал проверки (мс)",
-                    Error = "Интервал проверки должен быть указан"
-                });
-            }
-
-            // Проверка обязательного поля "Время стабильности"
-            if (string.IsNullOrWhiteSpace(this.Prop_StabilityTimeout))
-            {
-                ret.Items.Add(new ValidationResult.ValidationItem()
-                {
-                    PropertyName = "Время стабильности (мс)",
-                    Error = "Время стабильности должно быть указано"
-                });
-            }
-
-            // Проверка обязательных boolean полей
-            if (string.IsNullOrWhiteSpace(this.Prop_WaitForStability))
-            {
-                ret.Items.Add(new ValidationResult.ValidationItem()
-                {
-                    PropertyName = "Ожидать завершения записи",
-                    Error = "Значение должно быть указано"
-                });
-            }
-
-            if (string.IsNullOrWhiteSpace(this.Prop_UseWildcard))
-            {
-                ret.Items.Add(new ValidationResult.ValidationItem()
-                {
-                    PropertyName = "Использовать wildcard",
-                    Error = "Значение должно быть указано"
-                });
-            }
-
-            if (string.IsNullOrWhiteSpace(this.Prop_UseRegex))
-            {
-                ret.Items.Add(new ValidationResult.ValidationItem()
-                {
-                    PropertyName = "Использовать regex",
-                    Error = "Значение должно быть указано"
-                });
-            }
-
-            if (string.IsNullOrWhiteSpace(this.Prop_ThrowOnTimeout))
-            {
-                ret.Items.Add(new ValidationResult.ValidationItem()
-                {
-                    PropertyName = "Ошибка при таймауте",
-                    Error = "Значение должно быть указано"
-                });
-            }
+            // Проверка обязательных полей
+            ValidateField(ret, this.Prop_DirectoryPath, "Путь к директории", "Путь к директории не может быть пустым");
+            ValidateField(ret, this.Prop_FilePattern, "Маска файла", "Маска файла не может быть пустой");
+            ValidateField(ret, this.Prop_Timeout, "Таймаут (сек)", "Таймаут должен быть указан");
+            ValidateField(ret, this.Prop_CheckInterval, "Интервал проверки (мс)", "Интервал проверки должен быть указан");
+            ValidateField(ret, this.Prop_StabilityTimeout, "Время стабильности (мс)", "Время стабильности должно быть указано");
 
             return ret;
+        }
+
+        /// <summary>
+        /// Вспомогательный метод для валидации поля
+        /// </summary>
+        private void ValidateField(ValidationResult result, string value, string fieldName, string errorMessage)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                result.Items.Add(new ValidationResult.ValidationItem()
+                {
+                    PropertyName = fieldName,
+                    Error = errorMessage
+                });
+            }
         }
     }
 }
