@@ -90,6 +90,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="doc\WaitForFileBack.md" />
     <None Include="packages.config" />
     <None Include="Primo.MIA.nuspec" />
   </ItemGroup>
