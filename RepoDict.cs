@@ -30,7 +30,7 @@ namespace Primo.MIA
             TableDict = new Dictionary<string, DataTable>();
             StringListDict = new Dictionary<string, List<string>>();
             SecDict = new Dictionary<string, SecureString>();
-            AuthDict = new Dictionary<string, (SecureString login, SecureString password)>();
+            CredDict = new Dictionary<string, (string login, SecureString password)>();
             ObjectDict = new Dictionary<string, object>();
             JsonDict = new Dictionary<string, JToken>();
 
@@ -97,7 +97,7 @@ namespace Primo.MIA
         /// <summary>
         /// Словарь для учетных данных.
         /// </summary>
-        public static Dictionary<string, (SecureString login, SecureString password)> AuthDict { get; private set; }
+        public static Dictionary<string, (string login, SecureString password)> CredDict { get; private set; }
 
         /// <summary>
         /// Универсальный словарь для хранения произвольных объектов.

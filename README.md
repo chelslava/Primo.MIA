@@ -62,6 +62,19 @@ DataTable table = JsonHelpers.JTokenToDataTable(token);
 ### 3. `JTokenToDictionary`
 Преобразует JToken в словарь string-object.
 
+```json
+{
+  "name": "John",
+  "age": 30,
+  "isStudent": false,
+  "hobbies": ["reading", "gaming", "swimming"],
+  "address": {
+    "city": "New York",
+    "zip": "10001"
+  }
+}
+```
+
 **Параметры:**
 - `token` - JToken для конвертации
 
