@@ -63,6 +63,9 @@
     <Reference Include="LTools.SDK">
       <HintPath>C:\Program Files\Primo\Primo Studio Community x64\LTools.SDK.dll</HintPath>
     </Reference>
+    <Reference Include="LTools.Workflow">
+      <HintPath>C:\Program Files\Primo\Primo Studio Community x64\LTools.Workflow.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>packages\Newtonsoft.Json.13.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -80,7 +83,11 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="LogMessageBack.cs" />
     <Compile Include="SearchFilesBack.cs" />
+    <Compile Include="LogMessage.xaml.cs">
+      <DependentUpon>LogMessage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="WaitForFile.xaml.cs">
       <DependentUpon>WaitForFile.xaml</DependentUpon>
     </Compile>
@@ -94,6 +101,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="doc\LogMessage.md" />
     <None Include="doc\SearchFilesBack.md" />
     <None Include="doc\WaitForFileBack.md" />
     <None Include="packages.config" />
@@ -103,6 +111,10 @@
     <Content Include="images\sample.png" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="LogMessage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="WaitForFile.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
