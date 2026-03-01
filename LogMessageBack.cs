@@ -13,114 +13,6 @@ using static LTools.Common.Helpers.WFHelper.PropertiesItem;
 namespace Primo.MIA
 {
     /// <summary>
-    /// Уровень логирования
-    /// </summary>
-    public enum LogLevel
-    {
-        /// <summary>
-        /// Отладочная информация
-        /// </summary>
-        Debug,
-
-        /// <summary>
-        /// Информационное сообщение
-        /// </summary>
-        Info,
-
-        /// <summary>
-        /// Предупреждение
-        /// </summary>
-        Warning,
-
-        /// <summary>
-        /// Ошибка
-        /// </summary>
-        Error,
-
-        /// <summary>
-        /// Критическая ошибка
-        /// </summary>
-        Critical
-    }
-    /// <summary>
-    /// Режим вывода логов
-    /// </summary>
-    public enum LogOutputMode
-    {
-        /// <summary>
-        /// Только в файл
-        /// </summary>
-        FileOnly,
-
-        /// <summary>
-        /// Только в консоль
-        /// </summary>
-        ConsoleOnly,
-
-        /// <summary>
-        /// В файл и консоль одновременно
-        /// </summary>
-        FileAndConsole
-    }
-
-    /// <summary>
-    /// Стратегия ротации файлов логов
-    /// </summary>
-    public enum LogRotationStrategy
-    {
-        /// <summary>
-        /// Без ротации - весь лог в один файл
-        /// </summary>
-        None,
-
-        /// <summary>
-        /// Новый файл каждый день
-        /// </summary>
-        Daily,
-
-        /// <summary>
-        /// Новый файл каждый час
-        /// </summary>
-        Hourly,
-
-        /// <summary>
-        /// Новый файл при превышении размера
-        /// </summary>
-        BySize
-    }
-
-    /// <summary>
-    /// Шаблон имени файла лога
-    /// </summary>
-    public enum LogFileNameTemplate
-    {
-        /// <summary>
-        /// Фиксированное имя (app.log)
-        /// </summary>
-        Fixed,
-
-        /// <summary>
-        /// С датой (app_2025-02-15.log)
-        /// </summary>
-        WithDate,
-
-        /// <summary>
-        /// С датой и временем (app_2025-02-15_14-30.log)
-        /// </summary>
-        WithDateTime,
-
-        /// <summary>
-        /// С timestamp (app_20250215143045.log)
-        /// </summary>
-        WithTimestamp,
-
-        /// <summary>
-        /// Пользовательский формат
-        /// </summary>
-        Custom
-    }
-
-    /// <summary>
     /// Активность для логирования сообщений с расширенным функционалом:
     /// - Настраиваемые уровни логирования (Debug, Info, Warning, Error, Critical)
     /// - Гибкий вывод: файл, консоль или оба варианта
@@ -135,7 +27,7 @@ namespace Primo.MIA
         /// <summary>
         /// Имя группы компонента
         /// </summary>
-        private const string CGroupName = "MIA";
+        private const string CGroupName = "MIA" + WFPublishedElementBase.TREE_SEPARATOR + "Утилиты";
 
         /// <summary>
         /// Имя группы компонента
@@ -409,7 +301,8 @@ Custom – пользовательский паттерн (по умолчан�
 Выходные данные
 Путь к файлу лога: [String] Фактический полный путь к файлу, в который была произведена запись (с учётом ротации).
 Форматированное сообщение: [String] Итоговое сообщение после применения формата (с временем и уровнем, если они включены).";
-            sdkComponentIcon = "pack://application:,,/Primo.SDKSample;component/Images/sample.png";
+
+            sdkComponentIcon = "pack://application:,,,/Primo.MIA;component/images/sample.png";
 
             sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {

@@ -11,43 +11,6 @@ using static LTools.Common.Helpers.WFHelper.PropertiesItem;
 namespace Primo.MIA
 {
     /// <summary>
-    /// Тип поиска файлов
-    /// </summary>
-    public enum SearchType
-    {
-        /// <summary>
-        /// Поиск только файлов
-        /// </summary>
-        FilesOnly,
-
-        /// <summary>
-        /// Поиск только папок
-        /// </summary>
-        FoldersOnly,
-
-        /// <summary>
-        /// Поиск файлов и папок
-        /// </summary>
-        FilesAndFolders
-    }
-
-    /// <summary>
-    /// Тип фильтрации при поиске
-    /// </summary>
-    public enum SearchFilterType
-    {
-        /// <summary>
-        /// Wildcard фильтрация (*, ?)
-        /// </summary>
-        Wildcard,
-
-        /// <summary>
-        /// Regex фильтрация
-        /// </summary>
-        Regex
-    }
-
-    /// <summary>
     /// Активность для поиска файлов и папок в директории с защитой по таймауту:
     /// - Поддержка wildcard и regex фильтрации
     /// - Рекурсивный поиск в подпапках
@@ -60,7 +23,7 @@ namespace Primo.MIA
         /// <summary>
         /// Имя группы компонента
         /// </summary>
-        private const string CGroupName = "MIA";
+        private const string CGroupName = "MIA" + WFPublishedElementBase.TREE_SEPARATOR + "Утилиты";
 
         /// <summary>
         /// Имя группы компонента
@@ -241,7 +204,8 @@ FilesAndFolders - Искать и файлы, и папки одновремен
 Выходные данные:
 Найденные элементы: [List<String>] Список полных путей к найденным файлам и/или папкам, отсортированный по имени в алфавитном порядке. Папки имеют \ в конце пути.
 Количество элементов: [Int32] Общее количество найденных элементов (файлов и/или папок)";
-            sdkComponentIcon = "pack://application:,,/Primo.SDKSample;component/Images/sample.png";
+
+            sdkComponentIcon = "pack://application:,,/Primo.MIA;component/images/sample.png";
 
             sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {

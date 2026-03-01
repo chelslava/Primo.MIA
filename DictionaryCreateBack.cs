@@ -173,7 +173,7 @@ namespace Primo.MIA
                 "Количество элементов   — размер результата\n" +
                 "Пропущено дублей       — кол-во пропущенных дублей (только Invert)";
 
-            sdkComponentIcon = "pack://application:,,/Primo.SDKSample;component/Images/sample.png";
+            sdkComponentIcon = "pack://application:,,,/Primo.MIA;component/images/dict.png";
 
             sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {

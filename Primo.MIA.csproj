@@ -86,11 +86,24 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DictionaryConvertBack.cs" />
-    <Compile Include="DictionaryConvert.xaml.cs">
-      <DependentUpon>DictionaryConvert.xaml</DependentUpon>
+    <Compile Include="DictionaryContainsValue.xaml.cs">
+      <DependentUpon>DictionaryContainsValue.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DictionaryContainsKeyBack.cs" />
+    <Compile Include="DictionaryContainsValueBack.cs" />
+    <Compile Include="DictionaryGetInfo.xaml.cs">
+      <DependentUpon>DictionaryGetInfo.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DictionaryFromString.xaml.cs">
+      <DependentUpon>DictionaryFromString.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DictionaryGetInfoBack.cs" />
+    <Compile Include="DictionaryToStringBack.cs" />
+    <Compile Include="DictionaryToString.xaml.cs">
+      <DependentUpon>DictionaryToString.xaml</DependentUpon>
     </Compile>
     <Compile Include="DictionaryCreateBack.cs" />
+    <Compile Include="DictionaryFromStringBack.cs" />
     <Compile Include="DictionaryGetValue.xaml.cs">
       <DependentUpon>DictionaryGetValue.xaml</DependentUpon>
     </Compile>
@@ -118,12 +131,14 @@
     <Compile Include="LogMessage.xaml.cs">
       <DependentUpon>LogMessage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="TomlReadMode.cs" />
     <Compile Include="ReadTomlConfig.xaml.cs">
       <DependentUpon>ReadTomlConfig.xaml</DependentUpon>
     </Compile>
     <Compile Include="DictionarySetValue.xaml.cs">
       <DependentUpon>DictionarySetValue.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DictionaryContainsKey.xaml.cs">
+      <DependentUpon>DictionaryContainsKey.xaml</DependentUpon>
     </Compile>
     <Compile Include="WaitForFile.xaml.cs">
       <DependentUpon>WaitForFile.xaml</DependentUpon>
@@ -132,12 +147,22 @@
       <DependentUpon>SearchFiles.xaml</DependentUpon>
     </Compile>
     <Compile Include="WaitForFileBack.cs" />
-    <Compile Include="Config.cs" />
-    <Compile Include="JsonHelpers.cs" />
     <Compile Include="RepoDict.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="doc\Dictionary\00_INDEX.md" />
+    <None Include="doc\Dictionary\01_DictionaryCreate.md" />
+    <None Include="doc\Dictionary\02_DictionaryFilter.md" />
+    <None Include="doc\Dictionary\03_DictionaryFromString.md" />
+    <None Include="doc\Dictionary\04_DictionaryMerge.md" />
+    <None Include="doc\Dictionary\05_DictionaryContainsKey.md" />
+    <None Include="doc\Dictionary\06_DictionaryContainsValue.md" />
+    <None Include="doc\Dictionary\07_DictionaryGetInfo.md" />
+    <None Include="doc\Dictionary\08_DictionaryGetValue.md" />
+    <None Include="doc\Dictionary\09_DictionarySetValue.md" />
+    <None Include="doc\Dictionary\10_DictionaryRemoveKey.md" />
+    <None Include="doc\Dictionary\11_DictionaryToString.md" />
     <None Include="doc\LogMessage.md" />
     <None Include="doc\ReadTomlConfig.md" />
     <None Include="doc\SearchFilesBack.md" />
@@ -146,10 +171,27 @@
     <None Include="Primo.MIA.nuspec" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="images\sample.png" />
+    <Resource Include="images\dict.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="images\sample.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
   </ItemGroup>
   <ItemGroup>
-    <Page Include="DictionaryConvert.xaml">
+    <Page Include="DictionaryContainsValue.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="DictionaryGetInfo.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="DictionaryFromString.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="DictionaryToString.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -185,6 +227,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="DictionaryContainsKey.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="WaitForFile.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -193,6 +239,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="images\config.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

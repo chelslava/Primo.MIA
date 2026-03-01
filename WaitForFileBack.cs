@@ -14,43 +14,6 @@ using static LTools.Common.Helpers.WFHelper.PropertiesItem;
 namespace Primo.MIA
 {
     /// <summary>
-    /// Режим работы активности
-    /// </summary>
-    public enum WaitFileMode
-    {
-        /// <summary>
-        /// Ожидать появления нового файла (которого не было при запуске)
-        /// </summary>
-        WaitForNewFile,
-
-        /// <summary>
-        /// Ожидать файл независимо от того, был он или нет
-        /// </summary>
-        WaitForAnyFile
-    }
-
-    /// <summary>
-    /// Тип фильтрации файлов
-    /// </summary>
-    public enum FileFilterType
-    {
-        /// <summary>
-        /// Точное совпадение имени файла
-        /// </summary>
-        Exact,
-
-        /// <summary>
-        /// Wildcard фильтрация (*, ?)
-        /// </summary>
-        Wildcard,
-
-        /// <summary>
-        /// Regex фильтрация
-        /// </summary>
-        Regex
-    }
-
-    /// <summary>
     /// Активность для ожидания появления файла в директории:
     /// - Два режима: ожидание нового файла или любого файла по маске
     /// - Три типа фильтрации: точное совпадение, wildcard, regex
@@ -62,7 +25,8 @@ namespace Primo.MIA
         /// <summary>
         /// Имя группы компонента
         /// </summary>
-        private const string CGroupName = "MIA";
+        private const string CGroupName = "MIA" + WFPublishedElementBase.TREE_SEPARATOR + "Утилиты";
+
 
         /// <summary>
         /// Имя группы компонента
@@ -311,7 +275,8 @@ Regex - Использование регулярных выражений. На
 Имя файла: [String] Имя найденного файла без пути (например: report_20250215.xlsx). Пустая строка, если файл не найден
 Размер файла (байт): [Int64] Размер найденного файла в байтах. 0, если файл не найден
 Время ожидания (мс): [Int64] Фактическое время ожидания в миллисекундах";
-            sdkComponentIcon = "pack://application:,,/Primo.SDKSample;component/Images/sample.png";
+
+            sdkComponentIcon = "pack://application:,,,/Primo.MIA;component/images/sample.png";
 
             sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {

@@ -134,7 +134,7 @@ namespace Primo.MIA
                 "  Значение    — найденное значение или DefaultValue\n" +
                 "  Ключ найден — bool флаг результата поиска";
 
-            sdkComponentIcon = "pack://application:,,/Primo.SDKSample;component/Images/sample.png";
+            sdkComponentIcon = "pack://application:,,,/Primo.MIA;component/images/dict.png";
 
             sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {

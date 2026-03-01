@@ -121,7 +121,7 @@ namespace Primo.MIA
                 "  Результирующий словарь    — копия с изменённым ключом\n" +
                 "  Обновление (не добавление) — true если ключ уже существовал";
 
-            sdkComponentIcon = "pack://application:,,/Primo.SDKSample;component/Images/sample.png";
+            sdkComponentIcon = "pack://application:,,,/Primo.MIA;component/images/dict.png";
 
             sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {

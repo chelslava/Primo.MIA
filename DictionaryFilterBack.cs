@@ -1,9 +1,20 @@
 // =============================================================================
 // DictionaryFilter.cs — активность «Словарь: Фильтровать».
 //
-// Режимы (DictionaryFilterMode):
-//   ByKeys  — оставить только пары с ключами из List<string>
-//   ByValue — оставить только пары где значение содержит подстроку
+// Логика фильтрации разделена на два независимых параметра:
+//
+//   DictionaryFilterTarget (где искать):
+//     Keys        — искать/проверять по ключам словаря
+//     Values      — искать/проверять по значениям словаря
+//     KeysAndValues — совпадение в ключе ИЛИ в значении
+//
+//   DictionaryFilterMethod (как искать):
+//     Contains    — содержит подстроку
+//     Exact       — точное совпадение
+//     Regex       — регулярное выражение
+//     Wildcard    — wildcard-паттерн (* и ?)
+//
+//   Prop_CaseSensitive — регистронезависимость, работает для всех методов.
 //
 // Всегда возвращает новый словарь — оригинал не изменяется.
 // =============================================================================
@@ -15,39 +26,28 @@ using LTools.SDK;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using static LTools.Common.Helpers.WFHelper.PropertiesItem;
 
 namespace Primo.MIA
 {
     /// <summary>
     /// Активность «Словарь: Фильтровать».
-    /// Возвращает новый словарь содержащий только отфильтрованные пары.
-    /// Оригинальный словарь не изменяется.
+    /// Фильтрует Dictionary&lt;string, string&gt; по заданному условию.
+    /// Параметр Target определяет где искать (ключи / значения / оба).
+    /// Параметр Method определяет как искать (подстрока / точно / regex / wildcard).
+    /// Оригинальный словарь не изменяется — всегда возвращается новый.
     /// </summary>
     public class DictionaryFilterBack : PrimoComponentTO<DictionaryFilter>
     {
         private const string CGroupName = "MIA" + WFPublishedElementBase.TREE_SEPARATOR + "Словари";
         public override string GroupName { get => CGroupName; protected set { } }
 
-        protected override int sdkTimeOut
-        {
-            get => 10000;
-            set { }
-        }
+        protected override int sdkTimeOut { get => 10000; set { } }
 
         // =========================================================================
         // INPUT PROPERTIES
         // =========================================================================
-
-        private DictionaryFilterMode _mode = DictionaryFilterMode.ByKeys;
-        /// <summary>Режим фильтрации: по ключам или по подстроке в значениях</summary>
-        [LTools.Common.Model.Serialization.StoringProperty]
-        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Режим фильтрации")]
-        public DictionaryFilterMode Mode
-        {
-            get => _mode;
-            set { _mode = value; InvokePropertyChanged(this, "Mode"); }
-        }
 
         private string _propDictionary;
         /// <summary>Входной словарь Dictionary&lt;string, string&gt; для фильтрации</summary>
@@ -60,41 +60,48 @@ namespace Primo.MIA
             set { _propDictionary = value; InvokePropertyChanged(this, "Prop_Dictionary"); }
         }
 
-        private string _propKeysList;
+        private string _propQuery;
         /// <summary>
-        /// Список ключей которые нужно оставить (режим ByKeys).
-        /// Ключи из списка которых нет в словаре — игнорируются.
-        /// </summary>
-        [LTools.Common.Model.Serialization.StoringProperty]
-        [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(List<string>))]
-        [System.ComponentModel.Category("По ключам"), System.ComponentModel.DisplayName("Список ключей")]
-        public string Prop_KeysList
-        {
-            get => _propKeysList;
-            set { _propKeysList = value; InvokePropertyChanged(this, "Prop_KeysList"); }
-        }
-
-        private string _propSubstring;
-        /// <summary>
-        /// Подстрока для поиска в значениях (режим ByValue).
-        /// Оставляются только пары где значение содержит эту подстроку.
+        /// Строка-запрос: подстрока, точная строка, regex-паттерн или wildcard-паттерн.
+        /// Интерпретация зависит от выбранного метода поиска (Prop_Method).
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
-        [System.ComponentModel.Category("По значению"), System.ComponentModel.DisplayName("Подстрока поиска")]
-        public string Prop_Substring
+        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Строка поиска / паттерн")]
+        public string Prop_Query
         {
-            get => _propSubstring;
-            set { _propSubstring = value; InvokePropertyChanged(this, "Prop_Substring"); }
+            get => _propQuery;
+            set { _propQuery = value; InvokePropertyChanged(this, "Prop_Query"); }
+        }
+
+        private DictionaryFilterTarget _target = DictionaryFilterTarget.Values;
+        /// <summary>Где искать: Keys / Values / KeysAndValues</summary>
+        [LTools.Common.Model.Serialization.StoringProperty]
+        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Где искать")]
+        public DictionaryFilterTarget Prop_Target
+        {
+            get => _target;
+            set { _target = value; InvokePropertyChanged(this, "Prop_Target"); }
+        }
+
+        private DictionaryFilterMethod _method = DictionaryFilterMethod.Contains;
+        /// <summary>Метод поиска: Contains / Exact / Regex / Wildcard</summary>
+        [LTools.Common.Model.Serialization.StoringProperty]
+        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Метод поиска")]
+        public DictionaryFilterMethod Prop_Method
+        {
+            get => _method;
+            set { _method = value; InvokePropertyChanged(this, "Prop_Method"); }
         }
 
         private bool _caseSensitive = false;
         /// <summary>
-        /// Учитывать регистр при поиске подстроки (режим ByValue).
-        /// По умолчанию false — "Hello" содержит "hello".
+        /// Учитывать регистр при сравнении.
+        /// Работает для всех методов поиска и для обоих полей (ключ и значение).
+        /// По умолчанию false — поиск без учёта регистра.
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
-        [System.ComponentModel.Category("По значению"), System.ComponentModel.DisplayName("Учитывать регистр")]
+        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Учитывать регистр")]
         public bool Prop_CaseSensitive
         {
             get => _caseSensitive;
@@ -128,7 +135,7 @@ namespace Primo.MIA
         }
 
         private string _propFilteredOutCount;
-        /// <summary>Количество элементов отсеянных фильтром (не прошедших условие)</summary>
+        /// <summary>Количество элементов отсеянных фильтром</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
         [System.ComponentModel.Category("Выходные данные"), System.ComponentModel.DisplayName("Отсеяно фильтром")]
@@ -146,29 +153,27 @@ namespace Primo.MIA
         {
             sdkComponentName = "Словарь: Фильтровать";
             sdkComponentHelp =
-                "Фильтрует Dictionary<string, string> — возвращает новый словарь\n" +
-                "содержащий только элементы прошедшие условие фильтра.\n" +
-                "Оригинальный словарь не изменяется.\n\n" +
-                "── Режимы ──────────────────────────────────────────────\n" +
-                "ByKeys  — оставить только ключи из List<string>\n" +
-                "          Ключи из списка которых нет в словаре игнорируются.\n" +
-                "ByValue — оставить пары где значение содержит подстроку\n" +
-                "          Поддерживает настройку регистрозависимости.\n\n" +
-                "── Выходные параметры ──────────────────────────────────\n" +
-                "Результирующий словарь — элементы прошедшие фильтр\n" +
-                "Прошло фильтр          — количество элементов в результате\n" +
-                "Отсеяно фильтром       — количество пропущенных элементов";
+                "Фильтрует Dictionary<string, string>.\n" +
+                "Параметры независимы — любая комбинация Target + Method допустима.\n\n" +
+                "── Где искать (Target) ──────────────────────────────────────\n" +
+                "Keys         — условие применяется к ключам\n" +
+                "Values       — условие применяется к значениям\n" +
+                "KeysAndValues — пара проходит если условие выполнено для ключа ИЛИ значения\n\n" +
+                "── Метод поиска (Method) ────────────────────────────────────\n" +
+                "Contains — строка содержит подстроку\n" +
+                "Exact    — строка равна запросу полностью\n" +
+                "Regex    — строка соответствует регулярному выражению\n" +
+                "           Пример: ^\\d{4}-\\d{2}-\\d{2}$\n" +
+                "Wildcard — строка соответствует wildcard-паттерну\n" +
+                "           * = любое кол-во символов, ? = один символ\n" +
+                "           Пример: order_*_2024 или user_?@domain.com\n\n" +
+                "── Регистр ──────────────────────────────────────────────────\n" +
+                "Учитывать регистр — работает для всех методов и полей.";
 
-            sdkComponentIcon = "pack://application:,,/Primo.SDKSample;component/Images/sample.png";
+            sdkComponentIcon = "pack://application:,,,/Primo.MIA;component/images/dict.png";
 
             sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Mode", PropertyType = PropertyTypes.OBJECT,
-                    EditorType = ScriptEditorTypes.NONE, DataType = typeof(DictionaryFilterMode),
-                    ToolTip = "Режим фильтрации: ByKeys (по ключам) / ByValue (по подстроке)", IsReadOnly = false
-                },
                 new LTools.Common.Helpers.WFHelper.PropertiesItem()
                 {
                     PropName = "Prop_Dictionary", PropertyType = PropertyTypes.SCRIPT,
@@ -177,15 +182,27 @@ namespace Primo.MIA
                 },
                 new LTools.Common.Helpers.WFHelper.PropertiesItem()
                 {
-                    PropName = "Prop_KeysList", PropertyType = PropertyTypes.SCRIPT,
-                    EditorType = ScriptEditorTypes.NONE, DataType = typeof(List<string>),
-                    ToolTip = "Список ключей которые нужно оставить (режим ByKeys)", IsReadOnly = false
+                    PropName = "Prop_Query", PropertyType = PropertyTypes.SCRIPT,
+                    EditorType = ScriptEditorTypes.NONE, DataType = typeof(string),
+                    ToolTip = "Подстрока, точная строка, regex или wildcard — зависит от Метода поиска", IsReadOnly = false
                 },
                 new LTools.Common.Helpers.WFHelper.PropertiesItem()
                 {
-                    PropName = "Prop_Substring", PropertyType = PropertyTypes.SCRIPT,
-                    EditorType = ScriptEditorTypes.NONE, DataType = typeof(string),
-                    ToolTip = "Подстрока для поиска в значениях (режим ByValue)", IsReadOnly = false
+                    PropName = "Prop_Target", PropertyType = PropertyTypes.OBJECT,
+                    EditorType = ScriptEditorTypes.NONE, DataType = typeof(DictionaryFilterTarget),
+                    ToolTip = "Где искать: Keys / Values / KeysAndValues", IsReadOnly = false
+                },
+                new LTools.Common.Helpers.WFHelper.PropertiesItem()
+                {
+                    PropName = "Prop_Method", PropertyType = PropertyTypes.OBJECT,
+                    EditorType = ScriptEditorTypes.NONE, DataType = typeof(DictionaryFilterMethod),
+                    ToolTip = "Метод поиска: Contains / Exact / Regex / Wildcard", IsReadOnly = false
+                },
+                new LTools.Common.Helpers.WFHelper.PropertiesItem()
+                {
+                    PropName = "Prop_CaseSensitive", PropertyType = PropertyTypes.OBJECT,
+                    EditorType = ScriptEditorTypes.NONE, DataType = typeof(bool),
+                    ToolTip = "Учитывать регистр (применяется ко всем методам)", IsReadOnly = false
                 },
                 new LTools.Common.Helpers.WFHelper.PropertiesItem()
                 {
@@ -218,32 +235,29 @@ namespace Primo.MIA
         {
             try
             {
-                var    dict      = GetPropertyValue<Dictionary<string, string>>(this.Prop_Dictionary, "Prop_Dictionary", sd);
-                var    keysList  = GetPropertyValue<List<string>>(this.Prop_KeysList,  "Prop_KeysList",  sd);
-                string substring = GetPropertyValue<string>(this.Prop_Substring, "Prop_Substring", sd);
+                var dict = GetPropertyValue<Dictionary<string, string>>(this.Prop_Dictionary, "Prop_Dictionary", sd);
+                string query = GetPropertyValue<string>(this.Prop_Query, "Prop_Query", sd);
 
                 if (dict == null)
                     throw new ArgumentNullException("Prop_Dictionary", "Словарь не может быть null");
 
-                Dictionary<string, string> result;
+                if (query == null)
+                    throw new ArgumentNullException("Prop_Query", "Строка поиска не может быть null");
 
-                switch (this.Mode)
-                {
-                    case DictionaryFilterMode.ByKeys:
-                        result = ExecuteFilterByKeys(dict, keysList);
-                        break;
-                    case DictionaryFilterMode.ByValue:
-                        result = ExecuteFilterByValue(dict, substring ?? string.Empty);
-                        break;
-                    default:
-                        throw new InvalidOperationException($"Неизвестный режим: {this.Mode}");
-                }
+                // Строим предикат "как проверять одну строку" из выбранного метода
+                Func<string, bool> matchFunc = BuildMatchFunction(query);
+
+                // Применяем предикат к нужному полю пары согласно Target
+                var result = dict
+                    .Where(p => ApplyTarget(p, matchFunc))
+                    .ToDictionary(p => p.Key, p => p.Value);
 
                 int filteredOut = dict.Count - result.Count;
 
-                SetVariableValue(this.Prop_ResultDictionary, result,      sd);
-                SetVariableValue(this.Prop_Count,            result.Count, sd);
-                SetVariableValue(this.Prop_FilteredOutCount, filteredOut,  sd);
+                // Записываем выходные переменные
+                SetVariableValue(this.Prop_ResultDictionary, result, sd);
+                SetVariableValue(this.Prop_Count, result.Count, sd);
+                SetVariableValue(this.Prop_FilteredOutCount, filteredOut, sd);
 
                 return new ExecutionResult
                 {
@@ -253,47 +267,161 @@ namespace Primo.MIA
             }
             catch (Exception ex)
             {
-                return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Ошибка фильтрации: {ex.Message}" };
+                return new ExecutionResult
+                {
+                    IsSuccess = false,
+                    ErrorMessage = $"Ошибка фильтрации: {ex.Message}"
+                };
             }
         }
 
         // =========================================================================
-        // РЕАЛИЗАЦИЯ РЕЖИМОВ
+        // ПОСТРОЕНИЕ ПРЕДИКАТА МЕТОДА ПОИСКА
         // =========================================================================
 
         /// <summary>
-        /// ByKeys — оставить только пары с ключами из списка.
-        /// HashSet обеспечивает O(1) поиск при большом списке ключей.
+        /// Фабрика предикатов: по выбранному Prop_Method возвращает функцию
+        /// bool(string) которая проверяет соответствует ли переданная строка условию.
+        /// Все варианты учитывают флаг Prop_CaseSensitive.
         /// </summary>
-        private Dictionary<string, string> ExecuteFilterByKeys(
-            Dictionary<string, string> dict, List<string> keysList)
+        private Func<string, bool> BuildMatchFunction(string query)
         {
-            if (keysList == null)
-                throw new ArgumentNullException("Prop_KeysList", "Список ключей не может быть null для режима ByKeys");
+            switch (this.Prop_Method)
+            {
+                case DictionaryFilterMethod.Contains:
+                    return BuildContainsFunc(query);
 
-            // HashSet для O(1) поиска вместо O(n) у List
-            var allowedKeys = new HashSet<string>(keysList);
+                case DictionaryFilterMethod.Exact:
+                    return BuildExactFunc(query);
 
-            return dict
-                .Where(p => allowedKeys.Contains(p.Key))
-                .ToDictionary(p => p.Key, p => p.Value);
+                case DictionaryFilterMethod.Regex:
+                    return BuildRegexFunc(query);
+
+                case DictionaryFilterMethod.Wildcard:
+                    return BuildWildcardFunc(query);
+
+                default:
+                    throw new InvalidOperationException($"Неизвестный метод поиска: {this.Prop_Method}");
+            }
         }
 
         /// <summary>
-        /// ByValue — оставить только пары где значение содержит подстроку.
-        /// StringComparison определяет регистрозависимость поиска.
+        /// Contains — строка содержит подстроку query.
+        /// Использует IndexOf с нужным StringComparison для учёта регистра.
         /// </summary>
-        private Dictionary<string, string> ExecuteFilterByValue(
-            Dictionary<string, string> dict, string substring)
+        private Func<string, bool> BuildContainsFunc(string query)
         {
-            StringComparison comparison = this.Prop_CaseSensitive
+            StringComparison cmp = this.Prop_CaseSensitive
                 ? StringComparison.Ordinal
                 : StringComparison.OrdinalIgnoreCase;
 
-            return dict
-                .Where(p => p.Value != null
-                         && p.Value.IndexOf(substring, comparison) >= 0)
-                .ToDictionary(p => p.Key, p => p.Value);
+            // Null-безопасно: если проверяемая строка null — не проходит фильтр
+            return s => s != null && s.IndexOf(query, cmp) >= 0;
+        }
+
+        /// <summary>
+        /// Exact — строка полностью равна query.
+        /// Использует StringComparer для учёта регистра.
+        /// </summary>
+        private Func<string, bool> BuildExactFunc(string query)
+        {
+            StringComparison cmp = this.Prop_CaseSensitive
+                ? StringComparison.Ordinal
+                : StringComparison.OrdinalIgnoreCase;
+
+            return s => s != null && string.Equals(s, query, cmp);
+        }
+
+        /// <summary>
+        /// Regex — строка соответствует регулярному выражению.
+        /// Паттерн компилируется один раз через RegexOptions.Compiled.
+        /// Проверяет полное совпадение (^ ... $) чтобы поведение было предсказуемым.
+        /// Для частичного поиска пользователь может убрать якоря из своего паттерна.
+        /// </summary>
+        private Func<string, bool> BuildRegexFunc(string query)
+        {
+            if (string.IsNullOrEmpty(query))
+                throw new ArgumentException(
+                    "Regex-паттерн не может быть пустым", "Prop_Query");
+
+            var options = RegexOptions.Compiled;
+            if (!this.Prop_CaseSensitive)
+                options |= RegexOptions.IgnoreCase;
+
+            Regex regex;
+            try
+            {
+                regex = new Regex(query, options);
+            }
+            catch (ArgumentException ex)
+            {
+                throw new ArgumentException(
+                    $"Некорректный regex-паттерн '{query}': {ex.Message}", "Prop_Query", ex);
+            }
+
+            return s => s != null && regex.IsMatch(s);
+        }
+
+        /// <summary>
+        /// Wildcard — строка соответствует wildcard-паттерну.
+        /// Символы паттерна:
+        ///   * — любое количество любых символов (включая пустую строку)
+        ///   ? — ровно один любой символ
+        /// Реализация: wildcard транслируется в regex через Select + Regex.Escape.
+        /// Добавляются якоря ^ и $ — сопоставление всегда полное.
+        /// </summary>
+        private Func<string, bool> BuildWildcardFunc(string query)
+        {
+            if (string.IsNullOrEmpty(query))
+                throw new ArgumentException(
+                    "Wildcard-паттерн не может быть пустым", "Prop_Query");
+
+            // Транслируем каждый символ wildcard в эквивалент regex:
+            //   * → .*   (любое кол-во любых символов)
+            //   ? → .    (ровно один любой символ)
+            //   всё остальное → Regex.Escape (спецсимволы экранируются)
+            string regexPattern = "^"
+                + string.Concat(
+                    query.Select(c =>
+                        c == '*' ? ".*"
+                      : c == '?' ? "."
+                      : Regex.Escape(c.ToString())))
+                + "$";
+
+            var options = RegexOptions.Compiled;
+            if (!this.Prop_CaseSensitive)
+                options |= RegexOptions.IgnoreCase;
+
+            var regex = new Regex(regexPattern, options);
+            return s => s != null && regex.IsMatch(s);
+        }
+
+        // =========================================================================
+        // ПРИМЕНЕНИЕ ЦЕЛИ ПОИСКА (Target)
+        // =========================================================================
+
+        /// <summary>
+        /// Применяет предикат matchFunc к нужному полю пары согласно Prop_Target:
+        ///   Keys         — проверяет только ключ
+        ///   Values       — проверяет только значение
+        ///   KeysAndValues — проверяет ключ ИЛИ значение (достаточно одного совпадения)
+        /// </summary>
+        private bool ApplyTarget(KeyValuePair<string, string> pair, Func<string, bool> matchFunc)
+        {
+            switch (this.Prop_Target)
+            {
+                case DictionaryFilterTarget.Keys:
+                    return matchFunc(pair.Key);
+
+                case DictionaryFilterTarget.Values:
+                    return matchFunc(pair.Value);
+
+                case DictionaryFilterTarget.KeysAndValues:
+                    return matchFunc(pair.Key) || matchFunc(pair.Value);
+
+                default:
+                    throw new InvalidOperationException($"Неизвестная цель поиска: {this.Prop_Target}");
+            }
         }
 
         // =========================================================================
@@ -303,23 +431,52 @@ namespace Primo.MIA
         public override ValidationResult Validate()
         {
             var ret = new ValidationResult();
-            ValidateField(ret, this.Prop_Dictionary, "Словарь", "Словарь обязателен");
 
-            if (this.Mode == DictionaryFilterMode.ByKeys)
-                ValidateField(ret, this.Prop_KeysList, "Список ключей",
-                    "Список ключей обязателен для режима ByKeys");
+            // Входной словарь обязателен всегда
+            ValidateField(ret, this.Prop_Dictionary,
+                "Словарь", "Словарь обязателен");
 
-            if (this.Mode == DictionaryFilterMode.ByValue)
-                ValidateField(ret, this.Prop_Substring, "Подстрока поиска",
-                    "Подстрока обязательна для режима ByValue");
+            // Строка запроса обязательна всегда
+            ValidateField(ret, this.Prop_Query,
+                "Строка поиска / паттерн", "Строка поиска не может быть пустой");
+
+            // Для Regex дополнительно проверяем синтаксис прямо в валидаторе формы
+            if (this.Prop_Method == DictionaryFilterMethod.Regex
+                && !string.IsNullOrWhiteSpace(this.Prop_Query))
+            {
+                ValidateRegexSyntax(ret, this.Prop_Query);
+            }
 
             return ret;
         }
 
-        private void ValidateField(ValidationResult result, string value, string fieldName, string errorMessage)
+        /// <summary>Проверяет корректность regex-синтаксиса на этапе валидации формы</summary>
+        private void ValidateRegexSyntax(ValidationResult result, string pattern)
+        {
+            try
+            {
+                _ = new Regex(pattern);
+            }
+            catch (ArgumentException ex)
+            {
+                result.Items.Add(new ValidationResult.ValidationItem()
+                {
+                    PropertyName = "Строка поиска / паттерн",
+                    Error = $"Некорректный regex: {ex.Message}"
+                });
+            }
+        }
+
+        /// <summary>Добавляет ошибку валидации если поле пустое или null</summary>
+        private void ValidateField(ValidationResult result, string value,
+            string fieldName, string errorMessage)
         {
             if (string.IsNullOrWhiteSpace(value))
-                result.Items.Add(new ValidationResult.ValidationItem() { PropertyName = fieldName, Error = errorMessage });
+                result.Items.Add(new ValidationResult.ValidationItem()
+                {
+                    PropertyName = fieldName,
+                    Error = errorMessage
+                });
         }
     }
 }

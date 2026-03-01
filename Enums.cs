@@ -125,20 +125,217 @@ namespace Primo.MIA
     }
 
     /// <summary>
-    /// Режим фильтрации словаря
+    /// Режим работы активности
     /// </summary>
-    public enum DictionaryFilterMode
+    public enum WaitFileMode
     {
         /// <summary>
-        /// Оставить только пары у которых ключ входит в переданный List&lt;string&gt;.
-        /// Ключи из списка, которых нет в словаре, игнорируются.
+        /// Ожидать появления нового файла (которого не было при запуске)
         /// </summary>
-        ByKeys,
+        WaitForNewFile,
 
         /// <summary>
-        /// Оставить только пары у которых значение содержит указанную подстроку.
-        /// Поддерживает регистрозависимый и регистронезависимый поиск.
+        /// Ожидать файл независимо от того, был он или нет
         /// </summary>
-        ByValue
+        WaitForAnyFile
+    }
+
+    /// <summary>
+    /// Тип фильтрации файлов
+    /// </summary>
+    public enum FileFilterType
+    {
+        /// <summary>
+        /// Точное совпадение имени файла
+        /// </summary>
+        Exact,
+
+        /// <summary>
+        /// Wildcard фильтрация (*, ?)
+        /// </summary>
+        Wildcard,
+
+        /// <summary>
+        /// Regex фильтрация
+        /// </summary>
+        Regex
+    }
+
+    /// <summary>
+    /// Тип поиска файлов
+    /// </summary>
+    public enum SearchType
+    {
+        /// <summary>
+        /// Поиск только файлов
+        /// </summary>
+        FilesOnly,
+
+        /// <summary>
+        /// Поиск только папок
+        /// </summary>
+        FoldersOnly,
+
+        /// <summary>
+        /// Поиск файлов и папок
+        /// </summary>
+        FilesAndFolders
+    }
+
+    /// <summary>
+    /// Тип фильтрации при поиске
+    /// </summary>
+    public enum SearchFilterType
+    {
+        /// <summary>
+        /// Wildcard фильтрация (*, ?)
+        /// </summary>
+        Wildcard,
+
+        /// <summary>
+        /// Regex фильтрация
+        /// </summary>
+        Regex
+    }
+
+    /// <summary>
+    /// Уровень логирования
+    /// </summary>
+    public enum LogLevel
+    {
+        /// <summary>
+        /// Отладочная информация
+        /// </summary>
+        Debug,
+
+        /// <summary>
+        /// Информационное сообщение
+        /// </summary>
+        Info,
+
+        /// <summary>
+        /// Предупреждение
+        /// </summary>
+        Warning,
+
+        /// <summary>
+        /// Ошибка
+        /// </summary>
+        Error,
+
+        /// <summary>
+        /// Критическая ошибка
+        /// </summary>
+        Critical
+    }
+    /// <summary>
+    /// Режим вывода логов
+    /// </summary>
+    public enum LogOutputMode
+    {
+        /// <summary>
+        /// Только в файл
+        /// </summary>
+        FileOnly,
+
+        /// <summary>
+        /// Только в консоль
+        /// </summary>
+        ConsoleOnly,
+
+        /// <summary>
+        /// В файл и консоль одновременно
+        /// </summary>
+        FileAndConsole
+    }
+
+    /// <summary>
+    /// Стратегия ротации файлов логов
+    /// </summary>
+    public enum LogRotationStrategy
+    {
+        /// <summary>
+        /// Без ротации - весь лог в один файл
+        /// </summary>
+        None,
+
+        /// <summary>
+        /// Новый файл каждый день
+        /// </summary>
+        Daily,
+
+        /// <summary>
+        /// Новый файл каждый час
+        /// </summary>
+        Hourly,
+
+        /// <summary>
+        /// Новый файл при превышении размера
+        /// </summary>
+        BySize
+    }
+
+    /// <summary>
+    /// Шаблон имени файла лога
+    /// </summary>
+    public enum LogFileNameTemplate
+    {
+        /// <summary>
+        /// Фиксированное имя (app.log)
+        /// </summary>
+        Fixed,
+
+        /// <summary>
+        /// С датой (app_2025-02-15.log)
+        /// </summary>
+        WithDate,
+
+        /// <summary>
+        /// С датой и временем (app_2025-02-15_14-30.log)
+        /// </summary>
+        WithDateTime,
+
+        /// <summary>
+        /// С timestamp (app_20250215143045.log)
+        /// </summary>
+        WithTimestamp,
+
+        /// <summary>
+        /// Пользовательский формат
+        /// </summary>
+        Custom
+    }
+
+    /// <summary>
+    /// Где искать: в ключах, значениях или и там и там.
+    /// </summary>
+    public enum DictionaryFilterTarget
+    {
+        /// <summary>Применять условие к ключам словаря</summary>
+        Keys,
+
+        /// <summary>Применять условие к значениям словаря</summary>
+        Values,
+
+        /// <summary>Оставить пару если условие выполняется хотя бы для ключа ИЛИ значения</summary>
+        KeysAndValues
+    }
+
+    /// <summary>
+    /// Как искать: подстрока, точное совпадение, regex или wildcard.
+    /// </summary>
+    public enum DictionaryFilterMethod
+    {
+        /// <summary>Содержит подстроку (аналог String.Contains)</summary>
+        Contains,
+
+        /// <summary>Точное совпадение всей строки</summary>
+        Exact,
+
+        /// <summary>Регулярное выражение</summary>
+        Regex,
+
+        /// <summary>Wildcard-паттерн (* — любое кол-во символов, ? — один символ)</summary>
+        Wildcard
     }
 }

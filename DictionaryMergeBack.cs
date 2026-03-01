@@ -149,7 +149,7 @@ namespace Primo.MIA
                 "Были конфликты ключей  — bool: были ли совпадающие ключи\n" +
                 "Конфликтующие ключи    — List<string> с именами конфликтных ключей";
 
-            sdkComponentIcon = "pack://application:,,/Primo.SDKSample;component/Images/sample.png";
+            sdkComponentIcon = "pack://application:,,,/Primo.MIA;component/images/dict.png";
 
             sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {

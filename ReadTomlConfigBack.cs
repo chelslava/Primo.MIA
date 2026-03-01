@@ -48,15 +48,21 @@ namespace Primo.MIA
     ///   FullFileToDictionary — весь файл → плоский словарь
     ///   ReadProfile        — мёрж профилей окружений
     /// </summary>
-    public class ReadTomlConfigBack : PrimoComponentSimple<ReadTomlConfig>
+    public class ReadTomlConfigBack : PrimoComponentTO<ReadTomlConfig>
     {
-        private const string CGroupName = "MIA";
+        private const string CGroupName = "MIA" + WFPublishedElementBase.TREE_SEPARATOR + "Утилиты";
 
         /// <inheritdoc/>
         public override string GroupName
         {
             get => CGroupName;
             protected set { }
+        }
+
+        protected override int sdkTimeOut
+        {
+            get => 10000;
+            set { }
         }
 
         // =========================================================================
@@ -314,7 +320,7 @@ ReadProfile         — мёрж [default] + [production/staging/...]
 ── NuGet зависимость ───────────────────────────────────
 <PackageReference Include=""Tomlyn"" Version=""0.10.1"" />";
 
-            sdkComponentIcon = "pack://application:,,/Primo.SDKSample;component/Images/sample.png";
+            sdkComponentIcon = "pack://application:,,,/Primo.MIA;component/images/config.png";
 
             sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
@@ -433,7 +439,7 @@ ReadProfile         — мёрж [default] + [production/staging/...]
         /// <summary>
         /// Основное действие — читает TOML-файл согласно выбранному режиму
         /// </summary>
-        public override ExecutionResult SimpleAction(ScriptingData sd)
+        public override ExecutionResult TimedAction(ScriptingData sd)
         {
             try
             {

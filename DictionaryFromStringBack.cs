@@ -1,20 +1,5 @@
-// =============================================================================
-// DictionaryConvert.cs — две активности конвертации словарей:
-//
-//   DictionaryToStringBack   — «Словарь: В строку»
-//     Сериализует Dictionary<string, string> в строку вида "key1=val1;key2=val2".
-//     Разделители пар и разделитель ключ-значение настраиваются.
-//
-//   DictionaryFromStringBack — «Словарь: Из строки»
-//     Десериализует строку вида "key1=val1;key2=val2" в Dictionary<string, string>.
-//     Разделители пар и разделитель ключ-значение настраиваются.
-//     Пустые и некорректные пары пропускаются.
-//     При дублирующихся ключах — побеждает последнее значение.
-// =============================================================================
-
 using LTools.Common.Model;
 using LTools.Common.UIElements;
-using LTools.Enums;
 using LTools.SDK;
 using System;
 using System.Collections.Generic;
@@ -23,16 +8,15 @@ using static LTools.Common.Helpers.WFHelper.PropertiesItem;
 
 namespace Primo.MIA
 {
-    // =========================================================================
-    // АКТИВНОСТЬ 1: DictionaryToString — Словарь: В строку
-    // =========================================================================
-
     /// <summary>
-    /// Активность «Словарь: В строку».
-    /// Сериализует Dictionary&lt;string, string&gt; в строку вида "key1=val1;key2=val2".
-    /// Разделители настраиваются. Ключи сортируются алфавитно для стабильного вывода.
+    /// Активность «Словарь: Из строки».
+    /// Десериализует строку вида "key1=val1;key2=val2" в Dictionary&lt;string, string&gt;.
+    /// Разделители настраиваются.
+    /// Пустые и некорректные пары пропускаются с подсчётом.
+    /// При дублирующихся ключах — побеждает последнее значение.
+    /// Значение может содержать разделитель "=" — Split выполняется с лимитом 2 части.
     /// </summary>
-    public class DictionaryToStringBack : PrimoComponentTO<DictionaryConvert>
+    public class DictionaryFromStringBack : PrimoComponentTO<DictionaryFromString>
     {
         private const string CGroupName = "MIA" + WFPublishedElementBase.TREE_SEPARATOR + "Словари";
         public override string GroupName { get => CGroupName; protected set { } }
@@ -42,211 +26,6 @@ namespace Primo.MIA
             get => 10000;
             set { }
         }
-
-        // =========================================================================
-        // INPUT PROPERTIES
-        // =========================================================================
-
-        private string _propDictionary;
-        /// <summary>Словарь Dictionary&lt;string, string&gt; для сериализации в строку</summary>
-        [LTools.Common.Model.Serialization.StoringProperty]
-        [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(Dictionary<string, string>))]
-        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Словарь")]
-        public string Prop_Dictionary
-        {
-            get => _propDictionary;
-            set { _propDictionary = value; InvokePropertyChanged(this, "Prop_Dictionary"); }
-        }
-
-        private string _propPairSeparator;
-        /// <summary>
-        /// Разделитель между парами ключ-значение.
-        /// По умолчанию ";" → "key1=val1;key2=val2".
-        /// </summary>
-        [LTools.Common.Model.Serialization.StoringProperty]
-        [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
-        [System.ComponentModel.Category("Разделители"), System.ComponentModel.DisplayName("Разделитель пар")]
-        public string Prop_PairSeparator
-        {
-            get => _propPairSeparator;
-            set { _propPairSeparator = value; InvokePropertyChanged(this, "Prop_PairSeparator"); }
-        }
-
-        private string _propKeyValueSeparator;
-        /// <summary>
-        /// Разделитель между ключом и значением внутри пары.
-        /// По умолчанию "=" → "key=value".
-        /// </summary>
-        [LTools.Common.Model.Serialization.StoringProperty]
-        [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
-        [System.ComponentModel.Category("Разделители"), System.ComponentModel.DisplayName("Разделитель ключ-значение")]
-        public string Prop_KeyValueSeparator
-        {
-            get => _propKeyValueSeparator;
-            set { _propKeyValueSeparator = value; InvokePropertyChanged(this, "Prop_KeyValueSeparator"); }
-        }
-
-        // =========================================================================
-        // OUTPUT PROPERTIES
-        // =========================================================================
-
-        private string _propResult;
-        /// <summary>
-        /// Результирующая строка.
-        /// Формат: "key1=val1;key2=val2" (с настроенными разделителями).
-        /// Ключи отсортированы алфавитно для стабильного и предсказуемого вывода.
-        /// </summary>
-        [LTools.Common.Model.Serialization.StoringProperty]
-        [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
-        [System.ComponentModel.Category("Выходные данные"), System.ComponentModel.DisplayName("Результирующая строка")]
-        public string Prop_Result
-        {
-            get => _propResult;
-            set { _propResult = value; InvokePropertyChanged(this, "Prop_Result"); }
-        }
-
-        private string _propCount;
-        /// <summary>Количество пар вошедших в строку (равно размеру словаря)</summary>
-        [LTools.Common.Model.Serialization.StoringProperty]
-        [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
-        [System.ComponentModel.Category("Выходные данные"), System.ComponentModel.DisplayName("Количество пар")]
-        public string Prop_Count
-        {
-            get => _propCount;
-            set { _propCount = value; InvokePropertyChanged(this, "Prop_Count"); }
-        }
-
-        // =========================================================================
-        // КОНСТРУКТОР
-        // =========================================================================
-
-        public DictionaryToStringBack(IWFContainer container) : base(container)
-        {
-            sdkComponentName = "Словарь: В строку";
-            sdkComponentHelp =
-                "Сериализует Dictionary<string, string> в строку.\n" +
-                "Формат по умолчанию: \"key1=val1;key2=val2\"\n" +
-                "Ключи сортируются алфавитно для стабильного вывода.\n\n" +
-                "── Параметры ────────────────────────────────────────────\n" +
-                "Словарь*                  — входной Dictionary<string, string>\n" +
-                "Разделитель пар           — между парами (по умолчанию \";\")\n" +
-                "Разделитель ключ-значение — внутри пары (по умолчанию \"=\")\n\n" +
-                "── Выходные параметры ──────────────────────────────────\n" +
-                "Результирующая строка — сериализованный словарь\n" +
-                "Количество пар        — размер словаря\n\n" +
-                "── Примеры форматов ─────────────────────────────────────\n" +
-                "Пары=\";\", КЗ=\"=\"  → \"host=localhost;port=5432\"\n" +
-                "Пары=\"|\", КЗ=\":\" → \"host:localhost|port:5432\"\n" +
-                "Пары=\"\\n\", КЗ=\"=\" → многострочный формат";
-
-            sdkComponentIcon = "pack://application:,,/Primo.SDKSample;component/Images/sample.png";
-
-            sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
-            {
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_Dictionary", PropertyType = PropertyTypes.SCRIPT,
-                    EditorType = ScriptEditorTypes.NONE, DataType = typeof(Dictionary<string, string>),
-                    ToolTip = "Словарь Dictionary<string, string> для сериализации", IsReadOnly = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_PairSeparator", PropertyType = PropertyTypes.SCRIPT,
-                    EditorType = ScriptEditorTypes.NONE, DataType = typeof(string),
-                    ToolTip = "Разделитель между парами ключ-значение (по умолчанию \";\")", IsReadOnly = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_KeyValueSeparator", PropertyType = PropertyTypes.SCRIPT,
-                    EditorType = ScriptEditorTypes.NONE, DataType = typeof(string),
-                    ToolTip = "Разделитель между ключом и значением (по умолчанию \"=\")", IsReadOnly = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_Result", PropertyType = PropertyTypes.VARIABLE,
-                    EditorType = ScriptEditorTypes.NONE, DataType = typeof(string),
-                    ToolTip = "Результирующая строка в формате key1=val1;key2=val2", IsReadOnly = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_Count", PropertyType = PropertyTypes.VARIABLE,
-                    EditorType = ScriptEditorTypes.NONE, DataType = typeof(int),
-                    ToolTip = "Количество пар в строке", IsReadOnly = false
-                }
-            };
-
-            InitClass(container);
-            this.Prop_PairSeparator      = "\";\"";
-            this.Prop_KeyValueSeparator  = "\"=\"";
-        }
-
-        // =========================================================================
-        // ОСНОВНОЕ ДЕЙСТВИЕ
-        // =========================================================================
-
-        public override ExecutionResult TimedAction(ScriptingData sd)
-        {
-            try
-            {
-                var    dict    = GetPropertyValue<Dictionary<string, string>>(this.Prop_Dictionary,      "Prop_Dictionary",      sd);
-                string pairSep = GetPropertyValue<string>(this.Prop_PairSeparator,      "Prop_PairSeparator",      sd);
-                string kvSep   = GetPropertyValue<string>(this.Prop_KeyValueSeparator,  "Prop_KeyValueSeparator",  sd);
-
-                if (dict == null)
-                    throw new ArgumentNullException("Prop_Dictionary", "Словарь не может быть null");
-
-                // Нормализация разделителей
-                if (string.IsNullOrEmpty(pairSep)) pairSep = ";";
-                if (string.IsNullOrEmpty(kvSep))   kvSep   = "=";
-
-                // Сортируем по ключу для стабильного воспроизводимого вывода
-                // Каждую пару форматируем через Select, объединяем через string.Join
-                string result = string.Join(
-                    pairSep,
-                    dict.OrderBy(p => p.Key)
-                        .Select(p => $"{p.Key}{kvSep}{p.Value}")
-                );
-
-                SetVariableValue(this.Prop_Result, result,      sd);
-                SetVariableValue(this.Prop_Count,  dict.Count,  sd);
-
-                return new ExecutionResult { IsSuccess = true, SuccessMessage = $"Словарь сериализован: {dict.Count} пар" };
-            }
-            catch (Exception ex)
-            {
-                return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Ошибка сериализации: {ex.Message}" };
-            }
-        }
-
-        // =========================================================================
-        // ВАЛИДАЦИЯ
-        // =========================================================================
-
-        public override ValidationResult Validate()
-        {
-            var ret = new ValidationResult();
-            if (string.IsNullOrWhiteSpace(this.Prop_Dictionary))
-                ret.Items.Add(new ValidationResult.ValidationItem() { PropertyName = "Словарь", Error = "Словарь обязателен" });
-            return ret;
-        }
-    }
-
-    // =========================================================================
-    // АКТИВНОСТЬ 2: DictionaryFromString — Словарь: Из строки
-    // =========================================================================
-
-    /// <summary>
-    /// Активность «Словарь: Из строки».
-    /// Десериализует строку вида "key1=val1;key2=val2" в Dictionary&lt;string, string&gt;.
-    /// Разделители настраиваются.
-    /// Пустые и некорректные пары пропускаются с подсчётом.
-    /// При дублирующихся ключах — побеждает последнее значение.
-    /// Значение может содержать разделитель "=" — Split выполняется с лимитом 2 части.
-    /// </summary>
-    public class DictionaryFromStringBack : PrimoComponentSimple<LogMessage>
-    {
-        private const string CGroupName = "MIA";
-        public override string GroupName { get => CGroupName; protected set { } }
 
         // =========================================================================
         // INPUT PROPERTIES
@@ -373,7 +152,7 @@ namespace Primo.MIA
                 "Разобрано пар          — успешно обработанных пар\n" +
                 "Пропущено пар          — пар с ошибками/пустых";
 
-            sdkComponentIcon = "pack://application:,,/Primo.SDKSample;component/Images/sample.png";
+            sdkComponentIcon = "pack://application:,,,/Primo.MIA;component/images/dict.png";
 
             sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
@@ -424,7 +203,7 @@ namespace Primo.MIA
         // ОСНОВНОЕ ДЕЙСТВИЕ
         // =========================================================================
 
-        public override ExecutionResult SimpleAction(ScriptingData sd)
+        public override ExecutionResult TimedAction(ScriptingData sd)
         {
             try
             {
