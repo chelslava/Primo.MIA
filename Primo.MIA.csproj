@@ -86,6 +86,31 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DictionaryConvertBack.cs" />
+    <Compile Include="DictionaryConvert.xaml.cs">
+      <DependentUpon>DictionaryConvert.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DictionaryCreateBack.cs" />
+    <Compile Include="DictionaryGetValue.xaml.cs">
+      <DependentUpon>DictionaryGetValue.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DictionaryFilterBack.cs" />
+    <Compile Include="DictionaryGetValueBack.cs" />
+    <Compile Include="DictionaryFilter.xaml.cs">
+      <DependentUpon>DictionaryFilter.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DictionaryMergeBack.cs" />
+    <Compile Include="DictionaryMerge.xaml.cs">
+      <DependentUpon>DictionaryMerge.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DictionaryCreate.xaml.cs">
+      <DependentUpon>DictionaryCreate.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DictionaryOperationsSmallBack.cs" />
+    <Compile Include="DictionaryOperationsSmall.xaml.cs">
+      <DependentUpon>DictionaryOperationsSmall.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DictionarySetValueBack.cs" />
     <Compile Include="Enums.cs" />
     <Compile Include="ReadTomlConfigBack.cs" />
     <Compile Include="LogMessageBack.cs" />
@@ -96,6 +121,9 @@
     <Compile Include="TomlReadMode.cs" />
     <Compile Include="ReadTomlConfig.xaml.cs">
       <DependentUpon>ReadTomlConfig.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DictionarySetValue.xaml.cs">
+      <DependentUpon>DictionarySetValue.xaml</DependentUpon>
     </Compile>
     <Compile Include="WaitForFile.xaml.cs">
       <DependentUpon>WaitForFile.xaml</DependentUpon>
@@ -121,11 +149,39 @@
     <Content Include="images\sample.png" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="DictionaryConvert.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="DictionaryGetValue.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="DictionaryFilter.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="DictionaryMerge.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="DictionaryCreate.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="DictionaryOperationsSmall.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="LogMessage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="ReadTomlConfig.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="DictionarySetValue.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
