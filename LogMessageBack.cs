@@ -308,7 +308,7 @@ Custom – пользовательский паттерн (по умолчан�
 Путь к файлу лога: [String] Фактический полный путь к файлу, в который была произведена запись (с учётом ротации).
 Форматированное сообщение: [String] Итоговое сообщение после применения формата (с временем и уровнем, если они включены).";
 
-            sdkComponentIcon = "pack://application:,,,/Primo.MIA;component/images/sample.png";
+            sdkComponentIcon = "pack://application:,,,/Primo.MIA;component/images/log.png";
 
             sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
