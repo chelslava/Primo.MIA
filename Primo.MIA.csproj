@@ -86,45 +86,81 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DictionaryContainsValue.xaml.cs">
+    <Compile Include="Dictionary\DictionaryContainsValue.xaml.cs">
       <DependentUpon>DictionaryContainsValue.xaml</DependentUpon>
     </Compile>
-    <Compile Include="DictionaryContainsKeyBack.cs" />
-    <Compile Include="DictionaryContainsValueBack.cs" />
-    <Compile Include="DictionaryGetInfo.xaml.cs">
+    <Compile Include="Dictionary\DictionaryContainsKeyBack.cs" />
+    <Compile Include="Dictionary\DictionaryContainsValueBack.cs" />
+    <Compile Include="Dictionary\DictionaryGetInfo.xaml.cs">
       <DependentUpon>DictionaryGetInfo.xaml</DependentUpon>
     </Compile>
-    <Compile Include="DictionaryFromString.xaml.cs">
+    <Compile Include="Dictionary\DictionaryFromString.xaml.cs">
       <DependentUpon>DictionaryFromString.xaml</DependentUpon>
     </Compile>
-    <Compile Include="DictionaryGetInfoBack.cs" />
-    <Compile Include="DictionaryToStringBack.cs" />
-    <Compile Include="DictionaryToString.xaml.cs">
+    <Compile Include="Dictionary\DictionaryGetInfoBack.cs" />
+    <Compile Include="Dictionary\DictionaryToStringBack.cs" />
+    <Compile Include="Dictionary\DictionaryToString.xaml.cs">
       <DependentUpon>DictionaryToString.xaml</DependentUpon>
     </Compile>
-    <Compile Include="DictionaryCreateBack.cs" />
-    <Compile Include="DictionaryFromStringBack.cs" />
-    <Compile Include="DictionaryGetValue.xaml.cs">
+    <Compile Include="Dictionary\DictionaryCreateBack.cs" />
+    <Compile Include="Dictionary\DictionaryFromStringBack.cs" />
+    <Compile Include="Dictionary\DictionaryGetValue.xaml.cs">
       <DependentUpon>DictionaryGetValue.xaml</DependentUpon>
     </Compile>
-    <Compile Include="DictionaryFilterBack.cs" />
-    <Compile Include="DictionaryGetValueBack.cs" />
-    <Compile Include="DictionaryFilter.xaml.cs">
+    <Compile Include="Dictionary\DictionaryFilterBack.cs" />
+    <Compile Include="Dictionary\DictionaryGetValueBack.cs" />
+    <Compile Include="Dictionary\DictionaryFilter.xaml.cs">
       <DependentUpon>DictionaryFilter.xaml</DependentUpon>
     </Compile>
-    <Compile Include="DictionaryMergeBack.cs" />
-    <Compile Include="DictionaryMerge.xaml.cs">
+    <Compile Include="Dictionary\DictionaryMergeBack.cs" />
+    <Compile Include="Dictionary\DictionaryMerge.xaml.cs">
       <DependentUpon>DictionaryMerge.xaml</DependentUpon>
     </Compile>
-    <Compile Include="DictionaryCreate.xaml.cs">
+    <Compile Include="Dictionary\DictionaryCreate.xaml.cs">
       <DependentUpon>DictionaryCreate.xaml</DependentUpon>
     </Compile>
-    <Compile Include="DictionaryOperationsSmallBack.cs" />
-    <Compile Include="DictionaryOperationsSmall.xaml.cs">
+    <Compile Include="Dictionary\DictionaryOperationsSmallBack.cs" />
+    <Compile Include="Dictionary\DictionaryOperationsSmall.xaml.cs">
       <DependentUpon>DictionaryOperationsSmall.xaml</DependentUpon>
     </Compile>
-    <Compile Include="DictionarySetValueBack.cs" />
+    <Compile Include="Dictionary\DictionarySetValueBack.cs" />
     <Compile Include="Enums.cs" />
+    <Compile Include="List\ListGroup.xaml.cs">
+      <DependentUpon>ListGroup.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="List\ListTransform.xaml.cs">
+      <DependentUpon>ListTransform.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="List\ListSort.xaml.cs">
+      <DependentUpon>ListSort.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="List\ListSlice.xaml.cs">
+      <DependentUpon>ListSlice.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="List\ListSet.xaml.cs">
+      <DependentUpon>ListSet.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="List\ListInspect.xaml.cs">
+      <DependentUpon>ListInspect.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="List\ListFilter.xaml.cs">
+      <DependentUpon>ListFilter.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="List\ListConvert.xaml.cs">
+      <DependentUpon>ListConvert.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="List\ListAggregateBack.cs" />
+    <Compile Include="List\ListConvertBack.cs" />
+    <Compile Include="List\ListFilterBack.cs" />
+    <Compile Include="List\ListGroupBack.cs" />
+    <Compile Include="List\ListInspectBack.cs" />
+    <Compile Include="List\ListSetBack.cs" />
+    <Compile Include="List\ListSliceBack.cs" />
+    <Compile Include="List\ListSortBack.cs" />
+    <Compile Include="List\ListTransformBack.cs" />
+    <Compile Include="List\ListAggregate.xaml.cs">
+      <DependentUpon>ListAggregate.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ReadTomlConfigBack.cs" />
     <Compile Include="LogMessageBack.cs" />
     <Compile Include="SearchFilesBack.cs" />
@@ -134,10 +170,10 @@
     <Compile Include="ReadTomlConfig.xaml.cs">
       <DependentUpon>ReadTomlConfig.xaml</DependentUpon>
     </Compile>
-    <Compile Include="DictionarySetValue.xaml.cs">
+    <Compile Include="Dictionary\DictionarySetValue.xaml.cs">
       <DependentUpon>DictionarySetValue.xaml</DependentUpon>
     </Compile>
-    <Compile Include="DictionaryContainsKey.xaml.cs">
+    <Compile Include="Dictionary\DictionaryContainsKey.xaml.cs">
       <DependentUpon>DictionaryContainsKey.xaml</DependentUpon>
     </Compile>
     <Compile Include="WaitForFile.xaml.cs">
@@ -179,41 +215,77 @@
     </Resource>
   </ItemGroup>
   <ItemGroup>
-    <Page Include="DictionaryContainsValue.xaml">
+    <Page Include="Dictionary\DictionaryContainsValue.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="DictionaryGetInfo.xaml">
+    <Page Include="Dictionary\DictionaryGetInfo.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="DictionaryFromString.xaml">
+    <Page Include="Dictionary\DictionaryFromString.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="DictionaryToString.xaml">
+    <Page Include="Dictionary\DictionaryToString.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="DictionaryGetValue.xaml">
+    <Page Include="Dictionary\DictionaryGetValue.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="DictionaryFilter.xaml">
+    <Page Include="Dictionary\DictionaryFilter.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="DictionaryMerge.xaml">
+    <Page Include="Dictionary\DictionaryMerge.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="DictionaryCreate.xaml">
+    <Page Include="Dictionary\DictionaryCreate.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="DictionaryOperationsSmall.xaml">
+    <Page Include="Dictionary\DictionaryOperationsSmall.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="List\ListGroup.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="List\ListTransform.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="List\ListSort.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="List\ListSlice.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="List\ListSet.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="List\ListInspect.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="List\ListFilter.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="List\ListConvert.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="List\ListAggregate.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="LogMessage.xaml">
       <SubType>Designer</SubType>
@@ -223,11 +295,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="DictionarySetValue.xaml">
+    <Page Include="Dictionary\DictionarySetValue.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="DictionaryContainsKey.xaml">
+    <Page Include="Dictionary\DictionaryContainsKey.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -242,6 +314,16 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="images\config.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="images\list.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="images\file_search.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
   </ItemGroup>

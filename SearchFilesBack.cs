@@ -205,7 +205,7 @@ FilesAndFolders - Искать и файлы, и папки одновремен
 Найденные элементы: [List<String>] Список полных путей к найденным файлам и/или папкам, отсортированный по имени в алфавитном порядке. Папки имеют \ в конце пути.
 Количество элементов: [Int32] Общее количество найденных элементов (файлов и/или папок)";
 
-            sdkComponentIcon = "pack://application:,,/Primo.MIA;component/images/sample.png";
+            sdkComponentIcon = "pack://application:,,,/Primo.MIA;component/images/file_search.png";
 
             sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {

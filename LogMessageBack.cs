@@ -22,7 +22,7 @@ namespace Primo.MIA
     /// - Поддержка структурированного логирования
     /// - Thread-safe запись в файл
     /// </summary>
-    public class LogMessageBack : PrimoComponentSimple<LogMessage>
+    public class LogMessageBack : PrimoComponentTO<LogMessage>
     {
         /// <summary>
         /// Имя группы компонента
@@ -36,6 +36,12 @@ namespace Primo.MIA
         {
             get => CGroupName;
             protected set { }
+        }
+
+        protected override int sdkTimeOut
+        {
+            get => 10000;
+            set { }
         }
 
         // Статический объект для синхронизации записи в файл
@@ -450,7 +456,7 @@ Custom – пользовательский паттерн (по умолчан�
         /// <summary>
         /// Основное действие компонента
         /// </summary>
-        public override ExecutionResult SimpleAction(ScriptingData sd)
+        public override ExecutionResult TimedAction(ScriptingData sd)
         {
             try
             {
