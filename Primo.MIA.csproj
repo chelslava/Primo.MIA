@@ -86,8 +86,24 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="GeneratorsBack.cs" />
-    <Compile Include="ExcelCellRecalculateBack.cs" />
+    <Compile Include="Common\ActivityCategories.cs" />
+    <Compile Include="Common\ActivityIcons.cs" />
+    <Compile Include="Common\ActivityStrings.cs" />
+    <Compile Include="Common\FileHelper.cs" />
+    <Compile Include="Common\PropertyBuilder.cs" />
+    <Compile Include="Common\RegexHelper.cs" />
+    <Compile Include="Common\StringHelper.cs" />
+    <Compile Include="Common\ValidationHelper.cs" />
+    <Compile Include="Files\SearchFiles.xaml.cs">
+      <DependentUpon>SearchFiles.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Files\SearchFilesBack.cs" />
+    <Compile Include="Files\WaitForFile.xaml.cs">
+      <DependentUpon>WaitForFile.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Files\WaitForFileBack.cs" />
+    <Compile Include="Utilities\GeneratorsBack.cs" />
+    <Compile Include="Utilities\ExcelCellRecalculateBack.cs" />
     <Compile Include="Dictionary\DictionaryContainsValue.xaml.cs">
       <DependentUpon>DictionaryContainsValue.xaml</DependentUpon>
     </Compile>
@@ -163,19 +179,18 @@
     <Compile Include="List\ListAggregate.xaml.cs">
       <DependentUpon>ListAggregate.xaml</DependentUpon>
     </Compile>
-    <Compile Include="ReadTomlConfigBack.cs" />
-    <Compile Include="LogMessageBack.cs" />
-    <Compile Include="ExcelCellRecalculate.xaml.cs">
+    <Compile Include="Utilities\ReadTomlConfigBack.cs" />
+    <Compile Include="Utilities\LogMessageBack.cs" />
+    <Compile Include="Utilities\ExcelCellRecalculate.xaml.cs">
       <DependentUpon>ExcelCellRecalculate.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Generators.xaml.cs">
+    <Compile Include="Utilities\Generators.xaml.cs">
       <DependentUpon>Generators.xaml</DependentUpon>
     </Compile>
-    <Compile Include="SearchFilesBack.cs" />
-    <Compile Include="LogMessage.xaml.cs">
+    <Compile Include="Utilities\LogMessage.xaml.cs">
       <DependentUpon>LogMessage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="ReadTomlConfig.xaml.cs">
+    <Compile Include="Utilities\ReadTomlConfig.xaml.cs">
       <DependentUpon>ReadTomlConfig.xaml</DependentUpon>
     </Compile>
     <Compile Include="Dictionary\DictionarySetValue.xaml.cs">
@@ -221,13 +236,6 @@
     <Compile Include="Tuple\TupleUnzipBack.cs" />
     <Compile Include="Tuple\TupleZipBack.cs" />
     <Compile Include="Tuple\TupleSetBack.cs" />
-    <Compile Include="WaitForFile.xaml.cs">
-      <DependentUpon>WaitForFile.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="SearchFiles.xaml.cs">
-      <DependentUpon>SearchFiles.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="WaitForFileBack.cs" />
     <Compile Include="RepoDict.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -303,6 +311,14 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Files\SearchFiles.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Files\WaitForFile.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="List\ListGroup.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -339,11 +355,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="LogMessage.xaml">
+    <Page Include="Utilities\LogMessage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="ReadTomlConfig.xaml">
+    <Page Include="Utilities\ReadTomlConfig.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -355,11 +371,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="ExcelCellRecalculate.xaml">
+    <Page Include="Utilities\ExcelCellRecalculate.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Generators.xaml">
+    <Page Include="Utilities\Generators.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -399,14 +415,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="WaitForFile.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="SearchFiles.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
   </ItemGroup>
   <ItemGroup>
     <Resource Include="images\config.png">
@@ -445,6 +453,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="images\json.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Common\ActivityResources.resx" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

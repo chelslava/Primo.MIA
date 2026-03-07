@@ -1,6 +1,7 @@
 ﻿using LTools.Common.Model;
 using LTools.Common.UIElements;
 using LTools.SDK;
+using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -10,7 +11,7 @@ using static LTools.Common.Helpers.WFHelper.PropertiesItem;
 
 namespace Primo.MIA
 {
-    /// <summary>
+        /// <summary>
     /// Активность для поиска файлов и папок в директории с защитой по таймауту:
     /// - Поддержка wildcard и regex фильтрации
     /// - Рекурсивный поиск в подпапках
@@ -20,17 +21,9 @@ namespace Primo.MIA
     /// </summary>
     public class SearchFilesBack : PrimoComponentTO<SearchFiles>
     {
-        /// <summary>
-        /// Имя группы компонента
-        /// </summary>
-        private const string CGroupName = "MIA" + WFPublishedElementBase.TREE_SEPARATOR + "Утилиты";
-
-        /// <summary>
-        /// Имя группы компонента
-        /// </summary>
         public override string GroupName
         {
-            get => CGroupName;
+            get => ActivityCategories.Utilities;
             protected set { }
         }
 
@@ -42,7 +35,7 @@ namespace Primo.MIA
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
-        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Путь к директории")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_DirectoryPath)]
         public string Prop_DirectoryPath
         {
             get { return this.prop_DirectoryPath; }
@@ -54,7 +47,7 @@ namespace Primo.MIA
         /// Тип фильтрации
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
-        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Тип фильтрации")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_FilterType)]
         public SearchFilterType FilterType
         {
             get => this._filterType;
@@ -67,7 +60,7 @@ namespace Primo.MIA
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
-        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Паттерн поиска")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_SearchPattern)]
         public string Prop_Pattern
         {
             get { return this.prop_Pattern; }
@@ -79,7 +72,7 @@ namespace Primo.MIA
         /// Что искать: файлы, папки или оба типа
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
-        [System.ComponentModel.Category("Настройки"), System.ComponentModel.DisplayName("Что искать")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Settings), System.ComponentModel.DisplayName(ActivityStrings.Field_SearchType)]
         public SearchType SearchTypeValue
         {
             get => this._searchType;
@@ -91,7 +84,7 @@ namespace Primo.MIA
         /// Искать в подпапках (рекурсивно)
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
-        [System.ComponentModel.Category("Настройки"), System.ComponentModel.DisplayName("Искать в подпапках")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Settings), System.ComponentModel.DisplayName(ActivityStrings.Field_SearchInSubfolders)]
         public bool Prop_SearchInSubfolders
         {
             get { return this._searchInSubfolders; }
@@ -104,7 +97,7 @@ namespace Primo.MIA
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
-        [System.ComponentModel.Category("Настройки"), System.ComponentModel.DisplayName("Таймаут поиска (сек)")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Settings), System.ComponentModel.DisplayName(ActivityStrings.Field_SearchTimeout)]
         public string Prop_SearchTimeout
         {
             get { return this.prop_SearchTimeout; }
@@ -119,7 +112,7 @@ namespace Primo.MIA
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(List<string>))]
-        [System.ComponentModel.Category("Output"), System.ComponentModel.DisplayName("Найденные элементы")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_FoundItems)]
         public string Prop_FoundItems
         {
             get => prop_FoundItems;
@@ -136,7 +129,7 @@ namespace Primo.MIA
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
-        [System.ComponentModel.Category("Output"), System.ComponentModel.DisplayName("Количество элементов")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_ItemsCount)]
         public string Prop_ItemsCount
         {
             get => prop_ItemsCount;
@@ -180,7 +173,7 @@ namespace Primo.MIA
         /// </summary>
         public SearchFilesBack(IWFContainer container) : base(container)
         {
-            sdkComponentName = "Поиск файлов";
+            sdkComponentName = ActivityStrings.Activity_SearchFiles;
             sdkComponentHelp = @"Компонент ""Поиск файлов""
 Компонент для поиска файлов и папок в директории с поддержкой различных типов фильтрации и рекурсивного поиска.
 
@@ -205,11 +198,10 @@ FilesAndFolders - Искать и файлы, и папки одновремен
 Найденные элементы: [List<String>] Список полных путей к найденным файлам и/или папкам, отсортированный по имени в алфавитном порядке. Папки имеют \ в конце пути.
 Количество элементов: [Int32] Общее количество найденных элементов (файлов и/или папок)";
 
-            sdkComponentIcon = "pack://application:,,,/Primo.MIA;component/images/file_search.png";
+            sdkComponentIcon = ActivityIcons.FileSearch;
 
-            sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
+                        sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
-                // Путь к директории
                 new LTools.Common.Helpers.WFHelper.PropertiesItem()
                 {
                     PropName = "Prop_DirectoryPath",
@@ -219,75 +211,13 @@ FilesAndFolders - Искать и файлы, и папки одновремен
                     ToolTip = "Путь к директории для поиска файлов и папок",
                     IsReadOnly = false
                 },
-                // Тип фильтрации (enum)
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "FilterType",
-                    PropertyType = PropertyTypes.OBJECT,
-                    EditorType = ScriptEditorTypes.NONE,
-                    DataType = typeof(SearchFilterType),
-                    ToolTip = "Тип фильтрации: Wildcard (*.txt) или Regex паттерн",
-                    IsReadOnly = false
-                },
-                // Паттерн поиска
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_Pattern",
-                    PropertyType = PropertyTypes.SCRIPT,
-                    EditorType = ScriptEditorTypes.NONE,
-                    DataType = typeof(string),
-                    ToolTip = "Паттерн для поиска (wildcard: *.txt или regex: ^file_\\d{4}\\.txt$)",
-                    IsReadOnly = false
-                },
-                // Что искать (enum)
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "SearchTypeValue",
-                    PropertyType = PropertyTypes.OBJECT,
-                    EditorType = ScriptEditorTypes.NONE,
-                    DataType = typeof(SearchType),
-                    ToolTip = "Что искать: только файлы, только папки или оба типа",
-                    IsReadOnly = false
-                },
-                // Искать в подпапках
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_SearchInSubfolders",
-                    PropertyType = PropertyTypes.OBJECT,
-                    EditorType = ScriptEditorTypes.NONE,
-                    DataType = typeof(bool),
-                    ToolTip = "Если включено, выполняется рекурсивный поиск во всех вложенных директориях.",
-                    IsReadOnly = false
-                },
-                // Таймаут поиска
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_SearchTimeout",
-                    PropertyType = PropertyTypes.SCRIPT,
-                    EditorType = ScriptEditorTypes.NONE,
-                    DataType = typeof(int),
-                    ToolTip = "Максимальное время поиска в секундах (по умолчанию 60)",
-                    IsReadOnly = false
-                },
-                // Output свойства
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_FoundItems",
-                    PropertyType = PropertyTypes.VARIABLE,
-                    EditorType = ScriptEditorTypes.NONE,
-                    DataType = typeof(List<string>),
-                    ToolTip = "Список путей к найденным файлам и/или папкам",
-                    IsReadOnly = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_ItemsCount",
-                    PropertyType = PropertyTypes.VARIABLE,
-                    EditorType = ScriptEditorTypes.NONE,
-                    DataType = typeof(int),
-                    ToolTip = "Количество найденных элементов",
-                    IsReadOnly = false
-                }
+                PropertyBuilder.Enum<SearchFilterType>("FilterType", "Тип фильтрации: Wildcard (*.txt) или Regex паттерн"),
+                PropertyBuilder.String("Prop_Pattern", "Паттерн для поиска (wildcard: *.txt или regex: ^file_\\d{4}\\.txt$)"),
+                PropertyBuilder.Enum<SearchType>("SearchTypeValue", "Что искать: только файлы, только папки или оба типа"),
+                PropertyBuilder.Boolean("Prop_SearchInSubfolders", "Если включено, выполняется рекурсивный поиск во всех вложенных директориях."),
+                PropertyBuilder.Int("Prop_SearchTimeout", "Максимальное время поиска в секундах (по умолчанию 60)"),
+                PropertyBuilder.Variable<List<string>>("Prop_FoundItems", "Список путей к найденным файлам и/или папкам"),
+                PropertyBuilder.Variable<int>("Prop_ItemsCount", "Количество найденных элементов")
             };
 
             InitClass(container);
@@ -502,33 +432,12 @@ FilesAndFolders - Искать и файлы, и папки одновремен
         /// <summary>
         /// Проверка корректности введенных данных
         /// </summary>
-        public override ValidationResult Validate()
+                public override ValidationResult Validate()
         {
             ValidationResult ret = new ValidationResult();
-
-            // Проверка обязательных полей
-            ValidateField(ret, this.Prop_DirectoryPath, "Путь к директории",
-                "Путь к директории не может быть пустым");
-            ValidateField(ret, this.Prop_Pattern, "Паттерн поиска",
-                "Паттерн поиска не может быть пустым");
-
+            ret.ValidateRequired(this.Prop_DirectoryPath, ActivityStrings.Field_DirectoryPath, ActivityStrings.Error_DirectoryRequired);
+            ret.ValidateRequired(this.Prop_Pattern, ActivityStrings.Field_SearchPattern, ActivityStrings.Error_SearchPatternRequired);
             return ret;
-        }
-
-        /// <summary>
-        /// Вспомогательный метод для валидации поля
-        /// </summary>
-        private void ValidateField(ValidationResult result, string value,
-            string fieldName, string errorMessage)
-        {
-            if (string.IsNullOrWhiteSpace(value))
-            {
-                result.Items.Add(new ValidationResult.ValidationItem()
-                {
-                    PropertyName = fieldName,
-                    Error = errorMessage
-                });
-            }
         }
     }
 }

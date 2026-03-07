@@ -1,6 +1,7 @@
 ﻿using LTools.Common.Model;
 using LTools.Common.UIElements;
 using LTools.SDK;
+using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -819,33 +820,15 @@ Regex - Использование регулярных выражений. На
         /// <summary>
         /// Проверка корректности введенных данных
         /// </summary>
-        public override ValidationResult Validate()
+                public override ValidationResult Validate()
         {
             ValidationResult ret = new ValidationResult();
-
-            // Проверка обязательных полей
-            ValidateField(ret, this.Prop_DirectoryPath, "Путь к директории", "Путь к директории не может быть пустым");
-            ValidateField(ret, this.Prop_FilePattern, "Маска файла", "Маска файла не может быть пустой");
-            ValidateField(ret, this.Prop_Timeout, "Таймаут (сек)", "Таймаут должен быть указан");
-            ValidateField(ret, this.Prop_CheckInterval, "Интервал проверки (мс)", "Интервал проверки должен быть указан");
-            ValidateField(ret, this.Prop_StabilityTimeout, "Время стабильности (мс)", "Время стабильности должно быть указано");
-
+            ret.ValidateRequired(this.Prop_DirectoryPath, "Путь к директории", "Путь к директории не может быть пустым");
+            ret.ValidateRequired(this.Prop_FilePattern, "Маска файла", "Маска файла не может быть пустой");
+            ret.ValidateRequired(this.Prop_Timeout, "Таймаут (сек)", "Таймаут должен быть указан");
+            ret.ValidateRequired(this.Prop_CheckInterval, "Интервал проверки (мс)", "Интервал проверки должен быть указан");
+            ret.ValidateRequired(this.Prop_StabilityTimeout, "Время стабильности (мс)", "Время стабильности должно быть указано");
             return ret;
-        }
-
-        /// <summary>
-        /// Вспомогательный метод для валидации поля
-        /// </summary>
-        private void ValidateField(ValidationResult result, string value, string fieldName, string errorMessage)
-        {
-            if (string.IsNullOrWhiteSpace(value))
-            {
-                result.Items.Add(new ValidationResult.ValidationItem()
-                {
-                    PropertyName = fieldName,
-                    Error = errorMessage
-                });
-            }
         }
     }
 }
