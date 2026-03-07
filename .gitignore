@@ -42,11 +42,24 @@ Generated\ Files/
 # MSTest test Results
 [Tt]est[Rr]esult*/
 [Bb]uild[Ll]og.*
+TestResults/
 
 # NUnit
 *.VisualState.xml
 TestResult.xml
 nunit-*.xml
+
+# xUnit
+xunit-results.xml
+
+# Code Coverage
+coverage/
+CoverageReport/
+*.coverage
+*.coveragexml
+*.cobertura.xml
+*.opencover.xml
+*.lcov
 
 # Build Results of an ATL Project
 [Dd]ebugPS/
@@ -140,9 +153,7 @@ _TeamCity*
 .axoCover/*
 !.axoCover/settings.json
 
-# Visual Studio code coverage results
-*.coverage
-*.coveragexml
+# Visual Studio code coverage results (duplicates removed, see test section above)
 
 # NCrunch
 _NCrunch_*
@@ -350,3 +361,21 @@ FodyWeavers.xsd
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+
+# JetBrains Rider
+.idea/
+*.sln.iml
+*.sln.DotSettings
+
+# NuGet Packages
+*.nupkg
+*.snupkg
+**/packages/*
+!**/packages/build/
+*.nuget.props
+*.nuget.targets
+
+# Test Coverage Tools
+coveragereport/
+.coverage/
+*.trx

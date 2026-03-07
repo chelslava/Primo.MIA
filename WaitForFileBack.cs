@@ -276,7 +276,7 @@ Regex - Использование регулярных выражений. На
 Размер файла (байт): [Int64] Размер найденного файла в байтах. 0, если файл не найден
 Время ожидания (мс): [Int64] Фактическое время ожидания в миллисекундах";
 
-            sdkComponentIcon = "pack://application:,,,/Primo.MIA;component/images/sample.png";
+            sdkComponentIcon = "pack://application:,,,/Primo.MIA;component/images/sharp.png";
 
             sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {

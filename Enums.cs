@@ -521,4 +521,239 @@ namespace Primo.MIA
         RemoveNonAlpha
     }
 
+    /// <summary>
+    /// Тип генерируемого значения.
+    /// Определяет какой набор параметров будет использоваться.
+    /// </summary>
+    public enum GeneratorType
+    {
+        /// <summary>Генерация GUID (UUID) — глобально уникального идентификатора</summary>
+        Guid,
+        /// <summary>Генерация уникального имени файла с учётом уже существующих файлов</summary>
+        FileName,
+        /// <summary>Генерация случайного целого числа в заданном диапазоне</summary>
+        RandomNumber,
+        /// <summary>Форматирование текущей даты/времени в строку</summary>
+        Timestamp,
+        /// <summary>Последовательный счётчик с настраиваемым начальным значением и шагом</summary>
+        Counter,
+        /// <summary>Детерминированный хеш-идентификатор на основе SHA-256</summary>
+        HashId,
+        /// <summary>Формирование email-адреса из имени, фамилии и домена</summary>
+        Username,
+        /// <summary>Заполнение строки-шаблона значениями из словаря по ключам {key}</summary>
+        Template
+    }
+
+    /// <summary>
+    /// Формат строкового представления GUID.
+    /// Все форматы генерируют один и тот же GUID, отличается только его запись.
+    /// </summary>
+    public enum GuidFormat
+    {
+        /// <summary>
+        /// 32 шестнадцатеричных цифры без разделителей.
+        /// Пример: 00000000000000000000000000000000
+        /// </summary>
+        N,
+        /// <summary>
+        /// 32 цифры, разделённые дефисами (стандарт RFC 4122).
+        /// Пример: 00000000-0000-0000-0000-000000000000
+        /// </summary>
+        D,
+        /// <summary>
+        /// 32 цифры с дефисами в фигурных скобках.
+        /// Пример: {00000000-0000-0000-0000-000000000000}
+        /// </summary>
+        B,
+        /// <summary>
+        /// 32 цифры с дефисами в круглых скобках.
+        /// Пример: (00000000-0000-0000-0000-000000000000)
+        /// </summary>
+        P,
+        /// <summary>
+        /// Четыре шестнадцатеричных значения в фигурных скобках.
+        /// Пример: {0x00000000,0x0000,0x0000,{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00}}
+        /// </summary>
+        X
+    }
+
+    /// <summary>
+    /// Предустановленные форматы даты/времени для режима Timestamp.
+    /// При выборе Custom используется поле Prop_CustomTimestampFormat.
+    /// </summary>
+    public enum TimestampFormat
+    {
+        // ── Компактные форматы (для имён файлов и ID) ──────────────────────────
+
+        /// <summary>20250215_143045 — дата и время слитно, безопасно для имён файлов</summary>
+        yyyyMMdd_HHmmss,
+
+        /// <summary>20250215_1430 — дата и время до минут, для ежеминутных файлов</summary>
+        yyyyMMdd_HHmm,
+
+        /// <summary>20250215 — только дата слитно (для ежедневных файлов)</summary>
+        yyyyMMdd,
+
+        /// <summary>202502 — год и месяц (для ежемесячных файлов)</summary>
+        yyyyMM,
+
+        /// <summary>20250215143045123 — с миллисекундами, максимальная уникальность</summary>
+        yyyyMMddHHmmssfff,
+
+        // ── Форматы ISO 8601 (для баз данных и API) ────────────────────────────
+
+        /// <summary>2025-02-15 — дата ISO (стандарт для БД и API)</summary>
+        yyyy_MM_dd,
+
+        /// <summary>2025-02-15 14:30:45 — дата и время ISO без временной зоны</summary>
+        yyyy_MM_dd_HH_mm_ss,
+
+        /// <summary>2025-02-15T14:30:45 — дата и время ISO с разделителем T</summary>
+        ISO8601,
+
+        /// <summary>2025-02-15T14:30:45.123 — ISO с миллисекундами</summary>
+        ISO8601_ms,
+
+        // ── Русские и европейские форматы (для отчётов и документов) ──────────
+
+        /// <summary>15.02.2025 — российский формат ДД.ММ.ГГГГ</summary>
+        dd_MM_yyyy,
+
+        /// <summary>15.02.2025 14:30:45 — российский формат с временем</summary>
+        dd_MM_yyyy_HH_mm_ss,
+
+        /// <summary>15.02.2025 14:30 — российский формат до минут</summary>
+        dd_MM_yyyy_HH_mm,
+
+        /// <summary>15/02/2025 — европейский формат ДД/ММ/ГГГГ</summary>
+        dd_MM_yyyy_slash,
+
+        // ── Американский формат ────────────────────────────────────────────────
+
+        /// <summary>02/15/2025 — американский формат ММ/ДД/ГГГГ</summary>
+        MM_dd_yyyy,
+
+        /// <summary>02/15/2025 14:30:45 — американский формат с временем</summary>
+        MM_dd_yyyy_HH_mm_ss,
+
+        // ── Только время ───────────────────────────────────────────────────────
+
+        /// <summary>14:30:45 — только время ЧЧ:ММ:СС</summary>
+        HHmmss,
+
+        /// <summary>14:30 — только время ЧЧ:ММ</summary>
+        HHmm,
+
+        /// <summary>14:30:45.123 — время с миллисекундами</summary>
+        HHmmss_fff,
+
+        // ── Специальные форматы ────────────────────────────────────────────────
+
+        /// <summary>Суббота, 15 февраля 2025 г. — полная дата с днём недели (зависит от культуры)</summary>
+        FullDate,
+
+        /// <summary>Q1-2025, Q2-2025... — квартал и год (вычисляется вручную)</summary>
+        Quarter,
+
+        /// <summary>W07-2025 — номер недели ISO и год</summary>
+        WeekNumber,
+
+        /// <summary>Unix Timestamp — секунды с 01.01.1970 UTC</summary>
+        UnixTimestamp,
+
+        /// <summary>Пользовательский формат из поля Prop_CustomTimestampFormat</summary>
+        Custom
+    }
+
+    /// <summary>
+    /// Направление сортировки списка кортежей.
+    /// </summary>
+    public enum TupleSortDirection
+    {
+        /// <summary>По возрастанию (A→Z, 1→9)</summary>
+        Ascending,
+        /// <summary>По убыванию (Z→A, 9→1)</summary>
+        Descending
+    }
+
+    /// <summary>
+    /// Режим сортировки значений — как строки или как числа.
+    /// </summary>
+    public enum TupleSortType
+    {
+        /// <summary>Алфавитная сортировка без учёта регистра. Используется по умолчанию.</summary>
+        Alphabetical,
+        /// <summary>Числовая сортировка. Нечисловые элементы уходят в конец.</summary>
+        Numeric,
+        /// <summary>Натуральная сортировка: file2 < file10 (числовые части как числа).</summary>
+        Natural
+    }
+
+    /// <summary>
+    /// Номер элемента кортежа — Item1 … Item7.
+    /// Используется в TupleGetBack, TupleSetBack, TupleSortBack.
+    /// </summary>
+    public enum TupleItemIndex
+    {
+        /// <summary>Первый элемент кортежа — .Item1</summary>
+        Item1 = 1,
+        /// <summary>Второй элемент кортежа — .Item2</summary>
+        Item2 = 2,
+        /// <summary>Третий элемент кортежа — .Item3</summary>
+        Item3 = 3,
+        /// <summary>Четвёртый элемент кортежа — .Item4</summary>
+        Item4 = 4,
+        /// <summary>Пятый элемент кортежа — .Item5</summary>
+        Item5 = 5,
+        /// <summary>Шестой элемент кортежа — .Item6</summary>
+        Item6 = 6,
+        /// <summary>Седьмой элемент кортежа — .Item7</summary>
+        Item7 = 7
+    }
+
+    /// <summary>
+    /// Тип создаваемого или ожидаемого кортежа.
+    /// </summary>
+    public enum TupleKind
+    {
+        /// <summary>
+        /// System.Tuple&lt;T1..T7&gt; — ссылочный тип, иммутабелен.
+        /// Не требует дополнительных NuGet-пакетов.
+        /// </summary>
+        ClassicTuple,
+
+        /// <summary>
+        /// System.ValueTuple&lt;T1..T7&gt; — значимый тип (struct).
+        /// Меньше нагружает GC при обработке больших коллекций кортежей.
+        /// Требует NuGet: System.ValueTuple 4.5.0.
+        /// Через рефлексию ведёт себя аналогично ClassicTuple — мутабельность
+        /// ValueTuple доступна только при прямом доступе в C#-коде.
+        /// </summary>
+        ValueTuple
+    }
+
+    /// <summary>
+    /// Режим конвертации кортежа в другой тип данных или обратно.
+    /// </summary>
+    public enum TupleConvertMode
+    {
+        /// <summary>Tuple → List&lt;object&gt;: каждый элемент становится элементом списка</summary>
+        ToList,
+
+        /// <summary>List&lt;object&gt; → Tuple: первые 1–7 элементов списка становятся кортежем</summary>
+        FromList,
+
+        /// <summary>
+        /// Tuple → Dictionary&lt;string,object&gt;: ключи "Item1","Item2"… — значения элементов.
+        /// Удобно для логирования и сериализации.
+        /// </summary>
+        ToDictionary,
+
+        /// <summary>
+        /// Tuple → string: "Item1=значение1; Item2=значение2; …"
+        /// Разделитель настраивается через Prop_Separator.
+        /// </summary>
+        ToString
+    }
 }

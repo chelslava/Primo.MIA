@@ -1,0 +1,56 @@
+name: Build and Test
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  build-and-test:
+    runs-on: windows-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v1.1
+    
+    - name: Setup NuGet
+      uses: NuGet/setup-nuget@v1
+    
+    - name: Restore NuGet packages
+      run: nuget restore Primo.MIA.csproj
+    
+    - name: Build main project
+      run: msbuild Primo.MIA.csproj /p:Configuration=Release /p:Platform="Any CPU"
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '6.0.x'
+    
+    - name: Restore test project
+      run: dotnet restore Primo.MIA.Tests/Primo.MIA.Tests.csproj
+    
+    - name: Build test project
+      run: dotnet build Primo.MIA.Tests/Primo.MIA.Tests.csproj --configuration Release --no-restore
+    
+    - name: Run tests
+      run: dotnet test Primo.MIA.Tests/Primo.MIA.Tests.csproj --no-build --configuration Release --verbosity normal --logger "trx;LogFileName=test-results.trx"
+    
+    - name: Publish test results
+      uses: dorny/test-reporter@v1
+      if: always()
+      with:
+        name: Test Results
+        path: '**/test-results.trx'
+        reporter: dotnet-trx
+    
+    - name: Upload test results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: test-results
+        path: '**/test-results.trx'

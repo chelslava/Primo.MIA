@@ -86,6 +86,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GeneratorsBack.cs" />
     <Compile Include="ExcelCellRecalculateBack.cs" />
     <Compile Include="Dictionary\DictionaryContainsValue.xaml.cs">
       <DependentUpon>DictionaryContainsValue.xaml</DependentUpon>
@@ -167,6 +168,9 @@
     <Compile Include="ExcelCellRecalculate.xaml.cs">
       <DependentUpon>ExcelCellRecalculate.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Generators.xaml.cs">
+      <DependentUpon>Generators.xaml</DependentUpon>
+    </Compile>
     <Compile Include="SearchFilesBack.cs" />
     <Compile Include="LogMessage.xaml.cs">
       <DependentUpon>LogMessage.xaml</DependentUpon>
@@ -180,6 +184,43 @@
     <Compile Include="Dictionary\DictionaryContainsKey.xaml.cs">
       <DependentUpon>DictionaryContainsKey.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Tuple\TupleSet.xaml.cs">
+      <DependentUpon>TupleSet.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Tuple\TupleZip.xaml.cs">
+      <DependentUpon>TupleZip.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Tuple\TupleUnzip.xaml.cs">
+      <DependentUpon>TupleUnzip.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Tuple\TupleSort.xaml.cs">
+      <DependentUpon>TupleSort.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Tuple\TupleInspect.xaml.cs">
+      <DependentUpon>TupleInspect.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Tuple\TupleGet.xaml.cs">
+      <DependentUpon>TupleGet.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Tuple\TupleDestructure.xaml.cs">
+      <DependentUpon>TupleDestructure.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Tuple\TupleCreate.xaml.cs">
+      <DependentUpon>TupleCreate.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Tuple\TupleConvert.xaml.cs">
+      <DependentUpon>TupleConvert.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Tuple\TupleConvertBack.cs" />
+    <Compile Include="Tuple\TupleCreateBack.cs" />
+    <Compile Include="Tuple\TupleDestructureBack.cs" />
+    <Compile Include="Tuple\TupleGetBack.cs" />
+    <Compile Include="Tuple\TupleHelper.cs" />
+    <Compile Include="Tuple\TupleInspectBack.cs" />
+    <Compile Include="Tuple\TupleSortBack.cs" />
+    <Compile Include="Tuple\TupleUnzipBack.cs" />
+    <Compile Include="Tuple\TupleZipBack.cs" />
+    <Compile Include="Tuple\TupleSetBack.cs" />
     <Compile Include="WaitForFile.xaml.cs">
       <DependentUpon>WaitForFile.xaml</DependentUpon>
     </Compile>
@@ -203,6 +244,16 @@
     <None Include="doc\Dictionary\09_DictionarySetValue.md" />
     <None Include="doc\Dictionary\10_DictionaryRemoveKey.md" />
     <None Include="doc\Dictionary\11_DictionaryToString.md" />
+    <None Include="doc\Generators.md" />
+    <None Include="doc\List\ListAggregate.md" />
+    <None Include="doc\List\ListConvert.md" />
+    <None Include="doc\List\ListFilter.md" />
+    <None Include="doc\List\ListGroup.md" />
+    <None Include="doc\List\ListInspect.md" />
+    <None Include="doc\List\ListSet.md" />
+    <None Include="doc\List\ListSlice.md" />
+    <None Include="doc\List\ListSort.md" />
+    <None Include="doc\List\ListTransform.md" />
     <None Include="doc\LogMessage.md" />
     <None Include="doc\ReadTomlConfig.md" />
     <None Include="doc\SearchFilesBack.md" />
@@ -212,9 +263,6 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="images\dict.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="images\sample.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
   </ItemGroup>
@@ -311,6 +359,46 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Generators.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Tuple\TupleSet.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Tuple\TupleZip.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Tuple\TupleUnzip.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Tuple\TupleSort.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Tuple\TupleInspect.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Tuple\TupleGet.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Tuple\TupleDestructure.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Tuple\TupleCreate.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Tuple\TupleConvert.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="WaitForFile.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -344,6 +432,19 @@
     <Resource Include="images\log.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="images\generator.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="images\sharp.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="images\json.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
