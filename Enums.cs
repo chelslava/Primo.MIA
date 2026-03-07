@@ -712,7 +712,7 @@ namespace Primo.MIA
         Item7 = 7
     }
 
-    /// <summary>
+        /// <summary>
     /// Тип создаваемого или ожидаемого кортежа.
     /// </summary>
     public enum TupleKind
@@ -755,5 +755,22 @@ namespace Primo.MIA
         /// Разделитель настраивается через Prop_Separator.
         /// </summary>
         ToString
+    }
+
+    /// <summary>
+    /// HTTP-методы для выполнения запросов.
+    /// </summary>
+    public enum HttpMethodType
+    {
+        /// <summary>GET — получение данных</summary>
+        GET,
+        /// <summary>POST — отправка данных</summary>
+        POST,
+        /// <summary>PUT — обновление ресурса</summary>
+        PUT,
+        /// <summary>DELETE — удаление ресурса</summary>
+        DELETE,
+        /// <summary>PATCH — частичное обновление</summary>
+        PATCH
     }
 }

@@ -102,6 +102,10 @@
       <DependentUpon>WaitForFile.xaml</DependentUpon>
     </Compile>
     <Compile Include="Files\WaitForFileBack.cs" />
+    <Compile Include="HttpWeb\Http.xaml.cs">
+      <DependentUpon>Http.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="HttpWeb\HttpBack.cs" />
     <Compile Include="Utilities\GeneratorsBack.cs" />
     <Compile Include="Utilities\ExcelCellRecalculateBack.cs" />
     <Compile Include="Dictionary\DictionaryContainsValue.xaml.cs">
@@ -319,6 +323,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="HttpWeb\Http.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="List\ListGroup.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -443,6 +451,11 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="images\generator.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="images\http.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
   </ItemGroup>
