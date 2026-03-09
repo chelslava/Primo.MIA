@@ -35,6 +35,9 @@ namespace Primo.MIA.Common
         /// <summary>Иконка для активностей поиска файлов</summary>
         public const string FileSearch = BasePath + "file_search.png";
         
+        /// <summary>Иконка для активностей ожидания файлов</summary>
+        public const string FileWait = BasePath + "sharp.png";
+        
         /// <summary>Иконка для активностей работы с JSON</summary>
         public const string Json = BasePath + "json.png";
     }

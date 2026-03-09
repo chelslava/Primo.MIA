@@ -13,6 +13,7 @@
 using LTools.Common.Model;
 using LTools.Common.UIElements;
 using LTools.SDK;
+using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,10 +27,9 @@ namespace Primo.MIA
     /// количество элементов, список ключей и список значений.
     /// Не изменяет словарь.
     /// </summary>
-    public class DictionaryGetInfoBack : PrimoComponentTO<DictionaryGetInfo>
+        public class DictionaryGetInfoBack : PrimoComponentTO<DictionaryGetInfo>
     {
-        private const string CGroupName = "MIA" + WFPublishedElementBase.TREE_SEPARATOR + "Словари";
-        public override string GroupName { get => CGroupName; protected set { } }
+        public override string GroupName { get => ActivityCategories.Dictionaries; protected set { } }
 
         protected override int sdkTimeOut
         {
@@ -40,7 +40,7 @@ namespace Primo.MIA
         private string _propDictionary;
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(Dictionary<string, string>))]
-        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Словарь")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_Dictionary)]
         public string Prop_Dictionary
         {
             get => _propDictionary;
@@ -51,7 +51,7 @@ namespace Primo.MIA
         /// <summary>Количество пар ключ-значение в словаре</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
-        [System.ComponentModel.Category("Выходные данные"), System.ComponentModel.DisplayName("Количество элементов")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_Count)]
         public string Prop_Count
         {
             get => _propCount;
@@ -62,7 +62,7 @@ namespace Primo.MIA
         /// <summary>Все ключи словаря в алфавитном порядке</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(List<string>))]
-        [System.ComponentModel.Category("Выходные данные"), System.ComponentModel.DisplayName("Список ключей")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_Keys)]
         public string Prop_Keys
         {
             get => _propKeys;
@@ -76,7 +76,7 @@ namespace Primo.MIA
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(List<string>))]
-        [System.ComponentModel.Category("Выходные данные"), System.ComponentModel.DisplayName("Список значений")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_Values)]
         public string Prop_Values
         {
             get => _propValues;
@@ -87,7 +87,7 @@ namespace Primo.MIA
         /// <summary>True если словарь не содержит ни одного элемента</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(bool))]
-        [System.ComponentModel.Category("Выходные данные"), System.ComponentModel.DisplayName("Словарь пуст")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_IsEmpty)]
         public string Prop_IsEmpty
         {
             get => _propIsEmpty;
@@ -110,40 +110,15 @@ namespace Primo.MIA
                 "  Список значений      — List<string> в том же порядке что и ключи\n" +
                 "  Словарь пуст         — true если Count == 0";
 
-            sdkComponentIcon = "pack://application:,,,/Primo.MIA;component/images/dict.png";
+            sdkComponentIcon = ActivityIcons.Dictionary;
 
-            sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
+                                    sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_Dictionary", PropertyType = PropertyTypes.SCRIPT,
-                    EditorType = ScriptEditorTypes.NONE, DataType = typeof(Dictionary<string, string>),
-                    ToolTip = "Входной словарь Dictionary<string, string>", IsReadOnly = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_Count", PropertyType = PropertyTypes.VARIABLE,
-                    EditorType = ScriptEditorTypes.NONE, DataType = typeof(int),
-                    ToolTip = "Количество элементов в словаре", IsReadOnly = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_Keys", PropertyType = PropertyTypes.VARIABLE,
-                    EditorType = ScriptEditorTypes.NONE, DataType = typeof(List<string>),
-                    ToolTip = "Все ключи словаря (алфавитный порядок)", IsReadOnly = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_Values", PropertyType = PropertyTypes.VARIABLE,
-                    EditorType = ScriptEditorTypes.NONE, DataType = typeof(List<string>),
-                    ToolTip = "Все значения в порядке ключей", IsReadOnly = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_IsEmpty", PropertyType = PropertyTypes.VARIABLE,
-                    EditorType = ScriptEditorTypes.NONE, DataType = typeof(bool),
-                    ToolTip = "True если словарь пустой", IsReadOnly = false
-                }
+                PropertyBuilder.Script<Dictionary<string, string>>("Prop_Dictionary", "Входной словарь Dictionary<string, string>"),
+                PropertyBuilder.Variable<int>("Prop_Count", "Количество элементов в словаре"),
+                PropertyBuilder.Variable<List<string>>("Prop_Keys", "Все ключи словаря (алфавитный порядок)"),
+                PropertyBuilder.Variable<List<string>>("Prop_Values", "Все значения в порядке ключей"),
+                PropertyBuilder.Variable<bool>("Prop_IsEmpty", "True если словарь пустой")
             };
 
             InitClass(container);
@@ -177,11 +152,10 @@ namespace Primo.MIA
             }
         }
 
-        public override ValidationResult Validate()
+                public override ValidationResult Validate()
         {
             var ret = new ValidationResult();
-            if (string.IsNullOrWhiteSpace(this.Prop_Dictionary))
-                ret.Items.Add(new ValidationResult.ValidationItem() { PropertyName = "Словарь", Error = "Словарь обязателен" });
+            ret.ValidateRequired(this.Prop_Dictionary, ActivityStrings.Field_Dictionary, ActivityStrings.Error_DictionaryRequired);
             return ret;
         }
     }

@@ -1,6 +1,7 @@
 using LTools.Common.Model;
 using LTools.Common.UIElements;
 using LTools.SDK;
+using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,10 +15,9 @@ namespace Primo.MIA
     /// Поддерживает регистрозависимый и регистронезависимый поиск.
     /// Не изменяет словарь.
     /// </summary>
-    public class DictionaryContainsValueBack : PrimoComponentTO<DictionaryContainsValue>
+        public class DictionaryContainsValueBack : PrimoComponentTO<DictionaryContainsValue>
     {
-        private const string CGroupName = "MIA" + WFPublishedElementBase.TREE_SEPARATOR + "Словари";
-        public override string GroupName { get => CGroupName; protected set { } }
+        public override string GroupName { get => ActivityCategories.Dictionaries; protected set { } }
 
         protected override int sdkTimeOut
         {
@@ -28,7 +28,7 @@ namespace Primo.MIA
         private string _propDictionary;
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(Dictionary<string, string>))]
-        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Словарь")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_Dictionary)]
         public string Prop_Dictionary
         {
             get => _propDictionary;
@@ -39,7 +39,7 @@ namespace Primo.MIA
         /// <summary>Значение которое нужно найти в словаре (точное совпадение)</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
-        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Искомое значение")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_SearchValue)]
         public string Prop_SearchValue
         {
             get => _propSearchValue;
@@ -52,7 +52,7 @@ namespace Primo.MIA
         /// По умолчанию false — "Hello" == "hello".
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
-        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Учитывать регистр")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_CaseSensitive)]
         public bool Prop_CaseSensitive
         {
             get => _caseSensitive;
@@ -63,7 +63,7 @@ namespace Primo.MIA
         /// <summary>True если значение найдено в словаре, False если нет</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(bool))]
-        [System.ComponentModel.Category("Выходные данные"), System.ComponentModel.DisplayName("Значение найдено")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_Result)]
         public string Prop_Result
         {
             get => _propResult;
@@ -77,7 +77,7 @@ namespace Primo.MIA
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(List<string>))]
-        [System.ComponentModel.Category("Выходные данные"), System.ComponentModel.DisplayName("Ключи с таким значением")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_FoundKeys)]
         public string Prop_FoundKeys
         {
             get => _propFoundKeys;
@@ -97,34 +97,14 @@ namespace Primo.MIA
                 "  Значение найдено      — true если есть хотя бы одно совпадение\n" +
                 "  Ключи с таким значением — List<string> ключей с совпавшим значением";
 
-            sdkComponentIcon = "pack://application:,,,/Primo.MIA;component/images/dict.png";
+            sdkComponentIcon = ActivityIcons.Dictionary;
 
-            sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
+                                    sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_Dictionary", PropertyType = PropertyTypes.SCRIPT,
-                    EditorType = ScriptEditorTypes.NONE, DataType = typeof(Dictionary<string, string>),
-                    ToolTip = "Входной словарь", IsReadOnly = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_SearchValue", PropertyType = PropertyTypes.SCRIPT,
-                    EditorType = ScriptEditorTypes.NONE, DataType = typeof(string),
-                    ToolTip = "Значение для поиска (точное совпадение)", IsReadOnly = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_Result", PropertyType = PropertyTypes.VARIABLE,
-                    EditorType = ScriptEditorTypes.NONE, DataType = typeof(bool),
-                    ToolTip = "True если значение найдено хотя бы у одного ключа", IsReadOnly = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_FoundKeys", PropertyType = PropertyTypes.VARIABLE,
-                    EditorType = ScriptEditorTypes.NONE, DataType = typeof(List<string>),
-                    ToolTip = "Список ключей у которых значение совпало", IsReadOnly = false
-                }
+                PropertyBuilder.Script<Dictionary<string, string>>("Prop_Dictionary", "Входной словарь"),
+                PropertyBuilder.Script<string>("Prop_SearchValue", "Значение для поиска (точное совпадение)"),
+                PropertyBuilder.Variable<bool>("Prop_Result", "True если значение найдено хотя бы у одного ключа"),
+                PropertyBuilder.Variable<List<string>>("Prop_FoundKeys", "Список ключей у которых значение совпало")
             };
 
             InitClass(container);
@@ -162,18 +142,12 @@ namespace Primo.MIA
             }
         }
 
-        public override ValidationResult Validate()
+                public override ValidationResult Validate()
         {
             var ret = new ValidationResult();
-            ValidateField(ret, this.Prop_Dictionary,  "Словарь",         "Словарь обязателен");
-            ValidateField(ret, this.Prop_SearchValue, "Искомое значение", "Искомое значение обязательно");
+            ret.ValidateRequired(this.Prop_Dictionary, ActivityStrings.Field_Dictionary, ActivityStrings.Error_DictionaryRequired);
+            ret.ValidateRequired(this.Prop_SearchValue, ActivityStrings.Field_SearchValue, "Искомое значение обязательно");
             return ret;
-        }
-
-        private void ValidateField(ValidationResult result, string value, string fieldName, string errorMessage)
-        {
-            if (string.IsNullOrWhiteSpace(value))
-                result.Items.Add(new ValidationResult.ValidationItem() { PropertyName = fieldName, Error = errorMessage });
         }
     }
 }

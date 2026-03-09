@@ -23,6 +23,7 @@
 using LTools.Common.Model;
 using LTools.Common.UIElements;
 using LTools.SDK;
+using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -37,8 +38,7 @@ namespace Primo.MIA
     /// </summary>
     public class ListConvertBack : PrimoComponentTO<ListConvert>
     {
-        private const string CGroupName = "MIA" + WFPublishedElementBase.TREE_SEPARATOR + "Списки";
-        public override string GroupName { get => CGroupName; protected set { } }
+                public override string GroupName { get => ActivityCategories.Lists; protected set { } }
 
         protected override int sdkTimeOut
         {
@@ -49,7 +49,7 @@ namespace Primo.MIA
         private string _propList;
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(List<string>))]
-        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Список")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_List)]
         public string Prop_List
         {
             get => _propList;
@@ -58,7 +58,7 @@ namespace Primo.MIA
 
         private ListConvertMode _mode = ListConvertMode.ToDict;
         [LTools.Common.Model.Serialization.StoringProperty]
-        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Тип конвертации")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName("Тип конвертации")]
         public ListConvertMode Mode
         {
             get => _mode;
@@ -80,7 +80,7 @@ namespace Primo.MIA
         /// <summary>Разделитель для режимов ToDict (default "="), Flatten и FromCSVRow/ToCSVRow</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
-        [System.ComponentModel.Category("Параметры"), System.ComponentModel.DisplayName("Разделитель")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Parameters), System.ComponentModel.DisplayName(ActivityStrings.Field_Separator)]
         public string Prop_Separator
         {
             get => _propSeparator;
@@ -114,7 +114,7 @@ namespace Primo.MIA
         private string _propResultList;
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(List<string>))]
-        [System.ComponentModel.Category("Выходные данные"), System.ComponentModel.DisplayName("Список")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_List)]
         public string Prop_ResultList
         {
             get => _propResultList;
@@ -124,7 +124,7 @@ namespace Primo.MIA
         private string _propResultDict;
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(Dictionary<string, string>))]
-        [System.ComponentModel.Category("Выходные данные"), System.ComponentModel.DisplayName("Словарь")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_Dictionary)]
         public string Prop_ResultDict
         {
             get => _propResultDict;
@@ -134,7 +134,7 @@ namespace Primo.MIA
         private string _propResultString;
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
-        [System.ComponentModel.Category("Выходные данные"), System.ComponentModel.DisplayName("Строка")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName("Строка")]
         public string Prop_ResultString
         {
             get => _propResultString;
@@ -144,7 +144,7 @@ namespace Primo.MIA
         private string _propCount;
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
-        [System.ComponentModel.Category("Выходные данные"), System.ComponentModel.DisplayName("Количество")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_Count)]
         public string Prop_Count
         {
             get => _propCount;
@@ -163,100 +163,20 @@ namespace Primo.MIA
                 "ZipToDict    — zip двух List → Dictionary (ключи=ListA, знач=ListB)\n" +
                 "Flatten      — разбить каждый элемент по разделителю → плоский List\n" +
                 "Chunk        — разбить List на батчи по N элементов";
-            sdkComponentIcon = "pack://application:,,,/Primo.MIA;component/images/list.png";
+            sdkComponentIcon = ActivityIcons.List;
 
-            sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
+                        sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() 
-                { 
-                    PropName = "Prop_List",
-                    PropertyType = PropertyTypes.SCRIPT, 
-                    EditorType = ScriptEditorTypes.NONE,
-                    DataType = typeof(List<string>), 
-                    ToolTip = "Входной список", 
-                    IsReadOnly = false 
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() 
-                { 
-                    PropName = "Mode", 
-                    PropertyType = PropertyTypes.OBJECT, 
-                    EditorType = ScriptEditorTypes.NONE, 
-                    DataType = typeof(ListConvertMode), 
-                    ToolTip = "Тип конвертации",
-                    IsReadOnly = false 
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() 
-                { 
-                    PropName = "Prop_ListB", 
-                    PropertyType = PropertyTypes.SCRIPT,
-                    EditorType = ScriptEditorTypes.NONE,
-                    DataType = typeof(List<string>), 
-                    ToolTip = "Второй список (ZipToDict — значения)",
-                    IsReadOnly = false 
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                { 
-                    PropName = "Prop_Separator",
-                    PropertyType = PropertyTypes.SCRIPT,
-                    EditorType = ScriptEditorTypes.NONE, 
-                    DataType = typeof(string),
-                    ToolTip = "Разделитель: '=' для ToDict, ';' для Flatten", 
-                    IsReadOnly = false 
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() 
-                { 
-                    PropName = "Prop_ChunkSize",
-                    PropertyType = PropertyTypes.SCRIPT, 
-                    EditorType = ScriptEditorTypes.NONE,
-                    DataType = typeof(int),
-                    ToolTip = "Размер батча для Chunk", 
-                    IsReadOnly = false 
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() 
-                { 
-                    PropName = "Prop_CsvInput", 
-                    PropertyType = PropertyTypes.SCRIPT,
-                    EditorType = ScriptEditorTypes.NONE, 
-                    DataType = typeof(string), 
-                    ToolTip = "Входная CSV-строка для FromCSVRow",
-                    IsReadOnly = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() 
-                { 
-                    PropName = "Prop_ResultList",
-                    PropertyType = PropertyTypes.VARIABLE, 
-                    EditorType = ScriptEditorTypes.NONE,
-                    DataType = typeof(List<string>), 
-                    ToolTip = "Список-результат",
-                    IsReadOnly = false 
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() 
-                { 
-                    PropName = "Prop_ResultDict", 
-                    PropertyType = PropertyTypes.VARIABLE,
-                    EditorType = ScriptEditorTypes.NONE,
-                    DataType = typeof(Dictionary<string, string>),
-                    ToolTip = "Словарь-результат",
-                    IsReadOnly = false 
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() 
-                { 
-                    PropName = "Prop_ResultString",
-                    PropertyType = PropertyTypes.VARIABLE, 
-                    EditorType = ScriptEditorTypes.NONE,
-                    DataType = typeof(string), 
-                    ToolTip = "Строка-результат (CSV)", 
-                    IsReadOnly = false 
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() 
-                { 
-                    PropName = "Prop_Count",
-                    PropertyType = PropertyTypes.VARIABLE,
-                    EditorType = ScriptEditorTypes.NONE,
-                    DataType = typeof(int), 
-                    ToolTip = "Количество в результате", 
-                    IsReadOnly = false 
-                }
+                PropertyBuilder.Script<List<string>>("Prop_List", "Входной список"),
+                PropertyBuilder.Enum<ListConvertMode>("Mode", "Тип конвертации"),
+                PropertyBuilder.Script<List<string>>("Prop_ListB", "Второй список (ZipToDict — значения)"),
+                PropertyBuilder.Script<string>("Prop_Separator", "Разделитель: '=' для ToDict, ';' для Flatten"),
+                PropertyBuilder.Script<int>("Prop_ChunkSize", "Размер батча для Chunk"),
+                PropertyBuilder.Script<string>("Prop_CsvInput", "Входная CSV-строка для FromCSVRow"),
+                PropertyBuilder.Variable<List<string>>("Prop_ResultList", "Список-результат"),
+                PropertyBuilder.Variable<Dictionary<string, string>>("Prop_ResultDict", "Словарь-результат"),
+                PropertyBuilder.Variable<string>("Prop_ResultString", "Строка-результат (CSV)"),
+                PropertyBuilder.Variable<int>("Prop_Count", "Количество в результате")
             };
 
             InitClass(container);
@@ -428,9 +348,9 @@ namespace Primo.MIA
 
         public override ValidationResult Validate()
         {
-            var ret = new ValidationResult();
-            if (this.Mode != ListConvertMode.FromCSVRow && string.IsNullOrWhiteSpace(this.Prop_List))
-                ret.Items.Add(new ValidationResult.ValidationItem() { PropertyName = "Список", Error = "Список обязателен" });
+                        var ret = new ValidationResult();
+            if (this.Mode != ListConvertMode.FromCSVRow)
+                ret.ValidateRequired(this.Prop_List, ActivityStrings.Field_List, ActivityStrings.Error_ListRequired);
             if (this.Mode == ListConvertMode.FromCSVRow && string.IsNullOrWhiteSpace(this.Prop_CsvInput))
                 ret.Items.Add(new ValidationResult.ValidationItem() { PropertyName = "CSV строка", Error = "CSV строка обязательна для FromCSVRow" });
             return ret;

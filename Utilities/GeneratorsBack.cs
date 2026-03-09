@@ -23,6 +23,7 @@ using LTools.Common.Model;
 using LTools.Common.UIElements;
 using LTools.Enums;
 using LTools.SDK;
+using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -42,11 +43,8 @@ namespace Primo.MIA
     /// </summary>
     public class GeneratorsBack : PrimoComponentTO<Generators>
     {
-        /// <summary>Имя группы компонента в панели активностей</summary>
-        private const string CGroupName = "MIA" + WFPublishedElementBase.TREE_SEPARATOR + "Утилиты";
-
-        /// <inheritdoc/>
-        public override string GroupName { get => CGroupName; protected set { } }
+                /// <inheritdoc/>
+        public override string GroupName { get => ActivityCategories.Utilities; protected set { } }
 
         protected override int sdkTimeOut
         {
@@ -73,7 +71,7 @@ namespace Primo.MIA
         private GeneratorType _type = GeneratorType.Guid;
         /// <summary>Тип генерируемого значения. Определяет активный набор параметров.</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
-        [System.ComponentModel.Category("1. Основные"), System.ComponentModel.DisplayName("Тип генерации")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_GenerationType)]
         public GeneratorType Type
         {
             get => _type;
@@ -93,7 +91,7 @@ namespace Primo.MIA
         /// X — C-style (для кода).
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
-        [System.ComponentModel.Category("2. GUID"), System.ComponentModel.DisplayName("Формат GUID")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Guid), System.ComponentModel.DisplayName(ActivityStrings.Field_GuidFormat)]
         public GuidFormat Prop_GuidFormat
         {
             get => _propGuidFormat;
@@ -112,7 +110,7 @@ namespace Primo.MIA
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
-        [System.ComponentModel.Category("3. Имя файла"), System.ComponentModel.DisplayName("Директория")]
+        [System.ComponentModel.Category(ActivityStrings.Category_FileName), System.ComponentModel.DisplayName(ActivityStrings.Field_Directory)]
         public string Prop_Directory
         {
             get => _propDirectory;
@@ -128,7 +126,7 @@ namespace Primo.MIA
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
-        [System.ComponentModel.Category("3. Имя файла"), System.ComponentModel.DisplayName("Базовое имя")]
+        [System.ComponentModel.Category(ActivityStrings.Category_FileName), System.ComponentModel.DisplayName(ActivityStrings.Field_BaseName)]
         public string Prop_BaseName
         {
             get => _propBaseName;
@@ -142,7 +140,7 @@ namespace Primo.MIA
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
-        [System.ComponentModel.Category("3. Имя файла"), System.ComponentModel.DisplayName("Расширение")]
+        [System.ComponentModel.Category(ActivityStrings.Category_FileName), System.ComponentModel.DisplayName(ActivityStrings.Field_Extension)]
         public string Prop_Extension
         {
             get => _propExtension;
@@ -161,7 +159,7 @@ namespace Primo.MIA
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
-        [System.ComponentModel.Category("4. Случайное число"), System.ComponentModel.DisplayName("Минимальное значение")]
+        [System.ComponentModel.Category(ActivityStrings.Category_RandomNumber), System.ComponentModel.DisplayName(ActivityStrings.Field_MinValue)]
         public string Prop_MinValue
         {
             get => _propMinValue;
@@ -176,7 +174,7 @@ namespace Primo.MIA
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
-        [System.ComponentModel.Category("4. Случайное число"), System.ComponentModel.DisplayName("Максимальное значение")]
+        [System.ComponentModel.Category(ActivityStrings.Category_RandomNumber), System.ComponentModel.DisplayName(ActivityStrings.Field_MaxValue)]
         public string Prop_MaxValue
         {
             get => _propMaxValue;
@@ -200,7 +198,7 @@ namespace Primo.MIA
         ///   Специальные   — Quarter, WeekNumber, UnixTimestamp
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
-        [System.ComponentModel.Category("5. Временная метка"), System.ComponentModel.DisplayName("Формат даты")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Timestamp), System.ComponentModel.DisplayName(ActivityStrings.Field_TimestampFormatField)]
         public TimestampFormat Prop_TimestampFormat
         {
             get => _propTimestampFormat;
@@ -221,7 +219,7 @@ namespace Primo.MIA
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
-        [System.ComponentModel.Category("5. Временная метка"), System.ComponentModel.DisplayName("Кастомный формат")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Timestamp), System.ComponentModel.DisplayName(ActivityStrings.Field_CustomTimestampFormat)]
         public string Prop_CustomTimestampFormat
         {
             get => _propCustomTimestampFormat;
@@ -243,7 +241,7 @@ namespace Primo.MIA
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
-        [System.ComponentModel.Category("6. Счётчик"), System.ComponentModel.DisplayName("Ключ счётчика")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Counter), System.ComponentModel.DisplayName(ActivityStrings.Field_CounterKey)]
         public string Prop_CounterKey
         {
             get => _propCounterKey;
@@ -261,7 +259,7 @@ namespace Primo.MIA
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
-        [System.ComponentModel.Category("6. Счётчик"), System.ComponentModel.DisplayName("Начальное значение")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Counter), System.ComponentModel.DisplayName(ActivityStrings.Field_CounterStart)]
         public string Prop_CounterStart
         {
             get => _propCounterStart;
@@ -278,7 +276,7 @@ namespace Primo.MIA
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
-        [System.ComponentModel.Category("6. Счётчик"), System.ComponentModel.DisplayName("Шаг")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Counter), System.ComponentModel.DisplayName(ActivityStrings.Field_CounterStep)]
         public string Prop_CounterStep
         {
             get => _propCounterStep;
@@ -299,7 +297,7 @@ namespace Primo.MIA
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
-        [System.ComponentModel.Category("7. Хеш ID"), System.ComponentModel.DisplayName("Входная строка")]
+        [System.ComponentModel.Category(ActivityStrings.Category_HashId), System.ComponentModel.DisplayName(ActivityStrings.Field_InputString)]
         public string Prop_InputString
         {
             get => _propInputString;
@@ -314,7 +312,7 @@ namespace Primo.MIA
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
-        [System.ComponentModel.Category("7. Хеш ID"), System.ComponentModel.DisplayName("Префикс")]
+        [System.ComponentModel.Category(ActivityStrings.Category_HashId), System.ComponentModel.DisplayName(ActivityStrings.Field_HashPrefix)]
         public string Prop_HashPrefix
         {
             get => _propHashPrefix;
@@ -333,7 +331,7 @@ namespace Primo.MIA
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
-        [System.ComponentModel.Category("8. Имя пользователя"), System.ComponentModel.DisplayName("Имя")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Username), System.ComponentModel.DisplayName(ActivityStrings.Field_FirstName)]
         public string Prop_FirstName
         {
             get => _propFirstName;
@@ -349,7 +347,7 @@ namespace Primo.MIA
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
-        [System.ComponentModel.Category("8. Имя пользователя"), System.ComponentModel.DisplayName("Фамилия")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Username), System.ComponentModel.DisplayName(ActivityStrings.Field_LastName)]
         public string Prop_LastName
         {
             get => _propLastName;
@@ -365,7 +363,7 @@ namespace Primo.MIA
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
-        [System.ComponentModel.Category("8. Имя пользователя"), System.ComponentModel.DisplayName("Домен")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Username), System.ComponentModel.DisplayName(ActivityStrings.Field_Domain)]
         public string Prop_Domain
         {
             get => _propDomain;
@@ -386,7 +384,7 @@ namespace Primo.MIA
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
-        [System.ComponentModel.Category("9. Шаблон"), System.ComponentModel.DisplayName("Шаблон")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Template), System.ComponentModel.DisplayName(ActivityStrings.Field_Template)]
         public string Prop_Template
         {
             get => _propTemplate;
@@ -402,7 +400,7 @@ namespace Primo.MIA
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(Dictionary<string, object>))]
-        [System.ComponentModel.Category("9. Шаблон"), System.ComponentModel.DisplayName("Переменные")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Template), System.ComponentModel.DisplayName(ActivityStrings.Field_Variables)]
         public string Prop_Variables
         {
             get => _propVariables;
@@ -421,7 +419,7 @@ namespace Primo.MIA
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
-        [System.ComponentModel.Category("Выход"), System.ComponentModel.DisplayName("Результат")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_OutputVariable)]
         public string Prop_OutputVariable
         {
             get => _propOutputVariable;
@@ -471,151 +469,49 @@ namespace Primo.MIA
                 "Шаблон       — заполнение {плейсхолдеров} из словаря переменных.\n" +
                 "              Пример: 'Привет, {name}!' + {name: 'Иван'} → 'Привет, Иван!'";
 
-            sdkComponentIcon = "pack://application:,,,/Primo.MIA;component/images/generator.png";
+            sdkComponentIcon = ActivityIcons.Generator;
 
-            sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
+                        sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
                 // Тип генерации
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Type", PropertyType = PropertyTypes.OBJECT,
-                    EditorType = ScriptEditorTypes.NONE, DataType = typeof(GeneratorType),
-                    ToolTip = "Выбор типа генерации", IsReadOnly = false
-                },
+                PropertyBuilder.Enum<GeneratorType>("Type", "Выбор типа генерации"),
 
                 // GUID
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_GuidFormat", PropertyType = PropertyTypes.OBJECT,
-                    EditorType = ScriptEditorTypes.NONE, DataType = typeof(GuidFormat),
-                    ToolTip = "N=без дефисов, D=стандарт, B={...}, P=(...), X=C-style", IsReadOnly = false
-                },
+                PropertyBuilder.Enum<GuidFormat>("Prop_GuidFormat", "N=без дефисов, D=стандарт, B={...}, P=(...), X=C-style"),
 
                 // Имя файла
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_Directory", PropertyType = PropertyTypes.SCRIPT,
-                    EditorType = ScriptEditorTypes.FOLDER_SELECTOR, DataType = typeof(string),
-                    ToolTip = "Директория для проверки уникальности имени файла", IsReadOnly = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_BaseName", PropertyType = PropertyTypes.SCRIPT,
-                    EditorType = ScriptEditorTypes.NONE, DataType = typeof(string),
-                    ToolTip = "Базовое имя файла без расширения (например: report)", IsReadOnly = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_Extension", PropertyType = PropertyTypes.SCRIPT,
-                    EditorType = ScriptEditorTypes.NONE, DataType = typeof(string),
-                    ToolTip = "Расширение файла (например: .xlsx, .pdf, txt)", IsReadOnly = false
-                },
+                PropertyBuilder.FolderSelector("Prop_Directory", "Директория для проверки уникальности имени файла"),
+                PropertyBuilder.Script<string>("Prop_BaseName", "Базовое имя файла без расширения (например: report)"),
+                PropertyBuilder.Script<string>("Prop_Extension", "Расширение файла (например: .xlsx, .pdf, txt)"),
 
                 // Случайное число
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_MinValue", PropertyType = PropertyTypes.SCRIPT,
-                    EditorType = ScriptEditorTypes.NONE, DataType = typeof(int),
-                    ToolTip = "Минимальное значение диапазона (включительно)", IsReadOnly = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_MaxValue", PropertyType = PropertyTypes.SCRIPT,
-                    EditorType = ScriptEditorTypes.NONE, DataType = typeof(int),
-                    ToolTip = "Максимальное значение диапазона (включительно)", IsReadOnly = false
-                },
+                PropertyBuilder.Script<int>("Prop_MinValue", "Минимальное значение диапазона (включительно)"),
+                PropertyBuilder.Script<int>("Prop_MaxValue", "Максимальное значение диапазона (включительно)"),
 
                 // Временная метка
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_TimestampFormat", PropertyType = PropertyTypes.OBJECT,
-                    EditorType = ScriptEditorTypes.NONE, DataType = typeof(TimestampFormat),
-                    ToolTip = "Предустановленный формат даты/времени. Custom — использует Кастомный формат",
-                    IsReadOnly = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_CustomTimestampFormat", PropertyType = PropertyTypes.SCRIPT,
-                    EditorType = ScriptEditorTypes.NONE, DataType = typeof(string),
-                    ToolTip = "Формат C# DateTime (только при выборе Custom). Пример: dd.MM.yyyy HH:mm:ss",
-                    IsReadOnly = false
-                },
+                PropertyBuilder.Enum<TimestampFormat>("Prop_TimestampFormat", "Предустановленный формат даты/времени. Custom — использует Кастомный формат"),
+                PropertyBuilder.Script<string>("Prop_CustomTimestampFormat", "Формат C# DateTime (только при выборе Custom). Пример: dd.MM.yyyy HH:mm:ss"),
 
                 // Счётчик
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_CounterKey", PropertyType = PropertyTypes.SCRIPT,
-                    EditorType = ScriptEditorTypes.NONE, DataType = typeof(string),
-                    ToolTip = "Ключ в RepoDict.IntDict. Разные ключи = независимые счётчики", IsReadOnly = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_CounterStart", PropertyType = PropertyTypes.SCRIPT,
-                    EditorType = ScriptEditorTypes.NONE, DataType = typeof(int),
-                    ToolTip = "Начальное значение (только при первом вызове для данного ключа)", IsReadOnly = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_CounterStep", PropertyType = PropertyTypes.SCRIPT,
-                    EditorType = ScriptEditorTypes.NONE, DataType = typeof(int),
-                    ToolTip = "Шаг (1=стандартный, 10=десятки, -1=убывающий)", IsReadOnly = false
-                },
+                PropertyBuilder.Script<string>("Prop_CounterKey", "Ключ в RepoDict.IntDict. Разные ключи = независимые счётчики"),
+                PropertyBuilder.Script<int>("Prop_CounterStart", "Начальное значение (только при первом вызове для данного ключа)"),
+                PropertyBuilder.Script<int>("Prop_CounterStep", "Шаг (1=стандартный, 10=десятки, -1=убывающий)"),
 
                 // Хеш ID
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_InputString", PropertyType = PropertyTypes.SCRIPT,
-                    EditorType = ScriptEditorTypes.NONE, DataType = typeof(string),
-                    ToolTip = "Строка для вычисления SHA-256 хеша", IsReadOnly = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_HashPrefix", PropertyType = PropertyTypes.SCRIPT,
-                    EditorType = ScriptEditorTypes.NONE, DataType = typeof(string),
-                    ToolTip = "Префикс перед хешем (необязательно). Пример: DOC-", IsReadOnly = false
-                },
+                PropertyBuilder.Script<string>("Prop_InputString", "Строка для вычисления SHA-256 хеша"),
+                PropertyBuilder.Script<string>("Prop_HashPrefix", "Префикс перед хешем (необязательно). Пример: DOC-"),
 
                 // Имя пользователя
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_FirstName", PropertyType = PropertyTypes.SCRIPT,
-                    EditorType = ScriptEditorTypes.NONE, DataType = typeof(string),
-                    ToolTip = "Имя пользователя (латиница или транслит)", IsReadOnly = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_LastName", PropertyType = PropertyTypes.SCRIPT,
-                    EditorType = ScriptEditorTypes.NONE, DataType = typeof(string),
-                    ToolTip = "Фамилия пользователя (латиница или транслит)", IsReadOnly = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_Domain", PropertyType = PropertyTypes.SCRIPT,
-                    EditorType = ScriptEditorTypes.NONE, DataType = typeof(string),
-                    ToolTip = "Домен email без @. Пример: company.ru", IsReadOnly = false
-                },
+                PropertyBuilder.Script<string>("Prop_FirstName", "Имя пользователя (латиница или транслит)"),
+                PropertyBuilder.Script<string>("Prop_LastName", "Фамилия пользователя (латиница или транслит)"),
+                PropertyBuilder.Script<string>("Prop_Domain", "Домен email без @. Пример: company.ru"),
 
                 // Шаблон
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_Template", PropertyType = PropertyTypes.SCRIPT,
-                    EditorType = ScriptEditorTypes.NONE, DataType = typeof(string),
-                    ToolTip = "Шаблон с {плейсхолдерами}. Пример: Привет, {name}!", IsReadOnly = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_Variables", PropertyType = PropertyTypes.SCRIPT,
-                    EditorType = ScriptEditorTypes.NONE, DataType = typeof(Dictionary<string, object>),
-                    ToolTip = "Dictionary<string,object> с заменами для шаблона", IsReadOnly = false
-                },
+                PropertyBuilder.Script<string>("Prop_Template", "Шаблон с {плейсхолдерами}. Пример: Привет, {name}!"),
+                PropertyBuilder.Script<Dictionary<string, object>>("Prop_Variables", "Dictionary<string,object> с заменами для шаблона"),
 
                 // Выход
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_OutputVariable", PropertyType = PropertyTypes.VARIABLE,
-                    EditorType = ScriptEditorTypes.NONE, DataType = typeof(string),
-                    ToolTip = "Переменная для записи результата", IsReadOnly = false
-                }
+                PropertyBuilder.Variable<string>("Prop_OutputVariable", "Переменная для записи результата")
             };
 
             InitClass(container);
@@ -1008,41 +904,31 @@ namespace Primo.MIA
         /// Проверяет корректность заполнения свойств в дизайнере.
         /// Проверяет только обязательные поля для выбранного типа генератора.
         /// </summary>
-        public override ValidationResult Validate()
+                public override ValidationResult Validate()
         {
             var ret = new ValidationResult();
 
             // Выходная переменная обязательна для всех режимов
-            if (string.IsNullOrWhiteSpace(this.Prop_OutputVariable))
-                ret.Items.Add(new ValidationResult.ValidationItem()
-                { PropertyName = "Результат", Error = "Выходная переменная обязательна" });
+            ret.ValidateRequired(this.Prop_OutputVariable, ActivityStrings.Field_OutputVariable, "Выходная переменная обязательна");
 
             // Валидация специфичная для режима
             switch (this.Type)
             {
                 case GeneratorType.FileName:
-                    if (string.IsNullOrWhiteSpace(this.Prop_BaseName))
-                        ret.Items.Add(new ValidationResult.ValidationItem()
-                        { PropertyName = "Базовое имя", Error = "Базовое имя файла обязательно" });
+                    ret.ValidateRequired(this.Prop_BaseName, ActivityStrings.Field_BaseName, ActivityStrings.Error_BaseFileNameRequired);
                     break;
 
                 case GeneratorType.HashId:
-                    if (string.IsNullOrWhiteSpace(this.Prop_InputString))
-                        ret.Items.Add(new ValidationResult.ValidationItem()
-                        { PropertyName = "Входная строка", Error = "Входная строка для хеширования обязательна" });
+                    ret.ValidateRequired(this.Prop_InputString, ActivityStrings.Field_InputString, ActivityStrings.Error_InputStringRequired);
                     break;
 
                 case GeneratorType.Template:
-                    if (string.IsNullOrWhiteSpace(this.Prop_Template))
-                        ret.Items.Add(new ValidationResult.ValidationItem()
-                        { PropertyName = "Шаблон", Error = "Шаблон обязателен" });
+                    ret.ValidateRequired(this.Prop_Template, ActivityStrings.Field_Template, ActivityStrings.Error_TemplateRequired);
                     break;
 
                 case GeneratorType.Timestamp:
-                    if (this.Prop_TimestampFormat == TimestampFormat.Custom
-                        && string.IsNullOrWhiteSpace(this.Prop_CustomTimestampFormat))
-                        ret.Items.Add(new ValidationResult.ValidationItem()
-                        { PropertyName = "Кастомный формат", Error = "Формат даты обязателен при выборе Custom" });
+                    if (this.Prop_TimestampFormat == TimestampFormat.Custom)
+                        ret.ValidateRequired(this.Prop_CustomTimestampFormat, ActivityStrings.Field_CustomTimestampFormat, "Формат даты обязателен при выборе Custom");
                     break;
             }
 

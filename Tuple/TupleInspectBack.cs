@@ -1,6 +1,7 @@
 using LTools.Common.Model;
 using LTools.Common.UIElements;
 using LTools.SDK;
+using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,10 +15,9 @@ namespace Primo.MIA
     ///
     /// Все выходы вычисляются за один проход. Входной кортеж не изменяется.
     /// </summary>
-    public class TupleInspectBack : PrimoComponentTO<TupleInspect>
+        public class TupleInspectBack : PrimoComponentTO<TupleInspect>
     {
-        private const string CGroupName = "MIA" + WFPublishedElementBase.TREE_SEPARATOR + "Кортежи";
-        public override string GroupName { get => CGroupName; protected set { } }
+        public override string GroupName { get => ActivityCategories.Tuples; protected set { } }
 
         protected override int sdkTimeOut
         {
@@ -31,7 +31,8 @@ namespace Primo.MIA
         /// <summary>Анализируемый кортеж.</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(object))]
-        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Кортеж")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main)]
+        [System.ComponentModel.DisplayName(ActivityStrings.Field_Tuple)]
         public string Prop_Tuple { get => _propTuple; set { _propTuple = value; InvokePropertyChanged(this, "Prop_Tuple"); } }
 
         private string _propTupleB;
@@ -42,7 +43,8 @@ namespace Primo.MIA
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(object))]
-        [System.ComponentModel.Category("Сравнение"), System.ComponentModel.DisplayName("Второй кортеж (для сравнения)")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Comparison)]
+        [System.ComponentModel.DisplayName(ActivityStrings.Field_SecondTuple)]
         public string Prop_TupleB { get => _propTupleB; set { _propTupleB = value; InvokePropertyChanged(this, "Prop_TupleB"); } }
 
         // ── OUTPUT: основные ──────────────────────────────────────────────────
@@ -51,7 +53,8 @@ namespace Primo.MIA
         /// <summary>Количество элементов кортежа (1–7).</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
-        [System.ComponentModel.Category("Структура"), System.ComponentModel.DisplayName("Арность")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Structure)]
+        [System.ComponentModel.DisplayName(ActivityStrings.Field_Arity)]
         public string Prop_Arity { get => _propArity; set { _propArity = value; InvokePropertyChanged(this, "Prop_Arity"); } }
 
         private string _propTypeName;
@@ -61,7 +64,8 @@ namespace Primo.MIA
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
-        [System.ComponentModel.Category("Структура"), System.ComponentModel.DisplayName("Тип кортежа")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Structure)]
+        [System.ComponentModel.DisplayName(ActivityStrings.Field_TypeName)]
         public string Prop_TypeName { get => _propTypeName; set { _propTypeName = value; InvokePropertyChanged(this, "Prop_TypeName"); } }
 
         private string _propItemTypes;
@@ -71,7 +75,8 @@ namespace Primo.MIA
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
-        [System.ComponentModel.Category("Структура"), System.ComponentModel.DisplayName("Типы элементов")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Structure)]
+        [System.ComponentModel.DisplayName(ActivityStrings.Field_ItemTypes)]
         public string Prop_ItemTypes { get => _propItemTypes; set { _propItemTypes = value; InvokePropertyChanged(this, "Prop_ItemTypes"); } }
 
         private string _propItemValues;
@@ -81,14 +86,16 @@ namespace Primo.MIA
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
-        [System.ComponentModel.Category("Структура"), System.ComponentModel.DisplayName("Значения элементов")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Structure)]
+        [System.ComponentModel.DisplayName(ActivityStrings.Field_ItemValues)]
         public string Prop_ItemValues { get => _propItemValues; set { _propItemValues = value; InvokePropertyChanged(this, "Prop_ItemValues"); } }
 
         private string _propHasNulls;
         /// <summary>true если хотя бы один элемент кортежа равен null.</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(bool))]
-        [System.ComponentModel.Category("Структура"), System.ComponentModel.DisplayName("Есть null элементы")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Structure)]
+        [System.ComponentModel.DisplayName(ActivityStrings.Field_HasNulls)]
         public string Prop_HasNulls { get => _propHasNulls; set { _propHasNulls = value; InvokePropertyChanged(this, "Prop_HasNulls"); } }
 
         // ── OUTPUT: сравнение ─────────────────────────────────────────────────
@@ -100,21 +107,24 @@ namespace Primo.MIA
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(bool))]
-        [System.ComponentModel.Category("Сравнение"), System.ComponentModel.DisplayName("Равны")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Comparison)]
+        [System.ComponentModel.DisplayName(ActivityStrings.Field_AreEqual)]
         public string Prop_AreEqual { get => _propAreEqual; set { _propAreEqual = value; InvokePropertyChanged(this, "Prop_AreEqual"); } }
 
         private string _propSameArity;
         /// <summary>true если оба кортежа имеют одинаковую арность.</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(bool))]
-        [System.ComponentModel.Category("Сравнение"), System.ComponentModel.DisplayName("Одинаковая арность")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Comparison)]
+        [System.ComponentModel.DisplayName(ActivityStrings.Field_SameArity)]
         public string Prop_SameArity { get => _propSameArity; set { _propSameArity = value; InvokePropertyChanged(this, "Prop_SameArity"); } }
 
         private string _propSameTypes;
         /// <summary>true если оба кортежа имеют одинаковую арность И одинаковые типы всех элементов.</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(bool))]
-        [System.ComponentModel.Category("Сравнение"), System.ComponentModel.DisplayName("Совпадают типы")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Comparison)]
+        [System.ComponentModel.DisplayName(ActivityStrings.Field_SameTypes)]
         public string Prop_SameTypes { get => _propSameTypes; set { _propSameTypes = value; InvokePropertyChanged(this, "Prop_SameTypes"); } }
 
         // ── КОНСТРУКТОР ────────────────────────────────────────────────────────
@@ -135,20 +145,20 @@ namespace Primo.MIA
                 "Одинаковая арность — число элементов совпадает\n" +
                 "Совпадают типы   — арность И типы всех элементов совпадают";
 
-            sdkComponentIcon = "pack://application:,,,/Primo.MIA;component/images/sharp.png";
+            sdkComponentIcon = ActivityIcons.Tuple;
 
-            sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
+                        sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_Tuple",      PropertyType = PropertyTypes.SCRIPT,   EditorType = ScriptEditorTypes.NONE, DataType = typeof(object), ToolTip = "Анализируемый кортеж", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_TupleB",     PropertyType = PropertyTypes.SCRIPT,   EditorType = ScriptEditorTypes.NONE, DataType = typeof(object), ToolTip = "Второй кортеж для сравнения (необязательно)", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_Arity",      PropertyType = PropertyTypes.VARIABLE, EditorType = ScriptEditorTypes.NONE, DataType = typeof(int),    ToolTip = "Количество элементов", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_TypeName",   PropertyType = PropertyTypes.VARIABLE, EditorType = ScriptEditorTypes.NONE, DataType = typeof(string), ToolTip = "Тип кортежа", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_ItemTypes",  PropertyType = PropertyTypes.VARIABLE, EditorType = ScriptEditorTypes.NONE, DataType = typeof(string), ToolTip = "Типы элементов через запятую", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_ItemValues", PropertyType = PropertyTypes.VARIABLE, EditorType = ScriptEditorTypes.NONE, DataType = typeof(string), ToolTip = "Значения элементов через \"; \"", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_HasNulls",   PropertyType = PropertyTypes.VARIABLE, EditorType = ScriptEditorTypes.NONE, DataType = typeof(bool),   ToolTip = "Есть ли null-элементы", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_AreEqual",   PropertyType = PropertyTypes.VARIABLE, EditorType = ScriptEditorTypes.NONE, DataType = typeof(bool),   ToolTip = "Кортежи равны (все элементы совпадают)", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_SameArity",  PropertyType = PropertyTypes.VARIABLE, EditorType = ScriptEditorTypes.NONE, DataType = typeof(bool),   ToolTip = "Одинаковая арность", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_SameTypes",  PropertyType = PropertyTypes.VARIABLE, EditorType = ScriptEditorTypes.NONE, DataType = typeof(bool),   ToolTip = "Совпадают типы элементов", IsReadOnly = false }
+                PropertyBuilder.Script<object>("Prop_Tuple", "Анализируемый кортеж"),
+                PropertyBuilder.Script<object>("Prop_TupleB", "Второй кортеж для сравнения (необязательно)"),
+                PropertyBuilder.Variable<int>("Prop_Arity", "Количество элементов"),
+                PropertyBuilder.Variable<string>("Prop_TypeName", "Тип кортежа"),
+                PropertyBuilder.Variable<string>("Prop_ItemTypes", "Типы элементов через запятую"),
+                PropertyBuilder.Variable<string>("Prop_ItemValues", "Значения элементов через \"; \""),
+                PropertyBuilder.Variable<bool>("Prop_HasNulls", "Есть ли null-элементы"),
+                PropertyBuilder.Variable<bool>("Prop_AreEqual", "Кортежи равны (все элементы совпадают)"),
+                PropertyBuilder.Variable<bool>("Prop_SameArity", "Одинаковая арность"),
+                PropertyBuilder.Variable<bool>("Prop_SameTypes", "Совпадают типы элементов")
             };
 
             InitClass(container);
@@ -225,11 +235,10 @@ namespace Primo.MIA
 
         // ── ВАЛИДАЦИЯ ──────────────────────────────────────────────────────────
 
-        public override ValidationResult Validate()
+                public override ValidationResult Validate()
         {
             var ret = new ValidationResult();
-            if (string.IsNullOrWhiteSpace(this.Prop_Tuple))
-                ret.Items.Add(new ValidationResult.ValidationItem() { PropertyName = "Кортеж", Error = "Кортеж обязателен" });
+            ret.ValidateRequired(this.Prop_Tuple, ActivityStrings.Field_Tuple, ActivityStrings.Error_TupleRequired);
             return ret;
         }
     }

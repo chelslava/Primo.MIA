@@ -1,6 +1,7 @@
 using LTools.Common.Model;
 using LTools.Common.UIElements;
 using LTools.SDK;
+using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,10 +22,9 @@ namespace Primo.MIA
     ///
     /// Возвращает новый список — оригинал не изменяется.
     /// </summary>
-    public class TupleSortBack : PrimoComponentTO<TupleSort>
+        public class TupleSortBack : PrimoComponentTO<TupleSort>
     {
-        private const string CGroupName = "MIA" + WFPublishedElementBase.TREE_SEPARATOR + "Кортежи";
-        public override string GroupName { get => CGroupName; protected set { } }
+        public override string GroupName { get => ActivityCategories.Tuples; protected set { } }
 
         protected override int sdkTimeOut
         {
@@ -36,15 +36,17 @@ namespace Primo.MIA
 
         private string _propTupleList;
         /// <summary>Список кортежей для сортировки. Тип элемента — любой Tuple арности 1–7.</summary>
-        [LTools.Common.Model.Serialization.StoringProperty]
+                [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(object))]
-        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Список кортежей")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main)]
+        [System.ComponentModel.DisplayName(ActivityStrings.Field_TupleList)]
         public string Prop_TupleList { get => _propTupleList; set { _propTupleList = value; InvokePropertyChanged(this, "Prop_TupleList"); } }
 
         private TupleItemIndex _sortKey = TupleItemIndex.Item1;
         /// <summary>По значению какого элемента сортировать (Item1–Item7).</summary>
-        [LTools.Common.Model.Serialization.StoringProperty]
-        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Ключ сортировки")]
+                [LTools.Common.Model.Serialization.StoringProperty]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main)]
+        [System.ComponentModel.DisplayName(ActivityStrings.Field_SortKey)]
         public TupleItemIndex SortKey
         {
             get => _sortKey;
@@ -53,8 +55,9 @@ namespace Primo.MIA
 
         private TupleSortDirection _direction = TupleSortDirection.Ascending;
         /// <summary>Направление сортировки: по возрастанию или убыванию.</summary>
-        [LTools.Common.Model.Serialization.StoringProperty]
-        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Направление")]
+                [LTools.Common.Model.Serialization.StoringProperty]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main)]
+        [System.ComponentModel.DisplayName(ActivityStrings.Field_Direction)]
         public TupleSortDirection Direction
         {
             get => _direction;
@@ -63,8 +66,9 @@ namespace Primo.MIA
 
         private TupleSortType _sortType = TupleSortType.Alphabetical;
         /// <summary>Тип сортировки: алфавитная, числовая или натуральная.</summary>
-        [LTools.Common.Model.Serialization.StoringProperty]
-        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Тип сортировки")]
+                [LTools.Common.Model.Serialization.StoringProperty]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main)]
+        [System.ComponentModel.DisplayName(ActivityStrings.Field_SortType)]
         public TupleSortType SortType
         {
             get => _sortType;
@@ -75,16 +79,18 @@ namespace Primo.MIA
 
         private string _propResult;
         /// <summary>Отсортированный список кортежей. Имеет тот же тип что и входной список.</summary>
-        [LTools.Common.Model.Serialization.StoringProperty]
+                [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(object))]
-        [System.ComponentModel.Category("Выходные данные"), System.ComponentModel.DisplayName("Результат")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output)]
+        [System.ComponentModel.DisplayName(ActivityStrings.Field_OutputVariable)]
         public string Prop_Result { get => _propResult; set { _propResult = value; InvokePropertyChanged(this, "Prop_Result"); } }
 
         private string _propCount;
         /// <summary>Количество кортежей в результате.</summary>
-        [LTools.Common.Model.Serialization.StoringProperty]
+                [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
-        [System.ComponentModel.Category("Выходные данные"), System.ComponentModel.DisplayName("Количество")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output)]
+        [System.ComponentModel.DisplayName(ActivityStrings.Field_Count)]
         public string Prop_Count { get => _propCount; set { _propCount = value; InvokePropertyChanged(this, "Prop_Count"); } }
 
         // ── КОНСТРУКТОР ────────────────────────────────────────────────────────
@@ -102,16 +108,16 @@ namespace Primo.MIA
                 "  Numeric      — числовая; нечисловые уходят в конец\n" +
                 "  Natural      — file2 < file10 (числа внутри строки)\n\n" +
                 "Оригинальный список не изменяется — возвращается новый.";
-            sdkComponentIcon = "pack://application:,,,/Primo.MIA;component/images/sharp.png";
+            sdkComponentIcon = ActivityIcons.Tuple;
 
-            sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
+                        sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_TupleList", PropertyType = PropertyTypes.SCRIPT,   EditorType = ScriptEditorTypes.NONE, DataType = typeof(object), ToolTip = "Список кортежей для сортировки", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "SortKey",        PropertyType = PropertyTypes.OBJECT,   EditorType = ScriptEditorTypes.NONE, DataType = typeof(TupleItemIndex),     ToolTip = "По какому элементу сортировать (Item1–Item7)", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Direction",      PropertyType = PropertyTypes.OBJECT,   EditorType = ScriptEditorTypes.NONE, DataType = typeof(TupleSortDirection), ToolTip = "Направление: Ascending или Descending", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "SortType",       PropertyType = PropertyTypes.OBJECT,   EditorType = ScriptEditorTypes.NONE, DataType = typeof(TupleSortType),      ToolTip = "Тип: Alphabetical, Numeric, Natural", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_Result",    PropertyType = PropertyTypes.VARIABLE, EditorType = ScriptEditorTypes.NONE, DataType = typeof(object), ToolTip = "Отсортированный список", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_Count",     PropertyType = PropertyTypes.VARIABLE, EditorType = ScriptEditorTypes.NONE, DataType = typeof(int),    ToolTip = "Количество кортежей", IsReadOnly = false }
+                PropertyBuilder.Script<object>("Prop_TupleList", "Список кортежей для сортировки"),
+                PropertyBuilder.Enum<TupleItemIndex>("SortKey", "По какому элементу сортировать (Item1–Item7)"),
+                PropertyBuilder.Enum<TupleSortDirection>("Direction", "Направление: Ascending или Descending"),
+                PropertyBuilder.Enum<TupleSortType>("SortType", "Тип: Alphabetical, Numeric, Natural"),
+                PropertyBuilder.Variable<object>("Prop_Result", "Отсортированный список"),
+                PropertyBuilder.Variable<int>("Prop_Count", "Количество кортежей")
             };
 
             InitClass(container);
@@ -196,13 +202,11 @@ namespace Primo.MIA
 
         // ── ВАЛИДАЦИЯ ──────────────────────────────────────────────────────────
 
-        public override ValidationResult Validate()
+                public override ValidationResult Validate()
         {
             var ret = new ValidationResult();
-            if (string.IsNullOrWhiteSpace(this.Prop_TupleList))
-                ret.Items.Add(new ValidationResult.ValidationItem() { PropertyName = "Список кортежей", Error = "Список кортежей обязателен" });
-            if (string.IsNullOrWhiteSpace(this.Prop_Result))
-                ret.Items.Add(new ValidationResult.ValidationItem() { PropertyName = "Результат", Error = "Выходная переменная «Результат» обязательна" });
+            ret.ValidateRequired(this.Prop_TupleList, ActivityStrings.Field_TupleList, "Список кортежей обязателен");
+            ret.ValidateRequired(this.Prop_Result, ActivityStrings.Field_OutputVariable, "Выходная переменная «Результат» обязательна");
             return ret;
         }
     }

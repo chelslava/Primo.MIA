@@ -1,6 +1,7 @@
 using LTools.Common.Model;
 using LTools.Common.UIElements;
 using LTools.SDK;
+using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
 using static LTools.Common.Helpers.WFHelper.PropertiesItem;
@@ -19,10 +20,9 @@ namespace Primo.MIA
     ///
     /// Новый кортеж можно записать в ту же переменную — эффект «изменения».
     /// </summary>
-    public class TupleSetBack : PrimoComponentTO<TupleSet>
+        public class TupleSetBack : PrimoComponentTO<TupleSet>
     {
-        private const string CGroupName = "MIA" + WFPublishedElementBase.TREE_SEPARATOR + "Кортежи";
-        public override string GroupName { get => CGroupName; protected set { } }
+        public override string GroupName { get => ActivityCategories.Tuples; protected set { } }
 
         protected override int sdkTimeOut
         {
@@ -36,13 +36,15 @@ namespace Primo.MIA
         /// <summary>Исходный кортеж. Не изменяется — создаётся новый.</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(object))]
-        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Кортеж")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main)]
+        [System.ComponentModel.DisplayName(ActivityStrings.Field_Tuple)]
         public string Prop_Tuple { get => _propTuple; set { _propTuple = value; InvokePropertyChanged(this, "Prop_Tuple"); } }
 
         private TupleItemIndex _index = TupleItemIndex.Item1;
         /// <summary>Номер заменяемого элемента: Item1–Item7. Должен быть ≤ арности кортежа.</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
-        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Номер элемента")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main)]
+        [System.ComponentModel.DisplayName(ActivityStrings.Field_ItemIndex)]
         public TupleItemIndex Index
         {
             get => _index;
@@ -53,7 +55,8 @@ namespace Primo.MIA
         /// <summary>Новое значение для указанного элемента. Принимает любой тип.</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(object))]
-        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Новое значение")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main)]
+        [System.ComponentModel.DisplayName(ActivityStrings.Field_NewValue)]
         public string Prop_NewValue { get => _propNewValue; set { _propNewValue = value; InvokePropertyChanged(this, "Prop_NewValue"); } }
 
         // ── OUTPUT ─────────────────────────────────────────────────────────────
@@ -65,7 +68,8 @@ namespace Primo.MIA
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(object))]
-        [System.ComponentModel.Category("Выходные данные"), System.ComponentModel.DisplayName("Новый кортеж")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output)]
+        [System.ComponentModel.DisplayName(ActivityStrings.Field_NewTuple)]
         public string Prop_Result { get => _propResult; set { _propResult = value; InvokePropertyChanged(this, "Prop_Result"); } }
 
         // ── КОНСТРУКТОР ────────────────────────────────────────────────────────
@@ -81,14 +85,14 @@ namespace Primo.MIA
                 "  Номер = Item2, Новое значение = 99\n" +
                 "  → Новый кортеж: Tuple(\"Иванов\", 99, true)\n\n" +
                 "Ошибка: Номер элемента > арности кортежа.";
-            sdkComponentIcon = "pack://application:,,,/Primo.MIA;component/images/sharp.png";
+            sdkComponentIcon = ActivityIcons.Tuple;
 
-            sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
+                        sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_Tuple",    PropertyType = PropertyTypes.SCRIPT,   EditorType = ScriptEditorTypes.NONE, DataType = typeof(object), ToolTip = "Исходный кортеж (не изменяется)", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Index",         PropertyType = PropertyTypes.OBJECT,   EditorType = ScriptEditorTypes.NONE, DataType = typeof(TupleItemIndex), ToolTip = "Номер заменяемого элемента", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_NewValue", PropertyType = PropertyTypes.SCRIPT,   EditorType = ScriptEditorTypes.NONE, DataType = typeof(object), ToolTip = "Новое значение элемента", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_Result",   PropertyType = PropertyTypes.VARIABLE, EditorType = ScriptEditorTypes.NONE, DataType = typeof(object), ToolTip = "Новый кортеж с заменённым элементом", IsReadOnly = false }
+                PropertyBuilder.Script<object>("Prop_Tuple", "Исходный кортеж (не изменяется)"),
+                PropertyBuilder.Enum<TupleItemIndex>("Index", "Номер заменяемого элемента"),
+                PropertyBuilder.Script<object>("Prop_NewValue", "Новое значение элемента"),
+                PropertyBuilder.Variable<object>("Prop_Result", "Новый кортеж с заменённым элементом")
             };
 
             InitClass(container);
@@ -126,15 +130,12 @@ namespace Primo.MIA
 
         // ── ВАЛИДАЦИЯ ──────────────────────────────────────────────────────────
 
-        public override ValidationResult Validate()
+                public override ValidationResult Validate()
         {
             var ret = new ValidationResult();
-            if (string.IsNullOrWhiteSpace(this.Prop_Tuple))
-                ret.Items.Add(new ValidationResult.ValidationItem() { PropertyName = "Кортеж", Error = "Кортеж обязателен" });
-            if (string.IsNullOrWhiteSpace(this.Prop_NewValue))
-                ret.Items.Add(new ValidationResult.ValidationItem() { PropertyName = "Новое значение", Error = "Новое значение обязательно" });
-            if (string.IsNullOrWhiteSpace(this.Prop_Result))
-                ret.Items.Add(new ValidationResult.ValidationItem() { PropertyName = "Новый кортеж", Error = "Выходная переменная «Новый кортеж» обязательна" });
+            ret.ValidateRequired(this.Prop_Tuple, ActivityStrings.Field_Tuple, ActivityStrings.Error_TupleRequired);
+            ret.ValidateRequired(this.Prop_NewValue, ActivityStrings.Field_NewValue, ActivityStrings.Error_NewValueRequired);
+            ret.ValidateRequired(this.Prop_Result, ActivityStrings.Field_NewTuple, "Выходная переменная «Новый кортеж» обязательна");
             return ret;
         }
     }

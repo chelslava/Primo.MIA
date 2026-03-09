@@ -1,6 +1,7 @@
 using LTools.Common.Model;
 using LTools.Common.UIElements;
 using LTools.SDK;
+using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
 using static LTools.Common.Helpers.WFHelper.PropertiesItem;
@@ -18,10 +19,9 @@ namespace Primo.MIA
     /// Незаполненные Out-переменные пропускаются.
     /// Номер > арности кортежа — пропускается без ошибки.
     /// </summary>
-    public class TupleDestructureBack : PrimoComponentTO<TupleDestructure>
+        public class TupleDestructureBack : PrimoComponentTO<TupleDestructure>
     {
-        private const string CGroupName = "MIA" + WFPublishedElementBase.TREE_SEPARATOR + "Кортежи";
-        public override string GroupName { get => CGroupName; protected set { } }
+        public override string GroupName { get => ActivityCategories.Tuples; protected set { } }
 
         protected override int sdkTimeOut
         {
@@ -33,66 +33,76 @@ namespace Primo.MIA
 
         private string _propTuple;
         /// <summary>Входной кортеж — System.Tuple или System.ValueTuple любой арности.</summary>
-        [LTools.Common.Model.Serialization.StoringProperty]
+                [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(object))]
-        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Кортеж")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main)]
+        [System.ComponentModel.DisplayName(ActivityStrings.Field_Tuple)]
         public string Prop_Tuple { get => _propTuple; set { _propTuple = value; InvokePropertyChanged(this, "Prop_Tuple"); } }
 
         // ── OUTPUT: переменные для каждого элемента ────────────────────────────
 
         private string _propOut1;
-        [LTools.Common.Model.Serialization.StoringProperty]
+                [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(object))]
-        [System.ComponentModel.Category("Элементы"), System.ComponentModel.DisplayName("Out: Item1")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Elements)]
+        [System.ComponentModel.DisplayName(ActivityStrings.Field_OutItem1)]
         public string Prop_Out1 { get => _propOut1; set { _propOut1 = value; InvokePropertyChanged(this, "Prop_Out1"); } }
 
         private string _propOut2;
-        [LTools.Common.Model.Serialization.StoringProperty]
+                [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(object))]
-        [System.ComponentModel.Category("Элементы"), System.ComponentModel.DisplayName("Out: Item2")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Elements)]
+        [System.ComponentModel.DisplayName(ActivityStrings.Field_OutItem2)]
         public string Prop_Out2 { get => _propOut2; set { _propOut2 = value; InvokePropertyChanged(this, "Prop_Out2"); } }
 
         private string _propOut3;
-        [LTools.Common.Model.Serialization.StoringProperty]
+                [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(object))]
-        [System.ComponentModel.Category("Элементы"), System.ComponentModel.DisplayName("Out: Item3")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Elements)]
+        [System.ComponentModel.DisplayName(ActivityStrings.Field_OutItem3)]
         public string Prop_Out3 { get => _propOut3; set { _propOut3 = value; InvokePropertyChanged(this, "Prop_Out3"); } }
 
         private string _propOut4;
-        [LTools.Common.Model.Serialization.StoringProperty]
+                [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(object))]
-        [System.ComponentModel.Category("Элементы"), System.ComponentModel.DisplayName("Out: Item4")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Elements)]
+        [System.ComponentModel.DisplayName(ActivityStrings.Field_OutItem4)]
         public string Prop_Out4 { get => _propOut4; set { _propOut4 = value; InvokePropertyChanged(this, "Prop_Out4"); } }
 
         private string _propOut5;
-        [LTools.Common.Model.Serialization.StoringProperty]
+                [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(object))]
-        [System.ComponentModel.Category("Элементы"), System.ComponentModel.DisplayName("Out: Item5")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Elements)]
+        [System.ComponentModel.DisplayName(ActivityStrings.Field_OutItem5)]
         public string Prop_Out5 { get => _propOut5; set { _propOut5 = value; InvokePropertyChanged(this, "Prop_Out5"); } }
 
         private string _propOut6;
-        [LTools.Common.Model.Serialization.StoringProperty]
+                [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(object))]
-        [System.ComponentModel.Category("Элементы"), System.ComponentModel.DisplayName("Out: Item6")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Elements)]
+        [System.ComponentModel.DisplayName(ActivityStrings.Field_OutItem6)]
         public string Prop_Out6 { get => _propOut6; set { _propOut6 = value; InvokePropertyChanged(this, "Prop_Out6"); } }
 
         private string _propOut7;
-        [LTools.Common.Model.Serialization.StoringProperty]
+                [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(object))]
-        [System.ComponentModel.Category("Элементы"), System.ComponentModel.DisplayName("Out: Item7")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Elements)]
+        [System.ComponentModel.DisplayName(ActivityStrings.Field_OutItem7)]
         public string Prop_Out7 { get => _propOut7; set { _propOut7 = value; InvokePropertyChanged(this, "Prop_Out7"); } }
 
         private string _propArity;
-        [LTools.Common.Model.Serialization.StoringProperty]
+                [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
-        [System.ComponentModel.Category("Выходные данные"), System.ComponentModel.DisplayName("Арность")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output)]
+        [System.ComponentModel.DisplayName(ActivityStrings.Field_Arity)]
         public string Prop_Arity { get => _propArity; set { _propArity = value; InvokePropertyChanged(this, "Prop_Arity"); } }
 
         private string _propKindName;
         /// <summary>Имя типа кортежа: "Tuple`3" или "ValueTuple`3". Для диагностики.</summary>
-        [LTools.Common.Model.Serialization.StoringProperty]
+                [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
-        [System.ComponentModel.Category("Выходные данные"), System.ComponentModel.DisplayName("Тип (имя)")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output)]
+        [System.ComponentModel.DisplayName(ActivityStrings.Field_KindName)]
         public string Prop_KindName { get => _propKindName; set { _propKindName = value; InvokePropertyChanged(this, "Prop_KindName"); } }
 
         // ── КОНСТРУКТОР ────────────────────────────────────────────────────────
@@ -109,20 +119,20 @@ namespace Primo.MIA
                 "  • Номер Out > арности кортежа — пропускается без ошибки.\n" +
                 "  • «Тип (имя)»: \"Tuple`3\" или \"ValueTuple`3\".";
 
-            sdkComponentIcon = "pack://application:,,,/Primo.MIA;component/images/sharp.png";
+            sdkComponentIcon = ActivityIcons.Tuple;
 
-            sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
+                        sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_Tuple",    PropertyType = PropertyTypes.SCRIPT,   EditorType = ScriptEditorTypes.NONE, DataType = typeof(object), ToolTip = "Входной кортеж (Tuple или ValueTuple)", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_Out1",     PropertyType = PropertyTypes.VARIABLE, EditorType = ScriptEditorTypes.NONE, DataType = typeof(object), ToolTip = "Переменная для Item1", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_Out2",     PropertyType = PropertyTypes.VARIABLE, EditorType = ScriptEditorTypes.NONE, DataType = typeof(object), ToolTip = "Переменная для Item2", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_Out3",     PropertyType = PropertyTypes.VARIABLE, EditorType = ScriptEditorTypes.NONE, DataType = typeof(object), ToolTip = "Переменная для Item3", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_Out4",     PropertyType = PropertyTypes.VARIABLE, EditorType = ScriptEditorTypes.NONE, DataType = typeof(object), ToolTip = "Переменная для Item4", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_Out5",     PropertyType = PropertyTypes.VARIABLE, EditorType = ScriptEditorTypes.NONE, DataType = typeof(object), ToolTip = "Переменная для Item5", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_Out6",     PropertyType = PropertyTypes.VARIABLE, EditorType = ScriptEditorTypes.NONE, DataType = typeof(object), ToolTip = "Переменная для Item6", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_Out7",     PropertyType = PropertyTypes.VARIABLE, EditorType = ScriptEditorTypes.NONE, DataType = typeof(object), ToolTip = "Переменная для Item7", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_Arity",    PropertyType = PropertyTypes.VARIABLE, EditorType = ScriptEditorTypes.NONE, DataType = typeof(int),    ToolTip = "Арность кортежа", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_KindName", PropertyType = PropertyTypes.VARIABLE, EditorType = ScriptEditorTypes.NONE, DataType = typeof(string), ToolTip = "Имя типа кортежа (Tuple`N или ValueTuple`N)", IsReadOnly = false }
+                PropertyBuilder.Script<object>("Prop_Tuple", "Входной кортеж (Tuple или ValueTuple)"),
+                PropertyBuilder.Variable<object>("Prop_Out1", "Переменная для Item1"),
+                PropertyBuilder.Variable<object>("Prop_Out2", "Переменная для Item2"),
+                PropertyBuilder.Variable<object>("Prop_Out3", "Переменная для Item3"),
+                PropertyBuilder.Variable<object>("Prop_Out4", "Переменная для Item4"),
+                PropertyBuilder.Variable<object>("Prop_Out5", "Переменная для Item5"),
+                PropertyBuilder.Variable<object>("Prop_Out6", "Переменная для Item6"),
+                PropertyBuilder.Variable<object>("Prop_Out7", "Переменная для Item7"),
+                PropertyBuilder.Variable<int>("Prop_Arity", "Арность кортежа"),
+                PropertyBuilder.Variable<string>("Prop_KindName", "Имя типа кортежа (Tuple`N или ValueTuple`N)")
             };
 
             InitClass(container);
@@ -174,18 +184,17 @@ namespace Primo.MIA
 
         // ── ВАЛИДАЦИЯ ──────────────────────────────────────────────────────────
 
-        public override ValidationResult Validate()
+                public override ValidationResult Validate()
         {
             var ret = new ValidationResult();
-            if (string.IsNullOrWhiteSpace(this.Prop_Tuple))
-                ret.Items.Add(new ValidationResult.ValidationItem() { PropertyName = "Кортеж", Error = "Кортеж обязателен" });
+            ret.ValidateRequired(this.Prop_Tuple, ActivityStrings.Field_Tuple, ActivityStrings.Error_TupleRequired);
 
             bool anyOut = !string.IsNullOrWhiteSpace(this.Prop_Out1) || !string.IsNullOrWhiteSpace(this.Prop_Out2)
                        || !string.IsNullOrWhiteSpace(this.Prop_Out3) || !string.IsNullOrWhiteSpace(this.Prop_Out4)
                        || !string.IsNullOrWhiteSpace(this.Prop_Out5) || !string.IsNullOrWhiteSpace(this.Prop_Out6)
                        || !string.IsNullOrWhiteSpace(this.Prop_Out7);
             if (!anyOut)
-                ret.Items.Add(new ValidationResult.ValidationItem() { PropertyName = "Out:Item1", Error = "Задайте хотя бы одну выходную переменную (Out:Item1 … Out:Item7)" });
+                ret.Items.Add(new ValidationResult.ValidationItem() { PropertyName = ActivityStrings.Field_OutItem1, Error = "Задайте хотя бы одну выходную переменную (Out:Item1 … Out:Item7)" });
 
             return ret;
         }

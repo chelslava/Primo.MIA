@@ -10,18 +10,43 @@ namespace Primo.MIA.Common
         // КАТЕГОРИИ
         // ═══════════════════════════════════════════════════════════════════════
         
-        public const string Category_Main = "Основные";
+        public const string Category_Main = "1. Основные";
         public const string Category_Output = "Выходные данные";
         public const string Category_Settings = "Настройки";
         public const string Category_Search = "Поиск";
         public const string Category_FromLists = "FromLists";
         public const string Category_Invert = "Invert";
+        public const string Category_Separators = "Разделители";
         public const string Category_Elements = "Элементы";
         public const string Category_Lengths = "Длины";
         public const string Category_Statistics = "Статистика";
         public const string Category_File = "Файл";
         public const string Category_Format = "Формат";
         public const string Category_LengthRange = "LengthRange";
+        public const string Category_Sertificates_SSL = "2. Сертификаты и SSL";
+        public const string Category_Parameters = "Параметры";
+        public const string Category_Replace = "Replace";
+        public const string Category_PrefixSuffix = "Prefix/Suffix";
+        public const string Category_PadTruncate = "Pad/Truncate";
+        public const string Category_Join = "Join";
+        public const string Category_Random = "Random";
+        public const string Category_Comparison = "Сравнение";
+        public const string Category_Structure = "Структура";
+        public const string Category_Offset = "Смещение";
+        public const string Category_Profile = "Профиль";
+        public const string Category_FromList = "FromList";
+        public const string Category_ToString = "ToString";
+        public const string Category_Optional = "Опционально";
+        
+        // Категории для Generators
+        public const string Category_Guid = "2. GUID";
+        public const string Category_FileName = "3. Имя файла";
+        public const string Category_RandomNumber = "4. Случайное число";
+        public const string Category_Timestamp = "5. Временная метка";
+        public const string Category_Counter = "6. Счётчик";
+        public const string Category_HashId = "7. Хеш ID";
+        public const string Category_Username = "8. Имя пользователя";
+        public const string Category_Template = "9. Шаблон";
 
         // ═══════════════════════════════════════════════════════════════════════
         // НАЗВАНИЯ ПОЛЕЙ (общие)
@@ -51,6 +76,13 @@ namespace Primo.MIA.Common
         public const string Field_ThrowIfNotFound = "Ошибка если не найдено";
         public const string Field_ThrowOnDuplicates = "Ошибка при дублях";
         public const string Field_CaseSensitive = "Учитывать регистр";
+        public const string Field_PairSeparator = "Разделитель пар";
+        public const string Field_KeyValueSeparator = "Разделитель ключ-значение";
+        public const string Field_TrimWhitespace = "Обрезать пробелы";
+        public const string Field_SkippedCount = "Пропущено пар";
+        public const string Field_ParsedPairs = "Разобрано пар";
+        public const string Field_ResultString = "Результирующая строка";
+        public const string Field_PairCount = "Количество пар";
         
         // ═══════════════════════════════════════════════════════════════════════
         // НАЗВАНИЯ ПОЛЕЙ (выходные)
@@ -64,6 +96,11 @@ namespace Primo.MIA.Common
         public const string Field_IsUpdate = "Обновление (не добавление)";
         public const string Field_HadConflicts = "Были конфликты ключей";
         public const string Field_ConflictKeys = "Конфликтующие ключи";
+        public const string Field_Keys = "Список ключей";
+        public const string Field_Values = "Список значений";
+        public const string Field_IsEmpty = "Словарь пуст";
+        public const string Field_FoundKeys = "Ключи с таким значением";
+        public const string Field_Removed = "Ключ удалён";
         public const string Field_TotalCount = "Всего элементов";
         public const string Field_UniqueCount = "Уникальных";
         public const string Field_EmptyCount = "Пустых";
@@ -107,6 +144,19 @@ namespace Primo.MIA.Common
         public const string Error_CustomPatternRequired = "Пользовательский паттерн не может быть пустым";
         public const string Error_MaxFileSizeRequired = "Максимальный размер файла должен быть указан";
         public const string Error_SearchTimeoutRequired = "Таймаут поиска должен быть указан";
+        public const string Error_NewValueRequired = "Новое значение обязательно";
+        public const string Error_StartCellRequired = "Начальная ячейка обязательна";
+        public const string Error_FilePathRequired = "Путь к файлу не может быть пустым";
+        public const string Error_ProfileNameRequired = "Имя профиля обязательно в режиме ReadProfile";
+        public const string Error_SectionNameRequired = "Имя секции обязательно в режиме SectionToDictionary";
+        public const string Error_KeyPathRequired = "Ключ обязателен в режиме SingleValue";
+        public const string Error_RegexPatternRequired = "Regex паттерн обязателен для ByRegexGroup";
+        public const string Error_TemplateRequired = "Шаблон обязателен";
+        public const string Error_FilePatternRequired = "Маска файла не может быть пустой";
+        public const string Error_CheckIntervalRequired = "Интервал проверки должен быть указан";
+        public const string Error_StabilityTimeoutRequired = "Время стабильности должно быть указано";
+        public const string Error_TimeoutRequired = "Таймаут должен быть указан";
+        public const string Error_ListBRequired = "Список B обязателен для данной операции";
         
         // ═══════════════════════════════════════════════════════════════════════
         // НАЗВАНИЯ АКТИВНОСТЕЙ
@@ -157,6 +207,9 @@ namespace Primo.MIA.Common
         public const string Activity_Generators = "Генераторы";
         public const string Activity_ExcelCellRecalculate = "Excel: Пересчёт ячеек";
         public const string Activity_WaitForFile = "Ожидание файла";
+        
+        // Dictionary (дополнительные)
+        public const string Activity_DictionaryRemoveKey = "Словарь: Удалить ключ";
         
         // ═══════════════════════════════════════════════════════════════════════
         // ДОПОЛНИТЕЛЬНЫЕ ПОЛЯ
@@ -214,5 +267,139 @@ namespace Primo.MIA.Common
         public const string Field_Rejected = "Не прошли фильтр";
         public const string Field_MatchedCount = "Кол-во прошедших";
         public const string Field_RejectedCount = "Кол-во отсеянных";
+        
+        // Tuple fields
+        public const string Field_ItemIndex = "Номер элемента";
+        public const string Field_NewValue = "Новое значение";
+        public const string Field_NewTuple = "Новый кортеж";
+        public const string Field_ItemTypes = "Типы элементов";
+        public const string Field_ItemValues = "Значения элементов";
+        public const string Field_HasNulls = "Есть null элементы";
+        public const string Field_AreEqual = "Равны";
+        public const string Field_SameArity = "Одинаковая арность";
+        public const string Field_SameTypes = "Совпадают типы";
+        public const string Field_TypeName = "Тип кортежа";
+        public const string Field_SecondTuple = "Второй кортеж (для сравнения)";
+        public const string Field_OutItem1 = "Out: Item1";
+        public const string Field_OutItem2 = "Out: Item2";
+        public const string Field_OutItem3 = "Out: Item3";
+        public const string Field_OutItem4 = "Out: Item4";
+        public const string Field_OutItem5 = "Out: Item5";
+        public const string Field_OutItem6 = "Out: Item6";
+        public const string Field_OutItem7 = "Out: Item7";
+        public const string Field_ValueType = "Тип значения";
+        public const string Field_IncludeKeys = "Включать ключи";
+        public const string Field_ResultTuple = "Кортеж (результат)";
+        public const string Field_ResultList = "Список (результат)";
+        public const string Field_ResultDict = "Словарь (результат)";
+        public const string Field_SourceList = "Список (вход)";
+        public const string Field_ConvertMode = "Режим";
+        public const string Field_ListA_Item1 = "Список A (Item1)";
+        public const string Field_ListB_Item2 = "Список B (Item2)";
+        public const string Field_ListC_Item3 = "Список C (Item3, необязателен)";
+        public const string Field_TupleList = "Список кортежей";
+        public const string Field_TupleArity = "Арность кортежей";
+        public const string Field_ListA_FromItem1 = "Список A (из Item1)";
+        public const string Field_ListB_FromItem2 = "Список B (из Item2)";
+        public const string Field_ListC_FromItem3 = "Список C (из Item3)";
+        public const string Field_SortKey = "Ключ сортировки";
+        public const string Field_Direction = "Направление";
+        public const string Field_SortType = "Тип сортировки";
+        
+        // List fields
+        public const string Field_GroupingMode = "Способ группировки";
+        public const string Field_PrefixLength = "Длина префикса";
+        public const string Field_RegexPattern = "Regex паттерн";
+        public const string Field_TopN = "Топ N (для TopFrequent)";
+        public const string Field_Groups = "Группы";
+        public const string Field_GroupCount = "Количество групп";
+        public const string Field_FrequencyMap = "Частота элементов";
+        public const string Field_SortMode = "Способ сортировки";
+        public const string Field_RandomSeed = "Зерно (для Random)";
+        public const string Field_ListA = "Список A";
+        public const string Field_ListB = "Список B";
+        public const string Field_Operation = "Операция";
+        public const string Field_SliceMode = "Способ среза";
+        public const string Field_N = "N (кол-во / шаг)";
+        public const string Field_Page = "Номер страницы";
+        public const string Field_PageSize = "Размер страницы";
+        public const string Field_FromIndex = "Индекс от (включ.)";
+        public const string Field_ToIndex = "Индекс до (включ.)";
+        public const string Field_TotalPages = "Всего страниц";
+        public const string Field_TransformMode = "Преобразование";
+        public const string Field_Find = "Найти";
+        public const string Field_Replacement = "Заменить на";
+        public const string Field_Prefix = "Префикс";
+        public const string Field_Suffix = "Суффикс";
+        public const string Field_PadWidth = "Ширина (Pad)";
+        public const string Field_PadChar = "Символ заполнения";
+        public const string Field_MaxLengthTruncate = "Макс. длина (Truncate)";
+        public const string Field_AggregateFunction = "Агрегатная функция";
+        public const string Field_Separator = "Разделитель";
+        public const string Field_StringResult = "Строковый результат";
+        public const string Field_NumericResult = "Числовой результат";
+        public const string Field_NumericCount = "Кол-во числовых";
+        public const string Field_ChangedCount = "Изменилось элементов";
+        
+        // Dictionary fields
+        public const string Field_Query = "Строка поиска / паттерн";
+        public const string Field_Target = "Где искать";
+        public const string Field_SearchMethod = "Метод поиска";
+        public const string Field_FilteredOutCount = "Отсеяно фильтром";
+        
+        // Excel fields
+        public const string Field_StartCell = "Начальная ячейка";
+        public const string Field_RowOffset = "Смещение по строке (ΔR)";
+        public const string Field_ColumnOffset = "Смещение по столбцу (ΔC)";
+        public const string Field_TargetCell = "Целевая ячейка";
+        
+        // Generator fields
+        public const string Field_GenerationType = "Тип генерации";
+        public const string Field_GuidFormat = "Формат GUID";
+        public const string Field_BaseName = "Базовое имя";
+        public const string Field_Extension = "Расширение";
+        public const string Field_MinValue = "Минимальное значение";
+        public const string Field_MaxValue = "Максимальное значение";
+        public const string Field_TimestampFormatField = "Формат даты";
+        public const string Field_CustomTimestampFormat = "Кастомный формат";
+        public const string Field_CounterKey = "Ключ счётчика";
+        public const string Field_CounterStart = "Начальное значение";
+        public const string Field_CounterStep = "Шаг";
+        public const string Field_HashPrefix = "Префикс";
+        public const string Field_FirstName = "Имя";
+        public const string Field_LastName = "Фамилия";
+        public const string Field_Domain = "Домен";
+        public const string Field_Template = "Шаблон";
+        public const string Field_Variables = "Переменные";
+        public const string Field_OutputVariable = "Результат";
+        
+        // TOML Config fields
+        public const string Field_FilePath = "Путь к файлу";
+        public const string Field_ReadMode = "Режим чтения";
+        public const string Field_KeyPath = "Ключ (section.key)";
+        public const string Field_SectionName = "Секция";
+        public const string Field_Encoding = "Кодировка";
+        public const string Field_ProfileName = "Имя профиля";
+        public const string Field_DefaultProfileName = "Имя секции default";
+        public const string Field_MergeStrategy = "Стратегия слияния";
+        public const string Field_IncludeNestedSections = "Включать вложенные секции";
+        public const string Field_StringValue = "Строковое значение";
+        public const string Field_DictionaryValues = "Словарь значений";
+        public const string Field_KeyProfileFound = "Ключ/профиль найден";
+        public const string Field_KeysCount = "Кол-во ключей";
+        public const string Field_AvailableProfiles = "Доступные профили";
+        public const string Field_ProfileKeysCount = "Ключей из профиля";
+        public const string Field_DefaultKeysCount = "Ключей из default";
+        
+        // WaitForFile fields
+        public const string Field_WaitMode = "Режим ожидания";
+        public const string Field_FilePattern = "Маска файла";
+        public const string Field_CheckInterval = "Интервал проверки (мс)";
+        public const string Field_WaitForStability = "Ожидать завершения записи";
+        public const string Field_StabilityTimeout = "Время стабильности (мс)";
+        public const string Field_ThrowOnTimeout = "Ошибка при таймауте";
+        public const string Field_FileFound = "Файл найден";
+        public const string Field_FileSize = "Размер файла (байт)";
+        public const string Field_WaitTime = "Время ожидания (мс)";
     }
 }

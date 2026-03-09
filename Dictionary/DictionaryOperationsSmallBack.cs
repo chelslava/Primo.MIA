@@ -14,6 +14,7 @@ using LTools.Common.Model;
 using LTools.Common.UIElements;
 using LTools.Enums;
 using LTools.SDK;
+using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,10 +28,9 @@ namespace Primo.MIA
     /// Оригинальный словарь не изменяется.
     /// Если ключ не найден — поведение задаётся флагом Prop_ThrowIfNotFound.
     /// </summary>
-    public class DictionaryRemoveKeyBack : PrimoComponentTO<DictionaryOperationsSmall>
+        public class DictionaryRemoveKeyBack : PrimoComponentTO<DictionaryOperationsSmall>
     {
-        private const string CGroupName = "MIA" + WFPublishedElementBase.TREE_SEPARATOR + "Словари";
-        public override string GroupName { get => CGroupName; protected set { } }
+        public override string GroupName { get => ActivityCategories.Dictionaries; protected set { } }
 
         protected override int sdkTimeOut
         {
@@ -42,7 +42,7 @@ namespace Primo.MIA
         /// <summary>Входной словарь Dictionary&lt;string, string&gt;</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(Dictionary<string, string>))]
-        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Словарь")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_Dictionary)]
         public string Prop_Dictionary
         {
             get => _propDictionary;
@@ -53,7 +53,7 @@ namespace Primo.MIA
         /// <summary>Ключ который нужно удалить из словаря</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
-        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Ключ")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_Key)]
         public string Prop_Key
         {
             get => _propKey;
@@ -66,7 +66,7 @@ namespace Primo.MIA
         /// Если false — вернуть копию словаря без изменений.
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
-        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Ошибка если не найдено")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_ThrowIfNotFound)]
         public bool Prop_ThrowIfNotFound
         {
             get => _throwIfNotFound;
@@ -77,7 +77,7 @@ namespace Primo.MIA
         /// <summary>Новый словарь без удалённого ключа</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(Dictionary<string, string>))]
-        [System.ComponentModel.Category("Выходные данные"), System.ComponentModel.DisplayName("Результирующий словарь")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_ResultDictionary)]
         public string Prop_ResultDictionary
         {
             get => _propResultDictionary;
@@ -88,7 +88,7 @@ namespace Primo.MIA
         /// <summary>True если ключ был найден и удалён, False если ключа не было</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(bool))]
-        [System.ComponentModel.Category("Выходные данные"), System.ComponentModel.DisplayName("Ключ удалён")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_Removed)]
         public string Prop_Removed
         {
             get => _propRemoved;
@@ -109,34 +109,14 @@ namespace Primo.MIA
                 "  Результирующий словарь — копия без удалённого ключа\n" +
                 "  Ключ удалён            — true если ключ существовал и был удалён";
 
-            sdkComponentIcon = "pack://application:,,,/Primo.MIA;component/images/dict.png";
+            sdkComponentIcon = ActivityIcons.Dictionary;
 
-            sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
+                                    sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_Dictionary", PropertyType = PropertyTypes.SCRIPT,
-                    EditorType = ScriptEditorTypes.NONE, DataType = typeof(Dictionary<string, string>),
-                    ToolTip = "Входной словарь", IsReadOnly = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_Key", PropertyType = PropertyTypes.SCRIPT,
-                    EditorType = ScriptEditorTypes.NONE, DataType = typeof(string),
-                    ToolTip = "Ключ для удаления", IsReadOnly = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_ResultDictionary", PropertyType = PropertyTypes.VARIABLE,
-                    EditorType = ScriptEditorTypes.NONE, DataType = typeof(Dictionary<string, string>),
-                    ToolTip = "Новый словарь без удалённого ключа", IsReadOnly = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_Removed", PropertyType = PropertyTypes.VARIABLE,
-                    EditorType = ScriptEditorTypes.NONE, DataType = typeof(bool),
-                    ToolTip = "True если ключ был найден и удалён", IsReadOnly = false
-                }
+                PropertyBuilder.Script<Dictionary<string, string>>("Prop_Dictionary", "Входной словарь"),
+                PropertyBuilder.Script<string>("Prop_Key", "Ключ для удаления"),
+                PropertyBuilder.Variable<Dictionary<string, string>>("Prop_ResultDictionary", "Новый словарь без удалённого ключа"),
+                PropertyBuilder.Variable<bool>("Prop_Removed", "True если ключ был найден и удалён")
             };
 
             InitClass(container);
@@ -175,18 +155,12 @@ namespace Primo.MIA
             }
         }
 
-        public override ValidationResult Validate()
+                public override ValidationResult Validate()
         {
             var ret = new ValidationResult();
-            ValidateField(ret, this.Prop_Dictionary, "Словарь", "Словарь обязателен");
-            ValidateField(ret, this.Prop_Key,        "Ключ",    "Ключ обязателен");
+            ret.ValidateRequired(this.Prop_Dictionary, ActivityStrings.Field_Dictionary, ActivityStrings.Error_DictionaryRequired);
+            ret.ValidateRequired(this.Prop_Key, ActivityStrings.Field_Key, ActivityStrings.Error_KeyRequired);
             return ret;
-        }
-
-        private void ValidateField(ValidationResult result, string value, string fieldName, string errorMessage)
-        {
-            if (string.IsNullOrWhiteSpace(value))
-                result.Items.Add(new ValidationResult.ValidationItem() { PropertyName = fieldName, Error = errorMessage });
         }
     }
 }

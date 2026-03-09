@@ -14,6 +14,7 @@ using LTools.Common.Model;
 using LTools.Common.UIElements;
 using LTools.Enums;
 using LTools.SDK;
+using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,10 +27,9 @@ namespace Primo.MIA
     /// Объединяет два Dictionary&lt;string, string&gt; в один новый словарь.
     /// Оба входных словаря остаются без изменений.
     /// </summary>
-    public class DictionaryMergeBack : PrimoComponentTO<DictionaryMerge>
+        public class DictionaryMergeBack : PrimoComponentTO<DictionaryMerge>
     {
-        private const string CGroupName = "MIA" + WFPublishedElementBase.TREE_SEPARATOR + "Словари";
-        public override string GroupName { get => CGroupName; protected set { } }
+        public override string GroupName { get => ActivityCategories.Dictionaries; protected set { } }
 
         protected override int sdkTimeOut
         {
@@ -45,7 +45,7 @@ namespace Primo.MIA
         /// <summary>Первый словарь для объединения (базовый)</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(Dictionary<string, string>))]
-        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Первый словарь")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_FirstDictionary)]
         public string Prop_FirstDictionary
         {
             get => _propFirstDictionary;
@@ -56,7 +56,7 @@ namespace Primo.MIA
         /// <summary>Второй словарь для объединения</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(Dictionary<string, string>))]
-        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Второй словарь")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_SecondDictionary)]
         public string Prop_SecondDictionary
         {
             get => _propSecondDictionary;
@@ -71,7 +71,7 @@ namespace Primo.MIA
         /// ThrowOnDuplicate — исключение при любом совпадении ключей.
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
-        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Стратегия при конфликте")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_Strategy)]
         public DictionaryMergeStrategy Strategy
         {
             get => _strategy;
@@ -86,7 +86,7 @@ namespace Primo.MIA
         /// <summary>Объединённый словарь — результат слияния двух входных</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(Dictionary<string, string>))]
-        [System.ComponentModel.Category("Выходные данные"), System.ComponentModel.DisplayName("Результирующий словарь")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_ResultDictionary)]
         public string Prop_ResultDictionary
         {
             get => _propResultDictionary;
@@ -97,7 +97,7 @@ namespace Primo.MIA
         /// <summary>Количество элементов в объединённом словаре</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
-        [System.ComponentModel.Category("Выходные данные"), System.ComponentModel.DisplayName("Количество элементов")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_Count)]
         public string Prop_Count
         {
             get => _propCount;
@@ -108,7 +108,7 @@ namespace Primo.MIA
         /// <summary>True если при слиянии были обнаружены конфликтующие ключи</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(bool))]
-        [System.ComponentModel.Category("Выходные данные"), System.ComponentModel.DisplayName("Были конфликты ключей")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_HadConflicts)]
         public string Prop_HadConflicts
         {
             get => _propHadConflicts;
@@ -122,7 +122,7 @@ namespace Primo.MIA
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(List<string>))]
-        [System.ComponentModel.Category("Выходные данные"), System.ComponentModel.DisplayName("Конфликтующие ключи")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_ConflictKeys)]
         public string Prop_ConflictKeys
         {
             get => _propConflictKeys;
@@ -149,53 +149,17 @@ namespace Primo.MIA
                 "Были конфликты ключей  — bool: были ли совпадающие ключи\n" +
                 "Конфликтующие ключи    — List<string> с именами конфликтных ключей";
 
-            sdkComponentIcon = "pack://application:,,,/Primo.MIA;component/images/dict.png";
+            sdkComponentIcon = ActivityIcons.Dictionary;
 
-            sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
+                                    sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_FirstDictionary", PropertyType = PropertyTypes.SCRIPT,
-                    EditorType = ScriptEditorTypes.NONE, DataType = typeof(Dictionary<string, string>),
-                    ToolTip = "Первый (базовый) словарь для слияния", IsReadOnly = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_SecondDictionary", PropertyType = PropertyTypes.SCRIPT,
-                    EditorType = ScriptEditorTypes.NONE, DataType = typeof(Dictionary<string, string>),
-                    ToolTip = "Второй словарь для слияния", IsReadOnly = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Strategy", PropertyType = PropertyTypes.OBJECT,
-                    EditorType = ScriptEditorTypes.NONE, DataType = typeof(DictionaryMergeStrategy),
-                    ToolTip = "Стратегия при конфликте ключей: KeepFirst / KeepSecond / ThrowOnDuplicate",
-                    IsReadOnly = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_ResultDictionary", PropertyType = PropertyTypes.VARIABLE,
-                    EditorType = ScriptEditorTypes.NONE, DataType = typeof(Dictionary<string, string>),
-                    ToolTip = "Объединённый словарь", IsReadOnly = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_Count", PropertyType = PropertyTypes.VARIABLE,
-                    EditorType = ScriptEditorTypes.NONE, DataType = typeof(int),
-                    ToolTip = "Количество элементов в результирующем словаре", IsReadOnly = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_HadConflicts", PropertyType = PropertyTypes.VARIABLE,
-                    EditorType = ScriptEditorTypes.NONE, DataType = typeof(bool),
-                    ToolTip = "True если при слиянии были конфликтующие ключи", IsReadOnly = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_ConflictKeys", PropertyType = PropertyTypes.VARIABLE,
-                    EditorType = ScriptEditorTypes.NONE, DataType = typeof(List<string>),
-                    ToolTip = "Список ключей присутствовавших в обоих словарях", IsReadOnly = false
-                }
+                PropertyBuilder.Script<Dictionary<string, string>>("Prop_FirstDictionary", "Первый (базовый) словарь для слияния"),
+                PropertyBuilder.Script<Dictionary<string, string>>("Prop_SecondDictionary", "Второй словарь для слияния"),
+                PropertyBuilder.Enum<DictionaryMergeStrategy>("Strategy", "Стратегия при конфликте ключей: KeepFirst / KeepSecond / ThrowOnDuplicate"),
+                PropertyBuilder.Variable<Dictionary<string, string>>("Prop_ResultDictionary", "Объединённый словарь"),
+                PropertyBuilder.Variable<int>("Prop_Count", "Количество элементов в результирующем словаре"),
+                PropertyBuilder.Variable<bool>("Prop_HadConflicts", "True если при слиянии были конфликтующие ключи"),
+                PropertyBuilder.Variable<List<string>>("Prop_ConflictKeys", "Список ключей присутствовавших в обоих словарях")
             };
 
             InitClass(container);
@@ -267,18 +231,12 @@ namespace Primo.MIA
         // ВАЛИДАЦИЯ
         // =========================================================================
 
-        public override ValidationResult Validate()
+                public override ValidationResult Validate()
         {
             var ret = new ValidationResult();
-            ValidateField(ret, this.Prop_FirstDictionary,  "Первый словарь",  "Первый словарь обязателен");
-            ValidateField(ret, this.Prop_SecondDictionary, "Второй словарь", "Второй словарь обязателен");
+            ret.ValidateRequired(this.Prop_FirstDictionary, ActivityStrings.Field_FirstDictionary, "Первый словарь обязателен");
+            ret.ValidateRequired(this.Prop_SecondDictionary, ActivityStrings.Field_SecondDictionary, "Второй словарь обязателен");
             return ret;
-        }
-
-        private void ValidateField(ValidationResult result, string value, string fieldName, string errorMessage)
-        {
-            if (string.IsNullOrWhiteSpace(value))
-                result.Items.Add(new ValidationResult.ValidationItem() { PropertyName = fieldName, Error = errorMessage });
         }
     }
 }

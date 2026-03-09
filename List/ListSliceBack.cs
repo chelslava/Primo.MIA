@@ -14,6 +14,7 @@
 using LTools.Common.Model;
 using LTools.Common.UIElements;
 using LTools.SDK;
+using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,8 +29,7 @@ namespace Primo.MIA
     /// </summary>
     public class ListSliceBack : PrimoComponentTO<ListSlice>
     {
-        private const string CGroupName = "MIA" + WFPublishedElementBase.TREE_SEPARATOR + "Списки";
-        public override string GroupName { get => CGroupName; protected set { } }
+                public override string GroupName { get => ActivityCategories.Lists; protected set { } }
 
         protected override int sdkTimeOut
         {
@@ -40,7 +40,7 @@ namespace Primo.MIA
         private string _propList;
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(List<string>))]
-        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Список")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_List)]
         public string Prop_List
         {
             get => _propList;
@@ -49,7 +49,7 @@ namespace Primo.MIA
 
         private ListSliceMode _mode = ListSliceMode.FirstN;
         [LTools.Common.Model.Serialization.StoringProperty]
-        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Способ среза")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_SliceMode)]
         public ListSliceMode Mode
         {
             get => _mode;
@@ -60,7 +60,7 @@ namespace Primo.MIA
         /// <summary>Количество элементов (для FirstN, LastN, SkipFirst, SkipLast, EveryNth)</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
-        [System.ComponentModel.Category("Параметры"), System.ComponentModel.DisplayName("N (кол-во / шаг)")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Parameters), System.ComponentModel.DisplayName(ActivityStrings.Field_N)]
         public string Prop_N
         {
             get => _propN;
@@ -71,7 +71,7 @@ namespace Primo.MIA
         /// <summary>Номер страницы, начиная с 1 (режим Page)</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
-        [System.ComponentModel.Category("Параметры"), System.ComponentModel.DisplayName("Номер страницы")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Parameters), System.ComponentModel.DisplayName(ActivityStrings.Field_Page)]
         public string Prop_Page
         {
             get => _propPage;
@@ -82,7 +82,7 @@ namespace Primo.MIA
         /// <summary>Размер страницы (режим Page)</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
-        [System.ComponentModel.Category("Параметры"), System.ComponentModel.DisplayName("Размер страницы")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Parameters), System.ComponentModel.DisplayName(ActivityStrings.Field_PageSize)]
         public string Prop_PageSize
         {
             get => _propPageSize;
@@ -93,7 +93,7 @@ namespace Primo.MIA
         /// <summary>Начальный индекс включительно, нумерация с 0 (режим Range)</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
-        [System.ComponentModel.Category("Параметры"), System.ComponentModel.DisplayName("Индекс от (включ.)")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Parameters), System.ComponentModel.DisplayName(ActivityStrings.Field_FromIndex)]
         public string Prop_FromIndex
         {
             get => _propFromIndex;
@@ -104,7 +104,7 @@ namespace Primo.MIA
         /// <summary>Конечный индекс включительно, нумерация с 0 (режим Range)</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
-        [System.ComponentModel.Category("Параметры"), System.ComponentModel.DisplayName("Индекс до (включ.)")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Parameters), System.ComponentModel.DisplayName(ActivityStrings.Field_ToIndex)]
         public string Prop_ToIndex
         {
             get => _propToIndex;
@@ -114,7 +114,7 @@ namespace Primo.MIA
         private string _propResult;
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(List<string>))]
-        [System.ComponentModel.Category("Выходные данные"), System.ComponentModel.DisplayName("Результат")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_Result)]
         public string Prop_Result
         {
             get => _propResult;
@@ -124,7 +124,7 @@ namespace Primo.MIA
         private string _propCount;
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
-        [System.ComponentModel.Category("Выходные данные"), System.ComponentModel.DisplayName("Количество")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_Count)]
         public string Prop_Count
         {
             get => _propCount;
@@ -135,7 +135,7 @@ namespace Primo.MIA
         /// <summary>Общее количество страниц (заполняется только в режиме Page)</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
-        [System.ComponentModel.Category("Выходные данные"), System.ComponentModel.DisplayName("Всего страниц")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_TotalPages)]
         public string Prop_TotalPages
         {
             get => _propTotalPages;
@@ -154,20 +154,20 @@ namespace Primo.MIA
                 "Page      — пагинация: страница Page, размер PageSize\n" +
                 "Range     — элементы с индекса FromIndex до ToIndex (вкл.)\n" +
                 "EveryNth  — каждый N-й элемент (шаг N)";
-            sdkComponentIcon = "pack://application:,,,/Primo.MIA;component/images/list.png";
+            sdkComponentIcon = ActivityIcons.List;
 
-            sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
+                        sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_List", PropertyType = PropertyTypes.SCRIPT, EditorType = ScriptEditorTypes.NONE, DataType = typeof(List<string>), ToolTip = "Входной список", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Mode", PropertyType = PropertyTypes.OBJECT, EditorType = ScriptEditorTypes.NONE, DataType = typeof(ListSliceMode), ToolTip = "Способ среза", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_N", PropertyType = PropertyTypes.SCRIPT, EditorType = ScriptEditorTypes.NONE, DataType = typeof(int), ToolTip = "N — кол-во элементов или шаг", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_Page", PropertyType = PropertyTypes.SCRIPT, EditorType = ScriptEditorTypes.NONE, DataType = typeof(int), ToolTip = "Номер страницы (с 1) для режима Page", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_PageSize", PropertyType = PropertyTypes.SCRIPT, EditorType = ScriptEditorTypes.NONE, DataType = typeof(int), ToolTip = "Размер страницы для режима Page", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_FromIndex", PropertyType = PropertyTypes.SCRIPT, EditorType = ScriptEditorTypes.NONE, DataType = typeof(int), ToolTip = "Начальный индекс (с 0) для режима Range", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_ToIndex", PropertyType = PropertyTypes.SCRIPT, EditorType = ScriptEditorTypes.NONE, DataType = typeof(int), ToolTip = "Конечный индекс (включ.) для режима Range", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_Result", PropertyType = PropertyTypes.VARIABLE, EditorType = ScriptEditorTypes.NONE, DataType = typeof(List<string>), ToolTip = "Срез списка", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_Count", PropertyType = PropertyTypes.VARIABLE, EditorType = ScriptEditorTypes.NONE, DataType = typeof(int), ToolTip = "Количество элементов в результате", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_TotalPages", PropertyType = PropertyTypes.VARIABLE, EditorType = ScriptEditorTypes.NONE, DataType = typeof(int), ToolTip = "Всего страниц (только для режима Page)", IsReadOnly = false }
+                PropertyBuilder.Script<List<string>>("Prop_List", "Входной список"),
+                PropertyBuilder.Enum<ListSliceMode>("Mode", "Способ среза"),
+                PropertyBuilder.Script<int>("Prop_N", "N — кол-во элементов или шаг"),
+                PropertyBuilder.Script<int>("Prop_Page", "Номер страницы (с 1) для режима Page"),
+                PropertyBuilder.Script<int>("Prop_PageSize", "Размер страницы для режима Page"),
+                PropertyBuilder.Script<int>("Prop_FromIndex", "Начальный индекс (с 0) для режима Range"),
+                PropertyBuilder.Script<int>("Prop_ToIndex", "Конечный индекс (включ.) для режима Range"),
+                PropertyBuilder.Variable<List<string>>("Prop_Result", "Срез списка"),
+                PropertyBuilder.Variable<int>("Prop_Count", "Количество элементов в результате"),
+                PropertyBuilder.Variable<int>("Prop_TotalPages", "Всего страниц (только для режима Page)")
             };
 
             InitClass(container);
@@ -252,9 +252,8 @@ namespace Primo.MIA
 
         public override ValidationResult Validate()
         {
-            var ret = new ValidationResult();
-            if (string.IsNullOrWhiteSpace(this.Prop_List))
-                ret.Items.Add(new ValidationResult.ValidationItem() { PropertyName = "Список", Error = "Список обязателен" });
+                        var ret = new ValidationResult();
+            ret.ValidateRequired(this.Prop_List, ActivityStrings.Field_List, ActivityStrings.Error_ListRequired);
             return ret;
         }
     }

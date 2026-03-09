@@ -2,6 +2,7 @@ using LTools.Common.Model;
 using LTools.Common.UIElements;
 using LTools.Enums;
 using LTools.SDK;
+using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,10 +20,9 @@ namespace Primo.MIA
     ///   Список имён + список значений → список пар для обработки в цикле.
     ///   ["Иванов","Петров"] + ["42","37"] → [("Иванов","42"), ("Петров","37")]
     /// </summary>
-    public class TupleZipBack : PrimoComponentTO<TupleZip>
+        public class TupleZipBack : PrimoComponentTO<TupleZip>
     {
-        private const string CGroupName = "MIA" + WFPublishedElementBase.TREE_SEPARATOR + "Кортежи";
-        public override string GroupName { get => CGroupName; protected set { } }
+        public override string GroupName { get => ActivityCategories.Tuples; protected set { } }
 
         protected override int sdkTimeOut
         {
@@ -34,16 +34,18 @@ namespace Primo.MIA
 
         private string _propListA;
         /// <summary>Первый список — значения становятся Item1 каждого кортежа.</summary>
-        [LTools.Common.Model.Serialization.StoringProperty]
+                [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(List<string>))]
-        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Список A (Item1)")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main)]
+        [System.ComponentModel.DisplayName(ActivityStrings.Field_ListA_Item1)]
         public string Prop_ListA { get => _propListA; set { _propListA = value; InvokePropertyChanged(this, "Prop_ListA"); } }
 
         private string _propListB;
         /// <summary>Второй список — значения становятся Item2 каждого кортежа.</summary>
-        [LTools.Common.Model.Serialization.StoringProperty]
+                [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(List<string>))]
-        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Список B (Item2)")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main)]
+        [System.ComponentModel.DisplayName(ActivityStrings.Field_ListB_Item2)]
         public string Prop_ListB { get => _propListB; set { _propListB = value; InvokePropertyChanged(this, "Prop_ListB"); } }
 
         private string _propListC;
@@ -51,9 +53,10 @@ namespace Primo.MIA
         /// Третий список — необязателен. Если задан, создаются трёхэлементные кортежи Tuple&lt;string,string,string&gt;.
         /// Если не задан — создаются двухэлементные Tuple&lt;string,string&gt;.
         /// </summary>
-        [LTools.Common.Model.Serialization.StoringProperty]
+                [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(List<string>))]
-        [System.ComponentModel.Category("Опционально"), System.ComponentModel.DisplayName("Список C (Item3, необязателен)")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Optional)]
+        [System.ComponentModel.DisplayName(ActivityStrings.Field_ListC_Item3)]
         public string Prop_ListC { get => _propListC; set { _propListC = value; InvokePropertyChanged(this, "Prop_ListC"); } }
 
         // ── INPUT: вид кортежей ────────────────────────────────────────────────
@@ -64,8 +67,9 @@ namespace Primo.MIA
         ///   ClassicTuple — List&lt;Tuple&lt;string,string&gt;&gt; (по умолчанию, без NuGet).
         ///   ValueTuple   — List&lt;ValueTuple&lt;string,string&gt;&gt; (требует System.ValueTuple).
         /// </summary>
-        [LTools.Common.Model.Serialization.StoringProperty]
-        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Вид кортежей")]
+                [LTools.Common.Model.Serialization.StoringProperty]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main)]
+        [System.ComponentModel.DisplayName(ActivityStrings.Field_TupleKind)]
         public TupleKind Kind
         {
             get => _kind;
@@ -81,23 +85,26 @@ namespace Primo.MIA
         ///   List&lt;Tuple&lt;string,string,string&gt;&gt; если ListC задан.
         /// Используйте тип object или приводите при обходе цикла.
         /// </summary>
-        [LTools.Common.Model.Serialization.StoringProperty]
+                [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(object))]
-        [System.ComponentModel.Category("Выходные данные"), System.ComponentModel.DisplayName("Список кортежей")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output)]
+        [System.ComponentModel.DisplayName(ActivityStrings.Field_TupleList)]
         public string Prop_Result { get => _propResult; set { _propResult = value; InvokePropertyChanged(this, "Prop_Result"); } }
 
         private string _propCount;
         /// <summary>Количество кортежей в результате (длина минимального из входных списков).</summary>
-        [LTools.Common.Model.Serialization.StoringProperty]
+                [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
-        [System.ComponentModel.Category("Выходные данные"), System.ComponentModel.DisplayName("Количество")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output)]
+        [System.ComponentModel.DisplayName(ActivityStrings.Field_Count)]
         public string Prop_Count { get => _propCount; set { _propCount = value; InvokePropertyChanged(this, "Prop_Count"); } }
 
         private string _propArity;
         /// <summary>Арность каждого кортежа в результате (2 или 3).</summary>
-        [LTools.Common.Model.Serialization.StoringProperty]
+                [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
-        [System.ComponentModel.Category("Выходные данные"), System.ComponentModel.DisplayName("Арность кортежей")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output)]
+        [System.ComponentModel.DisplayName(ActivityStrings.Field_TupleArity)]
         public string Prop_Arity { get => _propArity; set { _propArity = value; InvokePropertyChanged(this, "Prop_Arity"); } }
 
         // ── КОНСТРУКТОР ────────────────────────────────────────────────────────
@@ -114,16 +121,16 @@ namespace Primo.MIA
                 "A=[\"a\",\"b\"]  B=[\"1\",\"2\"]  C=[\"X\",\"Y\"]\n" +
                 "→ [(\"a\",\"1\",\"X\"), (\"b\",\"2\",\"Y\")]  Tuple<string,string,string>\n\n" +
                 "Обратная операция — «Кортеж: Unzip списков».";
-            sdkComponentIcon = "pack://application:,,,/Primo.MIA;component/images/sharp.png";
+            sdkComponentIcon = ActivityIcons.Tuple;
 
-            sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
+                        sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_ListA", PropertyType = PropertyTypes.SCRIPT,   EditorType = ScriptEditorTypes.NONE, DataType = typeof(List<string>), ToolTip = "Список A — значения для Item1", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_ListB", PropertyType = PropertyTypes.SCRIPT,   EditorType = ScriptEditorTypes.NONE, DataType = typeof(List<string>), ToolTip = "Список B — значения для Item2", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_ListC", PropertyType = PropertyTypes.SCRIPT,   EditorType = ScriptEditorTypes.NONE, DataType = typeof(List<string>), ToolTip = "Список C — значения для Item3 (необязателен)", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_Result", PropertyType = PropertyTypes.VARIABLE, EditorType = ScriptEditorTypes.NONE, DataType = typeof(object),       ToolTip = "Результирующий список кортежей", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_Count",  PropertyType = PropertyTypes.VARIABLE, EditorType = ScriptEditorTypes.NONE, DataType = typeof(int),          ToolTip = "Количество кортежей", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_Arity",  PropertyType = PropertyTypes.VARIABLE, EditorType = ScriptEditorTypes.NONE, DataType = typeof(int),          ToolTip = "Арность каждого кортежа (2 или 3)", IsReadOnly = false }
+                PropertyBuilder.Script<List<string>>("Prop_ListA", "Список A — значения для Item1"),
+                PropertyBuilder.Script<List<string>>("Prop_ListB", "Список B — значения для Item2"),
+                PropertyBuilder.Script<List<string>>("Prop_ListC", "Список C — значения для Item3 (необязателен)"),
+                PropertyBuilder.Variable<object>("Prop_Result", "Результирующий список кортежей"),
+                PropertyBuilder.Variable<int>("Prop_Count", "Количество кортежей"),
+                PropertyBuilder.Variable<int>("Prop_Arity", "Арность каждого кортежа (2 или 3)")
             };
 
             InitClass(container);
@@ -191,15 +198,12 @@ namespace Primo.MIA
 
         // ── ВАЛИДАЦИЯ ──────────────────────────────────────────────────────────
 
-        public override ValidationResult Validate()
+                public override ValidationResult Validate()
         {
             var ret = new ValidationResult();
-            if (string.IsNullOrWhiteSpace(this.Prop_ListA))
-                ret.Items.Add(new ValidationResult.ValidationItem() { PropertyName = "Список A", Error = "Список A обязателен" });
-            if (string.IsNullOrWhiteSpace(this.Prop_ListB))
-                ret.Items.Add(new ValidationResult.ValidationItem() { PropertyName = "Список B", Error = "Список B обязателен" });
-            if (string.IsNullOrWhiteSpace(this.Prop_Result))
-                ret.Items.Add(new ValidationResult.ValidationItem() { PropertyName = "Список кортежей", Error = "Выходная переменная обязательна" });
+            ret.ValidateRequired(this.Prop_ListA, ActivityStrings.Field_ListA_Item1, "Список A обязателен");
+            ret.ValidateRequired(this.Prop_ListB, ActivityStrings.Field_ListB_Item2, ActivityStrings.Error_ListBRequired);
+            ret.ValidateRequired(this.Prop_Result, ActivityStrings.Field_TupleList, "Выходная переменная обязательна");
             return ret;
         }
     }

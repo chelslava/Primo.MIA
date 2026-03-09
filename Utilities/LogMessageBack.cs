@@ -2,6 +2,7 @@
 using LTools.Common.UIElements;
 using LTools.Enums;
 using LTools.SDK;
+using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -24,17 +25,10 @@ namespace Primo.MIA
     /// </summary>
     public class LogMessageBack : PrimoComponentTO<LogMessage>
     {
-        /// <summary>
-        /// Имя группы компонента
-        /// </summary>
-        private const string CGroupName = "MIA" + WFPublishedElementBase.TREE_SEPARATOR + "Утилиты";
-
-        /// <summary>
-        /// Имя группы компонента
-        /// </summary>
+                /// <inheritdoc/>
         public override string GroupName
         {
-            get => CGroupName;
+            get => ActivityCategories.Utilities;
             protected set { }
         }
 
@@ -55,7 +49,7 @@ namespace Primo.MIA
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
-        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Сообщение")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_Message)]
         public string Prop_Message
         {
             get { return this.prop_Message; }
@@ -67,7 +61,7 @@ namespace Primo.MIA
         /// Уровень логирования
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
-        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Уровень")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_Level)]
         public LogLevel Level
         {
             get => this._logLevel;
@@ -79,7 +73,7 @@ namespace Primo.MIA
         /// Режим вывода логов
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
-        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Режим вывода")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_OutputMode)]
         public LogOutputMode OutputMode
         {
             get => this._outputMode;
@@ -92,7 +86,7 @@ namespace Primo.MIA
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
-        [System.ComponentModel.Category("Файл"), System.ComponentModel.DisplayName("Директория логов")]
+        [System.ComponentModel.Category(ActivityStrings.Category_File), System.ComponentModel.DisplayName(ActivityStrings.Field_LogDirectory)]
         public string Prop_LogDirectory
         {
             get { return this.prop_LogDirectory; }
@@ -104,7 +98,7 @@ namespace Primo.MIA
         /// Шаблон имени файла
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
-        [System.ComponentModel.Category("Файл"), System.ComponentModel.DisplayName("Шаблон имени файла")]
+        [System.ComponentModel.Category(ActivityStrings.Category_File), System.ComponentModel.DisplayName(ActivityStrings.Field_FileNameTemplate)]
         public LogFileNameTemplate FileNameTemplate
         {
             get => this._fileNameTemplate;
@@ -117,7 +111,7 @@ namespace Primo.MIA
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
-        [System.ComponentModel.Category("Файл"), System.ComponentModel.DisplayName("Базовое имя файла")]
+        [System.ComponentModel.Category(ActivityStrings.Category_File), System.ComponentModel.DisplayName(ActivityStrings.Field_BaseFileName)]
         public string Prop_BaseFileName
         {
             get { return this.prop_BaseFileName; }
@@ -130,7 +124,7 @@ namespace Primo.MIA
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
-        [System.ComponentModel.Category("Файл"), System.ComponentModel.DisplayName("Расширение")]
+        [System.ComponentModel.Category(ActivityStrings.Category_File), System.ComponentModel.DisplayName(ActivityStrings.Field_FileExtension)]
         public string Prop_FileExtension
         {
             get { return this.prop_FileExtension; }
@@ -143,7 +137,7 @@ namespace Primo.MIA
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
-        [System.ComponentModel.Category("Файл"), System.ComponentModel.DisplayName("Пользовательский паттерн")]
+        [System.ComponentModel.Category(ActivityStrings.Category_File), System.ComponentModel.DisplayName(ActivityStrings.Field_CustomFileNamePattern)]
         public string Prop_CustomFileNamePattern
         {
             get { return this.prop_CustomFileNamePattern; }
@@ -155,7 +149,7 @@ namespace Primo.MIA
         /// Стратегия ротации файлов логов
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
-        [System.ComponentModel.Category("Файл"), System.ComponentModel.DisplayName("Ротация файлов")]
+        [System.ComponentModel.Category(ActivityStrings.Category_File), System.ComponentModel.DisplayName(ActivityStrings.Field_RotationStrategy)]
         public LogRotationStrategy RotationStrategy
         {
             get => this._rotationStrategy;
@@ -168,7 +162,7 @@ namespace Primo.MIA
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
-        [System.ComponentModel.Category("Файл"), System.ComponentModel.DisplayName("Макс. размер (МБ)")]
+        [System.ComponentModel.Category(ActivityStrings.Category_File), System.ComponentModel.DisplayName(ActivityStrings.Field_MaxFileSizeMB)]
         public string Prop_MaxFileSizeMB
         {
             get { return this.prop_MaxFileSizeMB; }
@@ -180,7 +174,7 @@ namespace Primo.MIA
         /// Включать timestamp в сообщение
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
-        [System.ComponentModel.Category("Формат"), System.ComponentModel.DisplayName("Добавлять время")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Format), System.ComponentModel.DisplayName(ActivityStrings.Field_IncludeTimestamp)]
         public bool Prop_IncludeTimestamp
         {
             get { return this._includeTimestamp; }
@@ -192,7 +186,7 @@ namespace Primo.MIA
         /// Включать уровень в сообщение
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
-        [System.ComponentModel.Category("Формат"), System.ComponentModel.DisplayName("Добавлять уровень")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Format), System.ComponentModel.DisplayName(ActivityStrings.Field_IncludeLevel)]
         public bool Prop_IncludeLevel
         {
             get { return this._includeLevel; }
@@ -205,7 +199,7 @@ namespace Primo.MIA
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
-        [System.ComponentModel.Category("Формат"), System.ComponentModel.DisplayName("Формат времени")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Format), System.ComponentModel.DisplayName(ActivityStrings.Field_TimestampFormat)]
         public string Prop_TimestampFormat
         {
             get { return this.prop_TimestampFormat; }
@@ -217,7 +211,7 @@ namespace Primo.MIA
         /// Добавлять перенос строки после сообщения
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
-        [System.ComponentModel.Category("Формат"), System.ComponentModel.DisplayName("Перенос строки")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Format), System.ComponentModel.DisplayName(ActivityStrings.Field_AppendNewLine)]
         public bool Prop_AppendNewLine
         {
             get { return this._appendNewLine; }
@@ -232,7 +226,7 @@ namespace Primo.MIA
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
-        [System.ComponentModel.Category("Output"), System.ComponentModel.DisplayName("Путь к файлу лога")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_ActualLogFile)]
         public string Prop_ActualLogFile
         {
             get => prop_ActualLogFile;
@@ -249,7 +243,7 @@ namespace Primo.MIA
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
-        [System.ComponentModel.Category("Output"), System.ComponentModel.DisplayName("Форматированное сообщение")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_FormattedMessage)]
         public string Prop_FormattedMessage
         {
             get => prop_FormattedMessage;
@@ -308,139 +302,23 @@ Custom – пользовательский паттерн (по умолчан�
 Путь к файлу лога: [String] Фактический полный путь к файлу, в который была произведена запись (с учётом ротации).
 Форматированное сообщение: [String] Итоговое сообщение после применения формата (с временем и уровнем, если они включены).";
 
-            sdkComponentIcon = "pack://application:,,,/Primo.MIA;component/images/log.png";
+            sdkComponentIcon = ActivityIcons.Log;
 
-            sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
+                        sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
-                // Сообщение
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_Message",
-                    PropertyType = PropertyTypes.SCRIPT,
-                    EditorType = ScriptEditorTypes.NONE,
-                    DataType = typeof(string),
-                    ToolTip = "Текст сообщения для логирования",
-                    IsReadOnly = false
-                },
-                // Уровень (enum)
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Level",
-                    PropertyType = PropertyTypes.OBJECT,
-                    EditorType = ScriptEditorTypes.NONE,
-                    DataType = typeof(LogLevel),
-                    ToolTip = "Уровень важности сообщения: Debug, Info, Warning, Error, Critical",
-                    IsReadOnly = false
-                },
-                // Режим вывода (enum)
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "OutputMode",
-                    PropertyType = PropertyTypes.OBJECT,
-                    EditorType = ScriptEditorTypes.NONE,
-                    DataType = typeof(LogOutputMode),
-                    ToolTip = "Куда выводить лог: в файл, консоль или оба варианта",
-                    IsReadOnly = false
-                },
-                // Директория логов
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_LogDirectory",
-                    PropertyType = PropertyTypes.SCRIPT,
-                    EditorType = ScriptEditorTypes.FOLDER_SELECTOR,
-                    DataType = typeof(string),
-                    ToolTip = "Путь к директории для сохранения файлов логов",
-                    IsReadOnly = false
-                },
-                // Шаблон имени файла (enum)
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "FileNameTemplate",
-                    PropertyType = PropertyTypes.OBJECT,
-                    EditorType = ScriptEditorTypes.NONE,
-                    DataType = typeof(LogFileNameTemplate),
-                    ToolTip = "Шаблон формирования имени файла: фиксированное, с датой, с временем или пользовательское",
-                    IsReadOnly = false
-                },
-                // Базовое имя файла
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_BaseFileName",
-                    PropertyType = PropertyTypes.SCRIPT,
-                    EditorType = ScriptEditorTypes.NONE,
-                    DataType = typeof(string),
-                    ToolTip = "Базовое имя файла без расширения (например: app, mylog, process)",
-                    IsReadOnly = false
-                },
-                // Расширение
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_FileExtension",
-                    PropertyType = PropertyTypes.SCRIPT,
-                    EditorType = ScriptEditorTypes.NONE,
-                    DataType = typeof(string),
-                    ToolTip = "Расширение файла (например: .log, .txt)",
-                    IsReadOnly = false
-                },
-                // Пользовательский паттерн
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_CustomFileNamePattern",
-                    PropertyType = PropertyTypes.SCRIPT,
-                    EditorType = ScriptEditorTypes.NONE,
-                    DataType = typeof(string),
-                    ToolTip = "Пользовательский паттерн имени файла. Плейсхолдеры: {base}, {date}, {time}, {timestamp}, {yyyy}, {MM}, {dd}, {HH}, {mm}, {ss}, {level}",
-                    IsReadOnly = false
-                },
-                // Ротация (enum)
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "RotationStrategy",
-                    PropertyType = PropertyTypes.OBJECT,
-                    EditorType = ScriptEditorTypes.NONE,
-                    DataType = typeof(LogRotationStrategy),
-                    ToolTip = "Стратегия создания новых файлов: нет, ежедневно, ежечасно, по размеру",
-                    IsReadOnly = false
-                },
-                // Максимальный размер
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_MaxFileSizeMB",
-                    PropertyType = PropertyTypes.SCRIPT,
-                    EditorType = ScriptEditorTypes.NONE,
-                    DataType = typeof(int),
-                    ToolTip = "Максимальный размер файла в МБ (для ротации по размеру)",
-                    IsReadOnly = false
-                },
-                // Формат времени
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_TimestampFormat",
-                    PropertyType = PropertyTypes.SCRIPT,
-                    EditorType = ScriptEditorTypes.NONE,
-                    DataType = typeof(string),
-                    ToolTip = "Формат даты/времени в сообщении (например: yyyy-MM-dd HH:mm:ss.fff)",
-                    IsReadOnly = false
-                },
-                // Output свойства
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_ActualLogFile",
-                    PropertyType = PropertyTypes.VARIABLE,
-                    EditorType = ScriptEditorTypes.NONE,
-                    DataType = typeof(string),
-                    ToolTip = "Фактический путь к файлу, в который была произведена запись",
-                    IsReadOnly = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_FormattedMessage",
-                    PropertyType = PropertyTypes.VARIABLE,
-                    EditorType = ScriptEditorTypes.NONE,
-                    DataType = typeof(string),
-                    ToolTip = "Полностью отформатированное сообщение с timestamp и уровнем",
-                    IsReadOnly = false
-                }
+                PropertyBuilder.Script<string>("Prop_Message", "Текст сообщения для логирования"),
+                PropertyBuilder.Enum<LogLevel>("Level", "Уровень важности сообщения: Debug, Info, Warning, Error, Critical"),
+                PropertyBuilder.Enum<LogOutputMode>("OutputMode", "Куда выводить лог: в файл, консоль или оба варианта"),
+                PropertyBuilder.FolderSelector("Prop_LogDirectory", "Путь к директории для сохранения файлов логов"),
+                PropertyBuilder.Enum<LogFileNameTemplate>("FileNameTemplate", "Шаблон формирования имени файла: фиксированное, с датой, с временем или пользовательское"),
+                PropertyBuilder.Script<string>("Prop_BaseFileName", "Базовое имя файла без расширения (например: app, mylog, process)"),
+                PropertyBuilder.Script<string>("Prop_FileExtension", "Расширение файла (например: .log, .txt)"),
+                PropertyBuilder.Script<string>("Prop_CustomFileNamePattern", "Пользовательский паттерн имени файла. Плейсхолдеры: {base}, {date}, {time}, {timestamp}, {yyyy}, {MM}, {dd}, {HH}, {mm}, {ss}, {level}"),
+                PropertyBuilder.Enum<LogRotationStrategy>("RotationStrategy", "Стратегия создания новых файлов: нет, ежедневно, ежечасно, по размеру"),
+                PropertyBuilder.Script<int>("Prop_MaxFileSizeMB", "Максимальный размер файла в МБ (для ротации по размеру)"),
+                PropertyBuilder.Script<string>("Prop_TimestampFormat", "Формат даты/времени в сообщении (например: yyyy-MM-dd HH:mm:ss.fff)"),
+                PropertyBuilder.Variable<string>("Prop_ActualLogFile", "Фактический путь к файлу, в который была произведена запись"),
+                PropertyBuilder.Variable<string>("Prop_FormattedMessage", "Полностью отформатированное сообщение с timestamp и уровнем")
             };
 
             InitClass(container);
@@ -887,50 +765,26 @@ Custom – пользовательский паттерн (по умолчан�
             ValidationResult ret = new ValidationResult();
 
             // Проверка сообщения
-            ValidateField(ret, this.Prop_Message, "Сообщение",
-                "Сообщение не может быть пустым");
+            ret.ValidateRequired(this.Prop_Message, ActivityStrings.Field_Message, ActivityStrings.Error_MessageRequired);
 
             // Проверка параметров файла если вывод в файл включен
             if (this.OutputMode != LogOutputMode.ConsoleOnly)
             {
-                ValidateField(ret, this.Prop_LogDirectory, "Директория логов",
-                    "Директория логов не может быть пустой");
-
-                ValidateField(ret, this.Prop_BaseFileName, "Базовое имя файла",
-                    "Базовое имя файла не может быть пустым");
-
-                ValidateField(ret, this.Prop_FileExtension, "Расширение",
-                    "Расширение файла не может быть пустым");
+                ret.ValidateRequired(this.Prop_LogDirectory, ActivityStrings.Field_LogDirectory, ActivityStrings.Error_LogDirectoryRequired);
+                ret.ValidateRequired(this.Prop_BaseFileName, ActivityStrings.Field_BaseFileName, ActivityStrings.Error_BaseFileNameRequired);
+                ret.ValidateRequired(this.Prop_FileExtension, ActivityStrings.Field_FileExtension, ActivityStrings.Error_FileExtensionRequired);
 
                 // Проверка пользовательского паттерна для Custom шаблона
                 if (this.FileNameTemplate == LogFileNameTemplate.Custom)
                 {
-                    ValidateField(ret, this.Prop_CustomFileNamePattern, "Пользовательский паттерн",
-                        "Пользовательский паттерн не может быть пустым");
+                    ret.ValidateRequired(this.Prop_CustomFileNamePattern, ActivityStrings.Field_CustomFileNamePattern, ActivityStrings.Error_CustomPatternRequired);
                 }
             }
 
             // Проверка максимального размера
-            ValidateField(ret, this.Prop_MaxFileSizeMB, "Макс. размер (МБ)",
-                "Максимальный размер файла должен быть указан");
+            ret.ValidateRequired(this.Prop_MaxFileSizeMB, ActivityStrings.Field_MaxFileSizeMB, ActivityStrings.Error_MaxFileSizeRequired);
 
             return ret;
-        }
-
-        /// <summary>
-        /// Вспомогательный метод для валидации поля
-        /// </summary>
-        private void ValidateField(ValidationResult result, string value,
-            string fieldName, string errorMessage)
-        {
-            if (string.IsNullOrWhiteSpace(value))
-            {
-                result.Items.Add(new ValidationResult.ValidationItem()
-                {
-                    PropertyName = fieldName,
-                    Error = errorMessage
-                });
-            }
         }
     }
 }

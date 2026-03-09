@@ -103,5 +103,63 @@ namespace Primo.MIA.Common
         {
             return Script<int>(propName, tooltip);
         }
+
+        /// <summary>
+        /// Создает свойство типа SCRIPT с селектором папки (FOLDER_SELECTOR).
+        /// </summary>
+        /// <param name="propName">Имя свойства</param>
+        /// <param name="tooltip">Подсказка</param>
+        /// <returns>Настроенный PropertiesItem</returns>
+        public static WFHelper.PropertiesItem FolderSelector(string propName, string tooltip)
+        {
+            return new WFHelper.PropertiesItem
+            {
+                PropName = propName,
+                PropertyType = PropertyTypes.SCRIPT,
+                EditorType = ScriptEditorTypes.FOLDER_SELECTOR,
+                DataType = typeof(string),
+                ToolTip = tooltip,
+                IsReadOnly = false
+            };
+        }
+
+        /// <summary>
+        /// Создает свойство типа SCRIPT с селектором файла (FILE_SELECTOR).
+        /// </summary>
+        /// <param name="propName">Имя свойства</param>
+        /// <param name="tooltip">Подсказка</param>
+        /// <returns>Настроенный PropertiesItem</returns>
+        public static WFHelper.PropertiesItem FileSelector(string propName, string tooltip)
+        {
+            return new WFHelper.PropertiesItem
+            {
+                PropName = propName,
+                PropertyType = PropertyTypes.SCRIPT,
+                EditorType = ScriptEditorTypes.FILE_SELECTOR,
+                DataType = typeof(string),
+                ToolTip = tooltip,
+                IsReadOnly = false
+            };
+        }
+
+        /// <summary>
+        /// Создает свойство типа OBJECT для булевого значения (checkbox в UI).
+        /// Используется для флагов которые не являются выражениями.
+        /// </summary>
+        /// <param name="propName">Имя свойства</param>
+        /// <param name="tooltip">Подсказка</param>
+        /// <returns>Настроенный PropertiesItem</returns>
+        public static WFHelper.PropertiesItem BooleanObject(string propName, string tooltip)
+        {
+            return new WFHelper.PropertiesItem
+            {
+                PropName = propName,
+                PropertyType = PropertyTypes.OBJECT,
+                EditorType = ScriptEditorTypes.NONE,
+                DataType = typeof(bool),
+                ToolTip = tooltip,
+                IsReadOnly = false
+            };
+        }
     }
 }

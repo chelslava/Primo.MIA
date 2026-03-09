@@ -10,6 +10,7 @@ using LTools.Common.Model;
 using LTools.Common.UIElements;
 using LTools.Enums;
 using LTools.SDK;
+using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,9 +25,7 @@ namespace Primo.MIA
     /// </summary>
     public class DictionarySetValueBack : PrimoComponentTO<DictionarySetValue>
     {
-        private const string CGroupName = "MIA" + WFPublishedElementBase.TREE_SEPARATOR + "Словари";
-
-        public override string GroupName { get => CGroupName; protected set { } }
+                public override string GroupName { get => ActivityCategories.Dictionaries; protected set { } }
 
         protected override int sdkTimeOut
         {
@@ -42,7 +41,7 @@ namespace Primo.MIA
         /// <summary>Входной словарь Dictionary&lt;string, string&gt;</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(Dictionary<string, string>))]
-        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Словарь")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_Dictionary)]
         public string Prop_Dictionary
         {
             get => _propDictionary;
@@ -53,7 +52,7 @@ namespace Primo.MIA
         /// <summary>Ключ для добавления или обновления</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
-        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Ключ")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_Key)]
         public string Prop_Key
         {
             get => _propKey;
@@ -64,7 +63,7 @@ namespace Primo.MIA
         /// <summary>Значение которое будет установлено для ключа</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
-        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Значение")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_Value)]
         public string Prop_Value
         {
             get => _propValue;
@@ -82,7 +81,7 @@ namespace Primo.MIA
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(Dictionary<string, string>))]
-        [System.ComponentModel.Category("Выходные данные"), System.ComponentModel.DisplayName("Результирующий словарь")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_ResultDictionary)]
         public string Prop_ResultDictionary
         {
             get => _propResultDictionary;
@@ -96,7 +95,7 @@ namespace Primo.MIA
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(bool))]
-        [System.ComponentModel.Category("Выходные данные"), System.ComponentModel.DisplayName("Обновление (не добавление)")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_IsUpdate)]
         public string Prop_IsUpdate
         {
             get => _propIsUpdate;
@@ -121,40 +120,15 @@ namespace Primo.MIA
                 "  Результирующий словарь    — копия с изменённым ключом\n" +
                 "  Обновление (не добавление) — true если ключ уже существовал";
 
-            sdkComponentIcon = "pack://application:,,,/Primo.MIA;component/images/dict.png";
+            sdkComponentIcon = ActivityIcons.Dictionary;
 
-            sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
+                        sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_Dictionary", PropertyType = PropertyTypes.SCRIPT,
-                    EditorType = ScriptEditorTypes.NONE, DataType = typeof(Dictionary<string, string>),
-                    ToolTip = "Входной словарь Dictionary<string, string>", IsReadOnly = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_Key", PropertyType = PropertyTypes.SCRIPT,
-                    EditorType = ScriptEditorTypes.NONE, DataType = typeof(string),
-                    ToolTip = "Ключ для добавления или обновления", IsReadOnly = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_Value", PropertyType = PropertyTypes.SCRIPT,
-                    EditorType = ScriptEditorTypes.NONE, DataType = typeof(string),
-                    ToolTip = "Значение которое будет установлено", IsReadOnly = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_ResultDictionary", PropertyType = PropertyTypes.VARIABLE,
-                    EditorType = ScriptEditorTypes.NONE, DataType = typeof(Dictionary<string, string>),
-                    ToolTip = "Новый словарь с изменённым ключом", IsReadOnly = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_IsUpdate", PropertyType = PropertyTypes.VARIABLE,
-                    EditorType = ScriptEditorTypes.NONE, DataType = typeof(bool),
-                    ToolTip = "True = обновление существующего, False = новый ключ", IsReadOnly = false
-                }
+                PropertyBuilder.Script<Dictionary<string, string>>("Prop_Dictionary", "Входной словарь Dictionary<string, string>"),
+                PropertyBuilder.Script<string>("Prop_Key", "Ключ для добавления или обновления"),
+                PropertyBuilder.Script<string>("Prop_Value", "Значение которое будет установлено"),
+                PropertyBuilder.Variable<Dictionary<string, string>>("Prop_ResultDictionary", "Новый словарь с изменённым ключом"),
+                PropertyBuilder.Variable<bool>("Prop_IsUpdate", "True = обновление существующего, False = новый ключ")
             };
 
             InitClass(container);
@@ -202,19 +176,13 @@ namespace Primo.MIA
         // ВАЛИДАЦИЯ
         // =========================================================================
 
-        public override ValidationResult Validate()
+                public override ValidationResult Validate()
         {
             var ret = new ValidationResult();
-            ValidateField(ret, this.Prop_Dictionary, "Словарь",  "Словарь обязателен");
-            ValidateField(ret, this.Prop_Key,        "Ключ",     "Ключ обязателен");
-            ValidateField(ret, this.Prop_Value,      "Значение", "Значение обязательно");
+            ret.ValidateRequired(this.Prop_Dictionary, ActivityStrings.Field_Dictionary, ActivityStrings.Error_DictionaryRequired);
+            ret.ValidateRequired(this.Prop_Key, ActivityStrings.Field_Key, ActivityStrings.Error_KeyRequired);
+            ret.ValidateRequired(this.Prop_Value, ActivityStrings.Field_Value, ActivityStrings.Error_ValueRequired);
             return ret;
-        }
-
-        private void ValidateField(ValidationResult result, string value, string fieldName, string errorMessage)
-        {
-            if (string.IsNullOrWhiteSpace(value))
-                result.Items.Add(new ValidationResult.ValidationItem() { PropertyName = fieldName, Error = errorMessage });
         }
     }
 }

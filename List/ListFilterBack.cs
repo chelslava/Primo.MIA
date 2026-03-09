@@ -23,6 +23,7 @@ using LTools.Common.Model;
 using LTools.Common.UIElements;
 using LTools.Enums;
 using LTools.SDK;
+using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -39,8 +40,7 @@ namespace Primo.MIA
     /// </summary>
     public class ListFilterBack : PrimoComponentTO<ListFilter>
     {
-        private const string CGroupName = "MIA" + WFPublishedElementBase.TREE_SEPARATOR + "Списки";
-        public override string GroupName { get => CGroupName; protected set { } }
+        public override string GroupName { get => ActivityCategories.Lists; protected set { } }
 
         protected override int sdkTimeOut
         {
@@ -54,7 +54,7 @@ namespace Primo.MIA
         /// <summary>Входной список List&lt;string&gt;</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(List<string>))]
-        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Список")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_List)]
         public string Prop_List
         {
             get => _propList;
@@ -64,7 +64,7 @@ namespace Primo.MIA
         private ListFilterMode _mode = ListFilterMode.Contains;
         /// <summary>Условие фильтрации</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
-        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Условие фильтрации")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_Condition)]
         public ListFilterMode Mode
         {
             get => _mode;
@@ -78,7 +78,7 @@ namespace Primo.MIA
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
-        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Паттерн / Подстрока")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_PatternSubstring)]
         public string Prop_Pattern
         {
             get => _propPattern;
@@ -92,7 +92,7 @@ namespace Primo.MIA
         /// Не влияет на режимы NumericOnly, NotEmpty, EmptyOnly, LengthRange.
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
-        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Учитывать регистр")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_CaseSensitive)]
         public bool Prop_CaseSensitive
         {
             get => _caseSensitive;
@@ -103,7 +103,7 @@ namespace Primo.MIA
         /// <summary>Минимальная длина строки (включительно) для режима LengthRange</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
-        [System.ComponentModel.Category("LengthRange"), System.ComponentModel.DisplayName("Мин. длина")]
+        [System.ComponentModel.Category(ActivityStrings.Category_LengthRange), System.ComponentModel.DisplayName(ActivityStrings.Field_MinLength)]
         public string Prop_MinLength
         {
             get => _propMinLength;
@@ -114,7 +114,7 @@ namespace Primo.MIA
         /// <summary>Максимальная длина строки (включительно) для режима LengthRange</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
-        [System.ComponentModel.Category("LengthRange"), System.ComponentModel.DisplayName("Макс. длина")]
+        [System.ComponentModel.Category(ActivityStrings.Category_LengthRange), System.ComponentModel.DisplayName(ActivityStrings.Field_MaxLength)]
         public string Prop_MaxLength
         {
             get => _propMaxLength;
@@ -127,7 +127,7 @@ namespace Primo.MIA
         /// <summary>Элементы прошедшие условие фильтра</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(List<string>))]
-        [System.ComponentModel.Category("Выходные данные"), System.ComponentModel.DisplayName("Прошли фильтр")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_Matched)]
         public string Prop_Matched
         {
             get => _propMatched;
@@ -138,7 +138,7 @@ namespace Primo.MIA
         /// <summary>Элементы НЕ прошедшие условие фильтра (остаток)</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(List<string>))]
-        [System.ComponentModel.Category("Выходные данные"), System.ComponentModel.DisplayName("Не прошли фильтр")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_Rejected)]
         public string Prop_Rejected
         {
             get => _propRejected;
@@ -149,7 +149,7 @@ namespace Primo.MIA
         /// <summary>Количество элементов прошедших фильтр</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
-        [System.ComponentModel.Category("Выходные данные"), System.ComponentModel.DisplayName("Кол-во прошедших")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_MatchedCount)]
         public string Prop_MatchedCount
         {
             get => _propMatchedCount;
@@ -160,7 +160,7 @@ namespace Primo.MIA
         /// <summary>Количество элементов НЕ прошедших фильтр</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
-        [System.ComponentModel.Category("Выходные данные"), System.ComponentModel.DisplayName("Кол-во отсеянных")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_RejectedCount)]
         public string Prop_RejectedCount
         {
             get => _propRejectedCount;
@@ -187,19 +187,20 @@ namespace Primo.MIA
                 "EmptyOnly   — только пустые строки\n" +
                 "LengthRange — длина в диапазоне [Мин, Макс]\n" +
                 "NumericOnly — строки являющиеся числами";
-            sdkComponentIcon = "pack://application:,,,/Primo.MIA;component/images/list.png";
+            sdkComponentIcon = ActivityIcons.List;
 
-            sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
+                        sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_List", PropertyType = PropertyTypes.SCRIPT, EditorType = ScriptEditorTypes.NONE, DataType = typeof(List<string>), ToolTip = "Входной список", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Mode", PropertyType = PropertyTypes.OBJECT, EditorType = ScriptEditorTypes.NONE, DataType = typeof(ListFilterMode), ToolTip = "Условие фильтрации", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_Pattern", PropertyType = PropertyTypes.SCRIPT, EditorType = ScriptEditorTypes.NONE, DataType = typeof(string), ToolTip = "Подстрока или регулярное выражение", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_MinLength", PropertyType = PropertyTypes.SCRIPT, EditorType = ScriptEditorTypes.NONE, DataType = typeof(int), ToolTip = "Мин. длина для LengthRange", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_MaxLength", PropertyType = PropertyTypes.SCRIPT, EditorType = ScriptEditorTypes.NONE, DataType = typeof(int), ToolTip = "Макс. длина для LengthRange", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_Matched", PropertyType = PropertyTypes.VARIABLE, EditorType = ScriptEditorTypes.NONE, DataType = typeof(List<string>), ToolTip = "Элементы прошедшие фильтр", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_Rejected", PropertyType = PropertyTypes.VARIABLE, EditorType = ScriptEditorTypes.NONE, DataType = typeof(List<string>), ToolTip = "Элементы НЕ прошедшие фильтр", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_MatchedCount", PropertyType = PropertyTypes.VARIABLE, EditorType = ScriptEditorTypes.NONE, DataType = typeof(int), ToolTip = "Кол-во прошедших", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_RejectedCount", PropertyType = PropertyTypes.VARIABLE, EditorType = ScriptEditorTypes.NONE, DataType = typeof(int), ToolTip = "Кол-во отсеянных", IsReadOnly = false }
+                PropertyBuilder.Script<List<string>>("Prop_List", "Входной список"),
+                PropertyBuilder.Enum<ListFilterMode>("Mode", "Условие фильтрации"),
+                PropertyBuilder.Script<string>("Prop_Pattern", "Подстрока или регулярное выражение"),
+                PropertyBuilder.BooleanObject("Prop_CaseSensitive", "Учитывать регистр при сравнении"),
+                PropertyBuilder.Script<int>("Prop_MinLength", "Мин. длина для LengthRange"),
+                PropertyBuilder.Script<int>("Prop_MaxLength", "Макс. длина для LengthRange"),
+                PropertyBuilder.Variable<List<string>>("Prop_Matched", "Элементы прошедшие фильтр"),
+                PropertyBuilder.Variable<List<string>>("Prop_Rejected", "Элементы НЕ прошедшие фильтр"),
+                PropertyBuilder.Variable<int>("Prop_MatchedCount", "Кол-во прошедших"),
+                PropertyBuilder.Variable<int>("Prop_RejectedCount", "Кол-во отсеянных")
             };
 
             InitClass(container);
@@ -311,10 +312,8 @@ namespace Primo.MIA
 
         public override ValidationResult Validate()
         {
-            var ret = new ValidationResult();
-
-            if (string.IsNullOrWhiteSpace(this.Prop_List))
-                ret.Items.Add(new ValidationResult.ValidationItem() { PropertyName = "Список", Error = "Список обязателен" });
+                        var ret = new ValidationResult();
+            ret.ValidateRequired(this.Prop_List, ActivityStrings.Field_List, ActivityStrings.Error_ListRequired);
 
             // Паттерн обязателен для текстовых и regex режимов
             var modesWithPattern = new[]
@@ -325,7 +324,7 @@ namespace Primo.MIA
             };
 
             if (modesWithPattern.Contains(this.Mode) && string.IsNullOrWhiteSpace(this.Prop_Pattern))
-                ret.Items.Add(new ValidationResult.ValidationItem() { PropertyName = "Паттерн", Error = "Паттерн обязателен для данного режима" });
+                ret.Items.Add(new ValidationResult.ValidationItem() { PropertyName = ActivityStrings.Field_PatternSubstring, Error = ActivityStrings.Error_PatternRequired });
 
             return ret;
         }

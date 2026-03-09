@@ -27,6 +27,7 @@ using LTools.Common.Model;
 using LTools.Common.UIElements;
 using LTools.Enums;
 using LTools.SDK;
+using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -42,8 +43,7 @@ namespace Primo.MIA
     /// </summary>
     public class ListTransformBack : PrimoComponentTO<ListTransform>
     {
-        private const string CGroupName = "MIA" + WFPublishedElementBase.TREE_SEPARATOR + "Списки";
-        public override string GroupName { get => CGroupName; protected set { } }
+        public override string GroupName { get => ActivityCategories.Lists; protected set { } }
 
         protected override int sdkTimeOut
         {
@@ -56,7 +56,7 @@ namespace Primo.MIA
         private string _propList;
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(List<string>))]
-        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Список")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_List)]
         public string Prop_List
         {
             get => _propList;
@@ -65,7 +65,7 @@ namespace Primo.MIA
 
         private ListTransformMode _mode = ListTransformMode.Trim;
         [LTools.Common.Model.Serialization.StoringProperty]
-        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Преобразование")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_TransformMode)]
         public ListTransformMode Mode
         {
             get => _mode;
@@ -76,7 +76,7 @@ namespace Primo.MIA
         /// <summary>Строка или regex для поиска (режимы Replace, RegexReplace)</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
-        [System.ComponentModel.Category("Replace"), System.ComponentModel.DisplayName("Найти")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Replace), System.ComponentModel.DisplayName(ActivityStrings.Field_Find)]
         public string Prop_Find
         {
             get => _propFind;
@@ -87,7 +87,7 @@ namespace Primo.MIA
         /// <summary>Строка-замена (режимы Replace, RegexReplace). Может быть пустой — удаление.</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
-        [System.ComponentModel.Category("Replace"), System.ComponentModel.DisplayName("Заменить на")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Replace), System.ComponentModel.DisplayName(ActivityStrings.Field_Replacement)]
         public string Prop_Replacement
         {
             get => _propReplacement;
@@ -98,7 +98,7 @@ namespace Primo.MIA
         /// <summary>Префикс для режимов Prefix и Wrap</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
-        [System.ComponentModel.Category("Prefix/Suffix"), System.ComponentModel.DisplayName("Префикс")]
+        [System.ComponentModel.Category(ActivityStrings.Category_PrefixSuffix), System.ComponentModel.DisplayName(ActivityStrings.Field_Prefix)]
         public string Prop_Prefix
         {
             get => _propPrefix;
@@ -109,7 +109,7 @@ namespace Primo.MIA
         /// <summary>Суффикс для режимов Suffix и Wrap</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
-        [System.ComponentModel.Category("Prefix/Suffix"), System.ComponentModel.DisplayName("Суффикс")]
+        [System.ComponentModel.Category(ActivityStrings.Category_PrefixSuffix), System.ComponentModel.DisplayName(ActivityStrings.Field_Suffix)]
         public string Prop_Suffix
         {
             get => _propSuffix;
@@ -120,7 +120,7 @@ namespace Primo.MIA
         /// <summary>Целевая ширина строки для PadLeft/PadRight</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
-        [System.ComponentModel.Category("Pad/Truncate"), System.ComponentModel.DisplayName("Ширина (Pad)")]
+        [System.ComponentModel.Category(ActivityStrings.Category_PadTruncate), System.ComponentModel.DisplayName(ActivityStrings.Field_PadWidth)]
         public string Prop_PadWidth
         {
             get => _propPadWidth;
@@ -131,7 +131,7 @@ namespace Primo.MIA
         /// <summary>Символ заполнения для PadLeft/PadRight. По умолчанию пробел.</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
-        [System.ComponentModel.Category("Pad/Truncate"), System.ComponentModel.DisplayName("Символ заполнения")]
+        [System.ComponentModel.Category(ActivityStrings.Category_PadTruncate), System.ComponentModel.DisplayName(ActivityStrings.Field_PadChar)]
         public string Prop_PadChar
         {
             get => _propPadChar;
@@ -142,7 +142,7 @@ namespace Primo.MIA
         /// <summary>Максимальная длина строки для режима Truncate</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
-        [System.ComponentModel.Category("Pad/Truncate"), System.ComponentModel.DisplayName("Макс. длина (Truncate)")]
+        [System.ComponentModel.Category(ActivityStrings.Category_PadTruncate), System.ComponentModel.DisplayName(ActivityStrings.Field_MaxLengthTruncate)]
         public string Prop_MaxLength
         {
             get => _propMaxLength;
@@ -152,7 +152,7 @@ namespace Primo.MIA
         private bool _caseSensitive = false;
         /// <summary>Учитывать регистр при поиске (режимы Replace, RegexReplace)</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
-        [System.ComponentModel.Category("Replace"), System.ComponentModel.DisplayName("Учитывать регистр")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Replace), System.ComponentModel.DisplayName(ActivityStrings.Field_CaseSensitive)]
         public bool Prop_CaseSensitive
         {
             get => _caseSensitive;
@@ -164,7 +164,7 @@ namespace Primo.MIA
         private string _propResult;
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(List<string>))]
-        [System.ComponentModel.Category("Выходные данные"), System.ComponentModel.DisplayName("Результат")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_Result)]
         public string Prop_Result
         {
             get => _propResult;
@@ -174,7 +174,7 @@ namespace Primo.MIA
         private string _propCount;
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
-        [System.ComponentModel.Category("Выходные данные"), System.ComponentModel.DisplayName("Количество")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_Count)]
         public string Prop_Count
         {
             get => _propCount;
@@ -185,7 +185,7 @@ namespace Primo.MIA
         /// <summary>Количество элементов которые реально изменились после трансформации</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
-        [System.ComponentModel.Category("Выходные данные"), System.ComponentModel.DisplayName("Изменилось элементов")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_ChangedCount)]
         public string Prop_ChangedCount
         {
             get => _propChangedCount;
@@ -211,22 +211,23 @@ namespace Primo.MIA
                 "Truncate             — обрезать до MaxLength символов\n" +
                 "RemoveNumbers        — удалить все цифры\n" +
                 "RemoveNonAlpha       — оставить только буквы и цифры";
-            sdkComponentIcon = "pack://application:,,,/Primo.MIA;component/images/list.png";
+            sdkComponentIcon = ActivityIcons.List;
 
-            sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
+                        sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_List", PropertyType = PropertyTypes.SCRIPT, EditorType = ScriptEditorTypes.NONE, DataType = typeof(List<string>), ToolTip = "Входной список", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Mode", PropertyType = PropertyTypes.OBJECT, EditorType = ScriptEditorTypes.NONE, DataType = typeof(ListTransformMode), ToolTip = "Тип преобразования", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_Find", PropertyType = PropertyTypes.SCRIPT, EditorType = ScriptEditorTypes.NONE, DataType = typeof(string), ToolTip = "Что заменить (Replace/RegexReplace)", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_Replacement", PropertyType = PropertyTypes.SCRIPT, EditorType = ScriptEditorTypes.NONE, DataType = typeof(string), ToolTip = "На что заменить (пусто = удалить)", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_Prefix", PropertyType = PropertyTypes.SCRIPT, EditorType = ScriptEditorTypes.NONE, DataType = typeof(string), ToolTip = "Префикс (Prefix/Wrap)", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_Suffix", PropertyType = PropertyTypes.SCRIPT, EditorType = ScriptEditorTypes.NONE, DataType = typeof(string), ToolTip = "Суффикс (Suffix/Wrap)", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_PadWidth", PropertyType = PropertyTypes.SCRIPT, EditorType = ScriptEditorTypes.NONE, DataType = typeof(int), ToolTip = "Целевая ширина (PadLeft/PadRight)", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_PadChar", PropertyType = PropertyTypes.SCRIPT, EditorType = ScriptEditorTypes.NONE, DataType = typeof(string), ToolTip = "Символ заполнения (по умолч. пробел)", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_MaxLength", PropertyType = PropertyTypes.SCRIPT, EditorType = ScriptEditorTypes.NONE, DataType = typeof(int), ToolTip = "Макс. длина (Truncate)", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_Result", PropertyType = PropertyTypes.VARIABLE, EditorType = ScriptEditorTypes.NONE, DataType = typeof(List<string>), ToolTip = "Преобразованный список", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_Count", PropertyType = PropertyTypes.VARIABLE, EditorType = ScriptEditorTypes.NONE, DataType = typeof(int), ToolTip = "Количество элементов", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_ChangedCount", PropertyType = PropertyTypes.VARIABLE, EditorType = ScriptEditorTypes.NONE, DataType = typeof(int), ToolTip = "Кол-во изменённых элементов", IsReadOnly = false }
+                PropertyBuilder.Script<List<string>>("Prop_List", "Входной список"),
+                PropertyBuilder.Enum<ListTransformMode>("Mode", "Тип преобразования"),
+                PropertyBuilder.Script<string>("Prop_Find", "Что заменить (Replace/RegexReplace)"),
+                PropertyBuilder.Script<string>("Prop_Replacement", "На что заменить (пусто = удалить)"),
+                PropertyBuilder.Script<string>("Prop_Prefix", "Префикс (Prefix/Wrap)"),
+                PropertyBuilder.Script<string>("Prop_Suffix", "Суффикс (Suffix/Wrap)"),
+                PropertyBuilder.Script<int>("Prop_PadWidth", "Целевая ширина (PadLeft/PadRight)"),
+                PropertyBuilder.Script<string>("Prop_PadChar", "Символ заполнения (по умолч. пробел)"),
+                PropertyBuilder.Script<int>("Prop_MaxLength", "Макс. длина (Truncate)"),
+                PropertyBuilder.BooleanObject("Prop_CaseSensitive", "Учитывать регистр при поиске"),
+                PropertyBuilder.Variable<List<string>>("Prop_Result", "Преобразованный список"),
+                PropertyBuilder.Variable<int>("Prop_Count", "Количество элементов"),
+                PropertyBuilder.Variable<int>("Prop_ChangedCount", "Кол-во изменённых элементов")
             };
 
             InitClass(container);
@@ -364,14 +365,12 @@ namespace Primo.MIA
 
         public override ValidationResult Validate()
         {
-            var ret = new ValidationResult();
-
-            if (string.IsNullOrWhiteSpace(this.Prop_List))
-                ret.Items.Add(new ValidationResult.ValidationItem() { PropertyName = "Список", Error = "Список обязателен" });
+                        var ret = new ValidationResult();
+            ret.ValidateRequired(this.Prop_List, ActivityStrings.Field_List, ActivityStrings.Error_ListRequired);
 
             if ((this.Mode == ListTransformMode.Replace || this.Mode == ListTransformMode.RegexReplace)
                 && string.IsNullOrEmpty(this.Prop_Find))
-                ret.Items.Add(new ValidationResult.ValidationItem() { PropertyName = "Найти", Error = "Строка поиска обязательна для Replace/RegexReplace" });
+                ret.Items.Add(new ValidationResult.ValidationItem() { PropertyName = ActivityStrings.Field_Find, Error = "Строка поиска обязательна для Replace/RegexReplace" });
 
             return ret;
         }

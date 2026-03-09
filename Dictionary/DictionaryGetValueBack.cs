@@ -10,6 +10,7 @@ using LTools.Common.Model;
 using LTools.Common.UIElements;
 using LTools.Enums;
 using LTools.SDK;
+using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,11 +23,9 @@ namespace Primo.MIA
     /// Возвращает значение по ключу из Dictionary&lt;string, string&gt;.
     /// Не изменяет словарь.
     /// </summary>
-    public class DictionaryGetValueBack : PrimoComponentTO<DictionaryGetValue>
+        public class DictionaryGetValueBack : PrimoComponentTO<DictionaryGetValue>
     {
-        private const string CGroupName = "MIA" + WFPublishedElementBase.TREE_SEPARATOR + "Словари";
-
-        public override string GroupName { get => CGroupName; protected set { } }
+        public override string GroupName { get => ActivityCategories.Dictionaries; protected set { } }
 
         protected override int sdkTimeOut
         {
@@ -42,7 +41,7 @@ namespace Primo.MIA
         /// <summary>Входной словарь Dictionary&lt;string, string&gt;</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(Dictionary<string, string>))]
-        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Словарь")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_Dictionary)]
         public string Prop_Dictionary
         {
             get => _propDictionary;
@@ -53,7 +52,7 @@ namespace Primo.MIA
         /// <summary>Ключ для поиска значения в словаре</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
-        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Ключ")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_Key)]
         public string Prop_Key
         {
             get => _propKey;
@@ -67,7 +66,7 @@ namespace Primo.MIA
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
-        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Значение по умолчанию")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_DefaultValue)]
         public string Prop_DefaultValue
         {
             get => _propDefaultValue;
@@ -80,7 +79,7 @@ namespace Primo.MIA
         /// Если false — вернуть Prop_DefaultValue.
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
-        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Ошибка если не найдено")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_ThrowIfNotFound)]
         public bool Prop_ThrowIfNotFound
         {
             get => _throwIfNotFound;
@@ -95,7 +94,7 @@ namespace Primo.MIA
         /// <summary>Найденное значение или DefaultValue если ключ не найден</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
-        [System.ComponentModel.Category("Выходные данные"), System.ComponentModel.DisplayName("Значение")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_Value)]
         public string Prop_Value
         {
             get => _propValue;
@@ -106,7 +105,7 @@ namespace Primo.MIA
         /// <summary>True если ключ найден в словаре, false если нет</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(bool))]
-        [System.ComponentModel.Category("Выходные данные"), System.ComponentModel.DisplayName("Ключ найден")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_Found)]
         public string Prop_Found
         {
             get => _propFound;
@@ -134,40 +133,15 @@ namespace Primo.MIA
                 "  Значение    — найденное значение или DefaultValue\n" +
                 "  Ключ найден — bool флаг результата поиска";
 
-            sdkComponentIcon = "pack://application:,,,/Primo.MIA;component/images/dict.png";
+            sdkComponentIcon = ActivityIcons.Dictionary;
 
-            sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
+                                    sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_Dictionary", PropertyType = PropertyTypes.SCRIPT,
-                    EditorType = ScriptEditorTypes.NONE, DataType = typeof(Dictionary<string, string>),
-                    ToolTip = "Входной словарь Dictionary<string, string>", IsReadOnly = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_Key", PropertyType = PropertyTypes.SCRIPT,
-                    EditorType = ScriptEditorTypes.NONE, DataType = typeof(string),
-                    ToolTip = "Ключ для поиска значения", IsReadOnly = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_DefaultValue", PropertyType = PropertyTypes.SCRIPT,
-                    EditorType = ScriptEditorTypes.NONE, DataType = typeof(string),
-                    ToolTip = "Значение по умолчанию если ключ не найден", IsReadOnly = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_Value", PropertyType = PropertyTypes.VARIABLE,
-                    EditorType = ScriptEditorTypes.NONE, DataType = typeof(string),
-                    ToolTip = "Найденное значение (или DefaultValue)", IsReadOnly = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_Found", PropertyType = PropertyTypes.VARIABLE,
-                    EditorType = ScriptEditorTypes.NONE, DataType = typeof(bool),
-                    ToolTip = "True если ключ был найден в словаре", IsReadOnly = false
-                }
+                PropertyBuilder.Script<Dictionary<string, string>>("Prop_Dictionary", "Входной словарь Dictionary<string, string>"),
+                PropertyBuilder.Script<string>("Prop_Key", "Ключ для поиска значения"),
+                PropertyBuilder.Script<string>("Prop_DefaultValue", "Значение по умолчанию если ключ не найден"),
+                PropertyBuilder.Variable<string>("Prop_Value", "Найденное значение (или DefaultValue)"),
+                PropertyBuilder.Variable<bool>("Prop_Found", "True если ключ был найден в словаре")
             };
 
             InitClass(container);
@@ -218,18 +192,12 @@ namespace Primo.MIA
         // ВАЛИДАЦИЯ
         // =========================================================================
 
-        public override ValidationResult Validate()
+                public override ValidationResult Validate()
         {
             var ret = new ValidationResult();
-            ValidateField(ret, this.Prop_Dictionary, "Словарь", "Словарь обязателен");
-            ValidateField(ret, this.Prop_Key,        "Ключ",    "Ключ обязателен");
+            ret.ValidateRequired(this.Prop_Dictionary, ActivityStrings.Field_Dictionary, ActivityStrings.Error_DictionaryRequired);
+            ret.ValidateRequired(this.Prop_Key, ActivityStrings.Field_Key, ActivityStrings.Error_KeyRequired);
             return ret;
-        }
-
-        private void ValidateField(ValidationResult result, string value, string fieldName, string errorMessage)
-        {
-            if (string.IsNullOrWhiteSpace(value))
-                result.Items.Add(new ValidationResult.ValidationItem() { PropertyName = fieldName, Error = errorMessage });
         }
     }
 }

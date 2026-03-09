@@ -18,6 +18,7 @@ using LTools.Common.Model;
 using LTools.Common.UIElements;
 using LTools.Enums;
 using LTools.SDK;
+using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,8 +34,7 @@ namespace Primo.MIA
     /// </summary>
     public class ListSortBack : PrimoComponentTO<ListSort>
     {
-        private const string CGroupName = "MIA" + WFPublishedElementBase.TREE_SEPARATOR + "Списки";
-        public override string GroupName { get => CGroupName; protected set { } }
+                public override string GroupName { get => ActivityCategories.Lists; protected set { } }
 
         protected override int sdkTimeOut
         {
@@ -48,7 +48,7 @@ namespace Primo.MIA
         /// <summary>Входной список List&lt;string&gt; для сортировки</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(List<string>))]
-        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Список")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_List)]
         public string Prop_List
         {
             get => _propList;
@@ -58,7 +58,7 @@ namespace Primo.MIA
         private ListSortMode _mode = ListSortMode.Alphabetical;
         /// <summary>Способ сортировки</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
-        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Способ сортировки")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_SortMode)]
         public ListSortMode Mode
         {
             get => _mode;
@@ -72,7 +72,7 @@ namespace Primo.MIA
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
-        [System.ComponentModel.Category("Random"), System.ComponentModel.DisplayName("Зерно (для Random)")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Random), System.ComponentModel.DisplayName(ActivityStrings.Field_RandomSeed)]
         public string Prop_RandomSeed
         {
             get => _propRandomSeed;
@@ -85,7 +85,7 @@ namespace Primo.MIA
         /// <summary>Отсортированный список</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(List<string>))]
-        [System.ComponentModel.Category("Выходные данные"), System.ComponentModel.DisplayName("Результат")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_Result)]
         public string Prop_Result
         {
             get => _propResult;
@@ -96,7 +96,7 @@ namespace Primo.MIA
         /// <summary>Количество элементов в результате</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
-        [System.ComponentModel.Category("Выходные данные"), System.ComponentModel.DisplayName("Количество")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_Count)]
         public string Prop_Count
         {
             get => _propCount;
@@ -122,15 +122,15 @@ namespace Primo.MIA
                 "Reverse             — обратный порядок (не сортирует)\n" +
                 "Random              — перемешивание Fisher–Yates";
 
-            sdkComponentIcon = "pack://application:,,,/Primo.MIA;component/images/list.png";
+            sdkComponentIcon = ActivityIcons.List;
 
-            sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
+                        sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_List", PropertyType = PropertyTypes.SCRIPT, EditorType = ScriptEditorTypes.NONE, DataType = typeof(List<string>), ToolTip = "Входной список", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Mode", PropertyType = PropertyTypes.OBJECT, EditorType = ScriptEditorTypes.NONE, DataType = typeof(ListSortMode), ToolTip = "Способ сортировки", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_RandomSeed", PropertyType = PropertyTypes.SCRIPT, EditorType = ScriptEditorTypes.NONE, DataType = typeof(int), ToolTip = "Зерно для Random (необязательно)", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_Result", PropertyType = PropertyTypes.VARIABLE, EditorType = ScriptEditorTypes.NONE, DataType = typeof(List<string>), ToolTip = "Отсортированный список", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_Count", PropertyType = PropertyTypes.VARIABLE, EditorType = ScriptEditorTypes.NONE, DataType = typeof(int), ToolTip = "Количество элементов", IsReadOnly = false }
+                PropertyBuilder.Script<List<string>>("Prop_List", "Входной список"),
+                PropertyBuilder.Enum<ListSortMode>("Mode", "Способ сортировки"),
+                PropertyBuilder.Script<int>("Prop_RandomSeed", "Зерно для Random (необязательно)"),
+                PropertyBuilder.Variable<List<string>>("Prop_Result", "Отсортированный список"),
+                PropertyBuilder.Variable<int>("Prop_Count", "Количество элементов")
             };
 
             InitClass(container);
@@ -228,9 +228,8 @@ namespace Primo.MIA
 
         public override ValidationResult Validate()
         {
-            var ret = new ValidationResult();
-            if (string.IsNullOrWhiteSpace(this.Prop_List))
-                ret.Items.Add(new ValidationResult.ValidationItem() { PropertyName = "Список", Error = "Список обязателен" });
+                        var ret = new ValidationResult();
+            ret.ValidateRequired(this.Prop_List, ActivityStrings.Field_List, ActivityStrings.Error_ListRequired);
             return ret;
         }
     }

@@ -44,14 +44,9 @@ namespace Primo.MIA
         /// <summary>
         /// Имя группы компонента
         /// </summary>
-        private const string CGroupName = "MIA" + WFPublishedElementBase.TREE_SEPARATOR + "HTTP";
-
-        /// <summary>
-        /// Имя группы компонента
-        /// </summary>
         public override string GroupName
         {
-            get => CGroupName;
+            get => ActivityCategories.HttpWeb;
             protected set { }
         }
 
@@ -82,7 +77,7 @@ namespace Primo.MIA
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
-        [System.ComponentModel.Category("1. Основные"),
+        [System.ComponentModel.Category(ActivityStrings.Category_Main),
          System.ComponentModel.DisplayName("URL")]
         public string Prop_Url
         {
@@ -96,7 +91,7 @@ namespace Primo.MIA
         /// Выберите один из: GET, POST, PUT, DELETE, PATCH.
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
-        [System.ComponentModel.Category("1. Основные"),
+        [System.ComponentModel.Category(ActivityStrings.Category_Main),
          System.ComponentModel.DisplayName("Метод")]
         public HttpMethodType Prop_Method
         {
@@ -112,7 +107,7 @@ namespace Primo.MIA
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
-        [System.ComponentModel.Category("1. Основные"),
+        [System.ComponentModel.Category(ActivityStrings.Category_Main),
          System.ComponentModel.DisplayName("Заголовки (JSON)")]
         public string Prop_Headers
         {
@@ -128,7 +123,7 @@ namespace Primo.MIA
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
-        [System.ComponentModel.Category("1. Основные"),
+        [System.ComponentModel.Category(ActivityStrings.Category_Main),
          System.ComponentModel.DisplayName("Тело запроса")]
         public string Prop_Body
         {
@@ -143,7 +138,7 @@ namespace Primo.MIA
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
-        [System.ComponentModel.Category("1. Основные"),
+        [System.ComponentModel.Category(ActivityStrings.Category_Main),
          System.ComponentModel.DisplayName("Таймаут (сек)")]
         public string Prop_Timeout
         {
@@ -159,7 +154,7 @@ namespace Primo.MIA
         /// Если true — необходимо указать путь к файлу .pfx и пароль.
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
-        [System.ComponentModel.Category("2. Сертификаты и SSL"),
+        [System.ComponentModel.Category(ActivityStrings.Category_Sertificates_SSL),
          System.ComponentModel.DisplayName("Использовать сертификат")]
         public bool Prop_UseCertificate
         {
@@ -175,7 +170,7 @@ namespace Primo.MIA
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
-        [System.ComponentModel.Category("2. Сертификаты и SSL"),
+        [System.ComponentModel.Category(ActivityStrings.Category_Sertificates_SSL),
          System.ComponentModel.DisplayName("Путь к сертификату")]
         public string Prop_CertPath
         {
@@ -190,7 +185,7 @@ namespace Primo.MIA
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
-        [System.ComponentModel.Category("2. Сертификаты и SSL"),
+        [System.ComponentModel.Category(ActivityStrings.Category_Sertificates_SSL),
          System.ComponentModel.DisplayName("Пароль сертификата")]
         public string Prop_CertPassword
         {
@@ -205,7 +200,7 @@ namespace Primo.MIA
         /// В продакшене это создаёт угрозу безопасности.
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
-        [System.ComponentModel.Category("2. Сертификаты и SSL"),
+        [System.ComponentModel.Category(ActivityStrings.Category_Sertificates_SSL),
          System.ComponentModel.DisplayName("Игнорировать ошибки SSL")]
         public bool Prop_IgnoreSslErrors
         {
@@ -222,7 +217,7 @@ namespace Primo.MIA
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
-        [System.ComponentModel.Category("Выход"),
+        [System.ComponentModel.Category(ActivityStrings.Category_Output),
          System.ComponentModel.DisplayName("Код ответа")]
         public string Prop_StatusCode
         {
@@ -237,7 +232,7 @@ namespace Primo.MIA
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
-        [System.ComponentModel.Category("Выход"),
+        [System.ComponentModel.Category(ActivityStrings.Category_Output),
          System.ComponentModel.DisplayName("Тело ответа")]
         public string Prop_ResponseContent
         {
@@ -252,7 +247,7 @@ namespace Primo.MIA
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
-        [System.ComponentModel.Category("Выход"),
+        [System.ComponentModel.Category(ActivityStrings.Category_Output),
          System.ComponentModel.DisplayName("Заголовки ответа (JSON)")]
         public string Prop_ResponseHeaders
         {
@@ -294,114 +289,18 @@ namespace Primo.MIA
 
             sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName      = "Prop_Url",
-                    PropertyType  = PropertyTypes.SCRIPT,
-                    EditorType    = ScriptEditorTypes.NONE,
-                    DataType      = typeof(string),
-                    ToolTip       = "Адрес запроса (URL)",
-                    IsReadOnly    = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName      = "Prop_Method",
-                    PropertyType  = PropertyTypes.OBJECT,
-                    EditorType    = ScriptEditorTypes.NONE,
-                    DataType      = typeof(HttpMethodType),
-                    ToolTip       = "HTTP-метод запроса",
-                    IsReadOnly    = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName      = "Prop_Headers",
-                    PropertyType  = PropertyTypes.SCRIPT,
-                    EditorType    = ScriptEditorTypes.NONE,
-                    DataType      = typeof(string),
-                    ToolTip       = "Заголовки запроса в формате JSON",
-                    IsReadOnly    = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName      = "Prop_Body",
-                    PropertyType  = PropertyTypes.SCRIPT,
-                    EditorType    = ScriptEditorTypes.NONE,
-                    DataType      = typeof(string),
-                    ToolTip       = "Тело запроса (для POST, PUT, PATCH)",
-                    IsReadOnly    = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName      = "Prop_Timeout",
-                    PropertyType  = PropertyTypes.SCRIPT,
-                    EditorType    = ScriptEditorTypes.NONE,
-                    DataType      = typeof(int),
-                    ToolTip       = "Таймаут запроса в секундах",
-                    IsReadOnly    = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName      = "Prop_UseCertificate",
-                    PropertyType  = PropertyTypes.OBJECT,
-                    EditorType    = ScriptEditorTypes.NONE,
-                    DataType      = typeof(bool),
-                    ToolTip       = "Использовать клиентский сертификат",
-                    IsReadOnly    = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName      = "Prop_CertPath",
-                    PropertyType  = PropertyTypes.SCRIPT,
-                    EditorType    = ScriptEditorTypes.FILE_SELECTOR,
-                    DataType      = typeof(string),
-                    ToolTip       = "Путь к файлу сертификата (.pfx)",
-                    IsReadOnly    = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName      = "Prop_CertPassword",
-                    PropertyType  = PropertyTypes.SCRIPT,
-                    EditorType    = ScriptEditorTypes.NONE,
-                    DataType      = typeof(string),
-                    ToolTip       = "Пароль к файлу сертификата",
-                    IsReadOnly    = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName      = "Prop_IgnoreSslErrors",
-                    PropertyType  = PropertyTypes.OBJECT,
-                    EditorType    = ScriptEditorTypes.NONE,
-                    DataType      = typeof(bool),
-                    ToolTip       = "Игнорировать ошибки SSL (только для тестовых сред)",
-                    IsReadOnly    = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName      = "Prop_StatusCode",
-                    PropertyType  = PropertyTypes.VARIABLE,
-                    EditorType    = ScriptEditorTypes.NONE,
-                    DataType      = typeof(int),
-                    ToolTip       = "Код HTTP-ответа сервера",
-                    IsReadOnly    = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName      = "Prop_ResponseContent",
-                    PropertyType  = PropertyTypes.VARIABLE,
-                    EditorType    = ScriptEditorTypes.NONE,
-                    DataType      = typeof(string),
-                    ToolTip       = "Тело ответа сервера",
-                    IsReadOnly    = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName      = "Prop_ResponseHeaders",
-                    PropertyType  = PropertyTypes.VARIABLE,
-                    EditorType    = ScriptEditorTypes.NONE,
-                    DataType      = typeof(string),
-                    ToolTip       = "Заголовки ответа в формате JSON",
-                    IsReadOnly    = false
-                }
+                PropertyBuilder.Script<string>("Prop_Url", "Адрес запроса (URL)"),
+                PropertyBuilder.Enum<HttpMethodType>("Prop_Method", "HTTP-метод запроса"),
+                PropertyBuilder.Script<string>("Prop_Headers", "Заголовки запроса в формате JSON"),
+                PropertyBuilder.Script<string>("Prop_Body", "Тело запроса (для POST, PUT, PATCH)"),
+                PropertyBuilder.Script<int>("Prop_Timeout", "Таймаут запроса в секундах"),
+                PropertyBuilder.BooleanObject("Prop_UseCertificate", "Использовать клиентский сертификат"),
+                PropertyBuilder.FileSelector("Prop_CertPath", "Путь к файлу сертификата (.pfx)"),
+                PropertyBuilder.Script<string>("Prop_CertPassword", "Пароль к файлу сертификата"),
+                PropertyBuilder.BooleanObject("Prop_IgnoreSslErrors", "Игнорировать ошибки SSL (только для тестовых сред)"),
+                PropertyBuilder.Variable<int>("Prop_StatusCode", "Код HTTP-ответа сервера"),
+                PropertyBuilder.Variable<string>("Prop_ResponseContent", "Тело ответа сервера"),
+                PropertyBuilder.Variable<string>("Prop_ResponseHeaders", "Заголовки ответа в формате JSON")
             };
 
             InitClass(container);
@@ -639,20 +538,11 @@ namespace Primo.MIA
             var ret = new ValidationResult();
 
             // URL обязателен
-            if (string.IsNullOrWhiteSpace(this.Prop_Url))
-                ret.Items.Add(new ValidationResult.ValidationItem()
-                {
-                    PropertyName = "URL",
-                    Error        = "Адрес запроса обязателен"
-                });
+            ret.ValidateRequired(this.Prop_Url, "URL", ActivityStrings.Error_UrlRequired);
 
             // Если включен сертификат — путь обязателен
-            if (this.Prop_UseCertificate && string.IsNullOrWhiteSpace(this.Prop_CertPath))
-                ret.Items.Add(new ValidationResult.ValidationItem()
-                {
-                    PropertyName = "Путь к сертификату",
-                    Error        = "Путь к сертификату обязателен при включенном флаге"
-                });
+            if (this.Prop_UseCertificate)
+                ret.ValidateRequired(this.Prop_CertPath, "Путь к сертификату", "Путь к сертификату обязателен при включенном флаге");
 
             return ret;
         }

@@ -23,18 +23,9 @@ namespace Primo.MIA
     /// </summary>
     public class WaitForFileBack : PrimoComponentSimple<WaitForFile>
     {
-        /// <summary>
-        /// Имя группы компонента
-        /// </summary>
-        private const string CGroupName = "MIA" + WFPublishedElementBase.TREE_SEPARATOR + "Утилиты";
-
-
-        /// <summary>
-        /// Имя группы компонента
-        /// </summary>
         public override string GroupName
         {
-            get => CGroupName;
+            get => ActivityCategories.Utilities;
             protected set { }
         }
 
@@ -45,7 +36,7 @@ namespace Primo.MIA
         /// Режим работы активности
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
-        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Режим ожидания")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_WaitMode)]
         public WaitFileMode WaitMode
         {
             get => this._waitMode;
@@ -58,7 +49,7 @@ namespace Primo.MIA
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
-        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Путь к директории")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_DirectoryPath)]
         public string Prop_DirectoryPath
         {
             get { return this.prop_DirectoryPath; }
@@ -70,7 +61,7 @@ namespace Primo.MIA
         /// Тип фильтрации файлов
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
-        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Тип фильтрации")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_FilterType)]
         public FileFilterType FilterType
         {
             get => this._filterType;
@@ -83,7 +74,7 @@ namespace Primo.MIA
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
-        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Маска файла")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_FilePattern)]
         public string Prop_FilePattern
         {
             get { return this.prop_FilePattern; }
@@ -96,7 +87,7 @@ namespace Primo.MIA
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
-        [System.ComponentModel.Category("Настройки"), System.ComponentModel.DisplayName("Таймаут (сек)")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Settings), System.ComponentModel.DisplayName(ActivityStrings.Field_Timeout)]
         public string Prop_Timeout
         {
             get { return this.prop_Timeout; }
@@ -109,7 +100,7 @@ namespace Primo.MIA
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
-        [System.ComponentModel.Category("Настройки"), System.ComponentModel.DisplayName("Интервал проверки (мс)")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Settings), System.ComponentModel.DisplayName(ActivityStrings.Field_CheckInterval)]
         public string Prop_CheckInterval
         {
             get { return this.prop_CheckInterval; }
@@ -121,7 +112,7 @@ namespace Primo.MIA
         /// Ожидать стабильности размера файла (файл полностью записан)
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
-        [System.ComponentModel.Category("Настройки"), System.ComponentModel.DisplayName("Ожидать завершения записи")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Settings), System.ComponentModel.DisplayName(ActivityStrings.Field_WaitForStability)]
         public bool Prop_WaitForStability
         {
             get { return this._waitForStability; }
@@ -134,7 +125,7 @@ namespace Primo.MIA
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
-        [System.ComponentModel.Category("Настройки"), System.ComponentModel.DisplayName("Время стабильности (мс)")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Settings), System.ComponentModel.DisplayName(ActivityStrings.Field_StabilityTimeout)]
         public string Prop_StabilityTimeout
         {
             get { return this.prop_StabilityTimeout; }
@@ -146,7 +137,7 @@ namespace Primo.MIA
         /// Выбрасывать исключение при таймауте
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
-        [System.ComponentModel.Category("Настройки"), System.ComponentModel.DisplayName("Ошибка при таймауте")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Settings), System.ComponentModel.DisplayName(ActivityStrings.Field_ThrowOnTimeout)]
         public bool Prop_ThrowOnTimeout
         {
             get { return this._throwOnTimeout; }
@@ -161,7 +152,7 @@ namespace Primo.MIA
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(bool))]
-        [System.ComponentModel.Category("Output"), System.ComponentModel.DisplayName("Файл найден")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_FileFound)]
         public string Prop_FileFound
         {
             get => prop_FileFound;
@@ -178,7 +169,7 @@ namespace Primo.MIA
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
-        [System.ComponentModel.Category("Output"), System.ComponentModel.DisplayName("Путь к файлу")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_FilePath)]
         public string Prop_FilePath
         {
             get => prop_FilePath;
@@ -195,7 +186,7 @@ namespace Primo.MIA
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
-        [System.ComponentModel.Category("Output"), System.ComponentModel.DisplayName("Имя файла")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_FileName)]
         public string Prop_FileName
         {
             get => prop_FileName;
@@ -212,7 +203,7 @@ namespace Primo.MIA
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(long))]
-        [System.ComponentModel.Category("Output"), System.ComponentModel.DisplayName("Размер файла (байт)")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_FileSize)]
         public string Prop_FileSize
         {
             get => prop_FileSize;
@@ -229,7 +220,7 @@ namespace Primo.MIA
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(long))]
-        [System.ComponentModel.Category("Output"), System.ComponentModel.DisplayName("Время ожидания (мс)")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_WaitTime)]
         public string Prop_WaitTime
         {
             get => prop_WaitTime;
@@ -277,126 +268,22 @@ Regex - Использование регулярных выражений. На
 Размер файла (байт): [Int64] Размер найденного файла в байтах. 0, если файл не найден
 Время ожидания (мс): [Int64] Фактическое время ожидания в миллисекундах";
 
-            sdkComponentIcon = "pack://application:,,,/Primo.MIA;component/images/sharp.png";
+            sdkComponentIcon = ActivityIcons.FileWait;
 
-            sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
+                        sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
-                // Режим работы (enum с выпадающим списком)
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "WaitMode",
-                    PropertyType = PropertyTypes.OBJECT,
-                    EditorType = ScriptEditorTypes.NONE,
-                    DataType = typeof(WaitFileMode),
-                    ToolTip = "Режим работы: ожидать новый файл или любой файл по маске",
-                    IsReadOnly = false
-                },
-                // Путь к директории
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_DirectoryPath",
-                    PropertyType = PropertyTypes.SCRIPT,
-                    EditorType = ScriptEditorTypes.FOLDER_SELECTOR,
-                    DataType = typeof(string),
-                    ToolTip = "Путь к директории для мониторинга появления файлов",
-                    IsReadOnly = false
-                },
-                // Тип фильтрации (enum с выпадающим списком)
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "FilterType",
-                    PropertyType = PropertyTypes.OBJECT,
-                    EditorType = ScriptEditorTypes.NONE,
-                    DataType = typeof(FileFilterType),
-                    ToolTip = "Тип фильтрации: точное совпадение, wildcard (*.txt) или regex паттерн",
-                    IsReadOnly = false
-                },
-                // Маска файла
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_FilePattern",
-                    PropertyType = PropertyTypes.SCRIPT,
-                    EditorType = ScriptEditorTypes.NONE,
-                    DataType = typeof(string),
-                    ToolTip = "Маска/паттерн файла в зависимости от выбранного типа фильтрации",
-                    IsReadOnly = false
-                },
-                // Таймаут
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_Timeout",
-                    PropertyType = PropertyTypes.SCRIPT,
-                    EditorType = ScriptEditorTypes.NONE,
-                    DataType = typeof(int),
-                    ToolTip = "Таймаут ожидания в секундах (по умолчанию 30)",
-                    IsReadOnly = false
-                },
-                // Интервал проверки
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_CheckInterval",
-                    PropertyType = PropertyTypes.SCRIPT,
-                    EditorType = ScriptEditorTypes.NONE,
-                    DataType = typeof(int),
-                    ToolTip = "Интервал проверки в миллисекундах (по умолчанию 500)",
-                    IsReadOnly = false
-                },
-                // Время стабильности
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_StabilityTimeout",
-                    PropertyType = PropertyTypes.SCRIPT,
-                    EditorType = ScriptEditorTypes.NONE,
-                    DataType = typeof(int),
-                    ToolTip = "Время стабильности размера файла в миллисекундах (по умолчанию 2000)",
-                    IsReadOnly = false
-                },
-                // Output свойства
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_FileFound",
-                    PropertyType = PropertyTypes.VARIABLE,
-                    EditorType = ScriptEditorTypes.NONE,
-                    DataType = typeof(bool),
-                    ToolTip = "Флаг обнаружения файла",
-                    IsReadOnly = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_FilePath",
-                    PropertyType = PropertyTypes.VARIABLE,
-                    EditorType = ScriptEditorTypes.NONE,
-                    DataType = typeof(string),
-                    ToolTip = "Полный путь к найденному файлу",
-                    IsReadOnly = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_FileName",
-                    PropertyType = PropertyTypes.VARIABLE,
-                    EditorType = ScriptEditorTypes.NONE,
-                    DataType = typeof(string),
-                    ToolTip = "Имя найденного файла",
-                    IsReadOnly = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_FileSize",
-                    PropertyType = PropertyTypes.VARIABLE,
-                    EditorType = ScriptEditorTypes.NONE,
-                    DataType = typeof(long),
-                    ToolTip = "Размер найденного файла в байтах",
-                    IsReadOnly = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_WaitTime",
-                    PropertyType = PropertyTypes.VARIABLE,
-                    EditorType = ScriptEditorTypes.NONE,
-                    DataType = typeof(long),
-                    ToolTip = "Фактическое время ожидания в миллисекундах",
-                    IsReadOnly = false
-                }
+                PropertyBuilder.Enum<WaitFileMode>("WaitMode", "Режим работы: ожидать новый файл или любой файл по маске"),
+                PropertyBuilder.FolderSelector("Prop_DirectoryPath", "Путь к директории для мониторинга появления файлов"),
+                PropertyBuilder.Enum<FileFilterType>("FilterType", "Тип фильтрации: точное совпадение, wildcard (*.txt) или regex паттерн"),
+                PropertyBuilder.Script<string>("Prop_FilePattern", "Маска/паттерн файла в зависимости от выбранного типа фильтрации"),
+                PropertyBuilder.Script<int>("Prop_Timeout", "Таймаут ожидания в секундах (по умолчанию 30)"),
+                PropertyBuilder.Script<int>("Prop_CheckInterval", "Интервал проверки в миллисекундах (по умолчанию 500)"),
+                PropertyBuilder.Script<int>("Prop_StabilityTimeout", "Время стабильности размера файла в миллисекундах (по умолчанию 2000)"),
+                PropertyBuilder.Variable<bool>("Prop_FileFound", "Флаг обнаружения файла"),
+                PropertyBuilder.Variable<string>("Prop_FilePath", "Полный путь к найденному файлу"),
+                PropertyBuilder.Variable<string>("Prop_FileName", "Имя найденного файла"),
+                PropertyBuilder.Variable<long>("Prop_FileSize", "Размер найденного файла в байтах"),
+                PropertyBuilder.Variable<long>("Prop_WaitTime", "Фактическое время ожидания в миллисекундах")
             };
 
             InitClass(container);
@@ -820,14 +707,14 @@ Regex - Использование регулярных выражений. На
         /// <summary>
         /// Проверка корректности введенных данных
         /// </summary>
-                public override ValidationResult Validate()
+                        public override ValidationResult Validate()
         {
             ValidationResult ret = new ValidationResult();
-            ret.ValidateRequired(this.Prop_DirectoryPath, "Путь к директории", "Путь к директории не может быть пустым");
-            ret.ValidateRequired(this.Prop_FilePattern, "Маска файла", "Маска файла не может быть пустой");
-            ret.ValidateRequired(this.Prop_Timeout, "Таймаут (сек)", "Таймаут должен быть указан");
-            ret.ValidateRequired(this.Prop_CheckInterval, "Интервал проверки (мс)", "Интервал проверки должен быть указан");
-            ret.ValidateRequired(this.Prop_StabilityTimeout, "Время стабильности (мс)", "Время стабильности должно быть указано");
+            ret.ValidateRequired(this.Prop_DirectoryPath, ActivityStrings.Field_DirectoryPath, ActivityStrings.Error_DirectoryRequired);
+            ret.ValidateRequired(this.Prop_FilePattern, ActivityStrings.Field_FilePattern, ActivityStrings.Error_FilePatternRequired);
+            ret.ValidateRequired(this.Prop_Timeout, ActivityStrings.Field_Timeout, ActivityStrings.Error_TimeoutRequired);
+            ret.ValidateRequired(this.Prop_CheckInterval, ActivityStrings.Field_CheckInterval, ActivityStrings.Error_CheckIntervalRequired);
+            ret.ValidateRequired(this.Prop_StabilityTimeout, ActivityStrings.Field_StabilityTimeout, ActivityStrings.Error_StabilityTimeoutRequired);
             return ret;
         }
     }

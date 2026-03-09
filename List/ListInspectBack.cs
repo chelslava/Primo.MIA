@@ -1,6 +1,7 @@
 using LTools.Common.Model;
 using LTools.Common.UIElements;
 using LTools.SDK;
+using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,8 +17,7 @@ namespace Primo.MIA
     /// </summary>
     public class ListInspectBack : PrimoComponentTO<ListInspect>
     {
-        private const string CGroupName = "MIA" + WFPublishedElementBase.TREE_SEPARATOR + "Списки";
-        public override string GroupName { get => CGroupName; protected set { } }
+                public override string GroupName { get => ActivityCategories.Lists; protected set { } }
 
         protected override int sdkTimeOut
         {
@@ -28,7 +28,7 @@ namespace Primo.MIA
         private string _propList;
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(List<string>))]
-        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Список")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_List)]
         public string Prop_List
         {
             get => _propList;
@@ -39,7 +39,7 @@ namespace Primo.MIA
         /// <summary>Значение для поиска в списке (для определения индексов вхождений)</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
-        [System.ComponentModel.Category("Поиск"), System.ComponentModel.DisplayName("Искомое значение")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Search), System.ComponentModel.DisplayName(ActivityStrings.Field_SearchValue)]
         public string Prop_SearchValue
         {
             get => _propSearchValue;
@@ -48,7 +48,7 @@ namespace Primo.MIA
 
         private bool _caseSensitive = false;
         [LTools.Common.Model.Serialization.StoringProperty]
-        [System.ComponentModel.Category("Поиск"), System.ComponentModel.DisplayName("Учитывать регистр")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Search), System.ComponentModel.DisplayName(ActivityStrings.Field_CaseSensitive)]
         public bool Prop_CaseSensitive
         {
             get => _caseSensitive;
@@ -60,31 +60,31 @@ namespace Primo.MIA
         private string _propTotalCount;
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
-        [System.ComponentModel.Category("Статистика"), System.ComponentModel.DisplayName("Всего элементов")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Statistics), System.ComponentModel.DisplayName(ActivityStrings.Field_TotalCount)]
         public string Prop_TotalCount { get => _propTotalCount; set { _propTotalCount = value; InvokePropertyChanged(this, "Prop_TotalCount"); } }
 
         private string _propUniqueCount;
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
-        [System.ComponentModel.Category("Статистика"), System.ComponentModel.DisplayName("Уникальных")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Statistics), System.ComponentModel.DisplayName(ActivityStrings.Field_UniqueCount)]
         public string Prop_UniqueCount { get => _propUniqueCount; set { _propUniqueCount = value; InvokePropertyChanged(this, "Prop_UniqueCount"); } }
 
         private string _propEmptyCount;
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
-        [System.ComponentModel.Category("Статистика"), System.ComponentModel.DisplayName("Пустых")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Statistics), System.ComponentModel.DisplayName(ActivityStrings.Field_EmptyCount)]
         public string Prop_EmptyCount { get => _propEmptyCount; set { _propEmptyCount = value; InvokePropertyChanged(this, "Prop_EmptyCount"); } }
 
         private string _propHasDuplicates;
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(bool))]
-        [System.ComponentModel.Category("Статистика"), System.ComponentModel.DisplayName("Есть дубликаты")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Statistics), System.ComponentModel.DisplayName(ActivityStrings.Field_HasDuplicates)]
         public string Prop_HasDuplicates { get => _propHasDuplicates; set { _propHasDuplicates = value; InvokePropertyChanged(this, "Prop_HasDuplicates"); } }
 
         private string _propDuplicates;
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(List<string>))]
-        [System.ComponentModel.Category("Статистика"), System.ComponentModel.DisplayName("Дублирующиеся значения")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Statistics), System.ComponentModel.DisplayName(ActivityStrings.Field_Duplicates)]
         public string Prop_Duplicates { get => _propDuplicates; set { _propDuplicates = value; InvokePropertyChanged(this, "Prop_Duplicates"); } }
 
         // — OUTPUT: статистика длин —
@@ -92,19 +92,19 @@ namespace Primo.MIA
         private string _propMinLength;
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
-        [System.ComponentModel.Category("Длины"), System.ComponentModel.DisplayName("Мин. длина")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Lengths), System.ComponentModel.DisplayName(ActivityStrings.Field_MinLength)]
         public string Prop_MinLength { get => _propMinLength; set { _propMinLength = value; InvokePropertyChanged(this, "Prop_MinLength"); } }
 
         private string _propMaxLength;
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
-        [System.ComponentModel.Category("Длины"), System.ComponentModel.DisplayName("Макс. длина")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Lengths), System.ComponentModel.DisplayName(ActivityStrings.Field_MaxLength)]
         public string Prop_MaxLength { get => _propMaxLength; set { _propMaxLength = value; InvokePropertyChanged(this, "Prop_MaxLength"); } }
 
         private string _propAvgLength;
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(double))]
-        [System.ComponentModel.Category("Длины"), System.ComponentModel.DisplayName("Средняя длина")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Lengths), System.ComponentModel.DisplayName(ActivityStrings.Field_AvgLength)]
         public string Prop_AvgLength { get => _propAvgLength; set { _propAvgLength = value; InvokePropertyChanged(this, "Prop_AvgLength"); } }
 
         // — OUTPUT: поиск —
@@ -112,25 +112,25 @@ namespace Primo.MIA
         private string _propContains;
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(bool))]
-        [System.ComponentModel.Category("Поиск"), System.ComponentModel.DisplayName("Найдено")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Search), System.ComponentModel.DisplayName(ActivityStrings.Field_Contains)]
         public string Prop_Contains { get => _propContains; set { _propContains = value; InvokePropertyChanged(this, "Prop_Contains"); } }
 
         private string _propFirstIndex;
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
-        [System.ComponentModel.Category("Поиск"), System.ComponentModel.DisplayName("Первый индекс")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Search), System.ComponentModel.DisplayName(ActivityStrings.Field_FirstIndex)]
         public string Prop_FirstIndex { get => _propFirstIndex; set { _propFirstIndex = value; InvokePropertyChanged(this, "Prop_FirstIndex"); } }
 
         private string _propAllIndexes;
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(List<int>))]
-        [System.ComponentModel.Category("Поиск"), System.ComponentModel.DisplayName("Все индексы")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Search), System.ComponentModel.DisplayName(ActivityStrings.Field_AllIndexes)]
         public string Prop_AllIndexes { get => _propAllIndexes; set { _propAllIndexes = value; InvokePropertyChanged(this, "Prop_AllIndexes"); } }
 
         private string _propOccurrenceCount;
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
-        [System.ComponentModel.Category("Поиск"), System.ComponentModel.DisplayName("Кол-во вхождений")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Search), System.ComponentModel.DisplayName(ActivityStrings.Field_OccurrenceCount)]
         public string Prop_OccurrenceCount { get => _propOccurrenceCount; set { _propOccurrenceCount = value; InvokePropertyChanged(this, "Prop_OccurrenceCount"); } }
 
         public ListInspectBack(IWFContainer container) : base(container)
@@ -150,24 +150,25 @@ namespace Primo.MIA
                 "  Первый индекс (-1 если не найдено)\n" +
                 "  Все индексы вхождений\n" +
                 "  Количество вхождений";
-            sdkComponentIcon = "pack://application:,,,/Primo.MIA;component/images/list.png";
+            sdkComponentIcon = ActivityIcons.List;
 
-            sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
+                        sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_List", PropertyType = PropertyTypes.SCRIPT, EditorType = ScriptEditorTypes.NONE, DataType = typeof(List<string>), ToolTip = "Входной список", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_SearchValue", PropertyType = PropertyTypes.SCRIPT, EditorType = ScriptEditorTypes.NONE, DataType = typeof(string), ToolTip = "Значение для поиска (необязательно)", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_TotalCount", PropertyType = PropertyTypes.VARIABLE, EditorType = ScriptEditorTypes.NONE, DataType = typeof(int), ToolTip = "Всего элементов", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_UniqueCount", PropertyType = PropertyTypes.VARIABLE, EditorType = ScriptEditorTypes.NONE, DataType = typeof(int), ToolTip = "Уникальных элементов", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_EmptyCount", PropertyType = PropertyTypes.VARIABLE, EditorType = ScriptEditorTypes.NONE, DataType = typeof(int), ToolTip = "Пустых элементов", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_HasDuplicates", PropertyType = PropertyTypes.VARIABLE, EditorType = ScriptEditorTypes.NONE, DataType = typeof(bool), ToolTip = "Есть ли дублирующиеся значения", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_Duplicates", PropertyType = PropertyTypes.VARIABLE, EditorType = ScriptEditorTypes.NONE, DataType = typeof(List<string>), ToolTip = "Список дублирующихся значений", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_MinLength", PropertyType = PropertyTypes.VARIABLE, EditorType = ScriptEditorTypes.NONE, DataType = typeof(int), ToolTip = "Минимальная длина строки", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_MaxLength", PropertyType = PropertyTypes.VARIABLE, EditorType = ScriptEditorTypes.NONE, DataType = typeof(int), ToolTip = "Максимальная длина строки", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_AvgLength", PropertyType = PropertyTypes.VARIABLE, EditorType = ScriptEditorTypes.NONE, DataType = typeof(double), ToolTip = "Средняя длина строки", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_Contains", PropertyType = PropertyTypes.VARIABLE, EditorType = ScriptEditorTypes.NONE, DataType = typeof(bool), ToolTip = "Найден ли искомый элемент", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_FirstIndex", PropertyType = PropertyTypes.VARIABLE, EditorType = ScriptEditorTypes.NONE, DataType = typeof(int), ToolTip = "Первый индекс вхождения (-1 если не найден)", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_AllIndexes", PropertyType = PropertyTypes.VARIABLE, EditorType = ScriptEditorTypes.NONE, DataType = typeof(List<int>), ToolTip = "Все индексы вхождений искомого значения", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_OccurrenceCount", PropertyType = PropertyTypes.VARIABLE, EditorType = ScriptEditorTypes.NONE, DataType = typeof(int), ToolTip = "Количество вхождений искомого значения", IsReadOnly = false }
+                PropertyBuilder.Script<List<string>>("Prop_List", "Входной список"),
+                PropertyBuilder.Script<string>("Prop_SearchValue", "Значение для поиска (необязательно)"),
+                PropertyBuilder.BooleanObject("Prop_CaseSensitive", "Учитывать регистр при поиске"),
+                PropertyBuilder.Variable<int>("Prop_TotalCount", "Всего элементов"),
+                PropertyBuilder.Variable<int>("Prop_UniqueCount", "Уникальных элементов"),
+                PropertyBuilder.Variable<int>("Prop_EmptyCount", "Пустых элементов"),
+                PropertyBuilder.Variable<bool>("Prop_HasDuplicates", "Есть ли дублирующиеся значения"),
+                PropertyBuilder.Variable<List<string>>("Prop_Duplicates", "Список дублирующихся значений"),
+                PropertyBuilder.Variable<int>("Prop_MinLength", "Минимальная длина строки"),
+                PropertyBuilder.Variable<int>("Prop_MaxLength", "Максимальная длина строки"),
+                PropertyBuilder.Variable<double>("Prop_AvgLength", "Средняя длина строки"),
+                PropertyBuilder.Variable<bool>("Prop_Contains", "Найден ли искомый элемент"),
+                PropertyBuilder.Variable<int>("Prop_FirstIndex", "Первый индекс вхождения (-1 если не найден)"),
+                PropertyBuilder.Variable<List<int>>("Prop_AllIndexes", "Все индексы вхождений искомого значения"),
+                PropertyBuilder.Variable<int>("Prop_OccurrenceCount", "Количество вхождений искомого значения")
             };
 
             InitClass(container);
@@ -265,9 +266,8 @@ namespace Primo.MIA
 
         public override ValidationResult Validate()
         {
-            var ret = new ValidationResult();
-            if (string.IsNullOrWhiteSpace(this.Prop_List))
-                ret.Items.Add(new ValidationResult.ValidationItem() { PropertyName = "Список", Error = "Список обязателен" });
+                        var ret = new ValidationResult();
+            ret.ValidateRequired(this.Prop_List, ActivityStrings.Field_List, ActivityStrings.Error_ListRequired);
             return ret;
         }
     }

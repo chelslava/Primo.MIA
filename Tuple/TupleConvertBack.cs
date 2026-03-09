@@ -2,6 +2,7 @@ using LTools.Common.Model;
 using LTools.Common.UIElements;
 using LTools.Enums;
 using LTools.SDK;
+using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,10 +20,9 @@ namespace Primo.MIA
     ///   ToDictionary — Tuple → Dictionary&lt;string,object&gt; с ключами "Item1".."ItemN"
     ///   ToString     — Tuple → строка вида "Item1=значение1; Item2=значение2"
     /// </summary>
-    public class TupleConvertBack : PrimoComponentTO<TupleConvert>
+        public class TupleConvertBack : PrimoComponentTO<TupleConvert>
     {
-        private const string CGroupName = "MIA" + WFPublishedElementBase.TREE_SEPARATOR + "Кортежи";
-        public override string GroupName { get => CGroupName; protected set { } }
+        public override string GroupName { get => ActivityCategories.Tuples; protected set { } }
 
         protected override int sdkTimeOut
         {
@@ -36,13 +36,15 @@ namespace Primo.MIA
         /// <summary>Входной кортеж. Обязателен для ToList, ToDictionary, ToString.</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(object))]
-        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Кортеж")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main)]
+        [System.ComponentModel.DisplayName(ActivityStrings.Field_Tuple)]
         public string Prop_Tuple { get => _propTuple; set { _propTuple = value; InvokePropertyChanged(this, "Prop_Tuple"); } }
 
         private TupleConvertMode _mode = TupleConvertMode.ToList;
         /// <summary>Режим конвертации.</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
-        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Режим")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main)]
+        [System.ComponentModel.DisplayName(ActivityStrings.Field_ConvertMode)]
         public TupleConvertMode Mode
         {
             get => _mode;
@@ -53,14 +55,16 @@ namespace Primo.MIA
         /// <summary>Исходный список для режима FromList. Используются первые 1–7 элементов.</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(List<object>))]
-        [System.ComponentModel.Category("FromList"), System.ComponentModel.DisplayName("Список (вход)")]
+        [System.ComponentModel.Category(ActivityStrings.Category_FromList)]
+        [System.ComponentModel.DisplayName(ActivityStrings.Field_SourceList)]
         public string Prop_SourceList { get => _propSourceList; set { _propSourceList = value; InvokePropertyChanged(this, "Prop_SourceList"); } }
 
         private string _propSeparator;
         /// <summary>Разделитель для режима ToString. По умолчанию "; ".</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
-        [System.ComponentModel.Category("ToString"), System.ComponentModel.DisplayName("Разделитель")]
+        [System.ComponentModel.Category(ActivityStrings.Category_ToString)]
+        [System.ComponentModel.DisplayName(ActivityStrings.Field_Separator)]
         public string Prop_Separator { get => _propSeparator; set { _propSeparator = value; InvokePropertyChanged(this, "Prop_Separator"); } }
 
         private string _propIncludeKeys;
@@ -71,7 +75,8 @@ namespace Primo.MIA
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(bool))]
-        [System.ComponentModel.Category("ToString"), System.ComponentModel.DisplayName("Включать ключи")]
+        [System.ComponentModel.Category(ActivityStrings.Category_ToString)]
+        [System.ComponentModel.DisplayName(ActivityStrings.Field_IncludeKeys)]
         public string Prop_IncludeKeys { get => _propIncludeKeys; set { _propIncludeKeys = value; InvokePropertyChanged(this, "Prop_IncludeKeys"); } }
 
         // ── OUTPUT ─────────────────────────────────────────────────────────────
@@ -80,35 +85,40 @@ namespace Primo.MIA
         /// <summary>Результирующий кортеж. Заполняется только для режима FromList.</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(object))]
-        [System.ComponentModel.Category("Выходные данные"), System.ComponentModel.DisplayName("Кортеж (результат)")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output)]
+        [System.ComponentModel.DisplayName(ActivityStrings.Field_ResultTuple)]
         public string Prop_ResultTuple { get => _propResultTuple; set { _propResultTuple = value; InvokePropertyChanged(this, "Prop_ResultTuple"); } }
 
         private string _propResultList;
         /// <summary>Результирующий список. Заполняется только для режима ToList.</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(List<object>))]
-        [System.ComponentModel.Category("Выходные данные"), System.ComponentModel.DisplayName("Список (результат)")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output)]
+        [System.ComponentModel.DisplayName(ActivityStrings.Field_ResultList)]
         public string Prop_ResultList { get => _propResultList; set { _propResultList = value; InvokePropertyChanged(this, "Prop_ResultList"); } }
 
         private string _propResultDict;
         /// <summary>Результирующий словарь. Заполняется только для режима ToDictionary.</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(Dictionary<string, object>))]
-        [System.ComponentModel.Category("Выходные данные"), System.ComponentModel.DisplayName("Словарь (результат)")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output)]
+        [System.ComponentModel.DisplayName(ActivityStrings.Field_ResultDict)]
         public string Prop_ResultDict { get => _propResultDict; set { _propResultDict = value; InvokePropertyChanged(this, "Prop_ResultDict"); } }
 
         private string _propResultString;
         /// <summary>Результирующая строка. Заполняется только для режима ToString.</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
-        [System.ComponentModel.Category("Выходные данные"), System.ComponentModel.DisplayName("Строка (результат)")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output)]
+        [System.ComponentModel.DisplayName(ActivityStrings.Field_ResultString)]
         public string Prop_ResultString { get => _propResultString; set { _propResultString = value; InvokePropertyChanged(this, "Prop_ResultString"); } }
 
         private string _propArity;
         /// <summary>Арность кортежа — количество элементов (1–7).</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
-        [System.ComponentModel.Category("Выходные данные"), System.ComponentModel.DisplayName("Арность")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output)]
+        [System.ComponentModel.DisplayName(ActivityStrings.Field_Arity)]
         public string Prop_Arity { get => _propArity; set { _propArity = value; InvokePropertyChanged(this, "Prop_Arity"); } }
 
         // ── КОНСТРУКТОР ────────────────────────────────────────────────────────
@@ -127,24 +137,24 @@ namespace Primo.MIA
                 "               «Включать ключи»=true:  \"Item1=Иванов; Item2=42\"\n" +
                 "               «Включать ключи»=false: \"Иванов; 42\"\n\n" +
                 "Разделитель для ToString — по умолчанию \"; \".";
-            sdkComponentIcon = "pack://application:,,,/Primo.MIA;component/images/sharp.png";
+            sdkComponentIcon = ActivityIcons.Tuple;
 
             // Значения по умолчанию
             this.Prop_Separator = "\"; \"";
             this.Prop_IncludeKeys = "true";
 
-            sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
+                        sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_Tuple",        PropertyType = PropertyTypes.SCRIPT,   EditorType = ScriptEditorTypes.NONE, DataType = typeof(object),                     ToolTip = "Входной кортеж (для ToList, ToDictionary, ToString)", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Mode",              PropertyType = PropertyTypes.OBJECT,   EditorType = ScriptEditorTypes.NONE, DataType = typeof(TupleConvertMode),           ToolTip = "Режим конвертации", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_SourceList",   PropertyType = PropertyTypes.SCRIPT,   EditorType = ScriptEditorTypes.NONE, DataType = typeof(List<object>),               ToolTip = "Список для конвертации в кортеж (только FromList)", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_Separator",    PropertyType = PropertyTypes.SCRIPT,   EditorType = ScriptEditorTypes.NONE, DataType = typeof(string),                     ToolTip = "Разделитель (только ToString). По умолчанию \"; \"", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_IncludeKeys",  PropertyType = PropertyTypes.SCRIPT,   EditorType = ScriptEditorTypes.NONE, DataType = typeof(bool),                       ToolTip = "Включать Item1=, Item2=... в строку (только ToString)", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_ResultTuple",  PropertyType = PropertyTypes.VARIABLE, EditorType = ScriptEditorTypes.NONE, DataType = typeof(object),                     ToolTip = "Результирующий кортеж (только FromList)", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_ResultList",   PropertyType = PropertyTypes.VARIABLE, EditorType = ScriptEditorTypes.NONE, DataType = typeof(List<object>),               ToolTip = "Результирующий список (только ToList)", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_ResultDict",   PropertyType = PropertyTypes.VARIABLE, EditorType = ScriptEditorTypes.NONE, DataType = typeof(Dictionary<string, object>), ToolTip = "Результирующий словарь (только ToDictionary)", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_ResultString", PropertyType = PropertyTypes.VARIABLE, EditorType = ScriptEditorTypes.NONE, DataType = typeof(string),                     ToolTip = "Результирующая строка (только ToString)", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_Arity",        PropertyType = PropertyTypes.VARIABLE, EditorType = ScriptEditorTypes.NONE, DataType = typeof(int),                        ToolTip = "Арность кортежа", IsReadOnly = false }
+                PropertyBuilder.Script<object>("Prop_Tuple", "Входной кортеж (для ToList, ToDictionary, ToString)"),
+                PropertyBuilder.Enum<TupleConvertMode>("Mode", "Режим конвертации"),
+                PropertyBuilder.Script<List<object>>("Prop_SourceList", "Список для конвертации в кортеж (только FromList)"),
+                PropertyBuilder.Script<string>("Prop_Separator", "Разделитель (только ToString). По умолчанию \"; \""),
+                PropertyBuilder.Script<bool>("Prop_IncludeKeys", "Включать Item1=, Item2=... в строку (только ToString)"),
+                PropertyBuilder.Variable<object>("Prop_ResultTuple", "Результирующий кортеж (только FromList)"),
+                PropertyBuilder.Variable<List<object>>("Prop_ResultList", "Результирующий список (только ToList)"),
+                PropertyBuilder.Variable<Dictionary<string, object>>("Prop_ResultDict", "Результирующий словарь (только ToDictionary)"),
+                PropertyBuilder.Variable<string>("Prop_ResultString", "Результирующая строка (только ToString)"),
+                PropertyBuilder.Variable<int>("Prop_Arity", "Арность кортежа")
             };
 
             InitClass(container);

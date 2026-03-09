@@ -14,6 +14,7 @@
 using LTools.Common.Model;
 using LTools.Common.UIElements;
 using LTools.SDK;
+using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,12 +29,7 @@ namespace Primo.MIA
     /// </summary>
     public class ListAggregateBack : PrimoComponentTO<ListAggregate>
     {
-        private const string CGroupName = "MIA" + WFPublishedElementBase.TREE_SEPARATOR + "Списки";
-        public override string GroupName 
-        { 
-            get => CGroupName;
-            protected set { } 
-        }
+        public override string GroupName { get => ActivityCategories.Lists; protected set { } }
 
         protected override int sdkTimeOut
         {
@@ -44,7 +40,7 @@ namespace Primo.MIA
         private string _propList;
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(List<string>))]
-        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Список")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_List)]
         public string Prop_List
         {
             get => _propList;
@@ -53,7 +49,7 @@ namespace Primo.MIA
 
         private ListAggregateMode _mode = ListAggregateMode.Count;
         [LTools.Common.Model.Serialization.StoringProperty]
-        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Агрегатная функция")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_AggregateFunction)]
         public ListAggregateMode Mode
         {
             get => _mode;
@@ -64,7 +60,7 @@ namespace Primo.MIA
         /// <summary>Разделитель между элементами (режим Join). По умолчанию ", ".</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
-        [System.ComponentModel.Category("Join"), System.ComponentModel.DisplayName("Разделитель")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Join), System.ComponentModel.DisplayName(ActivityStrings.Field_Separator)]
         public string Prop_Separator
         {
             get => _propSeparator;
@@ -75,7 +71,7 @@ namespace Primo.MIA
         /// <summary>Строковый результат — итог Join или строковых агрегатов</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
-        [System.ComponentModel.Category("Выходные данные"), System.ComponentModel.DisplayName("Строковый результат")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_StringResult)]
         public string Prop_StringResult
         {
             get => _propStringResult;
@@ -86,7 +82,7 @@ namespace Primo.MIA
         /// <summary>Числовой результат — для Count, Sum, Min, Max, Average</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(double))]
-        [System.ComponentModel.Category("Выходные данные"), System.ComponentModel.DisplayName("Числовой результат")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_NumericResult)]
         public string Prop_NumericResult
         {
             get => _propNumericResult;
@@ -97,7 +93,7 @@ namespace Primo.MIA
         /// <summary>Количество числовых элементов (для статистических режимов)</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
-        [System.ComponentModel.Category("Выходные данные"), System.ComponentModel.DisplayName("Кол-во числовых")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_NumericCount)]
         public string Prop_NumericCount
         {
             get => _propNumericCount;
@@ -116,64 +112,16 @@ namespace Primo.MIA
                 "ShortestString — кратчайшая строка\n" +
                 "LongestString  — длиннейшая строка\n" +
                 "Join           — склеить все через разделитель";
-            sdkComponentIcon = "pack://application:,,,/Primo.MIA;component/images/list.png";
+            sdkComponentIcon = ActivityIcons.List;
 
-            sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
+                        sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() 
-                { 
-                    PropName = "Prop_List",
-                    PropertyType = PropertyTypes.SCRIPT, 
-                    EditorType = ScriptEditorTypes.NONE, 
-                    DataType = typeof(List<string>), 
-                    ToolTip = "Входной список", 
-                    IsReadOnly = false 
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() 
-                {
-                    PropName = "Mode", 
-                    PropertyType = PropertyTypes.OBJECT,
-                    EditorType = ScriptEditorTypes.NONE, 
-                    DataType = typeof(ListAggregateMode), 
-                    ToolTip = "Агрегатная функция", 
-                    IsReadOnly = false 
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() 
-                {
-                    PropName = "Prop_Separator", 
-                    PropertyType = PropertyTypes.SCRIPT, 
-                    EditorType = ScriptEditorTypes.NONE, 
-                    DataType = typeof(string), 
-                    ToolTip = "Разделитель для Join (по умолч. \", \")",
-                    IsReadOnly = false 
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() 
-                {
-                    PropName = "Prop_StringResult",
-                    PropertyType = PropertyTypes.VARIABLE, 
-                    EditorType = ScriptEditorTypes.NONE,
-                    DataType = typeof(string), 
-                    ToolTip = "Строковый результат (Join, ShortestString, LongestString)", 
-                    IsReadOnly = false 
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() 
-                {
-                    PropName = "Prop_NumericResult",
-                    PropertyType = PropertyTypes.VARIABLE, 
-                    EditorType = ScriptEditorTypes.NONE,
-                    DataType = typeof(double), 
-                    ToolTip = "Числовой результат (Count, Sum, Min, Max, Average)", 
-                    IsReadOnly = false 
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() 
-                {
-                    PropName = "Prop_NumericCount",
-                    PropertyType = PropertyTypes.VARIABLE,
-                    EditorType = ScriptEditorTypes.NONE,
-                    DataType = typeof(int), 
-                    ToolTip = "Кол-во числовых элементов", 
-                    IsReadOnly = false 
-                }
+                PropertyBuilder.Script<List<string>>("Prop_List", "Входной список"),
+                PropertyBuilder.Enum<ListAggregateMode>("Mode", "Агрегатная функция"),
+                PropertyBuilder.Script<string>("Prop_Separator", "Разделитель для Join (по умолч. \", \")"),
+                PropertyBuilder.Variable<string>("Prop_StringResult", "Строковый результат (Join, ShortestString, LongestString)"),
+                PropertyBuilder.Variable<double>("Prop_NumericResult", "Числовой результат (Count, Sum, Min, Max, Average)"),
+                PropertyBuilder.Variable<int>("Prop_NumericCount", "Кол-во числовых элементов")
             };
 
             InitClass(container);
@@ -288,9 +236,8 @@ namespace Primo.MIA
 
         public override ValidationResult Validate()
         {
-            var ret = new ValidationResult();
-            if (string.IsNullOrWhiteSpace(this.Prop_List))
-                ret.Items.Add(new ValidationResult.ValidationItem() { PropertyName = "Список", Error = "Список обязателен" });
+                        var ret = new ValidationResult();
+            ret.ValidateRequired(this.Prop_List, ActivityStrings.Field_List, ActivityStrings.Error_ListRequired);
             return ret;
         }
     }

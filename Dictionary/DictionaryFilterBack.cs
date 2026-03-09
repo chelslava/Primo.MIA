@@ -23,6 +23,7 @@ using LTools.Common.Model;
 using LTools.Common.UIElements;
 using LTools.Enums;
 using LTools.SDK;
+using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,10 +39,9 @@ namespace Primo.MIA
     /// Параметр Method определяет как искать (подстрока / точно / regex / wildcard).
     /// Оригинальный словарь не изменяется — всегда возвращается новый.
     /// </summary>
-    public class DictionaryFilterBack : PrimoComponentTO<DictionaryFilter>
+        public class DictionaryFilterBack : PrimoComponentTO<DictionaryFilter>
     {
-        private const string CGroupName = "MIA" + WFPublishedElementBase.TREE_SEPARATOR + "Словари";
-        public override string GroupName { get => CGroupName; protected set { } }
+        public override string GroupName { get => ActivityCategories.Dictionaries; protected set { } }
 
         protected override int sdkTimeOut { get => 10000; set { } }
 
@@ -53,7 +53,7 @@ namespace Primo.MIA
         /// <summary>Входной словарь Dictionary&lt;string, string&gt; для фильтрации</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(Dictionary<string, string>))]
-        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Словарь")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_Dictionary)]
         public string Prop_Dictionary
         {
             get => _propDictionary;
@@ -67,7 +67,7 @@ namespace Primo.MIA
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
-        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Строка поиска / паттерн")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_Query)]
         public string Prop_Query
         {
             get => _propQuery;
@@ -77,7 +77,7 @@ namespace Primo.MIA
         private DictionaryFilterTarget _target = DictionaryFilterTarget.Values;
         /// <summary>Где искать: Keys / Values / KeysAndValues</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
-        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Где искать")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_Target)]
         public DictionaryFilterTarget Prop_Target
         {
             get => _target;
@@ -87,7 +87,7 @@ namespace Primo.MIA
         private DictionaryFilterMethod _method = DictionaryFilterMethod.Contains;
         /// <summary>Метод поиска: Contains / Exact / Regex / Wildcard</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
-        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Метод поиска")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_Method)]
         public DictionaryFilterMethod Prop_Method
         {
             get => _method;
@@ -101,7 +101,7 @@ namespace Primo.MIA
         /// По умолчанию false — поиск без учёта регистра.
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
-        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Учитывать регистр")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_CaseSensitive)]
         public bool Prop_CaseSensitive
         {
             get => _caseSensitive;
@@ -116,7 +116,7 @@ namespace Primo.MIA
         /// <summary>Отфильтрованный словарь — подмножество входного</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(Dictionary<string, string>))]
-        [System.ComponentModel.Category("Выходные данные"), System.ComponentModel.DisplayName("Результирующий словарь")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_ResultDictionary)]
         public string Prop_ResultDictionary
         {
             get => _propResultDictionary;
@@ -127,7 +127,7 @@ namespace Primo.MIA
         /// <summary>Количество элементов прошедших фильтр</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
-        [System.ComponentModel.Category("Выходные данные"), System.ComponentModel.DisplayName("Прошло фильтр")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_Count)]
         public string Prop_Count
         {
             get => _propCount;
@@ -138,7 +138,7 @@ namespace Primo.MIA
         /// <summary>Количество элементов отсеянных фильтром</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
-        [System.ComponentModel.Category("Выходные данные"), System.ComponentModel.DisplayName("Отсеяно фильтром")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_FilteredOutCount)]
         public string Prop_FilteredOutCount
         {
             get => _propFilteredOutCount;
@@ -170,58 +170,18 @@ namespace Primo.MIA
                 "── Регистр ──────────────────────────────────────────────────\n" +
                 "Учитывать регистр — работает для всех методов и полей.";
 
-            sdkComponentIcon = "pack://application:,,,/Primo.MIA;component/images/dict.png";
+            sdkComponentIcon = ActivityIcons.Dictionary;
 
-            sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
+                                    sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_Dictionary", PropertyType = PropertyTypes.SCRIPT,
-                    EditorType = ScriptEditorTypes.NONE, DataType = typeof(Dictionary<string, string>),
-                    ToolTip = "Входной словарь для фильтрации", IsReadOnly = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_Query", PropertyType = PropertyTypes.SCRIPT,
-                    EditorType = ScriptEditorTypes.NONE, DataType = typeof(string),
-                    ToolTip = "Подстрока, точная строка, regex или wildcard — зависит от Метода поиска", IsReadOnly = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_Target", PropertyType = PropertyTypes.OBJECT,
-                    EditorType = ScriptEditorTypes.NONE, DataType = typeof(DictionaryFilterTarget),
-                    ToolTip = "Где искать: Keys / Values / KeysAndValues", IsReadOnly = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_Method", PropertyType = PropertyTypes.OBJECT,
-                    EditorType = ScriptEditorTypes.NONE, DataType = typeof(DictionaryFilterMethod),
-                    ToolTip = "Метод поиска: Contains / Exact / Regex / Wildcard", IsReadOnly = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_CaseSensitive", PropertyType = PropertyTypes.OBJECT,
-                    EditorType = ScriptEditorTypes.NONE, DataType = typeof(bool),
-                    ToolTip = "Учитывать регистр (применяется ко всем методам)", IsReadOnly = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_ResultDictionary", PropertyType = PropertyTypes.VARIABLE,
-                    EditorType = ScriptEditorTypes.NONE, DataType = typeof(Dictionary<string, string>),
-                    ToolTip = "Отфильтрованный словарь", IsReadOnly = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_Count", PropertyType = PropertyTypes.VARIABLE,
-                    EditorType = ScriptEditorTypes.NONE, DataType = typeof(int),
-                    ToolTip = "Количество элементов прошедших фильтр", IsReadOnly = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_FilteredOutCount", PropertyType = PropertyTypes.VARIABLE,
-                    EditorType = ScriptEditorTypes.NONE, DataType = typeof(int),
-                    ToolTip = "Количество элементов отсеянных фильтром", IsReadOnly = false
-                }
+                PropertyBuilder.Script<Dictionary<string, string>>("Prop_Dictionary", "Входной словарь для фильтрации"),
+                PropertyBuilder.Script<string>("Prop_Query", "Подстрока, точная строка, regex или wildcard — зависит от Метода поиска"),
+                PropertyBuilder.Enum<DictionaryFilterTarget>("Prop_Target", "Где искать: Keys / Values / KeysAndValues"),
+                PropertyBuilder.Enum<DictionaryFilterMethod>("Prop_Method", "Метод поиска: Contains / Exact / Regex / Wildcard"),
+                PropertyBuilder.BooleanObject("Prop_CaseSensitive", "Учитывать регистр (применяется ко всем методам)"),
+                PropertyBuilder.Variable<Dictionary<string, string>>("Prop_ResultDictionary", "Отфильтрованный словарь"),
+                PropertyBuilder.Variable<int>("Prop_Count", "Количество элементов прошедших фильтр"),
+                PropertyBuilder.Variable<int>("Prop_FilteredOutCount", "Количество элементов отсеянных фильтром")
             };
 
             InitClass(container);
@@ -428,19 +388,13 @@ namespace Primo.MIA
         // ВАЛИДАЦИЯ
         // =========================================================================
 
-        public override ValidationResult Validate()
+                public override ValidationResult Validate()
         {
             var ret = new ValidationResult();
 
-            // Входной словарь обязателен всегда
-            ValidateField(ret, this.Prop_Dictionary,
-                "Словарь", "Словарь обязателен");
+            ret.ValidateRequired(this.Prop_Dictionary, ActivityStrings.Field_Dictionary, ActivityStrings.Error_DictionaryRequired);
+            ret.ValidateRequired(this.Prop_Query, ActivityStrings.Field_Query, "Строка поиска не может быть пустой");
 
-            // Строка запроса обязательна всегда
-            ValidateField(ret, this.Prop_Query,
-                "Строка поиска / паттерн", "Строка поиска не может быть пустой");
-
-            // Для Regex дополнительно проверяем синтаксис прямо в валидаторе формы
             if (this.Prop_Method == DictionaryFilterMethod.Regex
                 && !string.IsNullOrWhiteSpace(this.Prop_Query))
             {
@@ -450,8 +404,7 @@ namespace Primo.MIA
             return ret;
         }
 
-        /// <summary>Проверяет корректность regex-синтаксиса на этапе валидации формы</summary>
-        private void ValidateRegexSyntax(ValidationResult result, string pattern)
+                private void ValidateRegexSyntax(ValidationResult result, string pattern)
         {
             try
             {
@@ -461,22 +414,10 @@ namespace Primo.MIA
             {
                 result.Items.Add(new ValidationResult.ValidationItem()
                 {
-                    PropertyName = "Строка поиска / паттерн",
+                    PropertyName = ActivityStrings.Field_Query,
                     Error = $"Некорректный regex: {ex.Message}"
                 });
             }
-        }
-
-        /// <summary>Добавляет ошибку валидации если поле пустое или null</summary>
-        private void ValidateField(ValidationResult result, string value,
-            string fieldName, string errorMessage)
-        {
-            if (string.IsNullOrWhiteSpace(value))
-                result.Items.Add(new ValidationResult.ValidationItem()
-                {
-                    PropertyName = fieldName,
-                    Error = errorMessage
-                });
         }
     }
 }

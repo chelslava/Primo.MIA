@@ -1,6 +1,7 @@
 using LTools.Common.Model;
 using LTools.Common.UIElements;
 using LTools.SDK;
+using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,8 +19,7 @@ namespace Primo.MIA
     /// </summary>
     public class DictionaryFromStringBack : PrimoComponentTO<DictionaryFromString>
     {
-        private const string CGroupName = "MIA" + WFPublishedElementBase.TREE_SEPARATOR + "Словари";
-        public override string GroupName { get => CGroupName; protected set { } }
+        public override string GroupName { get => ActivityCategories.Dictionaries; protected set { } }
 
         protected override int sdkTimeOut
         {
@@ -38,7 +38,7 @@ namespace Primo.MIA
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
-        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Входная строка")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_InputString)]
         public string Prop_InputString
         {
             get => _propInputString;
@@ -52,7 +52,7 @@ namespace Primo.MIA
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
-        [System.ComponentModel.Category("Разделители"), System.ComponentModel.DisplayName("Разделитель пар")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Separators), System.ComponentModel.DisplayName(ActivityStrings.Field_PairSeparator)]
         public string Prop_PairSeparator
         {
             get => _propPairSeparator;
@@ -67,7 +67,7 @@ namespace Primo.MIA
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
-        [System.ComponentModel.Category("Разделители"), System.ComponentModel.DisplayName("Разделитель ключ-значение")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Separators), System.ComponentModel.DisplayName(ActivityStrings.Field_KeyValueSeparator)]
         public string Prop_KeyValueSeparator
         {
             get => _propKeyValueSeparator;
@@ -80,7 +80,7 @@ namespace Primo.MIA
         /// По умолчанию true — "  key  =  value  " → ключ "key", значение "value".
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
-        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Обрезать пробелы")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_TrimWhitespace)]
         public bool Prop_TrimWhitespace
         {
             get => _trimWhitespace;
@@ -95,7 +95,7 @@ namespace Primo.MIA
         /// <summary>Десериализованный словарь Dictionary&lt;string, string&gt;</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(Dictionary<string, string>))]
-        [System.ComponentModel.Category("Выходные данные"), System.ComponentModel.DisplayName("Результирующий словарь")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_ResultDictionary)]
         public string Prop_ResultDictionary
         {
             get => _propResultDictionary;
@@ -106,7 +106,7 @@ namespace Primo.MIA
         /// <summary>Количество успешно разобранных пар ключ-значение</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
-        [System.ComponentModel.Category("Выходные данные"), System.ComponentModel.DisplayName("Разобрано пар")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_ParsedPairs)]
         public string Prop_Count
         {
             get => _propCount;
@@ -120,7 +120,7 @@ namespace Primo.MIA
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
-        [System.ComponentModel.Category("Выходные данные"), System.ComponentModel.DisplayName("Пропущено пар")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_SkippedCount)]
         public string Prop_SkippedCount
         {
             get => _propSkippedCount;
@@ -152,46 +152,16 @@ namespace Primo.MIA
                 "Разобрано пар          — успешно обработанных пар\n" +
                 "Пропущено пар          — пар с ошибками/пустых";
 
-            sdkComponentIcon = "pack://application:,,,/Primo.MIA;component/images/dict.png";
+            sdkComponentIcon = ActivityIcons.Dictionary;
 
-            sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
+                        sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_InputString", PropertyType = PropertyTypes.SCRIPT,
-                    EditorType = ScriptEditorTypes.NONE, DataType = typeof(string),
-                    ToolTip = "Входная строка в формате key1=val1;key2=val2", IsReadOnly = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_PairSeparator", PropertyType = PropertyTypes.SCRIPT,
-                    EditorType = ScriptEditorTypes.NONE, DataType = typeof(string),
-                    ToolTip = "Разделитель между парами (по умолчанию \";\")", IsReadOnly = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_KeyValueSeparator", PropertyType = PropertyTypes.SCRIPT,
-                    EditorType = ScriptEditorTypes.NONE, DataType = typeof(string),
-                    ToolTip = "Разделитель ключ-значение (по умолчанию \"=\")", IsReadOnly = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_ResultDictionary", PropertyType = PropertyTypes.VARIABLE,
-                    EditorType = ScriptEditorTypes.NONE, DataType = typeof(Dictionary<string, string>),
-                    ToolTip = "Десериализованный словарь Dictionary<string, string>", IsReadOnly = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_Count", PropertyType = PropertyTypes.VARIABLE,
-                    EditorType = ScriptEditorTypes.NONE, DataType = typeof(int),
-                    ToolTip = "Количество успешно разобранных пар", IsReadOnly = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_SkippedCount", PropertyType = PropertyTypes.VARIABLE,
-                    EditorType = ScriptEditorTypes.NONE, DataType = typeof(int),
-                    ToolTip = "Количество пропущенных (некорректных или пустых) пар", IsReadOnly = false
-                }
+                PropertyBuilder.Script<string>("Prop_InputString", "Входная строка в формате key1=val1;key2=val2"),
+                PropertyBuilder.Script<string>("Prop_PairSeparator", "Разделитель между парами (по умолчанию \";\")"),
+                PropertyBuilder.Script<string>("Prop_KeyValueSeparator", "Разделитель ключ-значение (по умолчанию \"=\")"),
+                PropertyBuilder.Variable<Dictionary<string, string>>("Prop_ResultDictionary", "Десериализованный словарь Dictionary<string, string>"),
+                PropertyBuilder.Variable<int>("Prop_Count", "Количество успешно разобранных пар"),
+                PropertyBuilder.Variable<int>("Prop_SkippedCount", "Количество пропущенных (некорректных или пустых) пар")
             };
 
             InitClass(container);
@@ -268,10 +238,8 @@ namespace Primo.MIA
 
         public override ValidationResult Validate()
         {
-            var ret = new ValidationResult();
-            if (string.IsNullOrWhiteSpace(this.Prop_InputString))
-                ret.Items.Add(new ValidationResult.ValidationItem()
-                    { PropertyName = "Входная строка", Error = "Входная строка обязательна" });
+                        var ret = new ValidationResult();
+            ret.ValidateRequired(this.Prop_InputString, ActivityStrings.Field_InputString, ActivityStrings.Error_InputStringRequired);
             return ret;
         }
     }

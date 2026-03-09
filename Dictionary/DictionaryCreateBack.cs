@@ -15,6 +15,7 @@ using LTools.Common.Model;
 using LTools.Common.UIElements;
 using LTools.Enums;
 using LTools.SDK;
+using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,10 +28,9 @@ namespace Primo.MIA
     /// Создаёт Dictionary&lt;string, string&gt; четырьмя способами:
     /// пустой, из списков, копия или инверсия существующего.
     /// </summary>
-    public class DictionaryCreateBack : PrimoComponentTO<DictionaryCreate>
+        public class DictionaryCreateBack : PrimoComponentTO<DictionaryCreate>
     {
-        private const string CGroupName = "MIA" + WFPublishedElementBase.TREE_SEPARATOR + "Словари";
-        public override string GroupName { get => CGroupName; protected set { } }
+        public override string GroupName { get => ActivityCategories.Dictionaries; protected set { } }
 
         protected override int sdkTimeOut
         {
@@ -45,7 +45,7 @@ namespace Primo.MIA
         private DictionaryCreateMode _mode = DictionaryCreateMode.CreateEmpty;
         /// <summary>Режим создания словаря</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
-        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Режим создания")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_Mode)]
         public DictionaryCreateMode Mode
         {
             get => _mode;
@@ -59,7 +59,7 @@ namespace Primo.MIA
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(Dictionary<string, string>))]
-        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Словарь (для Clone/Invert)")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_Dictionary)]
         public string Prop_Dictionary
         {
             get => _propDictionary;
@@ -73,7 +73,7 @@ namespace Primo.MIA
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(List<string>))]
-        [System.ComponentModel.Category("FromLists"), System.ComponentModel.DisplayName("Список ключей")]
+        [System.ComponentModel.Category(ActivityStrings.Category_FromLists), System.ComponentModel.DisplayName(ActivityStrings.Field_KeysList)]
         public string Prop_KeysList
         {
             get => _propKeysList;
@@ -87,7 +87,7 @@ namespace Primo.MIA
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(List<string>))]
-        [System.ComponentModel.Category("FromLists"), System.ComponentModel.DisplayName("Список значений")]
+        [System.ComponentModel.Category(ActivityStrings.Category_FromLists), System.ComponentModel.DisplayName(ActivityStrings.Field_ValuesList)]
         public string Prop_ValuesList
         {
             get => _propValuesList;
@@ -101,7 +101,7 @@ namespace Primo.MIA
         /// false → сохранить первое вхождение, остальные игнорировать.
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
-        [System.ComponentModel.Category("Invert"), System.ComponentModel.DisplayName("Ошибка при дублях")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Invert), System.ComponentModel.DisplayName(ActivityStrings.Field_ThrowOnDuplicates)]
         public bool Prop_ThrowOnDuplicates
         {
             get => _throwOnDuplicates;
@@ -116,7 +116,7 @@ namespace Primo.MIA
         /// <summary>Созданный словарь — результат операции</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(Dictionary<string, string>))]
-        [System.ComponentModel.Category("Выходные данные"), System.ComponentModel.DisplayName("Результирующий словарь")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_ResultDictionary)]
         public string Prop_ResultDictionary
         {
             get => _propResultDictionary;
@@ -125,9 +125,9 @@ namespace Primo.MIA
 
         private string _propCount;
         /// <summary>Количество элементов в созданном словаре</summary>
-        [LTools.Common.Model.Serialization.StoringProperty]
+                [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
-        [System.ComponentModel.Category("Выходные данные"), System.ComponentModel.DisplayName("Количество элементов")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_Count)]
         public string Prop_Count
         {
             get => _propCount;
@@ -141,7 +141,7 @@ namespace Primo.MIA
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
-        [System.ComponentModel.Category("Выходные данные"), System.ComponentModel.DisplayName("Пропущено дублей (Invert)")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_DuplicatesCount)]
         public string Prop_DuplicatesCount
         {
             get => _propDuplicatesCount;
@@ -173,58 +173,18 @@ namespace Primo.MIA
                 "Количество элементов   — размер результата\n" +
                 "Пропущено дублей       — кол-во пропущенных дублей (только Invert)";
 
-            sdkComponentIcon = "pack://application:,,,/Primo.MIA;component/images/dict.png";
+            sdkComponentIcon = ActivityIcons.Dictionary;
 
-            sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
+                                    sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Mode", PropertyType = PropertyTypes.OBJECT,
-                    EditorType = ScriptEditorTypes.NONE, DataType = typeof(DictionaryCreateMode),
-                    ToolTip = "Режим: CreateEmpty / FromLists / Clone / Invert", IsReadOnly = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_Dictionary", PropertyType = PropertyTypes.SCRIPT,
-                    EditorType = ScriptEditorTypes.NONE, DataType = typeof(Dictionary<string, string>),
-                    ToolTip = "Входной словарь (только для Clone и Invert)", IsReadOnly = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_KeysList", PropertyType = PropertyTypes.SCRIPT,
-                    EditorType = ScriptEditorTypes.NONE, DataType = typeof(List<string>),
-                    ToolTip = "Список ключей (только для FromLists)", IsReadOnly = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_ValuesList", PropertyType = PropertyTypes.SCRIPT,
-                    EditorType = ScriptEditorTypes.NONE, DataType = typeof(List<string>),
-                    ToolTip = "Список значений (только для FromLists)", IsReadOnly = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_ThrowOnDuplicates",PropertyType = PropertyTypes.OBJECT,
-                    EditorType = ScriptEditorTypes.NONE, DataType= typeof(bool),
-                    ToolTip = "Ошибка при дублях",IsReadOnly = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_ResultDictionary", PropertyType = PropertyTypes.VARIABLE,
-                    EditorType = ScriptEditorTypes.NONE, DataType = typeof(Dictionary<string, string>),
-                    ToolTip = "Созданный словарь", IsReadOnly = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_Count", PropertyType = PropertyTypes.VARIABLE,
-                    EditorType = ScriptEditorTypes.NONE, DataType = typeof(int),
-                    ToolTip = "Количество элементов в результирующем словаре", IsReadOnly = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_DuplicatesCount", PropertyType = PropertyTypes.VARIABLE,
-                    EditorType = ScriptEditorTypes.NONE, DataType = typeof(int),
-                    ToolTip = "Количество пропущенных дублей при инверсии (только Invert)", IsReadOnly = false
-                }
+                PropertyBuilder.Enum<DictionaryCreateMode>("Mode", "Режим: CreateEmpty / FromLists / Clone / Invert"),
+                PropertyBuilder.Script<Dictionary<string, string>>("Prop_Dictionary", "Входной словарь (только для Clone и Invert)"),
+                PropertyBuilder.Script<List<string>>("Prop_KeysList", "Список ключей (только для FromLists)"),
+                PropertyBuilder.Script<List<string>>("Prop_ValuesList", "Список значений (только для FromLists)"),
+                PropertyBuilder.BooleanObject("Prop_ThrowOnDuplicates", "Ошибка при дублях"),
+                PropertyBuilder.Variable<Dictionary<string, string>>("Prop_ResultDictionary", "Созданный словарь"),
+                PropertyBuilder.Variable<int>("Prop_Count", "Количество элементов в результирующем словаре"),
+                PropertyBuilder.Variable<int>("Prop_DuplicatesCount", "Количество пропущенных дублей при инверсии (только Invert)")
             };
 
             InitClass(container);
@@ -367,27 +327,21 @@ namespace Primo.MIA
         // ВАЛИДАЦИЯ
         // =========================================================================
 
-        public override ValidationResult Validate()
+                public override ValidationResult Validate()
         {
             var ret = new ValidationResult();
 
             if (this.Mode == DictionaryCreateMode.Clone || this.Mode == DictionaryCreateMode.Invert)
-                ValidateField(ret, this.Prop_Dictionary, "Словарь",
+                ret.ValidateRequired(this.Prop_Dictionary, ActivityStrings.Field_Dictionary,
                     $"Словарь обязателен для режима {this.Mode}");
 
             if (this.Mode == DictionaryCreateMode.FromLists)
             {
-                ValidateField(ret, this.Prop_KeysList,   "Список ключей",   "Список ключей обязателен для режима FromLists");
-                ValidateField(ret, this.Prop_ValuesList, "Список значений", "Список значений обязателен для режима FromLists");
+                ret.ValidateRequired(this.Prop_KeysList, ActivityStrings.Field_KeysList, "Список ключей обязателен для режима FromLists");
+                ret.ValidateRequired(this.Prop_ValuesList, ActivityStrings.Field_ValuesList, "Список значений обязателен для режима FromLists");
             }
 
             return ret;
-        }
-
-        private void ValidateField(ValidationResult result, string value, string fieldName, string errorMessage)
-        {
-            if (string.IsNullOrWhiteSpace(value))
-                result.Items.Add(new ValidationResult.ValidationItem() { PropertyName = fieldName, Error = errorMessage });
         }
     }
 }

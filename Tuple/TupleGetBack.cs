@@ -1,7 +1,14 @@
+
+
+
+
+
+
 using LTools.Common.Model;
 using LTools.Common.UIElements;
 using LTools.Enums;
 using LTools.SDK;
+using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
 using static LTools.Common.Helpers.WFHelper.PropertiesItem;
@@ -15,10 +22,13 @@ namespace Primo.MIA
     /// Если запрошенный номер превышает арность кортежа — активность завершается ошибкой.
     /// Например, запрос Item3 из Tuple&lt;string,int&gt; (арность 2) — ошибка.
     /// </summary>
-    public class TupleGetBack : PrimoComponentTO<TupleGet>
+
+
+
+
+        public class TupleGetBack : PrimoComponentTO<TupleGet>
     {
-        private const string CGroupName = "MIA" + WFPublishedElementBase.TREE_SEPARATOR + "Кортежи";
-        public override string GroupName { get => CGroupName; protected set { } }
+        public override string GroupName { get => ActivityCategories.Tuples; protected set { } }
 
         protected override int sdkTimeOut
         {
@@ -30,15 +40,22 @@ namespace Primo.MIA
 
         private string _propTuple;
         /// <summary>Входной кортеж типа Tuple&lt;...&gt;.</summary>
+
+
+
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(object))]
-        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Кортеж")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main)]
+        [System.ComponentModel.DisplayName(ActivityStrings.Field_Tuple)]
         public string Prop_Tuple { get => _propTuple; set { _propTuple = value; InvokePropertyChanged(this, "Prop_Tuple"); } }
 
         private TupleItemIndex _index = TupleItemIndex.Item1;
         /// <summary>Номер извлекаемого элемента: Item1–Item7.</summary>
+
+
         [LTools.Common.Model.Serialization.StoringProperty]
-        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Номер элемента")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main)]
+        [System.ComponentModel.DisplayName(ActivityStrings.Field_ItemIndex)]
         public TupleItemIndex Index
         {
             get => _index;
@@ -52,9 +69,13 @@ namespace Primo.MIA
         /// Значение извлечённого элемента как object.
         /// Для работы с конкретным типом приведите переменную: (string)myVar, (int)myVar.
         /// </summary>
+
+
+
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(object))]
-        [System.ComponentModel.Category("Выходные данные"), System.ComponentModel.DisplayName("Значение")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output)]
+        [System.ComponentModel.DisplayName(ActivityStrings.Field_Value)]
         public string Prop_Value { get => _propValue; set { _propValue = value; InvokePropertyChanged(this, "Prop_Value"); } }
 
         private string _propTypeName;
@@ -62,9 +83,13 @@ namespace Primo.MIA
         /// Имя типа извлечённого элемента (например, "String", "Int32", "Boolean").
         /// Полезно для диагностики и условных переходов.
         /// </summary>
+
+
+
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
-        [System.ComponentModel.Category("Выходные данные"), System.ComponentModel.DisplayName("Тип значения")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output)]
+        [System.ComponentModel.DisplayName(ActivityStrings.Field_ValueType)]
         public string Prop_TypeName { get => _propTypeName; set { _propTypeName = value; InvokePropertyChanged(this, "Prop_TypeName"); } }
 
         // ── КОНСТРУКТОР ────────────────────────────────────────────────────────
@@ -80,14 +105,21 @@ namespace Primo.MIA
                 "Выход «Тип значения» содержит имя типа (String, Int32 и т.д.).\n\n" +
                 "Ошибка: если Номер элемента > арности кортежа.\n" +
                 "Пример: Item3 из Tuple<string,int> → ошибка (арность 2).";
-            sdkComponentIcon = "pack://application:,,,/Primo.MIA;component/images/sharp.png";
 
-            sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
+            sdkComponentIcon = ActivityIcons.Tuple;
+
+
+
+
+
+
+
+                        sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_Tuple",    PropertyType = PropertyTypes.SCRIPT,   EditorType = ScriptEditorTypes.NONE, DataType = typeof(object), ToolTip = "Входной кортеж", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Index",         PropertyType = PropertyTypes.OBJECT,   EditorType = ScriptEditorTypes.NONE, DataType = typeof(TupleItemIndex), ToolTip = "Номер элемента Item1–Item7", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_Value",    PropertyType = PropertyTypes.VARIABLE, EditorType = ScriptEditorTypes.NONE, DataType = typeof(object), ToolTip = "Извлечённое значение (object)", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_TypeName", PropertyType = PropertyTypes.VARIABLE, EditorType = ScriptEditorTypes.NONE, DataType = typeof(string), ToolTip = "Имя типа значения (String, Int32...)", IsReadOnly = false }
+                PropertyBuilder.Script<object>("Prop_Tuple", "Входной кортеж"),
+                PropertyBuilder.Enum<TupleItemIndex>("Index", "Номер элемента Item1–Item7"),
+                PropertyBuilder.Variable<object>("Prop_Value", "Извлечённое значение (object)"),
+                PropertyBuilder.Variable<string>("Prop_TypeName", "Имя типа значения (String, Int32...)")
             };
 
             InitClass(container);
@@ -132,13 +164,19 @@ namespace Primo.MIA
 
         // ── ВАЛИДАЦИЯ ──────────────────────────────────────────────────────────
 
-        public override ValidationResult Validate()
+
+
+
+
+
+
+
+
+                public override ValidationResult Validate()
         {
             var ret = new ValidationResult();
-            if (string.IsNullOrWhiteSpace(this.Prop_Tuple))
-                ret.Items.Add(new ValidationResult.ValidationItem() { PropertyName = "Кортеж", Error = "Кортеж обязателен" });
-            if (string.IsNullOrWhiteSpace(this.Prop_Value))
-                ret.Items.Add(new ValidationResult.ValidationItem() { PropertyName = "Значение", Error = "Выходная переменная «Значение» обязательна" });
+            ret.ValidateRequired(this.Prop_Tuple, ActivityStrings.Field_Tuple, ActivityStrings.Error_TupleRequired);
+            ret.ValidateRequired(this.Prop_Value, ActivityStrings.Field_Value, ActivityStrings.Error_ValueRequired);
             return ret;
         }
     }

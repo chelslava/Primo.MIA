@@ -28,6 +28,7 @@ using LTools.Common.Model;
 using LTools.Common.UIElements;
 using LTools.Enums;
 using LTools.SDK;
+using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -50,12 +51,9 @@ namespace Primo.MIA
     /// </summary>
     public class ReadTomlConfigBack : PrimoComponentTO<ReadTomlConfig>
     {
-        private const string CGroupName = "MIA" + WFPublishedElementBase.TREE_SEPARATOR + "Утилиты";
-
-        /// <inheritdoc/>
         public override string GroupName
         {
-            get => CGroupName;
+            get => ActivityCategories.Utilities;
             protected set { }
         }
 
@@ -73,7 +71,7 @@ namespace Primo.MIA
         /// <summary>Путь к TOML-файлу конфигурации</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
-        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Путь к файлу")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_FilePath)]
         public string Prop_FilePath
         {
             get => _propFilePath;
@@ -83,7 +81,7 @@ namespace Primo.MIA
         private TomlReadMode _readMode = TomlReadMode.SingleValue;
         /// <summary>Режим чтения: SingleValue / SectionToDictionary / FullFileToDictionary / ReadProfile</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
-        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Режим чтения")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_ReadMode)]
         public TomlReadMode ReadMode
         {
             get => _readMode;
@@ -94,7 +92,7 @@ namespace Primo.MIA
         /// <summary>Путь к ключу через точку: "section.subsection.key". Обязателен в режиме SingleValue.</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
-        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Ключ (section.key)")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_KeyPath)]
         public string Prop_KeyPath
         {
             get => _propKeyPath;
@@ -105,7 +103,7 @@ namespace Primo.MIA
         /// <summary>Имя секции для режима SectionToDictionary. Поддерживает вложенность: "app.database".</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
-        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Секция")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_SectionName)]
         public string Prop_SectionName
         {
             get => _propSectionName;
@@ -116,7 +114,7 @@ namespace Primo.MIA
         /// <summary>Значение по умолчанию для режима SingleValue, если ключ не найден.</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
-        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Значение по умолчанию")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_DefaultValue)]
         public string Prop_DefaultValue
         {
             get => _propDefaultValue;
@@ -126,7 +124,7 @@ namespace Primo.MIA
         private bool _throwIfKeyNotFound = false;
         /// <summary>Выбросить исключение если ключ/секция/профиль не найдены. Если false — вернуть DefaultValue или пустой словарь.</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
-        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Ошибка если не найдено")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_ThrowIfNotFound)]
         public bool Prop_ThrowIfKeyNotFound
         {
             get => _throwIfKeyNotFound;
@@ -137,7 +135,7 @@ namespace Primo.MIA
         /// <summary>Кодировка файла. По умолчанию UTF-8.</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
-        [System.ComponentModel.Category("Файл"), System.ComponentModel.DisplayName("Кодировка")]
+        [System.ComponentModel.Category(ActivityStrings.Category_File), System.ComponentModel.DisplayName(ActivityStrings.Field_Encoding)]
         public string Prop_Encoding
         {
             get => _propEncoding;
@@ -155,7 +153,7 @@ namespace Primo.MIA
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
-        [System.ComponentModel.Category("Профиль"), System.ComponentModel.DisplayName("Имя профиля")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Profile), System.ComponentModel.DisplayName(ActivityStrings.Field_ProfileName)]
         public string Prop_ProfileName
         {
             get => _propProfileName;
@@ -169,7 +167,7 @@ namespace Primo.MIA
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
-        [System.ComponentModel.Category("Профиль"), System.ComponentModel.DisplayName("Имя секции default")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Profile), System.ComponentModel.DisplayName(ActivityStrings.Field_DefaultProfileName)]
         public string Prop_DefaultProfileName
         {
             get => _propDefaultProfileName;
@@ -179,7 +177,7 @@ namespace Primo.MIA
         private ProfileMergeStrategy _mergeStrategy = ProfileMergeStrategy.DefaultThenProfile;
         /// <summary>Стратегия слияния: DefaultThenProfile / ProfileOnly / ProfileThenDefault</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
-        [System.ComponentModel.Category("Профиль"), System.ComponentModel.DisplayName("Стратегия слияния")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Profile), System.ComponentModel.DisplayName(ActivityStrings.Field_MergeStrategy)]
         public ProfileMergeStrategy MergeStrategy
         {
             get => _mergeStrategy;
@@ -192,7 +190,7 @@ namespace Primo.MIA
         /// Если false — только плоские ключи верхнего уровня секции профиля.
         /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
-        [System.ComponentModel.Category("Профиль"), System.ComponentModel.DisplayName("Включать вложенные секции")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Profile), System.ComponentModel.DisplayName(ActivityStrings.Field_IncludeNestedSections)]
         public bool Prop_IncludeNestedSections
         {
             get => _includeNestedSections;
@@ -207,7 +205,7 @@ namespace Primo.MIA
         /// <summary>Прочитанное строковое значение (режим SingleValue)</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
-        [System.ComponentModel.Category("Выходные данные"), System.ComponentModel.DisplayName("Строковое значение")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_StringValue)]
         public string Prop_StringValue
         {
             get => _propStringValue;
@@ -218,7 +216,7 @@ namespace Primo.MIA
         /// <summary>Итоговый словарь Dictionary&lt;string,string&gt; (режимы SectionToDictionary, FullFileToDictionary, ReadProfile)</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(Dictionary<string, string>))]
-        [System.ComponentModel.Category("Выходные данные"), System.ComponentModel.DisplayName("Словарь значений")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_DictionaryValues)]
         public string Prop_Dictionary
         {
             get => _propDictionary;
@@ -229,7 +227,7 @@ namespace Primo.MIA
         /// <summary>Флаг: найден ли ключ (SingleValue) или профиль (ReadProfile)</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(bool))]
-        [System.ComponentModel.Category("Выходные данные"), System.ComponentModel.DisplayName("Ключ/профиль найден")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_KeyProfileFound)]
         public string Prop_KeyExists
         {
             get => _propKeyExists;
@@ -240,7 +238,7 @@ namespace Primo.MIA
         /// <summary>Общее количество ключей в итоговом словаре</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
-        [System.ComponentModel.Category("Выходные данные"), System.ComponentModel.DisplayName("Кол-во ключей")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_KeysCount)]
         public string Prop_KeysCount
         {
             get => _propKeysCount;
@@ -251,7 +249,7 @@ namespace Primo.MIA
         /// <summary>Список всех секций файла верхнего уровня (режим ReadProfile)</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(List<string>))]
-        [System.ComponentModel.Category("Выходные данные"), System.ComponentModel.DisplayName("Доступные профили")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_AvailableProfiles)]
         public string Prop_AvailableProfiles
         {
             get => _propAvailableProfiles;
@@ -262,7 +260,7 @@ namespace Primo.MIA
         /// <summary>Количество ключей из профиля в итоговом словаре (режим ReadProfile)</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
-        [System.ComponentModel.Category("Выходные данные"), System.ComponentModel.DisplayName("Ключей из профиля")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_ProfileKeysCount)]
         public string Prop_ProfileKeysCount
         {
             get => _propProfileKeysCount;
@@ -273,7 +271,7 @@ namespace Primo.MIA
         /// <summary>Количество ключей из секции default в итоговом словаре (режим ReadProfile)</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
-        [System.ComponentModel.Category("Выходные данные"), System.ComponentModel.DisplayName("Ключей из default")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_DefaultKeysCount)]
         public string Prop_DefaultKeysCount
         {
             get => _propDefaultKeysCount;
@@ -320,108 +318,26 @@ ReadProfile         — мёрж [default] + [production/staging/...]
 ── NuGet зависимость ───────────────────────────────────
 <PackageReference Include=""Tomlyn"" Version=""0.10.1"" />";
 
-            sdkComponentIcon = "pack://application:,,,/Primo.MIA;component/images/config.png";
+            sdkComponentIcon = ActivityIcons.Config;
 
-            sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
+                        sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName     = "Prop_FilePath",      PropertyType = PropertyTypes.SCRIPT,
-                    EditorType   = ScriptEditorTypes.FILE_SELECTOR, DataType = typeof(string),
-                    ToolTip      = "Полный путь к TOML-файлу конфигурации", IsReadOnly = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName     = "ReadMode",           PropertyType = PropertyTypes.OBJECT,
-                    EditorType   = ScriptEditorTypes.NONE, DataType = typeof(TomlReadMode),
-                    ToolTip      = "Режим чтения: SingleValue / SectionToDictionary / FullFileToDictionary / ReadProfile",
-                    IsReadOnly   = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName     = "Prop_KeyPath",       PropertyType = PropertyTypes.SCRIPT,
-                    EditorType   = ScriptEditorTypes.NONE, DataType = typeof(string),
-                    ToolTip      = "Путь к ключу через точку (режим SingleValue)", IsReadOnly = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName     = "Prop_SectionName",   PropertyType = PropertyTypes.SCRIPT,
-                    EditorType   = ScriptEditorTypes.NONE, DataType = typeof(string),
-                    ToolTip      = "Имя секции (режим SectionToDictionary)", IsReadOnly = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName     = "Prop_DefaultValue",  PropertyType = PropertyTypes.SCRIPT,
-                    EditorType   = ScriptEditorTypes.NONE, DataType = typeof(string),
-                    ToolTip      = "Значение по умолчанию если ключ не найден", IsReadOnly = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName     = "Prop_Encoding",      PropertyType = PropertyTypes.SCRIPT,
-                    EditorType   = ScriptEditorTypes.NONE, DataType = typeof(string),
-                    ToolTip      = "Кодировка файла (по умолчанию UTF-8)", IsReadOnly = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName     = "Prop_ProfileName",   PropertyType = PropertyTypes.SCRIPT,
-                    EditorType   = ScriptEditorTypes.NONE, DataType = typeof(string),
-                    ToolTip      = "Имя профиля окружения: production, staging (режим ReadProfile)",
-                    IsReadOnly   = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName     = "Prop_DefaultProfileName", PropertyType = PropertyTypes.SCRIPT,
-                    EditorType   = ScriptEditorTypes.NONE, DataType = typeof(string),
-                    ToolTip      = "Имя базовой секции (по умолчанию 'default')", IsReadOnly = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName     = "MergeStrategy",      PropertyType = PropertyTypes.OBJECT,
-                    EditorType   = ScriptEditorTypes.NONE, DataType = typeof(ProfileMergeStrategy),
-                    ToolTip      = "Стратегия слияния профиля с default", IsReadOnly = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName     = "Prop_StringValue",   PropertyType = PropertyTypes.VARIABLE,
-                    EditorType   = ScriptEditorTypes.NONE, DataType = typeof(string),
-                    ToolTip      = "Прочитанное строковое значение (режим SingleValue)", IsReadOnly = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName     = "Prop_Dictionary",    PropertyType = PropertyTypes.VARIABLE,
-                    EditorType   = ScriptEditorTypes.NONE, DataType = typeof(Dictionary<string, string>),
-                    ToolTip      = "Итоговый словарь ключ-значение", IsReadOnly = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName     = "Prop_KeyExists",     PropertyType = PropertyTypes.VARIABLE,
-                    EditorType   = ScriptEditorTypes.NONE, DataType = typeof(bool),
-                    ToolTip      = "Найден ли ключ (SingleValue) или профиль (ReadProfile)", IsReadOnly = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName     = "Prop_KeysCount",     PropertyType = PropertyTypes.VARIABLE,
-                    EditorType   = ScriptEditorTypes.NONE, DataType = typeof(int),
-                    ToolTip      = "Количество ключей в итоговом словаре", IsReadOnly = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName     = "Prop_AvailableProfiles", PropertyType = PropertyTypes.VARIABLE,
-                    EditorType   = ScriptEditorTypes.NONE, DataType = typeof(List<string>),
-                    ToolTip      = "Список доступных профилей (секций) файла (режим ReadProfile)", IsReadOnly = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName     = "Prop_ProfileKeysCount", PropertyType = PropertyTypes.VARIABLE,
-                    EditorType   = ScriptEditorTypes.NONE, DataType = typeof(int),
-                    ToolTip      = "Количество ключей из секции профиля (режим ReadProfile)", IsReadOnly = false
-                },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName     = "Prop_DefaultKeysCount", PropertyType = PropertyTypes.VARIABLE,
-                    EditorType   = ScriptEditorTypes.NONE, DataType = typeof(int),
-                    ToolTip      = "Количество ключей из секции default (режим ReadProfile)", IsReadOnly = false
-                }
+                PropertyBuilder.FileSelector("Prop_FilePath", "Полный путь к TOML-файлу конфигурации"),
+                PropertyBuilder.Enum<TomlReadMode>("ReadMode", "Режим чтения: SingleValue / SectionToDictionary / FullFileToDictionary / ReadProfile"),
+                PropertyBuilder.Script<string>("Prop_KeyPath", "Путь к ключу через точку (режим SingleValue)"),
+                PropertyBuilder.Script<string>("Prop_SectionName", "Имя секции (режим SectionToDictionary)"),
+                PropertyBuilder.Script<string>("Prop_DefaultValue", "Значение по умолчанию если ключ не найден"),
+                PropertyBuilder.Script<string>("Prop_Encoding", "Кодировка файла (по умолчанию UTF-8)"),
+                PropertyBuilder.Script<string>("Prop_ProfileName", "Имя профиля окружения: production, staging (режим ReadProfile)"),
+                PropertyBuilder.Script<string>("Prop_DefaultProfileName", "Имя базовой секции (по умолчанию 'default')"),
+                PropertyBuilder.Enum<ProfileMergeStrategy>("MergeStrategy", "Стратегия слияния профиля с default"),
+                PropertyBuilder.Variable<string>("Prop_StringValue", "Прочитанное строковое значение (режим SingleValue)"),
+                PropertyBuilder.Variable<Dictionary<string, string>>("Prop_Dictionary", "Итоговый словарь ключ-значение"),
+                PropertyBuilder.Variable<bool>("Prop_KeyExists", "Найден ли ключ (SingleValue) или профиль (ReadProfile)"),
+                PropertyBuilder.Variable<int>("Prop_KeysCount", "Количество ключей в итоговом словаре"),
+                PropertyBuilder.Variable<List<string>>("Prop_AvailableProfiles", "Список доступных профилей (секций) файла (режим ReadProfile)"),
+                PropertyBuilder.Variable<int>("Prop_ProfileKeysCount", "Количество ключей из секции профиля (режим ReadProfile)"),
+                PropertyBuilder.Variable<int>("Prop_DefaultKeysCount", "Количество ключей из секции default (режим ReadProfile)")
             };
 
             InitClass(container);
@@ -929,39 +845,22 @@ ReadProfile         — мёрж [default] + [production/staging/...]
         {
             var ret = new ValidationResult();
 
-            ValidateField(ret, this.Prop_FilePath,
-                "Путь к файлу", "Путь к TOML-файлу не может быть пустым");
+            ret.ValidateRequired(this.Prop_FilePath, ActivityStrings.Field_FilePath, ActivityStrings.Error_FilePathRequired);
 
             switch (this.ReadMode)
             {
                 case TomlReadMode.SingleValue:
-                    ValidateField(ret, this.Prop_KeyPath,
-                        "Ключ (section.key)", "Ключ обязателен в режиме SingleValue");
+                    ret.ValidateRequired(this.Prop_KeyPath, ActivityStrings.Field_KeyPath, ActivityStrings.Error_KeyPathRequired);
                     break;
                 case TomlReadMode.SectionToDictionary:
-                    ValidateField(ret, this.Prop_SectionName,
-                        "Секция", "Имя секции обязательно в режиме SectionToDictionary");
+                    ret.ValidateRequired(this.Prop_SectionName, ActivityStrings.Field_SectionName, ActivityStrings.Error_SectionNameRequired);
                     break;
                 case TomlReadMode.ReadProfile:
-                    ValidateField(ret, this.Prop_ProfileName,
-                        "Имя профиля", "Имя профиля обязательно в режиме ReadProfile");
+                    ret.ValidateRequired(this.Prop_ProfileName, ActivityStrings.Field_ProfileName, ActivityStrings.Error_ProfileNameRequired);
                     break;
             }
 
             return ret;
-        }
-
-        private void ValidateField(ValidationResult result, string value,
-            string fieldName, string errorMessage)
-        {
-            if (string.IsNullOrWhiteSpace(value))
-            {
-                result.Items.Add(new ValidationResult.ValidationItem()
-                {
-                    PropertyName = fieldName,
-                    Error = errorMessage
-                });
-            }
         }
     }
 }

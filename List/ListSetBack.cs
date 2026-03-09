@@ -15,6 +15,7 @@ using LTools.Common.Model;
 using LTools.Common.UIElements;
 using LTools.Enums;
 using LTools.SDK;
+using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,8 +30,7 @@ namespace Primo.MIA
     /// </summary>
     public class ListSetBack : PrimoComponentTO<ListSet>
     {
-        private const string CGroupName = "MIA" + WFPublishedElementBase.TREE_SEPARATOR + "Списки";
-        public override string GroupName { get => CGroupName; protected set { } }
+                public override string GroupName { get => ActivityCategories.Lists; protected set { } }
 
         protected override int sdkTimeOut
         {
@@ -42,7 +42,7 @@ namespace Primo.MIA
         /// <summary>Первый список (множество A). Обязателен для всех операций.</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(List<string>))]
-        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Список A")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_ListA)]
         public string Prop_ListA
         {
             get => _propListA;
@@ -53,7 +53,7 @@ namespace Primo.MIA
         /// <summary>Второй список (множество B). Не нужен для операции Distinct.</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(List<string>))]
-        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Список B")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_ListB)]
         public string Prop_ListB
         {
             get => _propListB;
@@ -62,7 +62,7 @@ namespace Primo.MIA
 
         private ListSetOperation _operation = ListSetOperation.Union;
         [LTools.Common.Model.Serialization.StoringProperty]
-        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Операция")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_Operation)]
         public ListSetOperation Operation
         {
             get => _operation;
@@ -72,7 +72,7 @@ namespace Primo.MIA
         private bool _caseSensitive = false;
         /// <summary>Учитывать регистр при сравнении элементов</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
-        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Учитывать регистр")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_CaseSensitive)]
         public bool Prop_CaseSensitive
         {
             get => _caseSensitive;
@@ -82,7 +82,7 @@ namespace Primo.MIA
         private string _propResult;
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(List<string>))]
-        [System.ComponentModel.Category("Выходные данные"), System.ComponentModel.DisplayName("Результат")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_Result)]
         public string Prop_Result
         {
             get => _propResult;
@@ -92,7 +92,7 @@ namespace Primo.MIA
         private string _propCount;
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
-        [System.ComponentModel.Category("Выходные данные"), System.ComponentModel.DisplayName("Количество")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_Count)]
         public string Prop_Count
         {
             get => _propCount;
@@ -110,15 +110,16 @@ namespace Primo.MIA
                 "ExceptReverse — B∖A: в B но не в A\n" +
                 "SymmetricDiff — только в одном из списков (не в обоих)\n" +
                 "Distinct      — уникальные элементы A (дубли удаляются)";
-            sdkComponentIcon = "pack://application:,,,/Primo.MIA;component/images/list.png";
+            sdkComponentIcon = ActivityIcons.List;
 
-            sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
+                        sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_ListA", PropertyType = PropertyTypes.SCRIPT, EditorType = ScriptEditorTypes.NONE, DataType = typeof(List<string>), ToolTip = "Список A", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_ListB", PropertyType = PropertyTypes.SCRIPT, EditorType = ScriptEditorTypes.NONE, DataType = typeof(List<string>), ToolTip = "Список B (не нужен для Distinct)", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Operation", PropertyType = PropertyTypes.OBJECT, EditorType = ScriptEditorTypes.NONE, DataType = typeof(ListSetOperation), ToolTip = "Операция над множествами", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_Result", PropertyType = PropertyTypes.VARIABLE, EditorType = ScriptEditorTypes.NONE, DataType = typeof(List<string>), ToolTip = "Результирующий список", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_Count", PropertyType = PropertyTypes.VARIABLE, EditorType = ScriptEditorTypes.NONE, DataType = typeof(int), ToolTip = "Количество элементов в результате", IsReadOnly = false }
+                PropertyBuilder.Script<List<string>>("Prop_ListA", "Список A"),
+                PropertyBuilder.Script<List<string>>("Prop_ListB", "Список B (не нужен для Distinct)"),
+                PropertyBuilder.Enum<ListSetOperation>("Operation", "Операция над множествами"),
+                PropertyBuilder.BooleanObject("Prop_CaseSensitive", "Учитывать регистр при сравнении"),
+                PropertyBuilder.Variable<List<string>>("Prop_Result", "Результирующий список"),
+                PropertyBuilder.Variable<int>("Prop_Count", "Количество элементов в результате")
             };
 
             InitClass(container);
@@ -190,11 +191,10 @@ namespace Primo.MIA
 
         public override ValidationResult Validate()
         {
-            var ret = new ValidationResult();
-            if (string.IsNullOrWhiteSpace(this.Prop_ListA))
-                ret.Items.Add(new ValidationResult.ValidationItem() { PropertyName = "Список A", Error = "Список A обязателен" });
-            if (this.Operation != ListSetOperation.Distinct && string.IsNullOrWhiteSpace(this.Prop_ListB))
-                ret.Items.Add(new ValidationResult.ValidationItem() { PropertyName = "Список B", Error = "Список B обязателен для данной операции" });
+                        var ret = new ValidationResult();
+            ret.ValidateRequired(this.Prop_ListA, ActivityStrings.Field_ListA, ActivityStrings.Error_ListRequired);
+            if (this.Operation != ListSetOperation.Distinct)
+                ret.ValidateRequired(this.Prop_ListB, ActivityStrings.Field_ListB, ActivityStrings.Error_ListBRequired);
             return ret;
         }
     }

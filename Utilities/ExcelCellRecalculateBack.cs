@@ -2,6 +2,7 @@
 using LTools.Common.UIElements;
 using LTools.Enums;
 using LTools.SDK;
+using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,8 +18,7 @@ namespace Primo.MIA
     /// </summary>
     public class ExcelCellRecalculateBack : PrimoComponentTO<ExcelCellRecalculate>
     {
-        private const string CGroupName = "MIA" + WFPublishedElementBase.TREE_SEPARATOR + "Утилиты";
-        public override string GroupName { get => CGroupName; protected set { } }
+        public override string GroupName { get => ActivityCategories.Utilities; protected set { } }
 
         protected override int sdkTimeOut
         {
@@ -29,7 +29,7 @@ namespace Primo.MIA
         private string _propStartCell;
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
-        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Начальная ячейка")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_StartCell)]
         public string Prop_StartCell
         {
             get => _propStartCell;
@@ -39,7 +39,7 @@ namespace Primo.MIA
         private string _propRowOffset;
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
-        [System.ComponentModel.Category("Смещение"), System.ComponentModel.DisplayName("Смещение по строке (ΔR)")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Offset), System.ComponentModel.DisplayName(ActivityStrings.Field_RowOffset)]
         public string Prop_RowOffset
         {
             get => _propRowOffset;
@@ -49,7 +49,7 @@ namespace Primo.MIA
         private string _propColumnOffset;
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
-        [System.ComponentModel.Category("Смещение"), System.ComponentModel.DisplayName("Смещение по столбцу (ΔC)")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Offset), System.ComponentModel.DisplayName(ActivityStrings.Field_ColumnOffset)]
         public string Prop_ColumnOffset
         {
             get => _propColumnOffset;
@@ -59,7 +59,7 @@ namespace Primo.MIA
         private string _propTargetCell;
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
-        [System.ComponentModel.Category("Выходные данные"), System.ComponentModel.DisplayName("Целевая ячейка")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_TargetCell)]
         public string Prop_TargetCell
         {
             get => _propTargetCell;
@@ -73,14 +73,14 @@ namespace Primo.MIA
                 "Пересчитывает имя ячейки Excel на основе смещения от начальной ячейки.\n" +
                 "Пример: A1 + (ΔR=2, ΔC=3) → D3\n" +
                 "Поддерживает формат A1, B2, Z10, AA5 и т.д.";
-            sdkComponentIcon = "pack://application:,,,/Primo.MIA;component/images/excel.png";
+            sdkComponentIcon = ActivityIcons.Excel;
 
             sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_StartCell", PropertyType = PropertyTypes.SCRIPT, EditorType = ScriptEditorTypes.NONE, DataType = typeof(string), ToolTip = "Имя начальной ячейки (например, A1)", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_RowOffset", PropertyType = PropertyTypes.SCRIPT, EditorType = ScriptEditorTypes.NONE, DataType = typeof(int), ToolTip = "Смещение по строкам (ΔR)", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_ColumnOffset", PropertyType = PropertyTypes.SCRIPT, EditorType = ScriptEditorTypes.NONE, DataType = typeof(int), ToolTip = "Смещение по столбцам (ΔC)", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_TargetCell", PropertyType = PropertyTypes.VARIABLE, EditorType = ScriptEditorTypes.NONE, DataType = typeof(string), ToolTip = "Вычисленное имя целевой ячейки", IsReadOnly = false }
+                PropertyBuilder.Script<string>("Prop_StartCell", "Имя начальной ячейки (например, A1)"),
+                PropertyBuilder.Script<int>("Prop_RowOffset", "Смещение по строкам (ΔR)"),
+                PropertyBuilder.Script<int>("Prop_ColumnOffset", "Смещение по столбцам (ΔC)"),
+                PropertyBuilder.Variable<string>("Prop_TargetCell", "Вычисленное имя целевой ячейки")
             };
 
             InitClass(container);
@@ -193,20 +193,10 @@ namespace Primo.MIA
 
         #endregion
 
-        public override ValidationResult Validate()
+                public override ValidationResult Validate()
         {
             var ret = new ValidationResult();
-            if (string.IsNullOrWhiteSpace(this.Prop_StartCell))
-                ret.Items.Add(new ValidationResult.ValidationItem() { PropertyName = "Начальная ячейка", Error = "Начальная ячейка обязательна" });
-
-            // Проверяем формат начальной ячейки
-            //if (!string.IsNullOrWhiteSpace(this.Prop_StartCell))
-            //{
-            //    var cellInfo = ParseExcelCell(this.Prop_StartCell);
-            //    if (!cellInfo.IsValid)
-            //        ret.Items.Add(new ValidationResult.ValidationItem() { PropertyName = "Начальная ячейка", Error = "Неверный формат ячейки (ожидается A1, B2 и т.д.)" });
-            //}
-
+            ret.ValidateRequired(this.Prop_StartCell, ActivityStrings.Field_StartCell, ActivityStrings.Error_StartCellRequired);
             return ret;
         }
     }

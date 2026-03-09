@@ -2,6 +2,7 @@ using LTools.Common.Model;
 using LTools.Common.UIElements;
 using LTools.Enums;
 using LTools.SDK;
+using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,8 +18,7 @@ namespace Primo.MIA
     /// </summary>
     public class ListGroupBack : PrimoComponentTO<ListGroup>
     {
-        private const string CGroupName = "MIA" + WFPublishedElementBase.TREE_SEPARATOR + "Списки";
-        public override string GroupName { get => CGroupName; protected set { } }
+                public override string GroupName { get => ActivityCategories.Lists; protected set { } }
 
         protected override int sdkTimeOut
         {
@@ -29,7 +29,7 @@ namespace Primo.MIA
         private string _propList;
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(List<string>))]
-        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Список")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_List)]
         public string Prop_List
         {
             get => _propList;
@@ -38,7 +38,7 @@ namespace Primo.MIA
 
         private ListGroupMode _mode = ListGroupMode.ByFirstChar;
         [LTools.Common.Model.Serialization.StoringProperty]
-        [System.ComponentModel.Category("Основные"), System.ComponentModel.DisplayName("Способ группировки")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_GroupingMode)]
         public ListGroupMode Mode
         {
             get => _mode;
@@ -49,7 +49,7 @@ namespace Primo.MIA
         /// <summary>Длина префикса для режима ByPrefix</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
-        [System.ComponentModel.Category("Параметры"), System.ComponentModel.DisplayName("Длина префикса")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Parameters), System.ComponentModel.DisplayName(ActivityStrings.Field_PrefixLength)]
         public string Prop_PrefixLength
         {
             get => _propPrefixLength;
@@ -60,7 +60,7 @@ namespace Primo.MIA
         /// <summary>Regex с capture-группой для режима ByRegexGroup. Группа 1 → ключ.</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
-        [System.ComponentModel.Category("Параметры"), System.ComponentModel.DisplayName("Regex паттерн")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Parameters), System.ComponentModel.DisplayName(ActivityStrings.Field_RegexPattern)]
         public string Prop_RegexPattern
         {
             get => _propRegexPattern;
@@ -71,7 +71,7 @@ namespace Primo.MIA
         /// <summary>Количество топ-элементов (режим TopFrequent)</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
-        [System.ComponentModel.Category("Параметры"), System.ComponentModel.DisplayName("Топ N (для TopFrequent)")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Parameters), System.ComponentModel.DisplayName(ActivityStrings.Field_TopN)]
         public string Prop_TopN
         {
             get => _propTopN;
@@ -82,7 +82,7 @@ namespace Primo.MIA
         /// <summary>Словарь: ключ группы → список элементов</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(Dictionary<string, List<string>>))]
-        [System.ComponentModel.Category("Выходные данные"), System.ComponentModel.DisplayName("Группы")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_Groups)]
         public string Prop_GroupedResult
         {
             get => _propGroupedResult;
@@ -93,7 +93,7 @@ namespace Primo.MIA
         /// <summary>Количество групп в результате</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
-        [System.ComponentModel.Category("Выходные данные"), System.ComponentModel.DisplayName("Количество групп")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_GroupCount)]
         public string Prop_GroupCount
         {
             get => _propGroupCount;
@@ -104,7 +104,7 @@ namespace Primo.MIA
         /// <summary>Словарь: элемент → количество вхождений (заполняется всегда)</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(Dictionary<string, int>))]
-        [System.ComponentModel.Category("Выходные данные"), System.ComponentModel.DisplayName("Частота элементов")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_FrequencyMap)]
         public string Prop_FrequencyMap
         {
             get => _propFrequencyMap;
@@ -122,18 +122,18 @@ namespace Primo.MIA
                 "ByPrefix     — по первым N символам\n" +
                 "ByRegexGroup — по первой capture-группе regex\n" +
                 "TopFrequent  — топ-N самых частых значений";
-            sdkComponentIcon = "pack://application:,,,/Primo.MIA;component/images/list.png";
+            sdkComponentIcon = ActivityIcons.List;
 
-            sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
+                        sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_List", PropertyType = PropertyTypes.SCRIPT, EditorType = ScriptEditorTypes.NONE, DataType = typeof(List<string>), ToolTip = "Входной список", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Mode", PropertyType = PropertyTypes.OBJECT, EditorType = ScriptEditorTypes.NONE, DataType = typeof(ListGroupMode), ToolTip = "Способ группировки", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_PrefixLength", PropertyType = PropertyTypes.SCRIPT, EditorType = ScriptEditorTypes.NONE, DataType = typeof(int), ToolTip = "Длина префикса (ByPrefix)", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_RegexPattern", PropertyType = PropertyTypes.SCRIPT, EditorType = ScriptEditorTypes.NONE, DataType = typeof(string), ToolTip = "Regex с capture-группой (ByRegexGroup)", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_TopN", PropertyType = PropertyTypes.SCRIPT, EditorType = ScriptEditorTypes.NONE, DataType = typeof(int), ToolTip = "Топ N элементов (TopFrequent)", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_GroupedResult", PropertyType = PropertyTypes.VARIABLE, EditorType = ScriptEditorTypes.NONE, DataType = typeof(Dictionary<string, List<string>>), ToolTip = "Словарь группы → элементы", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_GroupCount", PropertyType = PropertyTypes.VARIABLE, EditorType = ScriptEditorTypes.NONE, DataType = typeof(int), ToolTip = "Количество групп", IsReadOnly = false },
-                new LTools.Common.Helpers.WFHelper.PropertiesItem() { PropName = "Prop_FrequencyMap", PropertyType = PropertyTypes.VARIABLE, EditorType = ScriptEditorTypes.NONE, DataType = typeof(Dictionary<string, int>), ToolTip = "Словарь элемент → частота", IsReadOnly = false }
+                PropertyBuilder.Script<List<string>>("Prop_List", "Входной список"),
+                PropertyBuilder.Enum<ListGroupMode>("Mode", "Способ группировки"),
+                PropertyBuilder.Script<int>("Prop_PrefixLength", "Длина префикса (ByPrefix)"),
+                PropertyBuilder.Script<string>("Prop_RegexPattern", "Regex с capture-группой (ByRegexGroup)"),
+                PropertyBuilder.Script<int>("Prop_TopN", "Топ N элементов (TopFrequent)"),
+                PropertyBuilder.Variable<Dictionary<string, List<string>>>("Prop_GroupedResult", "Словарь группы → элементы"),
+                PropertyBuilder.Variable<int>("Prop_GroupCount", "Количество групп"),
+                PropertyBuilder.Variable<Dictionary<string, int>>("Prop_FrequencyMap", "Словарь элемент → частота")
             };
 
             InitClass(container);
@@ -232,11 +232,10 @@ namespace Primo.MIA
 
         public override ValidationResult Validate()
         {
-            var ret = new ValidationResult();
-            if (string.IsNullOrWhiteSpace(this.Prop_List))
-                ret.Items.Add(new ValidationResult.ValidationItem() { PropertyName = "Список", Error = "Список обязателен" });
-            if (this.Mode == ListGroupMode.ByRegexGroup && string.IsNullOrWhiteSpace(this.Prop_RegexPattern))
-                ret.Items.Add(new ValidationResult.ValidationItem() { PropertyName = "Regex паттерн", Error = "Regex паттерн обязателен для ByRegexGroup" });
+                        var ret = new ValidationResult();
+            ret.ValidateRequired(this.Prop_List, ActivityStrings.Field_List, ActivityStrings.Error_ListRequired);
+            if (this.Mode == ListGroupMode.ByRegexGroup)
+                ret.ValidateRequired(this.Prop_RegexPattern, ActivityStrings.Field_RegexPattern, ActivityStrings.Error_RegexPatternRequired);
             return ret;
         }
     }
