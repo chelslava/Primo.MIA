@@ -3,12 +3,12 @@ using System.Windows.Markup;
 
 namespace Primo.MIA
 {
-    [ContentProperty(" \NestedActivity\\)]
- public partial class ElementUploadFile : UserControl
- {
- public ElementUploadFile()
- {
- InitializeComponent();
- }
- }
+    [ContentProperty("NestedActivity")]
+    public partial class ElementUploadFile : UserControl
+    {
+        public ElementUploadFile()
+        {
+            InitializeComponent();
+        }
+    }
 }

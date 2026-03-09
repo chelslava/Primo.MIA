@@ -3,12 +3,12 @@ using System.Windows.Markup;
 
 namespace Primo.MIA
 {
-    [ContentProperty(" \NestedActivity\\)]
- public partial class ElementDragDrop : UserControl
- {
- public ElementDragDrop()
- {
- InitializeComponent();
- }
- }
+    [ContentProperty("NestedActivity")]
+    public partial class ElementDragDrop : UserControl
+    {
+        public ElementDragDrop()
+        {
+            InitializeComponent();
+        }
+    }
 }

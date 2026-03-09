@@ -3,12 +3,12 @@ using System.Windows.Markup;
 
 namespace Primo.MIA
 {
-    [ContentProperty(" \NestedActivity\\)]
- public partial class ElementGetScreenshot : UserControl
- {
- public ElementGetScreenshot()
- {
- InitializeComponent();
- }
- }
+    [ContentProperty("NestedActivity")]
+    public partial class ElementGetScreenshot : UserControl
+    {
+        public ElementGetScreenshot()
+        {
+            InitializeComponent();
+        }
+    }
 }

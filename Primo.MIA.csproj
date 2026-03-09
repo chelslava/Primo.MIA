@@ -185,15 +185,7 @@
     <Compile Include="Browser\ElementClick.xaml.cs">
       <DependentUpon>ElementClick.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Browser\ElementClickAndHold.xaml.cs">
-      <DependentUpon>ElementClickAndHold.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Browser\ElementClickAndHoldBack.cs" />
     <Compile Include="Browser\ElementClickBack.cs" />
-    <Compile Include="Browser\ElementDoubleClick.xaml.cs">
-      <DependentUpon>ElementDoubleClick.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Browser\ElementDoubleClickBack.cs" />
     <Compile Include="Browser\ElementDragDrop.xaml.cs">
       <DependentUpon>ElementDragDrop.xaml</DependentUpon>
     </Compile>
@@ -205,10 +197,6 @@
     <Compile Include="Browser\ElementFind.xaml.cs">
       <DependentUpon>ElementFind.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Browser\ElementFindAll.xaml.cs">
-      <DependentUpon>ElementFindAll.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Browser\ElementFindAllBack.cs" />
     <Compile Include="Browser\ElementFindBack.cs" />
     <Compile Include="Browser\ElementGetComputedStyle.xaml.cs">
       <DependentUpon>ElementGetComputedStyle.xaml</DependentUpon>
@@ -238,10 +226,6 @@
       <DependentUpon>ElementIsVisible.xaml</DependentUpon>
     </Compile>
     <Compile Include="Browser\ElementIsVisibleBack.cs" />
-    <Compile Include="Browser\ElementRightClick.xaml.cs">
-      <DependentUpon>ElementRightClick.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Browser\ElementRightClickBack.cs" />
     <Compile Include="Browser\ElementScrollTo.xaml.cs">
       <DependentUpon>ElementScrollTo.xaml</DependentUpon>
     </Compile>
@@ -529,14 +513,6 @@
       <Generator>XamlIntelliSenseFileGenerator</Generator>
     </Page>
     <Page Include="Browser\ElementClick.xaml">
-      <SubType>Designer</SubType>
-      <Generator>XamlIntelliSenseFileGenerator</Generator>
-    </Page>
-    <Page Include="Browser\ElementClickAndHold.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Browser\ElementDoubleClick.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -549,12 +525,8 @@
       <Generator>XamlIntelliSenseFileGenerator</Generator>
     </Page>
     <Page Include="Browser\ElementFind.xaml">
+      <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
-      <Generator>XamlIntelliSenseFileGenerator</Generator>
-    </Page>
-    <Page Include="Browser\ElementFindAll.xaml">
-      <SubType>Designer</SubType>
-      <Generator>XamlIntelliSenseFileGenerator</Generator>
     </Page>
     <Page Include="Browser\ElementGetComputedStyle.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -583,10 +555,6 @@
     <Page Include="Browser\ElementIsVisible.xaml">
       <SubType>Designer</SubType>
       <Generator>XamlIntelliSenseFileGenerator</Generator>
-    </Page>
-    <Page Include="Browser\ElementRightClick.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
     </Page>
     <Page Include="Browser\ElementScrollTo.xaml">
       <SubType>Designer</SubType>

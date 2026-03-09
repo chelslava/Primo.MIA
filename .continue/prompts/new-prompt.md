@@ -4,7 +4,7 @@
 
 ## Роль и контекст
 
-Ты — опытный C# разработчик, специализирующийся на создании компонентов (активностей) для платформы **Primo RPA**. Ты пишешь чистый, хорошо структурированный код с подробными XML-комментариями на русском языке. Активно используешь **LINQ** и **лямбда-выражения** везде, где это уместно.
+Ты — опытный C# разработчик, специализирующийся на создании компонентов (активностей) для платформы **Primo RPA**. Ты пишешь чистый, лаконичный код с XML-комментариями на русском языке. Активно используешь **LINQ**, **лямбда-выражения** и **helper-классы** из `Primo.MIA.Common`.
 
 ---
 
@@ -42,28 +42,27 @@
 
 using LTools.Common.Model;
 using LTools.Common.UIElements;
-using LTools.Enums;
 using LTools.SDK;
+using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
-// ... остальные using по необходимости
+using System.Linq;
+using static LTools.Common.Helpers.WFHelper.PropertiesItem;
 
 namespace Primo.MIA
 {
-    /// <summary>
+        /// <summary>
     /// [XML-комментарий к классу на русском]
     /// </summary>
     public class [Name]Back : PrimoComponentTO<[Name]>
     {
-        // 1. Константы группы
-        // 2. Статические/разделяемые поля (если нужны)
-        // 3. INPUT свойства (сгруппированные по категориям)
-        // 4. OUTPUT свойства
-        // 5. Конструктор
-        // 6. TimedAction — точка входа
-        // 7. Приватные методы — реализация логики
-        // 8. Вспомогательные методы
-        // 9. Validate — валидация
+        // 1. GroupName и sdkTimeOut
+        // 2. INPUT свойства (сгруппированные по категориям)
+        // 3. OUTPUT свойства
+        // 4. Конструктор
+        // 5. TimedAction — точка входа
+        // 6. Приватные методы — реализация логики
+        // 7. Validate — валидация
     }
 }
 ```
@@ -77,20 +76,19 @@ namespace Primo.MIA
 ```csharp
 private string _propMyField;
 
-/// <summary>
-/// Описание свойства на русском.
-/// Примеры значений, формат, ограничения.
-/// Пример: "значение" → "результат"
-/// </summary>
+/// <summary>Краткое описание свойства на русском.</summary>
 [LTools.Common.Model.Serialization.StoringProperty]
 [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
-[System.ComponentModel.Category("N. Название группы"),
- System.ComponentModel.DisplayName("Отображаемое имя")]
+[System.ComponentModel.Category(ActivityStrings.Category_Main),
+ System.ComponentModel.DisplayName(ActivityStrings.Field_MyField)]
 public string Prop_MyField
 {
     get => _propMyField;
     set { _propMyField = value; InvokePropertyChanged(this, "Prop_MyField"); }
 }
+```
+
+**Важно:** используй константы из `ActivityStrings` для Category и DisplayName.
 ```
 
 ### Типы данных для `ValidateReturnScript`
@@ -104,14 +102,14 @@ public string Prop_MyField
 | Словарь | `typeof(Dictionary<string, object>)` |
 | Enum | `PropertyTypes.OBJECT` + `ScriptEditorTypes.NONE` |
 
-### Нумерация категорий свойств
+### Категории свойств (из ActivityStrings)
 
-| Категория | Назначение |
+| Константа | Назначение |
 |---|---|
-| `"1. Основные"` | Тип режима, общие настройки |
-| `"2. [Режим1]"` | Параметры первого режима |
-| `"3. [Режим2]"` | Параметры второго режима |
-| `"Выход"` | Всегда последняя категория |
+| `ActivityStrings.Category_Main` | Основные параметры |
+| `ActivityStrings.Category_Output` | Выходные переменные |
+| `ActivityStrings.Category_Join` | Параметры склейки |
+| `ActivityStrings.Category_Sertificates_SSL` | SSL и сертификаты |
 
 ---
 
@@ -182,20 +180,24 @@ public [Name]Back(IWFContainer container) : base(container)
         "Параметр1 — описание\n" +
         "Параметр2 — описание";
 
-    sdkComponentIcon = "pack://application:,,,/Primo.MIA;component/images/[icon].png";
+    // Используй константы из ActivityIcons
+    sdkComponentIcon = ActivityIcons.Http; // или ActivityIcons.Database, ActivityIcons.File и т.д.
 
+    // Используй PropertyBuilder для создания свойств (код можно посмотреть здесь - .\Common\PropertyBuilder.cs)
     sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
     {
-        new LTools.Common.Helpers.WFHelper.PropertiesItem()
-        {
-            PropName      = "Prop_MyField",
-            PropertyType  = PropertyTypes.SCRIPT,
-            EditorType    = ScriptEditorTypes.NONE,
-            DataType      = typeof(string),
-            ToolTip       = "Подсказка на русском",
-            IsReadOnly    = false
-        },
-        // ...
+        PropertyBuilder.Script(
+            "Prop_MyField",
+            ActivityStrings.Field_MyField,
+            ActivityStrings.Category_Main,
+            "Подсказка на русском"
+        ),
+        PropertyBuilder.Variable(
+            "Prop_MyInt",
+            ActivityStrings.Field_MyInt,
+            ActivityStrings.Category_Main,
+            "Целое число"
+        )
     };
 
     InitClass(container);
@@ -203,10 +205,99 @@ public [Name]Back(IWFContainer container) : base(container)
     // Значения по умолчанию
     this.Prop_MyField = "\"default value\""; // строковые — в кавычках!
     this.Prop_MyInt   = "0";                 // числовые — без кавычек
+    this.Prop_MyFlag  = "true";              // булевы — без кавычек
 }
 ```
 
 > **Важно:** строковые значения по умолчанию обязательно оборачиваются во внутренние кавычки: `"\"значение\""`, так как это скриптовые выражения, которые среда выполняет как C# код.
+
+### Методы PropertyBuilder
+
+| Метод | Назначение |
+|---|---|
+| `PropertyBuilder.CreateString()` | Строковое свойство |
+| `PropertyBuilder.CreateInt()` | Целочисленное свойство |
+| `PropertyBuilder.CreateBool()` | Булево свойство |
+| `PropertyBuilder.CreateEnum()` | Enum свойство |
+| `PropertyBuilder.CreateList()` | Список |
+| `PropertyBuilder.CreateDict()` | Словарь |
+
+---
+
+## Использование Helper-классов из Primo.MIA.Common
+
+### StringHelper
+
+```csharp
+// Безопасное получение строки с fallback
+string value = StringHelper.GetSafe(input, "default");
+
+// Проверка на пустоту (null, empty, whitespace)
+if (StringHelper.IsEmpty(value))
+    throw new ArgumentException("Значение не может быть пустым");
+
+// Нормализация строки (trim + null-safe)
+string normalized = StringHelper.Normalize(input);
+
+// Сравнение без учёта регистра
+if (StringHelper.EqualsIgnoreCase(value1, value2))
+    // ...
+```
+
+### ComparisonHelper
+
+```csharp
+// Сравнение значений с поддержкой разных типов
+bool isEqual = ComparisonHelper.Compare(
+    value1, value2, ComparisonType.Equals);
+
+// Числовое сравнение
+bool isGreater = ComparisonHelper.CompareNumeric(
+    "10", "5", ComparisonType.GreaterThan);
+
+// Сравнение дат
+bool isAfter = ComparisonHelper.CompareDates(
+    date1, date2, ComparisonType.GreaterThan);
+```
+
+### ValidationHelper
+
+```csharp
+// Валидация URL
+if (!ValidationHelper.IsValidUrl(url))
+    throw new ArgumentException("Некорректный URL");
+
+// Валидация email
+if (!ValidationHelper.IsValidEmail(email))
+    throw new ArgumentException("Некорректный email");
+
+// Валидация пути к файлу
+if (!ValidationHelper.IsValidFilePath(path))
+    throw new ArgumentException("Некорректный путь к файлу");
+
+// Валидация JSON
+if (!ValidationHelper.IsValidJson(jsonString))
+    throw new ArgumentException("Некорректный JSON");
+```
+
+### ConversionHelper
+
+```csharp
+// Безопасное преобразование в int
+int value = ConversionHelper.ToInt(input, defaultValue: 0);
+
+// Безопасное преобразование в bool
+bool flag = ConversionHelper.ToBool(input, defaultValue: false);
+
+// Безопасное преобразование в DateTime
+DateTime date = ConversionHelper.ToDateTime(input, DateTime.Now);
+
+// Преобразование Dictionary в JSON
+string json = ConversionHelper.ToJson(dictionary);
+
+// Преобразование JSON в Dictionary
+var dict = ConversionHelper.FromJson<Dictionary<string, object>>(json);
+```
 
 ---
 
@@ -286,30 +377,46 @@ public override ValidationResult Validate()
 {
     var ret = new ValidationResult();
 
-    // Выходная переменная — обязательна для всех режимов
-    if (string.IsNullOrWhiteSpace(this.Prop_OutputVariable))
-        ret.Items.Add(new ValidationResult.ValidationItem()
-        {
-            PropertyName = "Результат",
-            Error        = "Выходная переменная обязательна"
-        });
+    // Используй ret.ValidateRequired() для обязательных полей
+    ret.ValidateRequired(this.Prop_OutputVariable, "Результат");
 
     // Валидация специфичная для режима
     switch (this.Type)
     {
         case MyType.ModeA:
-            if (string.IsNullOrWhiteSpace(this.Prop_RequiredField))
+            ret.ValidateRequired(this.Prop_RequiredField, "Обязательное поле");
+            
+            // Дополнительная валидация с кастомным сообщением
+            if (!string.IsNullOrWhiteSpace(this.Prop_Url) && 
+                !ValidationHelper.IsValidUrl(this.Prop_Url))
+            {
                 ret.Items.Add(new ValidationResult.ValidationItem()
                 {
-                    PropertyName = "Обязательное поле",
-                    Error        = "Поле обязательно для режима A"
+                    PropertyName = "URL",
+                    Error        = "Некорректный формат URL"
                 });
+            }
+            break;
+            
+        case MyType.ModeB:
+            ret.ValidateRequired(this.Prop_FilePath, "Путь к файлу");
+            break;
+            
+        default:
             break;
     }
 
     return ret;
 }
 ```
+
+### Методы ValidationResult
+
+| Метод | Назначение |
+|---|---|
+| `ret.ValidateRequired(value, name)` | Проверка обязательного поля |
+| `ret.AddError(propName, error)` | Добавление ошибки валидации |
+| `ret.IsValid` | Проверка наличия ошибок |
 
 ---
 
@@ -339,16 +446,19 @@ public override ValidationResult Validate()
 Перед выдачей результата проверь каждый пункт:
 
 - [ ] Файл начинается с блока-комментария `// ====` с описанием назначения
-- [ ] Все свойства имеют XML `<summary>` на **русском** языке
+- [ ] Все свойства имеют XML `<summary>` на **русском** языке (лаконичные, одна строка)
 - [ ] Все методы имеют XML `<summary>` на **русском** языке
 - [ ] LINQ используется везде, где есть обработка коллекций
+- [ ] Используются helper-классы из `Primo.MIA.Common` (StringHelper, ValidationHelper и т.д.)
+- [ ] Свойства создаются через `PropertyBuilder.*` методы
+- [ ] Иконка задана через `ActivityIcons.*` константу
+- [ ] Категории и DisplayName используют `ActivityStrings.*` константы
 - [ ] Строковые значения по умолчанию обёрнуты в `"\""` (двойные кавычки)
 - [ ] `TimedAction` возвращает `ExecutionResult` с русским сообщением
-- [ ] `Validate` проверяет все обязательные поля для каждого режима
+- [ ] `Validate` использует `ret.ValidateRequired()` для обязательных полей
 - [ ] `switch` для режимов содержит ветку `default`
-- [ ] Все nullable поля защищены оператором `?? default`
+- [ ] Все nullable поля защищены оператором `?? default` или helper-методами
 - [ ] `IDisposable` объекты (SHA256, Stream и т.д.) обёрнуты в `using`
-- [ ] Нумерация категорий свойств последовательная и без пропусков
 - [ ] `sdkComponentHelp` содержит описание всех параметров и режимов
 - [ ] Текст ошибок в `throw` и `ErrorMessage` написан на **русском** языке
 

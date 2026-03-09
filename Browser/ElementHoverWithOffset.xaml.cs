@@ -3,12 +3,12 @@ using System.Windows.Markup;
 
 namespace Primo.MIA
 {
-    [ContentProperty(" \NestedActivity\\)]
- public partial class ElementHoverWithOffset : UserControl
- {
- public ElementHoverWithOffset()
- {
- InitializeComponent();
- }
- }
+    [ContentProperty("NestedActivity")]
+    public partial class ElementHoverWithOffset : UserControl
+    {
+        public ElementHoverWithOffset()
+        {
+            InitializeComponent();
+        }
+    }
 }
