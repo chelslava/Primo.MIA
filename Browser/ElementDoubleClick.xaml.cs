@@ -1,12 +1,14 @@
+﻿using System.Windows.Controls;
 using System.Windows.Markup;
 
 namespace Primo.MIA
 {
-    [ContentProperty("NestedActivity")]
-    public partial class ElementDoubleClick : ElementDoubleClickBack
-    {
-        public ElementDoubleClick() : base(null)
-        {
-        }
-    }
+    [ContentProperty(" \NestedActivity\\)]
+ public partial class ElementDoubleClick : UserControl
+ {
+ public ElementDoubleClick()
+ {
+ InitializeComponent();
+ }
+ }
 }

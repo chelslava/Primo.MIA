@@ -1,12 +1,14 @@
+﻿using System.Windows.Controls;
 using System.Windows.Markup;
 
 namespace Primo.MIA
 {
-    [ContentProperty("NestedActivity")]
-    public partial class BrowserStorageManage : BrowserStorageManageBack
-    {
-        public BrowserStorageManage() : base(null)
-        {
-        }
-    }
+    [ContentProperty(" \NestedActivity\\)]
+ public partial class BrowserStorageManage : UserControl
+ {
+ public BrowserStorageManage()
+ {
+ InitializeComponent();
+ }
+ }
 }
