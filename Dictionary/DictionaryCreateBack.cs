@@ -327,9 +327,11 @@ namespace Primo.MIA
         // ВАЛИДАЦИЯ
         // =========================================================================
 
-                public override ValidationResult Validate()
+                        public override ValidationResult Validate()
         {
             var ret = new ValidationResult();
+
+            ret.ValidateRequired(this.Prop_ResultDictionary, ActivityStrings.Field_ResultDictionary, "Выходная переменная для результата обязательна");
 
             if (this.Mode == DictionaryCreateMode.Clone || this.Mode == DictionaryCreateMode.Invert)
                 ret.ValidateRequired(this.Prop_Dictionary, ActivityStrings.Field_Dictionary,

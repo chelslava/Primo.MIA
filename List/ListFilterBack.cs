@@ -287,12 +287,13 @@ namespace Primo.MIA
                 case ListFilterMode.EmptyOnly:
                     return s => string.IsNullOrWhiteSpace(s);
 
-                case ListFilterMode.LengthRange:
+                                case ListFilterMode.LengthRange:
                 {
-                    // Читаем min/max из свойств — GetPropertyValue уже был вызван в SimpleAction
-                    // Здесь парсим напрямую из строк-свойств (они уже содержат разрешённые значения)
-                    int min = int.TryParse(this.Prop_MinLength, out int mn) ? mn : 0;
-                    int max = int.TryParse(this.Prop_MaxLength, out int mx) ? mx : int.MaxValue;
+                    // Читаем min/max через GetPropertyValue для разрешения скриптовых выражений
+                    string minStr = GetPropertyValue<string>(this.Prop_MinLength, "Prop_MinLength", sd) ?? "0";
+                    string maxStr = GetPropertyValue<string>(this.Prop_MaxLength, "Prop_MaxLength", sd) ?? int.MaxValue.ToString();
+                    int min = int.TryParse(minStr, out int mn) ? mn : 0;
+                    int max = int.TryParse(maxStr, out int mx) ? mx : int.MaxValue;
                     return s => s != null && s.Length >= min && s.Length <= max;
                 }
 

@@ -104,10 +104,54 @@ namespace Primo.MIA
         /// </summary>
         public static Dictionary<string, object> ObjectDict { get; private set; }
 
-        /// <summary>
+                /// <summary>
         /// Словарь для хранения JSON данных (JToken).
         /// </summary>
         public static Dictionary<string, JToken> JsonDict { get; private set; }
+
+        //---------------------------------------------------------------------
+        //  HELPER METHODS
+        //---------------------------------------------------------------------
+
+        /// <summary>
+        /// Сохраняет объект в ObjectDict по ключу.
+        /// </summary>
+        public static void Set(string key, object value)
+        {
+            ObjectDict[key] = value;
+        }
+
+        /// <summary>
+        /// Получает объект из ObjectDict по ключу.
+        /// </summary>
+        public static object Get(string key)
+        {
+            return ObjectDict.TryGetValue(key, out var value) ? value : null;
+        }
+
+        /// <summary>
+        /// Получает типизированный объект из ObjectDict по ключу.
+        /// </summary>
+        public static T Get<T>(string key) where T : class
+        {
+            return ObjectDict.TryGetValue(key, out var value) ? value as T : null;
+        }
+
+        /// <summary>
+        /// Проверяет наличие ключа в ObjectDict.
+        /// </summary>
+        public static bool Contains(string key)
+        {
+            return ObjectDict.ContainsKey(key);
+        }
+
+        /// <summary>
+        /// Удаляет объект из ObjectDict по ключу.
+        /// </summary>
+        public static bool Remove(string key)
+        {
+            return ObjectDict.Remove(key);
+        }
 
 
         //---------------------------------------------------------------------
