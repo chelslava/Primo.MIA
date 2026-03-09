@@ -1,0 +1,34 @@
+<UserControl x:Class="Primo.MIA.BrowserGetLogs"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Primo.MIA"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+         <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <Image Grid.Column="0" 
+               Width="32" 
+               Height="32" 
+               Margin="5"
+               VerticalAlignment="Center"
+               Source="pack://application:,,,/Primo.MIA;component/images/browser.png"/>
+
+        <StackPanel Grid.Column="1" 
+                    VerticalAlignment="Center" 
+                    Margin="5">
+            <TextBlock Text="Получить логи браузера" 
+                       FontWeight="Bold" 
+                       FontSize="12"/>
+            <TextBlock FontSize="10" 
+                       Foreground="Gray">
+                <Run Text="{Binding Path=Prop_LogType, Mode=OneWay}"/>
+            </TextBlock>
+        </StackPanel>        
+    </Grid>
+</UserControl>

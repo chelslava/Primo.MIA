@@ -40,5 +40,8 @@ namespace Primo.MIA.Common
         
         /// <summary>Иконка для активностей работы с JSON</summary>
         public const string Json = BasePath + "json.png";
+        
+        /// <summary>Иконка для активностей работы с браузером (Selenium)</summary>
+        public const string Browser = BasePath + "browser.png";
     }
 }

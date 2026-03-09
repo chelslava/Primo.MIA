@@ -773,4 +773,229 @@ namespace Primo.MIA
         /// <summary>PATCH — частичное обновление</summary>
         PATCH
     }
+
+    /// <summary>
+    /// Тип браузера для автоматизации
+    /// </summary>
+    public enum BrowserType
+    {
+        /// <summary>Google Chrome</summary>
+        Chrome,
+        /// <summary>Mozilla Firefox</summary>
+        Firefox,
+        /// <summary>Microsoft Edge</summary>
+        Edge
+    }
+
+    /// <summary>
+    /// Тип локатора для поиска элементов на странице
+    /// </summary>
+    public enum ElementLocatorType
+    {
+        /// <summary>Поиск по атрибуту id</summary>
+        Id,
+        /// <summary>Поиск по атрибуту name</summary>
+        Name,
+        /// <summary>Поиск по имени CSS-класса</summary>
+        ClassName,
+        /// <summary>Поиск по имени тега</summary>
+        TagName,
+        /// <summary>Поиск по полному тексту ссылки</summary>
+        LinkText,
+        /// <summary>Поиск по частичному тексту ссылки</summary>
+        PartialLinkText,
+        /// <summary>Поиск по CSS-селектору</summary>
+        CssSelector,
+        /// <summary>Поиск по XPath-выражению</summary>
+        XPath
+    }
+
+    /// <summary>
+    /// Тип условия ожидания
+    /// </summary>
+    public enum WaitConditionType
+    {
+        /// <summary>Элемент существует в DOM</summary>
+        ElementExists,
+        /// <summary>Элемент видим на странице</summary>
+        ElementVisible,
+        /// <summary>Элемент доступен для клика</summary>
+        ElementClickable,
+        /// <summary>Элемент невидим или отсутствует</summary>
+        ElementInvisible,
+        /// <summary>Текст присутствует в элементе</summary>
+        TextPresent,
+        /// <summary>Заголовок страницы содержит текст</summary>
+        TitleContains,
+        /// <summary>URL содержит текст</summary>
+        UrlContains,
+        /// <summary>Алерт присутствует</summary>
+        AlertPresent
+    }
+
+    /// <summary>
+    /// Режим выбора опции в select элементе
+    /// </summary>
+    public enum SelectMode
+    {
+        /// <summary>Выбор по видимому тексту</summary>
+        ByText,
+        /// <summary>Выбор по значению атрибута value</summary>
+        ByValue,
+        /// <summary>Выбор по индексу (начиная с 0)</summary>
+        ByIndex
+    }
+
+    /// <summary>
+    /// Выравнивание при прокрутке к элементу
+    /// </summary>
+    public enum ScrollAlignment
+    {
+        /// <summary>Прокрутить элемент к верхней части окна</summary>
+        Top,
+        /// <summary>Прокрутить элемент к центру окна</summary>
+        Center,
+        /// <summary>Прокрутить элемент к нижней части окна</summary>
+        Bottom
+    }
+
+    /// <summary>
+    /// Операция с cookies
+    /// </summary>
+    public enum CookieOperation
+    {
+        /// <summary>Получить cookie по имени</summary>
+        Get,
+        /// <summary>Получить все cookies</summary>
+        GetAll,
+        /// <summary>Установить cookie</summary>
+        Set,
+        /// <summary>Удалить cookie по имени</summary>
+        Delete,
+        /// <summary>Удалить все cookies</summary>
+        DeleteAll
+    }
+
+    /// <summary>
+    /// Тип переключения контекста браузера
+    /// </summary>
+    public enum SwitchToType
+    {
+        /// <summary>Переключиться на iframe по индексу или имени</summary>
+        Frame,
+        /// <summary>Переключиться на окно по handle</summary>
+        Window,
+        /// <summary>Переключиться на алерт</summary>
+        Alert,
+        /// <summary>Вернуться к основному контенту страницы</summary>
+        DefaultContent,
+        /// <summary>Вернуться к родительскому фрейму</summary>
+        ParentFrame
+    }
+
+    /// <summary>
+    /// Действие с алертом
+    /// </summary>
+    public enum AlertAction
+    {
+        /// <summary>Принять алерт (OK)</summary>
+        Accept,
+        /// <summary>Отклонить алерт (Cancel)</summary>
+        Dismiss,
+        /// <summary>Получить текст алерта</summary>
+        GetText,
+        /// <summary>Ввести текст в prompt</summary>
+        SendKeys
+    }
+
+    /// <summary>
+    /// Операция с вкладками браузера
+    /// </summary>
+    public enum TabOperation
+    {
+        /// <summary>Открыть новую вкладку</summary>
+        OpenNewTab,
+        /// <summary>Закрыть текущую вкладку</summary>
+        CloseCurrentTab,
+        /// <summary>Закрыть вкладку по handle</summary>
+        CloseTabByHandle,
+        /// <summary>Получить список всех handles</summary>
+        GetAllHandles,
+        /// <summary>Получить handle текущей вкладки</summary>
+        GetCurrentHandle,
+        /// <summary>Переключиться на вкладку по индексу</summary>
+        SwitchToTab
+    }
+
+    /// <summary>
+    /// Тип хранилища браузера
+    /// </summary>
+    public enum StorageType
+    {
+        /// <summary>localStorage — данные сохраняются между сессиями</summary>
+        LocalStorage,
+        /// <summary>sessionStorage — данные удаляются при закрытии вкладки</summary>
+        SessionStorage
+    }
+
+    /// <summary>
+    /// Операция с хранилищем браузера
+    /// </summary>
+    public enum StorageOperation
+    {
+        /// <summary>Получить значение по ключу</summary>
+        GetItem,
+        /// <summary>Установить значение</summary>
+        SetItem,
+        /// <summary>Удалить ключ</summary>
+        RemoveItem,
+        /// <summary>Очистить всё хранилище</summary>
+        Clear,
+        /// <summary>Получить все ключи</summary>
+        GetAllKeys,
+        /// <summary>Получить длину хранилища</summary>
+        GetLength
+    }
+
+    /// <summary>
+    /// Тип логов браузера
+    /// </summary>
+    public enum BrowserLogType
+    {
+        /// <summary>Логи браузера</summary>
+        Browser,
+        /// <summary>Логи драйвера</summary>
+        Driver,
+        /// <summary>Логи клиента</summary>
+        Client,
+        /// <summary>Логи сервера</summary>
+        Server,
+        /// <summary>Логи производительности</summary>
+        Performance
+    }
+
+    /// <summary>
+    /// Операция с multiple select элементом
+    /// </summary>
+    public enum MultiSelectOperation
+    {
+        /// <summary>Выбрать опцию по тексту</summary>
+        SelectByText,
+        /// <summary>Выбрать опцию по value</summary>
+        SelectByValue,
+        /// <summary>Выбрать опцию по индексу</summary>
+        SelectByIndex,
+        /// <summary>Снять выбор по тексту</summary>
+        DeselectByText,
+        /// <summary>Снять выбор по value</summary>
+        DeselectByValue,
+        /// <summary>Снять выбор по индексу</summary>
+        DeselectByIndex,
+        /// <summary>Снять все выборы</summary>
+        DeselectAll,
+        /// <summary>Получить все опции</summary>
+        GetAllOptions,
+        /// <summary>Получить выбранные опции</summary>
+        GetSelectedOptions
+    }
 }

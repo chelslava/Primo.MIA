@@ -25,7 +25,10 @@ namespace Primo.MIA.Common
         /// <summary>Категория "MIA → Файлы"</summary>
         public const string Files = Prefix + "Файлы";
         
-        /// <summary>Категория "MIA → Утилиты"</summary>
+                /// <summary>Категория "MIA → Утилиты"</summary>
         public const string Utilities = Prefix + "Утилиты";
+        
+        /// <summary>Категория "MIA → Браузер"</summary>
+        public const string Browser = Prefix + "Браузер";
     }
 }

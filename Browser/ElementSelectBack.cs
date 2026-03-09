@@ -1,0 +1,290 @@
+// =============================================================================
+// ElementSelectBack.cs — активность «Выбрать из списка».
+//
+// Выбирает опцию из выпадающего списка (select).
+// Поддерживает выбор по тексту, значению или индексу.
+//
+// Режимы выбора:
+//   ByText  — по видимому тексту опции
+//   ByValue — по значению атрибута value
+//   ByIndex — по порядковому номеру (начиная с 0)
+// =============================================================================
+
+using LTools.Common.Model;
+using LTools.Common.UIElements;
+using LTools.SDK;
+using OpenQA.Selenium;
+using OpenQA.Selenium.Support.UI;
+using Primo.MIA.Common;
+using System;
+using System.Collections.Generic;
+using static LTools.Common.Helpers.WFHelper.PropertiesItem;
+
+namespace Primo.MIA
+{
+    /// <summary>
+    /// Активность для выбора опции из выпадающего списка.
+    /// </summary>
+    public class ElementSelectBack : PrimoComponentTO<ElementSelect>
+    {
+        public override string GroupName
+        {
+            get => ActivityCategories.Browser;
+            protected set { }
+        }
+
+        protected override int sdkTimeOut
+        {
+            get => 10000;
+            set { }
+        }
+
+        // ── Входные параметры ──────────────────────────────────────────
+
+        private string _propSessionId;
+        /// <summary>ID сессии браузера.</summary>
+        [LTools.Common.Model.Serialization.StoringProperty]
+        [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main),
+         System.ComponentModel.DisplayName(ActivityStrings.Field_SessionId)]
+        public string Prop_SessionId
+        {
+            get => _propSessionId;
+            set { _propSessionId = value; InvokePropertyChanged(this, "Prop_SessionId"); }
+        }
+
+        private string _propElementId;
+        /// <summary>ID элемента select (если элемент уже найден).</summary>
+        [LTools.Common.Model.Serialization.StoringProperty]
+        [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main),
+         System.ComponentModel.DisplayName(ActivityStrings.Field_ElementId)]
+        public string Prop_ElementId
+        {
+            get => _propElementId;
+            set { _propElementId = value; InvokePropertyChanged(this, "Prop_ElementId"); }
+        }
+
+        private ElementLocatorType _propLocatorType;
+        /// <summary>Тип локатора для поиска элемента.</summary>
+        [LTools.Common.Model.Serialization.StoringProperty]
+        [System.ComponentModel.Category(ActivityStrings.Category_Locator),
+         System.ComponentModel.DisplayName(ActivityStrings.Field_LocatorType)]
+        public ElementLocatorType Prop_LocatorType
+        {
+            get => _propLocatorType;
+            set { _propLocatorType = value; InvokePropertyChanged(this, "Prop_LocatorType"); }
+        }
+
+        private string _propLocatorValue;
+        /// <summary>Значение локатора для поиска элемента.</summary>
+        [LTools.Common.Model.Serialization.StoringProperty]
+        [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
+        [System.ComponentModel.Category(ActivityStrings.Category_Locator),
+         System.ComponentModel.DisplayName(ActivityStrings.Field_LocatorValue)]
+        public string Prop_LocatorValue
+        {
+            get => _propLocatorValue;
+            set { _propLocatorValue = value; InvokePropertyChanged(this, "Prop_LocatorValue"); }
+        }
+
+        private string _propWaitTimeout;
+        /// <summary>Таймаут ожидания элемента (сек).</summary>
+        [LTools.Common.Model.Serialization.StoringProperty]
+        [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
+        [System.ComponentModel.Category(ActivityStrings.Category_Wait),
+         System.ComponentModel.DisplayName(ActivityStrings.Field_WaitTimeout)]
+        public string Prop_WaitTimeout
+        {
+            get => _propWaitTimeout;
+            set { _propWaitTimeout = value; InvokePropertyChanged(this, "Prop_WaitTimeout"); }
+        }
+
+        private SelectMode _propSelectMode;
+        /// <summary>Режим выбора опции.</summary>
+        [LTools.Common.Model.Serialization.StoringProperty]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main),
+         System.ComponentModel.DisplayName(ActivityStrings.Field_SelectMode)]
+        public SelectMode Prop_SelectMode
+        {
+            get => _propSelectMode;
+            set { _propSelectMode = value; InvokePropertyChanged(this, "Prop_SelectMode"); }
+        }
+
+        private string _propSelectValue;
+        /// <summary>Значение для выбора (текст, value или индекс).</summary>
+        [LTools.Common.Model.Serialization.StoringProperty]
+        [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main),
+         System.ComponentModel.DisplayName(ActivityStrings.Field_SelectValue)]
+        public string Prop_SelectValue
+        {
+            get => _propSelectValue;
+            set { _propSelectValue = value; InvokePropertyChanged(this, "Prop_SelectValue"); }
+        }
+
+        // ── Конструктор ────────────────────────────────────────────────
+
+        public ElementSelectBack(IWFContainer container) : base(container)
+        {
+            sdkComponentName = ActivityStrings.Activity_ElementSelect;
+            sdkComponentHelp =
+                "Выбирает опцию из выпадающего списка.\n" +
+                "\n" +
+                "── Основные параметры ────────────────────────\n" +
+                "ID сессии   — идентификатор сессии браузера\n" +
+                "ID элемента — идентификатор select (если уже найден)\n" +
+                "Режим выбора — способ выбора опции\n" +
+                "Значение    — текст, value или индекс для выбора\n" +
+                "\n" +
+                "── Локатор (альтернатива ID элемента) ────────\n" +
+                "Тип локатора — способ поиска элемента\n" +
+                "Значение локатора — конкретное значение для поиска\n" +
+                "\n" +
+                "── Ожидание ──────────────────────────────────\n" +
+                "Таймаут (сек) — время ожидания появления элемента\n" +
+                "\n" +
+                "── Режимы выбора ──────────────────────────────\n" +
+                "ByText  — по видимому тексту опции\n" +
+                "ByValue — по значению атрибута value\n" +
+                "ByIndex — по порядковому номеру (с 0)\n" +
+                "\n" +
+                "ПРИМЕЧАНИЕ: Если указан локатор, элемент будет найден автоматически.";
+
+            sdkComponentIcon = ActivityIcons.Browser;
+
+            sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
+            {
+                PropertyBuilder.Variable<string>("Prop_SessionId", "ID сессии браузера"),
+                PropertyBuilder.Variable<string>("Prop_ElementId", "ID элемента (если уже найден)"),
+                PropertyBuilder.Enum<ElementLocatorType>("Prop_LocatorType", "Тип локатора"),
+                PropertyBuilder.String("Prop_LocatorValue", "Значение локатора"),
+                PropertyBuilder.Int("Prop_WaitTimeout", "Таймаут ожидания элемента (сек)"),
+                PropertyBuilder.Enum<SelectMode>("Prop_SelectMode", "Режим выбора"),
+                PropertyBuilder.String("Prop_SelectValue", "Значение для выбора")
+            };
+
+            InitClass(container);
+
+            this.Prop_SessionId = "\"\"";
+            this.Prop_ElementId = "\"\"";
+            this.Prop_LocatorType = ElementLocatorType.Id;
+            this.Prop_LocatorValue = "\"\"";
+            this.Prop_WaitTimeout = "10";
+            this.Prop_SelectMode = SelectMode.ByText;
+            this.Prop_SelectValue = "\"\"";
+        }
+
+        // ── TimedAction — точка входа ──────────────────────────────────
+
+        public override ExecutionResult TimedAction(ScriptingData sd)
+        {
+            try
+            {
+                // Чтение параметров
+                string sessionId = GetPropertyValue<string>(this.Prop_SessionId, "Prop_SessionId", sd);
+                string elementId = GetPropertyValue<string>(this.Prop_ElementId, "Prop_ElementId", sd);
+                string locatorValue = GetPropertyValue<string>(this.Prop_LocatorValue, "Prop_LocatorValue", sd);
+                string selectValue = GetPropertyValue<string>(this.Prop_SelectValue, "Prop_SelectValue", sd);
+
+                if (string.IsNullOrWhiteSpace(sessionId))
+                    throw new ArgumentException("ID сессии не может быть пустым");
+
+                if (string.IsNullOrWhiteSpace(selectValue))
+                    throw new ArgumentException("Значение для выбора не может быть пустым");
+
+                // Получение драйвера
+                var driver = SeleniumHelper.GetDriver(sessionId);
+
+                // Получение элемента: либо по ID, либо поиск по локатору
+                IWebElement element;
+                if (!string.IsNullOrWhiteSpace(locatorValue))
+                {
+                    // Поиск элемента по локатору
+                    string timeoutStr = GetPropertyValue<string>(this.Prop_WaitTimeout, "Prop_WaitTimeout", sd) ?? "10";
+                    int timeout = int.TryParse(timeoutStr, out int t) ? t : 10;
+                    timeout = SeleniumHelper.ValidateTimeout(timeout, 10);
+
+                    var locator = SeleniumHelper.CreateLocator(this.Prop_LocatorType, locatorValue);
+                    element = SeleniumHelper.WaitForElement(driver, locator, timeout);
+                }
+                else if (!string.IsNullOrWhiteSpace(elementId))
+                {
+                    // Использование существующего элемента
+                    element = SeleniumHelper.GetElement(elementId);
+                }
+                else
+                {
+                    throw new ArgumentException("Необходимо указать либо ID элемента, либо локатор для поиска");
+                }
+
+                // Создание SelectElement
+                var select = new SelectElement(element);
+
+                // Выбор опции в зависимости от режима
+                switch (this.Prop_SelectMode)
+                {
+                    case SelectMode.ByText:
+                        select.SelectByText(selectValue);
+                        break;
+
+                    case SelectMode.ByValue:
+                        select.SelectByValue(selectValue);
+                        break;
+
+                    case SelectMode.ByIndex:
+                        if (int.TryParse(selectValue, out int index))
+                            select.SelectByIndex(index);
+                        else
+                            throw new ArgumentException($"Некорректный индекс: {selectValue}");
+                        break;
+
+                    default:
+                        throw new ArgumentException($"Неизвестный режим выбора: {this.Prop_SelectMode}");
+                }
+
+                string resultMsg = !string.IsNullOrWhiteSpace(locatorValue)
+                    ? $"[Выбрать из списка] Выбрано ({this.Prop_SelectMode}): {selectValue}, локатор: {this.Prop_LocatorType}={locatorValue}"
+                    : $"[Выбрать из списка] Выбрано ({this.Prop_SelectMode}): {selectValue}, элемент: {elementId}";
+
+                return new ExecutionResult
+                {
+                    IsSuccess = true,
+                    SuccessMessage = resultMsg
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ExecutionResult
+                {
+                    IsSuccess = false,
+                    ErrorMessage = $"Ошибка [Выбрать из списка]: {ex.Message}"
+                };
+            }
+        }
+
+        // ── Валидация ──────────────────────────────────────────────────
+
+        public override ValidationResult Validate()
+        {
+            var ret = new ValidationResult();
+            ret.ValidateRequired(this.Prop_SessionId, ActivityStrings.Field_SessionId, "ID сессии обязателен");
+            ret.ValidateRequired(this.Prop_SelectValue, ActivityStrings.Field_SelectValue, "Значение для выбора обязательно");
+            
+            // Проверяем что указан либо ElementId, либо LocatorValue
+            bool hasElementId = !string.IsNullOrWhiteSpace(this.Prop_ElementId);
+            bool hasLocator = !string.IsNullOrWhiteSpace(this.Prop_LocatorValue);
+            
+            if (!hasElementId && !hasLocator)
+            {
+                ret.Items.Add(new ValidationResult.ValidationItem()
+                {
+                    PropertyName = "ElementId/LocatorValue",
+                    Error = "Необходимо указать либо ID элемента, либо локатор для поиска"
+                });
+            }
+            
+            return ret;
+        }
+    }
+}

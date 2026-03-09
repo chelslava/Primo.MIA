@@ -5,6 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{DCB4DF82-554F-4523-83ED-46857D44AF4D}</ProjectGuid>
+    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Primo.MIA</RootNamespace>
@@ -21,6 +22,8 @@
     <RepositoryUrl>https://gitlab.com/chelslava/Primo.MIA</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -42,9 +45,6 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Hjson, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\Hjson.3.0.0\lib\net40\Hjson.dll</HintPath>
-    </Reference>
     <Reference Include="LTools.Common">
       <HintPath>C:\Program Files\Primo\Primo Studio Community x64\LTools.Common.dll</HintPath>
     </Reference>
@@ -66,11 +66,44 @@
     <Reference Include="LTools.Workflow">
       <HintPath>C:\Program Files\Primo\Primo Studio Community x64\LTools.Workflow.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=8.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.Bcl.AsyncInterfaces.8.0.0\lib\netstandard2.0\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>packages\Newtonsoft.Json.13.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
+    <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>packages\System.Buffers.4.5.1\lib\net461\System.Buffers.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.IO.Compression, Version=4.2.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL" />
+    <Reference Include="System.Memory, Version=4.0.1.2, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>packages\System.Memory.4.5.5\lib\net461\System.Memory.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Numerics.Vectors, Version=4.1.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>packages\System.Numerics.Vectors.4.5.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>packages\System.Runtime.CompilerServices.Unsafe.6.0.0\lib\net461\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Text.Encodings.Web, Version=8.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>packages\System.Text.Encodings.Web.8.0.0\lib\netstandard2.0\System.Text.Encodings.Web.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Text.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>packages\System.Text.Json.8.0.5\lib\netstandard2.0\System.Text.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Threading.Channels, Version=8.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>packages\System.Threading.Channels.8.0.0\lib\netstandard2.0\System.Threading.Channels.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>packages\System.Threading.Tasks.Extensions.4.5.4\lib\net461\System.Threading.Tasks.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="WebDriver, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\Selenium.WebDriver.4.41.0\lib\netstandard2.0\WebDriver.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xaml" />
@@ -83,9 +116,160 @@
     <Reference Include="Tomlyn, Version=0.16.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>packages\Tomlyn.0.16.2\lib\netstandard2.0\Tomlyn.dll</HintPath>
     </Reference>
+    <Reference Include="WebDriver.Support, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\Selenium.Support.4.41.0\lib\netstandard2.0\WebDriver.Support.dll</HintPath>
+    </Reference>
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Browser\AlertHandle.xaml.cs">
+      <DependentUpon>AlertHandle.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Browser\AlertHandleBack.cs" />
+    <Compile Include="Browser\BrowserClose.xaml.cs">
+      <DependentUpon>BrowserClose.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Browser\BrowserCloseBack.cs" />
+    <Compile Include="Browser\BrowserExecuteJavaScript.xaml.cs">
+      <DependentUpon>BrowserExecuteJavaScript.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Browser\BrowserExecuteJavaScriptBack.cs" />
+    <Compile Include="Browser\BrowserGetInfo.xaml.cs">
+      <DependentUpon>BrowserGetInfo.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Browser\BrowserGetInfoBack.cs" />
+    <Compile Include="Browser\BrowserGetLogs.xaml.cs">
+      <DependentUpon>BrowserGetLogs.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Browser\BrowserGetLogsBack.cs" />
+    <Compile Include="Browser\BrowserManageCookies.xaml.cs">
+      <DependentUpon>BrowserManageCookies.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Browser\BrowserManageCookiesBack.cs" />
+    <Compile Include="Browser\BrowserNavigate.xaml.cs">
+      <DependentUpon>BrowserNavigate.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Browser\BrowserNavigateBack.cs" />
+    <Compile Include="Browser\BrowserOpen.xaml.cs">
+      <DependentUpon>BrowserOpen.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Browser\BrowserOpenBack.cs" />
+    <Compile Include="Browser\BrowserScreenshot.xaml.cs">
+      <DependentUpon>BrowserScreenshot.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Browser\BrowserScreenshotBack.cs" />
+    <Compile Include="Browser\BrowserStorageManage.xaml.cs">
+      <DependentUpon>BrowserStorageManage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Browser\BrowserStorageManageBack.cs" />
+    <Compile Include="Browser\BrowserSwitchTo.xaml.cs">
+      <DependentUpon>BrowserSwitchTo.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Browser\BrowserSwitchToBack.cs" />
+    <Compile Include="Browser\BrowserTabManage.xaml.cs">
+      <DependentUpon>BrowserTabManage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Browser\BrowserTabManageBack.cs" />
+    <Compile Include="Browser\BrowserWaitFor.xaml.cs">
+      <DependentUpon>BrowserWaitFor.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Browser\BrowserWaitForBack.cs" />
+    <Compile Include="Browser\BrowserWindowManage.xaml.cs">
+      <DependentUpon>BrowserWindowManage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Browser\BrowserWindowManageBack.cs" />
+    <Compile Include="Browser\ElementClear.xaml.cs">
+      <DependentUpon>ElementClear.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Browser\ElementClearBack.cs" />
+    <Compile Include="Browser\ElementClick.xaml.cs">
+      <DependentUpon>ElementClick.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Browser\ElementClickAndHold.xaml.cs">
+      <DependentUpon>ElementClickAndHold.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Browser\ElementClickAndHoldBack.cs" />
+    <Compile Include="Browser\ElementClickBack.cs" />
+    <Compile Include="Browser\ElementDoubleClick.xaml.cs">
+      <DependentUpon>ElementDoubleClick.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Browser\ElementDoubleClickBack.cs" />
+    <Compile Include="Browser\ElementDragDrop.xaml.cs">
+      <DependentUpon>ElementDragDrop.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Browser\ElementDragDropBack.cs" />
+    <Compile Include="Browser\ElementExists.xaml.cs">
+      <DependentUpon>ElementExists.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Browser\ElementExistsBack.cs" />
+    <Compile Include="Browser\ElementFind.xaml.cs">
+      <DependentUpon>ElementFind.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Browser\ElementFindAll.xaml.cs">
+      <DependentUpon>ElementFindAll.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Browser\ElementFindAllBack.cs" />
+    <Compile Include="Browser\ElementFindBack.cs" />
+    <Compile Include="Browser\ElementGetComputedStyle.xaml.cs">
+      <DependentUpon>ElementGetComputedStyle.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Browser\ElementGetComputedStyleBack.cs" />
+    <Compile Include="Browser\ElementGetProperty.xaml.cs">
+      <DependentUpon>ElementGetProperty.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Browser\ElementGetPropertyBack.cs" />
+    <Compile Include="Browser\ElementGetRect.xaml.cs">
+      <DependentUpon>ElementGetRect.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Browser\ElementGetRectBack.cs" />
+    <Compile Include="Browser\ElementGetScreenshot.xaml.cs">
+      <DependentUpon>ElementGetScreenshot.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Browser\ElementGetScreenshotBack.cs" />
+    <Compile Include="Browser\ElementHover.xaml.cs">
+      <DependentUpon>ElementHover.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Browser\ElementHoverBack.cs" />
+    <Compile Include="Browser\ElementHoverWithOffset.xaml.cs">
+      <DependentUpon>ElementHoverWithOffset.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Browser\ElementHoverWithOffsetBack.cs" />
+    <Compile Include="Browser\ElementIsVisible.xaml.cs">
+      <DependentUpon>ElementIsVisible.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Browser\ElementIsVisibleBack.cs" />
+    <Compile Include="Browser\ElementRightClick.xaml.cs">
+      <DependentUpon>ElementRightClick.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Browser\ElementRightClickBack.cs" />
+    <Compile Include="Browser\ElementScrollTo.xaml.cs">
+      <DependentUpon>ElementScrollTo.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Browser\ElementScrollToBack.cs" />
+    <Compile Include="Browser\ElementSelect.xaml.cs">
+      <DependentUpon>ElementSelect.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Browser\ElementSelectBack.cs" />
+    <Compile Include="Browser\ElementSelectMultiple.xaml.cs">
+      <DependentUpon>ElementSelectMultiple.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Browser\ElementSelectMultipleBack.cs" />
+    <Compile Include="Browser\ElementSendKeys.xaml.cs">
+      <DependentUpon>ElementSendKeys.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Browser\ElementSendKeysBack.cs" />
+    <Compile Include="Browser\ElementSubmit.xaml.cs">
+      <DependentUpon>ElementSubmit.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Browser\ElementSubmitBack.cs" />
+    <Compile Include="Browser\ElementTypeText.xaml.cs">
+      <DependentUpon>ElementTypeText.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Browser\ElementTypeTextBack.cs" />
+    <Compile Include="Browser\ElementUploadFile.xaml.cs">
+      <DependentUpon>ElementUploadFile.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Browser\ElementUploadFileBack.cs" />
     <Compile Include="Common\ActivityCategories.cs" />
     <Compile Include="Common\ActivityIcons.cs" />
     <Compile Include="Common\ActivityStrings.cs" />
@@ -94,6 +278,7 @@
     <Compile Include="Common\NaturalComparer.cs" />
     <Compile Include="Common\PropertyBuilder.cs" />
     <Compile Include="Common\RegexHelper.cs" />
+    <Compile Include="Common\SeleniumHelper.cs" />
     <Compile Include="Common\StringHelper.cs" />
     <Compile Include="Common\TupleHelper.cs" />
     <Compile Include="Common\ValidationHelper.cs" />
@@ -247,6 +432,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="doc\Dictionary\00_INDEX.md" />
     <None Include="doc\Dictionary\01_DictionaryCreate.md" />
     <None Include="doc\Dictionary\02_DictionaryFilter.md" />
@@ -282,6 +468,154 @@
     </Resource>
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Browser\AlertHandle.xaml">
+      <SubType>Designer</SubType>
+      <Generator>XamlIntelliSenseFileGenerator</Generator>
+    </Page>
+    <Page Include="Browser\BrowserClose.xaml">
+      <SubType>Designer</SubType>
+      <Generator>XamlIntelliSenseFileGenerator</Generator>
+    </Page>
+    <Page Include="Browser\BrowserExecuteJavaScript.xaml">
+      <SubType>Designer</SubType>
+      <Generator>XamlIntelliSenseFileGenerator</Generator>
+    </Page>
+    <Page Include="Browser\BrowserGetInfo.xaml">
+      <SubType>Designer</SubType>
+      <Generator>XamlIntelliSenseFileGenerator</Generator>
+    </Page>
+    <Page Include="Browser\BrowserGetLogs.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Browser\BrowserManageCookies.xaml">
+      <SubType>Designer</SubType>
+      <Generator>XamlIntelliSenseFileGenerator</Generator>
+    </Page>
+    <Page Include="Browser\BrowserNavigate.xaml">
+      <SubType>Designer</SubType>
+      <Generator>XamlIntelliSenseFileGenerator</Generator>
+    </Page>
+    <Page Include="Browser\BrowserOpen.xaml">
+      <SubType>Designer</SubType>
+      <Generator>XamlIntelliSenseFileGenerator</Generator>
+    </Page>
+    <Page Include="Browser\BrowserScreenshot.xaml">
+      <SubType>Designer</SubType>
+      <Generator>XamlIntelliSenseFileGenerator</Generator>
+    </Page>
+    <Page Include="Browser\BrowserStorageManage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Browser\BrowserSwitchTo.xaml">
+      <SubType>Designer</SubType>
+      <Generator>XamlIntelliSenseFileGenerator</Generator>
+    </Page>
+    <Page Include="Browser\BrowserTabManage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Browser\BrowserWaitFor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>XamlIntelliSenseFileGenerator</Generator>
+    </Page>
+    <Page Include="Browser\BrowserWindowManage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Browser\ElementClear.xaml">
+      <SubType>Designer</SubType>
+      <Generator>XamlIntelliSenseFileGenerator</Generator>
+    </Page>
+    <Page Include="Browser\ElementClick.xaml">
+      <SubType>Designer</SubType>
+      <Generator>XamlIntelliSenseFileGenerator</Generator>
+    </Page>
+    <Page Include="Browser\ElementClickAndHold.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Browser\ElementDoubleClick.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Browser\ElementDragDrop.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Browser\ElementExists.xaml">
+      <SubType>Designer</SubType>
+      <Generator>XamlIntelliSenseFileGenerator</Generator>
+    </Page>
+    <Page Include="Browser\ElementFind.xaml">
+      <SubType>Designer</SubType>
+      <Generator>XamlIntelliSenseFileGenerator</Generator>
+    </Page>
+    <Page Include="Browser\ElementFindAll.xaml">
+      <SubType>Designer</SubType>
+      <Generator>XamlIntelliSenseFileGenerator</Generator>
+    </Page>
+    <Page Include="Browser\ElementGetComputedStyle.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Browser\ElementGetProperty.xaml">
+      <SubType>Designer</SubType>
+      <Generator>XamlIntelliSenseFileGenerator</Generator>
+    </Page>
+    <Page Include="Browser\ElementGetRect.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Browser\ElementGetScreenshot.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Browser\ElementHover.xaml">
+      <SubType>Designer</SubType>
+      <Generator>XamlIntelliSenseFileGenerator</Generator>
+    </Page>
+    <Page Include="Browser\ElementHoverWithOffset.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Browser\ElementIsVisible.xaml">
+      <SubType>Designer</SubType>
+      <Generator>XamlIntelliSenseFileGenerator</Generator>
+    </Page>
+    <Page Include="Browser\ElementRightClick.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Browser\ElementScrollTo.xaml">
+      <SubType>Designer</SubType>
+      <Generator>XamlIntelliSenseFileGenerator</Generator>
+    </Page>
+    <Page Include="Browser\ElementSelect.xaml">
+      <SubType>Designer</SubType>
+      <Generator>XamlIntelliSenseFileGenerator</Generator>
+    </Page>
+    <Page Include="Browser\ElementSelectMultiple.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Browser\ElementSendKeys.xaml">
+      <SubType>Designer</SubType>
+      <Generator>XamlIntelliSenseFileGenerator</Generator>
+    </Page>
+    <Page Include="Browser\ElementSubmit.xaml">
+      <SubType>Designer</SubType>
+      <Generator>XamlIntelliSenseFileGenerator</Generator>
+    </Page>
+    <Page Include="Browser\ElementTypeText.xaml">
+      <SubType>Designer</SubType>
+      <Generator>XamlIntelliSenseFileGenerator</Generator>
+    </Page>
+    <Page Include="Browser\ElementUploadFile.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Dictionary\DictionaryContainsValue.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -468,10 +802,20 @@
     </Resource>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="images\json.png" />
+    <Resource Include="images\json.png" />
+    <Resource Include="images\browser.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Common\ActivityResources.resx" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="packages\Selenium.WebDriver.4.41.0\build\Selenium.WebDriver.targets" Condition="Exists('packages\Selenium.WebDriver.4.41.0\build\Selenium.WebDriver.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>Данный проект ссылается на пакеты NuGet, отсутствующие на этом компьютере. Используйте восстановление пакетов NuGet, чтобы скачать их.  Дополнительную информацию см. по адресу: http://go.microsoft.com/fwlink/?LinkID=322105. Отсутствует следующий файл: {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('packages\Selenium.WebDriver.4.41.0\build\Selenium.WebDriver.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Selenium.WebDriver.4.41.0\build\Selenium.WebDriver.targets'))" />
+  </Target>
 </Project>

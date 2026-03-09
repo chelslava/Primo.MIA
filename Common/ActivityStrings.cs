@@ -391,7 +391,7 @@ namespace Primo.MIA.Common
         public const string Field_ProfileKeysCount = "Ключей из профиля";
         public const string Field_DefaultKeysCount = "Ключей из default";
         
-        // WaitForFile fields
+                // WaitForFile fields
         public const string Field_WaitMode = "Режим ожидания";
         public const string Field_FilePattern = "Маска файла";
         public const string Field_CheckInterval = "Интервал проверки (мс)";
@@ -401,5 +401,137 @@ namespace Primo.MIA.Common
         public const string Field_FileFound = "Файл найден";
         public const string Field_FileSize = "Размер файла (байт)";
         public const string Field_WaitTime = "Время ожидания (мс)";
+        
+        // ═══════════════════════════════════════════════════════════════════════
+        // BROWSER / SELENIUM
+        // ═══════════════════════════════════════════════════════════════════════
+        
+        // Browser categories
+        public const string Category_Browser = "Браузер";
+        public const string Category_BrowserOptions = "2. Опции браузера";
+        public const string Category_Element = "Элемент";
+        public const string Category_Wait = "Ожидание";
+        public const string Category_Locator = "Локатор";
+        
+        // Browser fields
+        public const string Field_SessionId = "ID сессии";
+        public const string Field_BrowserType = "Тип браузера";
+        public const string Field_Headless = "Headless режим";
+        public const string Field_IncognitoMode = "Режим инкогнито";
+        public const string Field_DisableImages = "Отключить изображения";
+        public const string Field_UserAgent = "User-Agent";
+        public const string Field_DriverPath = "Путь к драйверу";
+        public const string Field_WindowSize = "Размер окна";
+        public const string Field_PageLoadTimeout = "Таймаут загрузки (сек)";
+        public const string Field_ImplicitWait = "Неявное ожидание (сек)";
+        
+        // Element locator fields
+        public const string Field_LocatorType = "Тип локатора";
+        public const string Field_LocatorValue = "Значение локатора";
+        public const string Field_ElementId = "ID элемента";
+        public const string Field_ElementIds = "Список ID элементов";
+        public const string Field_WaitTimeout = "Таймаут (сек)";
+        public const string Field_WaitCondition = "Условие ожидания";
+        
+                // Element interaction fields
+        public const string Field_Text = "Текст";
+        public const string Field_ClearBeforeType = "Очистить перед вводом";
+        public const string Field_SimulateTyping = "Эмуляция печати";
+        public const string Field_TypingDelay = "Задержка между символами (мс)";
+        public const string Field_WaitAfterClick = "Ожидать после клика";
+        public const string Field_ClickBeforeType = "Кликнуть перед вводом";
+        public const string Field_PressEnterAfter = "Нажать Enter после ввода";
+        public const string Field_SpecialKey = "Специальная клавиша";
+        public const string Field_RepeatCount = "Количество повторений";
+        public const string Field_PropertyName = "Имя свойства";
+        public const string Field_AttributeName = "Имя атрибута";
+        public const string Field_CssProperty = "CSS свойство";
+        
+        // Element state fields
+        public const string Field_IsVisible = "Видим";
+        public const string Field_IsEnabled = "Включён";
+        public const string Field_IsSelected = "Выбран";
+        public const string Field_ElementExists = "Элемент существует";
+        public const string Field_ElementText = "Текст элемента";
+        public const string Field_ElementValue = "Значение элемента";
+        public const string Field_ElementCount = "Количество элементов";
+        
+        // Browser navigation fields
+        public const string Field_NavigateUrl = "URL для перехода";
+        public const string Field_CurrentUrl = "Текущий URL";
+        public const string Field_PageTitle = "Заголовок страницы";
+        public const string Field_PageSource = "HTML код страницы";
+        
+        // Screenshot fields
+        public const string Field_ScreenshotPath = "Путь к скриншоту";
+        public const string Field_ScreenshotBase64 = "Скриншот (Base64)";
+        
+        // JavaScript fields
+        public const string Field_JavaScriptCode = "JavaScript код";
+        public const string Field_ScriptArguments = "Аргументы скрипта";
+        public const string Field_ScriptResult = "Результат выполнения";
+        
+        // Select fields
+        public const string Field_SelectMode = "Режим выбора";
+        public const string Field_SelectValue = "Значение для выбора";
+        public const string Field_SelectedOptions = "Выбранные опции";
+        
+        // Cookie fields
+        public const string Field_CookieOperation = "Операция";
+        public const string Field_CookieName = "Имя cookie";
+        public const string Field_CookieValue = "Значение cookie";
+        public const string Field_CookieDomain = "Домен";
+        public const string Field_CookiePath = "Путь";
+        public const string Field_CookieExpiry = "Срок действия";
+        public const string Field_Cookies = "Cookies";
+        
+        // Switch context fields
+        public const string Field_SwitchToType = "Тип контекста";
+        public const string Field_FrameLocator = "Локатор фрейма";
+        public const string Field_WindowHandle = "Handle окна";
+        public const string Field_WindowHandles = "Список handles";
+        
+        // Alert fields
+        public const string Field_AlertAction = "Действие";
+        public const string Field_AlertText = "Текст алерта";
+        public const string Field_AlertInput = "Текст для ввода";
+        
+        // Scroll fields
+        public const string Field_ScrollAlignment = "Выравнивание";
+        public const string Field_ScrollPixels = "Пиксели";
+        public const string Field_ScrollDirection = "Направление";
+        
+        // Browser errors
+        public const string Error_SessionIdRequired = "ID сессии обязателен";
+        public const string Error_SessionNotFound = "Сессия браузера не найдена";
+        public const string Error_LocatorValueRequired = "Значение локатора обязательно";
+        public const string Error_ElementIdRequired = "ID элемента обязателен";
+        public const string Error_ElementNotFound = "Элемент не найден";
+        public const string Error_TextRequired = "Текст обязателен";
+        public const string Error_JavaScriptRequired = "JavaScript код обязателен";
+        public const string Error_CookieNameRequired = "Имя cookie обязательно";
+        public const string Error_InvalidWindowHandle = "Некорректный handle окна";
+        
+        // Browser activities
+        public const string Activity_BrowserOpen = "Браузер: Открыть";
+        public const string Activity_BrowserClose = "Браузер: Закрыть";
+        public const string Activity_BrowserNavigate = "Браузер: Навигация";
+        public const string Activity_BrowserGetInfo = "Браузер: Получить информацию";
+        public const string Activity_BrowserScreenshot = "Браузер: Скриншот";
+        public const string Activity_ElementFind = "Элемент: Найти";
+        public const string Activity_ElementFindAll = "Элемент: Найти все";
+        public const string Activity_ElementClick = "Элемент: Клик";
+        public const string Activity_ElementTypeText = "Элемент: Ввод текста";
+        public const string Activity_ElementGetProperty = "Элемент: Получить свойство";
+        public const string Activity_ElementExists = "Элемент: Проверить существование";
+        public const string Activity_ElementIsVisible = "Элемент: Проверить видимость";
+        public const string Activity_BrowserWaitFor = "Браузер: Ожидание условия";
+        public const string Activity_BrowserExecuteJS = "Браузер: Выполнить JavaScript";
+        public const string Activity_ElementSelect = "Элемент: Выбор в списке";
+        public const string Activity_BrowserManageCookies = "Браузер: Управление cookies";
+        public const string Activity_BrowserSwitchTo = "Браузер: Переключить контекст";
+        public const string Activity_AlertHandle = "Браузер: Обработка алерта";
+        public const string Activity_ElementScrollTo = "Элемент: Прокрутить к элементу";
+        public const string Activity_ElementSendKeys = "Элемент: Нажать клавишу";
     }
 }
