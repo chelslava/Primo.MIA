@@ -181,8 +181,8 @@ namespace Primo.MIA
                 case ListSortMode.ByLengthDesc:
                     return list.OrderByDescending(x => x?.Length ?? 0).ThenBy(x => x).ToList();
 
-                case ListSortMode.Natural:
-                    return list.OrderBy(x => x, NaturalStringComparer.Instance).ToList();
+                                case ListSortMode.Natural:
+                    return list.OrderBy(x => x, NaturalComparer.Instance).ToList();
 
                 case ListSortMode.Reverse:
                     // Копируем и переворачиваем — без пересортировки
@@ -234,54 +234,4 @@ namespace Primo.MIA
         }
     }
 
-    // =========================================================================
-    // ВСПОМОГАТЕЛЬНЫЙ КОМПАРАТОР — натуральная сортировка
-    // =========================================================================
-
-    /// <summary>
-    /// Компаратор натуральной сортировки строк.
-    /// "file2" &lt; "file10" — числовые части сравниваются как числа, не как строки.
-    /// Используется LINQ-совместимый паттерн через IComparer&lt;string&gt;.
-    /// </summary>
-    internal sealed class NaturalStringComparer : IComparer<string>
-    {
-        // Синглтон — один экземпляр на всё приложение
-        public static readonly NaturalStringComparer Instance = new NaturalStringComparer();
-
-        private static readonly Regex _tokenizer =
-            new Regex(@"(\d+)", RegexOptions.Compiled);
-
-        public int Compare(string x, string y)
-        {
-            if (x == y) return 0;
-            if (x == null) return -1;
-            if (y == null) return 1;
-
-            // Разбиваем строки на токены: текст и числовые части чередуются
-            string[] xTokens = _tokenizer.Split(x);
-            string[] yTokens = _tokenizer.Split(y);
-
-            // Сравниваем попарно
-            int minLen = Math.Min(xTokens.Length, yTokens.Length);
-
-            for (int i = 0; i < minLen; i++)
-            {
-                string xt = xTokens[i];
-                string yt = yTokens[i];
-
-                int cmp;
-
-                // Если оба токена — числа, сравниваем как long
-                if (long.TryParse(xt, out long xn) && long.TryParse(yt, out long yn))
-                    cmp = xn.CompareTo(yn);
-                else
-                    cmp = string.Compare(xt, yt, StringComparison.OrdinalIgnoreCase);
-
-                if (cmp != 0) return cmp;
-            }
-
-            // Если все общие токены равны — более короткая строка идёт первой
-            return xTokens.Length.CompareTo(yTokens.Length);
-        }
     }
-}

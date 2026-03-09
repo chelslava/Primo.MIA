@@ -30,7 +30,7 @@ namespace Primo.MIA
     /// </summary>
     public class ListSetBack : PrimoComponentTO<ListSet>
     {
-                public override string GroupName { get => ActivityCategories.Lists; protected set { } }
+        public override string GroupName { get => ActivityCategories.Lists; protected set { } }
 
         protected override int sdkTimeOut
         {
@@ -112,7 +112,7 @@ namespace Primo.MIA
                 "Distinct      — уникальные элементы A (дубли удаляются)";
             sdkComponentIcon = ActivityIcons.List;
 
-                        sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
+            sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
                 PropertyBuilder.Script<List<string>>("Prop_ListA", "Список A"),
                 PropertyBuilder.Script<List<string>>("Prop_ListB", "Список B (не нужен для Distinct)"),
@@ -134,9 +134,7 @@ namespace Primo.MIA
 
                 if (listA == null) throw new ArgumentNullException("Prop_ListA", "Список A не может быть null");
 
-                var comparer = this.Prop_CaseSensitive
-                    ? StringComparer.Ordinal
-                    : StringComparer.OrdinalIgnoreCase;
+                    var comparer = ComparisonHelper.GetStringComparer(this.Prop_CaseSensitive);
 
                 List<string> result;
 
@@ -191,7 +189,7 @@ namespace Primo.MIA
 
         public override ValidationResult Validate()
         {
-                        var ret = new ValidationResult();
+            var ret = new ValidationResult();
             ret.ValidateRequired(this.Prop_ListA, ActivityStrings.Field_ListA, ActivityStrings.Error_ListRequired);
             if (this.Operation != ListSetOperation.Distinct)
                 ret.ValidateRequired(this.Prop_ListB, ActivityStrings.Field_ListB, ActivityStrings.Error_ListBRequired);

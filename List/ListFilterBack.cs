@@ -244,9 +244,7 @@ namespace Primo.MIA
         /// </summary>
         private Func<string, bool> BuildPredicate(string pattern, ScriptingData sd)
         {
-            StringComparison sc = this.Prop_CaseSensitive
-                ? StringComparison.Ordinal
-                : StringComparison.OrdinalIgnoreCase;
+                        StringComparison sc = ComparisonHelper.GetStringComparison(this.Prop_CaseSensitive);
 
             switch (this.Mode)
             {

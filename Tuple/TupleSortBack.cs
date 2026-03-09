@@ -168,10 +168,10 @@ namespace Primo.MIA
                             : items.OrderByDescending(numKey);
                         break;
 
-                    case TupleSortType.Natural:
+                                        case TupleSortType.Natural:
                         sorted = this.Direction == TupleSortDirection.Ascending
-                            ? items.OrderBy(getKey, NaturalTupleComparer.Instance)
-                            : items.OrderByDescending(getKey, NaturalTupleComparer.Instance);
+                            ? items.OrderBy(getKey, NaturalComparer.Instance)
+                            : items.OrderByDescending(getKey, NaturalComparer.Instance);
                         break;
 
                     default: // Alphabetical

@@ -306,11 +306,9 @@ namespace Primo.MIA
                 case ListTransformMode.TrimEnd:
                     return s => (s ?? string.Empty).TrimEnd();
 
-                case ListTransformMode.Replace:
+                                case ListTransformMode.Replace:
                 {
-                    StringComparison sc = this.Prop_CaseSensitive
-                        ? StringComparison.Ordinal
-                        : StringComparison.OrdinalIgnoreCase;
+                    StringComparison sc = ComparisonHelper.GetStringComparison(this.Prop_CaseSensitive);
 
                     // Replace без учёта регистра через regex (string.Replace не поддерживает StringComparison)
                     if (!this.Prop_CaseSensitive)

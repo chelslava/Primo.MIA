@@ -1,33 +1,28 @@
 // =============================================================================
-// TupleHelper.cs — активности «Кортеж: Создать» и «Кортеж: Деструктуризация».
+// TupleHelper.cs — вспомогательные методы для работы с кортежами.
 //
-// TupleCreateBack      — создаёт Tuple из 1–7 элементов произвольных типов.
-// TupleDestructureBack — раскладывает все элементы кортежа в отдельные переменные.
+// Прозрачная работа с System.Tuple и System.ValueTuple через рефлексию.
+// Поддерживает создание, чтение и замену элементов кортежей арности 1-7.
 //
 // Совместимость: .NET Framework 4.7.2
 // Тип кортежа:   System.Tuple<T1..T7> — иммутабельный, доступ через .Item1–.Item7.
 //
-// ВАЖНО: ValueTuple (C# 7 синтаксис (a, b)) НЕ используется — он требует NuGet
-// пакет System.ValueTuple в .NET Framework. Используется классический Tuple.
+// ВАЖНО: ValueTuple (C# 7 синтаксис (a, b)) требует NuGet пакет
+// System.ValueTuple в .NET Framework. Классический Tuple не требует.
 // =============================================================================
 
 using System;
-using System.Collections.Generic;
 using System.Reflection;
 
-namespace Primo.MIA
+namespace Primo.MIA.Common
 {
-    // =========================================================================
-    // ВСПОМОГАТЕЛЬНЫЙ КЛАСС — единая работа с Tuple и ValueTuple через рефлексию
-    // =========================================================================
-
     /// <summary>
     /// Вспомогательные методы для работы с System.Tuple и System.ValueTuple через рефлексию.
     /// Прозрачно определяет тип кортежа и использует нужный механизм доступа:
     ///   System.Tuple      → PropertyInfo (свойство, только чтение)
     ///   System.ValueTuple → FieldInfo    (публичное поле, чтение и запись)
     /// </summary>
-    internal static class TupleHelper
+    public static class TupleHelper
     {
         // ── Определение типа ──────────────────────────────────────────────────
 
@@ -166,51 +161,6 @@ namespace Primo.MIA
                 case 7: return ValueTuple.Create(v[0], v[1], v[2], v[3], v[4], v[5], v[6]);
                 default: throw new InvalidOperationException($"Арность {arity} не поддерживается (максимум 7).");
             }
-        }
-    }
-
-    // =========================================================================
-    // ВСПОМОГАТЕЛЬНЫЙ КОМПАРАТОР — натуральная сортировка строк
-    // =========================================================================
-
-    /// <summary>
-    /// Компаратор строк для натуральной сортировки.
-    /// Числовые части сравниваются как числа: "file2" &lt; "file10".
-    /// Используется в TupleSortBack для режима Natural.
-    /// </summary>
-    internal sealed class NaturalTupleComparer : IComparer<string>
-    {
-        public static readonly NaturalTupleComparer Instance = new NaturalTupleComparer();
-
-        private static readonly System.Text.RegularExpressions.Regex _splitter =
-            new System.Text.RegularExpressions.Regex(@"(\d+)", System.Text.RegularExpressions.RegexOptions.Compiled);
-
-        public int Compare(string x, string y)
-        {
-            if (x == y) return 0;
-            if (x == null) return -1;
-            if (y == null) return 1;
-
-            string[] xParts = _splitter.Split(x);
-            string[] yParts = _splitter.Split(y);
-
-            for (int i = 0; i < Math.Min(xParts.Length, yParts.Length); i++)
-            {
-                string px = xParts[i];
-                string py = yParts[i];
-
-                int cmp;
-                long nx, ny;
-                // Если оба токена — числа, сравниваем числово
-                if (long.TryParse(px, out nx) && long.TryParse(py, out ny))
-                    cmp = nx.CompareTo(ny);
-                else
-                    cmp = string.Compare(px, py, StringComparison.OrdinalIgnoreCase);
-
-                if (cmp != 0) return cmp;
-            }
-
-            return xParts.Length.CompareTo(yParts.Length);
         }
     }
 }

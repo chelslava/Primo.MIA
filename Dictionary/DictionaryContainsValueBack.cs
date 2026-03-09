@@ -120,9 +120,7 @@ namespace Primo.MIA
                 if (dict == null) throw new ArgumentNullException("Prop_Dictionary", "Словарь не может быть null");
                 if (searchVal == null) throw new ArgumentNullException("Prop_SearchValue", "Искомое значение не может быть null");
 
-                StringComparison comparison = this.Prop_CaseSensitive
-                    ? StringComparison.Ordinal
-                    : StringComparison.OrdinalIgnoreCase;
+                    StringComparison comparison = ComparisonHelper.GetStringComparison(this.Prop_CaseSensitive);
 
                 // Через LINQ Where собираем все ключи с совпавшим значением
                 List<string> foundKeys = dict

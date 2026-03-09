@@ -137,10 +137,10 @@ namespace Primo.MIA
 
                 string sep = GetPropertyValue<string>(this.Prop_Separator, "Prop_Separator", sd) ?? ", ";
 
-                // Числа из списка — парсим один раз через LINQ для числовых режимов
+                                // Числа из списка — парсим один раз через LINQ для числовых режимов
                 var numbers = list
                     .Where(s => !string.IsNullOrWhiteSpace(s))
-                    .Select(s => new { Raw = s, Parsed = TryParseDouble(s) })
+                    .Select(s => new { Raw = s, Parsed = StringHelper.TryParseDouble(s) })
                     .Where(x => x.Parsed.HasValue)
                     .Select(x => x.Parsed.Value)
                     .ToList();
@@ -222,19 +222,7 @@ namespace Primo.MIA
             }
         }
 
-        /// <summary>Безопасный парсинг double с поддержкой точки и запятой как разделителя</summary>
-        private static double? TryParseDouble(string s)
-        {
-            if (double.TryParse(s, System.Globalization.NumberStyles.Any,
-                System.Globalization.CultureInfo.InvariantCulture, out double d))
-                return d;
-            if (double.TryParse(s, System.Globalization.NumberStyles.Any,
-                System.Globalization.CultureInfo.CurrentCulture, out double d2))
-                return d2;
-            return null;
-        }
-
-        public override ValidationResult Validate()
+                public override ValidationResult Validate()
         {
                         var ret = new ValidationResult();
             ret.ValidateRequired(this.Prop_List, ActivityStrings.Field_List, ActivityStrings.Error_ListRequired);

@@ -89,10 +89,13 @@
     <Compile Include="Common\ActivityCategories.cs" />
     <Compile Include="Common\ActivityIcons.cs" />
     <Compile Include="Common\ActivityStrings.cs" />
+    <Compile Include="Common\ComparisonHelper.cs" />
     <Compile Include="Common\FileHelper.cs" />
+    <Compile Include="Common\NaturalComparer.cs" />
     <Compile Include="Common\PropertyBuilder.cs" />
     <Compile Include="Common\RegexHelper.cs" />
     <Compile Include="Common\StringHelper.cs" />
+    <Compile Include="Common\TupleHelper.cs" />
     <Compile Include="Common\ValidationHelper.cs" />
     <Compile Include="Files\SearchFiles.xaml.cs">
       <DependentUpon>SearchFiles.xaml</DependentUpon>
@@ -106,6 +109,7 @@
       <DependentUpon>Http.xaml</DependentUpon>
     </Compile>
     <Compile Include="HttpWeb\HttpBack.cs" />
+    <Compile Include="HttpWeb\HttpLogic.cs" />
     <Compile Include="Utilities\GeneratorsBack.cs" />
     <Compile Include="Utilities\ExcelCellRecalculateBack.cs" />
     <Compile Include="Dictionary\DictionaryContainsValue.xaml.cs">
@@ -234,7 +238,6 @@
     <Compile Include="Tuple\TupleCreateBack.cs" />
     <Compile Include="Tuple\TupleDestructureBack.cs" />
     <Compile Include="Tuple\TupleGetBack.cs" />
-    <Compile Include="Tuple\TupleHelper.cs" />
     <Compile Include="Tuple\TupleInspectBack.cs" />
     <Compile Include="Tuple\TupleSortBack.cs" />
     <Compile Include="Tuple\TupleUnzipBack.cs" />

@@ -335,25 +335,25 @@ namespace Primo.MIA
                 string headersJson = GetPropertyValue<string>(this.Prop_Headers, "Prop_Headers", sd) ?? "{}";
                 string body = GetPropertyValue<string>(this.Prop_Body, "Prop_Body", sd) ?? string.Empty;
                 
-                string timeoutStr = GetPropertyValue<string>(this.Prop_Timeout, "Prop_Timeout", sd) ?? "100";
-                if (!int.TryParse(timeoutStr, out int timeout)) timeout = 100;
+                                string timeoutStr = GetPropertyValue<string>(this.Prop_Timeout, "Prop_Timeout", sd) ?? "100";
+                int timeout = HttpLogic.ParseTimeout(timeoutStr, 100);
 
                 // ── Создание HttpClient с настройками ──────────────────
                 using (var client = CreateHttpClient(sd, timeout))
                 {
-                    // Парсинг и добавление заголовков
-                    var headers = ParseHeaders(headersJson);
-                    headers.Where(h => !string.IsNullOrEmpty(h.Key))
-                           .ToList()
-                           .ForEach(h => client.DefaultRequestHeaders.TryAddWithoutValidation(h.Key, h.Value));
+                                        // Парсинг и добавление заголовков
+                    var headers = HttpLogic.ParseHeaders(headersJson);
+                    var normalizedHeaders = HttpLogic.NormalizeHeaders(headers);
+                    normalizedHeaders.ToList()
+                                    .ForEach(h => client.DefaultRequestHeaders.TryAddWithoutValidation(h.Key, h.Value));
 
                     // ── Выполнение запроса ─────────────────────────────────
                     var response = ExecuteRequest(client, url, body, sd).Result;
 
-                    // ── Обработка ответа ───────────────────────────────────
+                                        // ── Обработка ответа ───────────────────────────────────
                     int statusCode = (int)response.StatusCode;
                     string responseContent = response.Content.ReadAsStringAsync().Result;
-                    string responseHeaders = SerializeResponseHeaders(response.Headers, response.Content.Headers);
+                    string responseHeaders = HttpLogic.SerializeResponseHeaders(response.Headers, response.Content.Headers);
 
                     // Запись результатов в выходные переменные
                     if (!string.IsNullOrWhiteSpace(this.Prop_StatusCode))
@@ -424,27 +424,7 @@ namespace Primo.MIA
             return client;
         }
 
-        /// <summary>
-        /// Парсит JSON-строку заголовков в словарь.
-        /// Если парсинг не удался — возвращает пустой словарь.
-        /// Пример входа: {"Content-Type": "application/json", "Authorization": "Bearer token"}
-        /// </summary>
-        private Dictionary<string, string> ParseHeaders(string headersJson)
-        {
-            try
-            {
-                if (string.IsNullOrWhiteSpace(headersJson) || headersJson.Trim() == "{}")
-                    return new Dictionary<string, string>();
-
-                var parsed = JsonConvert.DeserializeObject<Dictionary<string, string>>(headersJson);
-                return parsed ?? new Dictionary<string, string>();
-            }
-            catch
-            {
-                // Если парсинг не удался — возвращаем пустой словарь
-                return new Dictionary<string, string>();
-            }
-        }
+        
 
         /// <summary>
         /// Выполняет HTTP-запрос в соответствии с выбранным методом.
@@ -501,31 +481,7 @@ namespace Primo.MIA
             return new StringContent(body, Encoding.UTF8, "application/json");
         }
 
-        /// <summary>
-        /// Сериализует заголовки ответа в JSON-строку.
-        /// Объединяет заголовки из HttpResponseHeaders и HttpContentHeaders.
-        /// Возвращает JSON-объект вида: {"Header-Name": "value1, value2", ...}
-        /// </summary>
-        private string SerializeResponseHeaders(
-            HttpResponseHeaders responseHeaders, 
-            HttpContentHeaders contentHeaders)
-        {
-            var allHeaders = new Dictionary<string, string>();
-
-            // Собираем заголовки ответа
-            responseHeaders
-                .Where(h => h.Value != null)
-                .ToList()
-                .ForEach(h => allHeaders[h.Key] = string.Join(", ", h.Value));
-
-            // Собираем заголовки содержимого
-            contentHeaders
-                .Where(h => h.Value != null)
-                .ToList()
-                .ForEach(h => allHeaders[h.Key] = string.Join(", ", h.Value));
-
-            return JsonConvert.SerializeObject(allHeaders, Formatting.None);
-        }
+        
 
         // ── Валидация ──────────────────────────────────────────────────
 

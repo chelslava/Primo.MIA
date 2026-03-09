@@ -271,9 +271,7 @@ namespace Primo.MIA
         /// </summary>
         private Func<string, bool> BuildContainsFunc(string query)
         {
-            StringComparison cmp = this.Prop_CaseSensitive
-                ? StringComparison.Ordinal
-                : StringComparison.OrdinalIgnoreCase;
+            StringComparison cmp = ComparisonHelper.GetStringComparison(this.Prop_CaseSensitive);
 
             // Null-безопасно: если проверяемая строка null — не проходит фильтр
             return s => s != null && s.IndexOf(query, cmp) >= 0;
@@ -285,9 +283,7 @@ namespace Primo.MIA
         /// </summary>
         private Func<string, bool> BuildExactFunc(string query)
         {
-            StringComparison cmp = this.Prop_CaseSensitive
-                ? StringComparison.Ordinal
-                : StringComparison.OrdinalIgnoreCase;
+            StringComparison cmp = ComparisonHelper.GetStringComparison(this.Prop_CaseSensitive);
 
             return s => s != null && string.Equals(s, query, cmp);
         }
@@ -388,7 +384,7 @@ namespace Primo.MIA
         // ВАЛИДАЦИЯ
         // =========================================================================
 
-                public override ValidationResult Validate()
+        public override ValidationResult Validate()
         {
             var ret = new ValidationResult();
 

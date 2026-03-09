@@ -632,7 +632,7 @@ namespace Primo.MIA
                 ? baseName + ext
                 : Path.Combine(dir, baseName + ext);
 
-            return GenerateUniqueFilePath(
+                        return FileHelper.GenerateUniqueFilePath(
                 Path.GetDirectoryName(fullPath),
                 Path.GetFileNameWithoutExtension(fullPath),
                 Path.GetExtension(fullPath));
@@ -863,38 +863,7 @@ namespace Primo.MIA
             });
         }
 
-        // =========================================================================
-        // ВСПОМОГАТЕЛЬНЫЕ МЕТОДЫ
-        // =========================================================================
-
-        /// <summary>
-        /// Генерирует уникальный путь к файлу.
-        /// Если файл directory\baseName+extension уже существует —
-        /// перебирает суффиксы (1), (2)... до нахождения свободного имени.
-        /// Возвращает полный путь к файлу (файл при этом НЕ создаётся).
-        /// </summary>
-        private string GenerateUniqueFilePath(string directory, string baseName, string extension)
-        {
-            // Если директория пустая — работаем только с именем файла
-            string Combine(string name) => string.IsNullOrEmpty(directory)
-                ? name + extension
-                : Path.Combine(directory, name + extension);
-
-            string candidate = Combine(baseName);
-
-            // Если файл не существует — сразу возвращаем
-            if (!File.Exists(candidate)) return candidate;
-
-            // Перебираем суффиксы пока не найдём свободное имя
-            for (int counter = 1; counter <= 9999; counter++)
-            {
-                candidate = Combine($"{baseName}({counter})");
-                if (!File.Exists(candidate)) return candidate;
-            }
-
-            // Если все 9999 имён заняты — добавляем GUID для гарантированной уникальности
-            return Combine($"{baseName}_{Guid.NewGuid():N}");
-        }
+        
 
         // =========================================================================
         // ВАЛИДАЦИЯ
