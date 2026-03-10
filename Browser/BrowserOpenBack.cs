@@ -1,16 +1,18 @@
-﻿// =============================================================================
-// BrowserOpenBack.cs — активность «Открыть браузер».
+// =============================================================================
+// BrowserOpenBack.cs — активность-контейнер «Открыть браузер».
 //
-// Инициализирует новую сессию браузера с заданными параметрами.
-// Поддерживает Chrome, Firefox, Edge с настройкой headless режима,
-// инкогнито и других опций.
+// Открывает браузер, регистрирует сессию в ambient-контексте и выполняет
+// вложенные активности. После выхода из контейнера браузер НЕ закрывается
+// автоматически — SDK не предоставляет хука "после контейнера".
 //
-// Поддерживаемые браузеры:
-//   Chrome   — Google Chrome / Chromium
-//   Firefox  — Mozilla Firefox
-//   Edge     — Microsoft Edge
+// Для закрытия браузера используйте активность BrowserCloseBack.
+// Её можно поместить:
+//   - Последней внутри контейнера (браузер закроется в конце сценария)
+//   - После контейнера (если нужен доступ к sessionId снаружи)
 //
-// ВАЖНО: Сессия сохраняется в RepoDict и должна быть закрыта через BrowserClose.
+// Жизненный цикл:
+//   SimpleAction → открыть браузер, Push контекста → дочерние активности
+//   BrowserCloseBack → Pop контекста, закрыть браузер
 // =============================================================================
 
 using LTools.Common.Model;
@@ -18,8 +20,8 @@ using LTools.Common.UIElements;
 using LTools.SDK;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
-using OpenQA.Selenium.Firefox;
 using OpenQA.Selenium.Edge;
+using OpenQA.Selenium.Firefox;
 using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
@@ -28,12 +30,13 @@ using static LTools.Common.Helpers.WFHelper.PropertiesItem;
 namespace Primo.MIA
 {
     /// <summary>
-    /// Активность для открытия браузера и создания новой сессии.
-    /// Поддерживает настройку headless режима, инкогнито и других опций.
+    /// Активность-контейнер для открытия браузера.
+    /// SimpleAction открывает браузер и регистрирует сессию в контексте,
+    /// после чего движок SDK выполняет вложенные активности.
     /// </summary>
-    public class BrowserOpenBack : PrimoComponentTO<BrowserOpen>
+    public class BrowserOpenBack : PrimoContainerCustom<BrowserOpen>
     {
-        // ── Константы и свойства SDK ───────────────────────────────────
+        // ── Группа ────────────────────────────────────────────────────────────
 
         public override string GroupName
         {
@@ -41,15 +44,12 @@ namespace Primo.MIA
             protected set { }
         }
 
-        protected override int sdkTimeOut
-        {
-            get => 60000; // 60 секунд на запуск браузера
-            set { }
-        }
+        // ── Входные параметры ──────────────────────────────────────────────────
 
-        // ── Входные параметры ──────────────────────────────────────────
+        #region Prop_BrowserType
 
         private BrowserType _propBrowserType;
+
         /// <summary>Тип браузера для запуска.</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [System.ComponentModel.Category(ActivityStrings.Category_Main),
@@ -57,10 +57,15 @@ namespace Primo.MIA
         public BrowserType Prop_BrowserType
         {
             get => _propBrowserType;
-            set { _propBrowserType = value; InvokePropertyChanged(this, "Prop_BrowserType"); }
+            set { _propBrowserType = value; InvokePropertyChanged(this, nameof(Prop_BrowserType)); }
         }
 
+        #endregion
+
+        #region Prop_Headless
+
         private bool _propHeadless;
+
         /// <summary>Запустить браузер в headless режиме (без GUI).</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [System.ComponentModel.Category(ActivityStrings.Category_BrowserOptions),
@@ -68,10 +73,15 @@ namespace Primo.MIA
         public bool Prop_Headless
         {
             get => _propHeadless;
-            set { _propHeadless = value; InvokePropertyChanged(this, "Prop_Headless"); }
+            set { _propHeadless = value; InvokePropertyChanged(this, nameof(Prop_Headless)); }
         }
 
+        #endregion
+
+        #region Prop_IncognitoMode
+
         private bool _propIncognitoMode;
+
         /// <summary>Запустить браузер в режиме инкогнито.</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [System.ComponentModel.Category(ActivityStrings.Category_BrowserOptions),
@@ -79,10 +89,15 @@ namespace Primo.MIA
         public bool Prop_IncognitoMode
         {
             get => _propIncognitoMode;
-            set { _propIncognitoMode = value; InvokePropertyChanged(this, "Prop_IncognitoMode"); }
+            set { _propIncognitoMode = value; InvokePropertyChanged(this, nameof(Prop_IncognitoMode)); }
         }
 
+        #endregion
+
+        #region Prop_DisableImages
+
         private bool _propDisableImages;
+
         /// <summary>Отключить загрузку изображений для ускорения.</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [System.ComponentModel.Category(ActivityStrings.Category_BrowserOptions),
@@ -90,10 +105,15 @@ namespace Primo.MIA
         public bool Prop_DisableImages
         {
             get => _propDisableImages;
-            set { _propDisableImages = value; InvokePropertyChanged(this, "Prop_DisableImages"); }
+            set { _propDisableImages = value; InvokePropertyChanged(this, nameof(Prop_DisableImages)); }
         }
 
+        #endregion
+
+        #region Prop_UserAgent
+
         private string _propUserAgent;
+
         /// <summary>Пользовательский User-Agent (опционально).</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
@@ -102,11 +122,19 @@ namespace Primo.MIA
         public string Prop_UserAgent
         {
             get => _propUserAgent;
-            set { _propUserAgent = value; InvokePropertyChanged(this, "Prop_UserAgent"); }
+            set { _propUserAgent = value; InvokePropertyChanged(this, nameof(Prop_UserAgent)); }
         }
 
+        #endregion
+
+        #region Prop_DriverPath
+
         private string _propDriverPath;
-        /// <summary>Путь к драйверу Selenium (chromedriver.exe, geckodriver.exe и т.д.). Если не указан, используется драйвер из PATH.</summary>
+
+        /// <summary>
+        /// Путь к драйверу Selenium (chromedriver.exe, geckodriver.exe и т.д.).
+        /// Если не указан — используется драйвер из PATH.
+        /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
         [System.ComponentModel.Category(ActivityStrings.Category_BrowserOptions),
@@ -114,13 +142,22 @@ namespace Primo.MIA
         public string Prop_DriverPath
         {
             get => _propDriverPath;
-            set { _propDriverPath = value; InvokePropertyChanged(this, "Prop_DriverPath"); }
+            set { _propDriverPath = value; InvokePropertyChanged(this, nameof(Prop_DriverPath)); }
         }
 
-        // ── Выходные параметры ─────────────────────────────────────────
+        #endregion
+
+        // ── Выходные параметры ─────────────────────────────────────────────────
+
+        #region Prop_SessionId
 
         private string _propSessionId;
-        /// <summary>ID созданной сессии браузера.</summary>
+
+        /// <summary>
+        /// ID созданной сессии браузера.
+        /// Автоматически доступен дочерним активностям с пустым Prop_SessionId
+        /// через ambient-контекст BrowserSessionContext.
+        /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
         [System.ComponentModel.Category(ActivityStrings.Category_Output),
@@ -128,16 +165,18 @@ namespace Primo.MIA
         public string Prop_SessionId
         {
             get => _propSessionId;
-            set { _propSessionId = value; InvokePropertyChanged(this, "Prop_SessionId"); }
+            set { _propSessionId = value; InvokePropertyChanged(this, nameof(Prop_SessionId)); }
         }
 
-        // ── Конструктор ────────────────────────────────────────────────
+        #endregion
+
+        // ── Конструктор ────────────────────────────────────────────────────────
 
         public BrowserOpenBack(IWFContainer container) : base(container)
         {
             sdkComponentName = ActivityStrings.Activity_BrowserOpen;
             sdkComponentHelp =
-                "Открывает новый браузер и создаёт сессию для автоматизации.\n" +
+                "Открывает браузер и выполняет вложенные активности.\n" +
                 "\n" +
                 "── Основные параметры ────────────────────────\n" +
                 "Тип браузера     — Chrome, Firefox или Edge\n" +
@@ -145,13 +184,16 @@ namespace Primo.MIA
                 "── Опции браузера ─────────────────────────────\n" +
                 "Headless режим   — запуск без GUI (фоновый режим)\n" +
                 "Режим инкогнито  — приватный режим браузера\n" +
-                "Отключить изображения — ускорение загрузки\n" +
-                "User-Agent       — пользовательский UA строка\n" +
-                "Путь к драйверу  — путь к chromedriver.exe / geckodriver.exe\n" +
-                "                    (если не указан, используется из PATH)\n" +
+                "Отключить изображения — ускорение загрузки страниц\n" +
+                "User-Agent       — пользовательская UA строка\n" +
+                "Путь к драйверу  — chromedriver.exe / geckodriver.exe\n" +
                 "\n" +
                 "── Выходные параметры ─────────────────────────\n" +
-                "ID сессии        — уникальный идентификатор для других активностей";
+                "ID сессии — автоматически передаётся дочерним активностям.\n" +
+                "            В дочерних активностях Prop_SessionId можно не заполнять.\n" +
+                "\n" +
+                "ВАЖНО: Поместите активность «Закрыть браузер» последней внутри\n" +
+                "контейнера — браузер не закрывается автоматически.";
 
             sdkComponentIcon = ActivityIcons.Browser;
 
@@ -169,197 +211,138 @@ namespace Primo.MIA
             InitClass(container);
 
             // Значения по умолчанию
-            this.Prop_BrowserType = BrowserType.Chrome;
-            this.Prop_Headless = false;
+            this.Prop_BrowserType   = BrowserType.Chrome;
+            this.Prop_Headless      = false;
             this.Prop_IncognitoMode = false;
             this.Prop_DisableImages = false;
-            this.Prop_UserAgent = "\"\"";
-            this.Prop_DriverPath = "\"\"";
+            this.Prop_UserAgent     = "\"\"";
+            this.Prop_DriverPath    = "\"\"";
         }
 
-        // ── TimedAction — точка входа ──────────────────────────────────
+        // ── SimpleAction — выполняется ДО дочерних активностей ────────────────
 
         /// <summary>
-        /// Основной метод выполнения — создаёт браузер и сохраняет сессию.
+        /// Открывает браузер и регистрирует сессию в ambient-контексте.
+        /// После return движок SDK выполняет вложенные активности контейнера.
+        /// Закрытие браузера — через BrowserCloseBack последней внутри контейнера.
         /// </summary>
-        public override ExecutionResult TimedAction(ScriptingData sd)
+        public override ExecutionResult SimpleAction(ScriptingData sd)
         {
             try
             {
-                // ── Чтение параметров ──────────────────────────────────
-                string userAgent = GetPropertyValue<string>(this.Prop_UserAgent, "Prop_UserAgent", sd) ?? string.Empty;
-                string driverPath = GetPropertyValue<string>(this.Prop_DriverPath, "Prop_DriverPath", sd) ?? string.Empty;
+                string userAgent  = GetPropertyValue<string>(this.Prop_UserAgent,  nameof(Prop_UserAgent),  sd) ?? string.Empty;
+                string driverPath = GetPropertyValue<string>(this.Prop_DriverPath, nameof(Prop_DriverPath), sd) ?? string.Empty;
 
-                // ── Генерация уникального ID сессии ────────────────────
-                string sessionId = SeleniumHelper.GenerateSessionId();
+                // Генерируем ID сессии и создаём WebDriver
+                string sessionId      = SeleniumHelper.GenerateSessionId();
+                IWebDriver driver     = CreateDriver(this.Prop_BrowserType, userAgent, driverPath);
 
-                // ── Создание драйвера в зависимости от типа браузера ──
-                IWebDriver driver = CreateDriver(this.Prop_BrowserType, userAgent, driverPath);
-
-                // ── Сохранение в RepoDict ──────────────────────────────
+                // Сохраняем драйвер в репозитории
                 RepoDict.Set(sessionId, driver);
 
-                // ── Запись ID сессии в выходную переменную ────────────
+                // Регистрируем сессию в ambient-контексте —
+                // дочерние активности с пустым Prop_SessionId получат её автоматически
+                // через SessionResolver.Resolve → BrowserSessionContext.Current
+                BrowserSessionContext.Push(sessionId);
+
+                // Записываем ID в выходную переменную (если задана пользователем)
                 if (!string.IsNullOrWhiteSpace(this.Prop_SessionId))
                     SetVariableValue(this.Prop_SessionId, sessionId, sd);
 
                 return new ExecutionResult
                 {
-                    IsSuccess = true,
-                    SuccessMessage = $"[Открыть браузер] {this.Prop_BrowserType} → {sessionId}"
+                    IsSuccess      = true,
+                    SuccessMessage = $"[Открыть браузер] {this.Prop_BrowserType} → сессия {sessionId}"
                 };
             }
             catch (Exception ex)
             {
                 return new ExecutionResult
                 {
-                    IsSuccess = false,
+                    IsSuccess    = false,
                     ErrorMessage = $"Ошибка [Открыть браузер]: {ex.Message}"
                 };
             }
         }
 
-        // ── Приватные методы — реализация логики ──────────────────────
+        // ── Приватные методы ───────────────────────────────────────────────────
 
         /// <summary>
-        /// Создаёт экземпляр WebDriver в зависимости от типа браузера.
-        /// Применяет все настроенные опции (headless, incognito и т.д.).
+        /// Создаёт WebDriver в зависимости от типа браузера.
         /// </summary>
         private IWebDriver CreateDriver(BrowserType browserType, string userAgent, string driverPath)
         {
             switch (browserType)
             {
-                case BrowserType.Chrome:
-                    return CreateChromeDriver(userAgent, driverPath);
-
-                case BrowserType.Firefox:
-                    return CreateFirefoxDriver(userAgent, driverPath);
-
-                case BrowserType.Edge:
-                    return CreateEdgeDriver(userAgent, driverPath);
-
+                case BrowserType.Chrome:  return CreateChromeDriver(userAgent, driverPath);
+                case BrowserType.Firefox: return CreateFirefoxDriver(userAgent, driverPath);
+                case BrowserType.Edge:    return CreateEdgeDriver(userAgent, driverPath);
                 default:
                     throw new NotSupportedException($"Браузер {browserType} не поддерживается");
             }
         }
 
-        /// <summary>
-        /// Создаёт Chrome WebDriver с настроенными опциями.
-        /// </summary>
+        /// <summary>Создаёт Chrome WebDriver с настроенными опциями.</summary>
         private IWebDriver CreateChromeDriver(string userAgent, string driverPath)
         {
             var options = new ChromeOptions();
 
-            // Headless режим
-            if (this.Prop_Headless)
-                options.AddArgument("--headless");
-
-            // Режим инкогнито
-            if (this.Prop_IncognitoMode)
-                options.AddArgument("--incognito");
-
-            // Отключение изображений
-            if (this.Prop_DisableImages)
-            {
-                options.AddUserProfilePreference("profile.default_content_setting_values.images", 2);
-            }
-
-            // Пользовательский User-Agent
+            if (this.Prop_Headless)      options.AddArgument("--headless");
+            if (this.Prop_IncognitoMode) options.AddArgument("--incognito");
+            if (this.Prop_DisableImages) options.AddUserProfilePreference(
+                "profile.default_content_setting_values.images", 2);
             if (!string.IsNullOrWhiteSpace(userAgent))
                 options.AddArgument($"--user-agent={userAgent}");
 
-            // Дополнительные опции для стабильности
             options.AddArgument("--no-sandbox");
             options.AddArgument("--disable-dev-shm-usage");
 
-            // Создание драйвера с указанием пути или без
-            if (!string.IsNullOrWhiteSpace(driverPath))
-                return new ChromeDriver(driverPath, options);
-            else
-                return new ChromeDriver(options);
+            return !string.IsNullOrWhiteSpace(driverPath)
+                ? new ChromeDriver(driverPath, options)
+                : new ChromeDriver(options);
         }
 
-        /// <summary>
-        /// Создаёт Firefox WebDriver с настроенными опциями.
-        /// </summary>
+        /// <summary>Создаёт Firefox WebDriver с настроенными опциями.</summary>
         private IWebDriver CreateFirefoxDriver(string userAgent, string driverPath)
         {
             var options = new FirefoxOptions();
 
-            // Headless режим
-            if (this.Prop_Headless)
-                options.AddArgument("--headless");
-
-            // Режим инкогнито
-            if (this.Prop_IncognitoMode)
-                options.AddArgument("-private");
-
-            // Отключение изображений
-            if (this.Prop_DisableImages)
-            {
-                options.SetPreference("permissions.default.image", 2);
-            }
-
-            // Пользовательский User-Agent
+            if (this.Prop_Headless)      options.AddArgument("--headless");
+            if (this.Prop_IncognitoMode) options.AddArgument("-private");
+            if (this.Prop_DisableImages) options.SetPreference("permissions.default.image", 2);
             if (!string.IsNullOrWhiteSpace(userAgent))
                 options.SetPreference("general.useragent.override", userAgent);
 
-            // Создание драйвера с указанием пути или без
-            if (!string.IsNullOrWhiteSpace(driverPath))
-                return new FirefoxDriver(driverPath, options);
-            else
-                return new FirefoxDriver(options);
+            return !string.IsNullOrWhiteSpace(driverPath)
+                ? new FirefoxDriver(driverPath, options)
+                : new FirefoxDriver(options);
         }
 
-        /// <summary>
-        /// Создаёт Edge WebDriver с настроенными опциями.
-        /// </summary>
+        /// <summary>Создаёт Edge WebDriver с настроенными опциями.</summary>
         private IWebDriver CreateEdgeDriver(string userAgent, string driverPath)
         {
             var options = new EdgeOptions();
 
-            // Headless режим
-            if (this.Prop_Headless)
-                options.AddArgument("--headless");
-
-            // Режим инкогнито
-            if (this.Prop_IncognitoMode)
-                options.AddArgument("--inprivate");
-
-            // Отключение изображений
-            if (this.Prop_DisableImages)
-            {
-                options.AddUserProfilePreference("profile.default_content_setting_values.images", 2);
-            }
-
-            // Пользовательский User-Agent
+            if (this.Prop_Headless)      options.AddArgument("--headless");
+            if (this.Prop_IncognitoMode) options.AddArgument("--inprivate");
+            if (this.Prop_DisableImages) options.AddUserProfilePreference(
+                "profile.default_content_setting_values.images", 2);
             if (!string.IsNullOrWhiteSpace(userAgent))
                 options.AddArgument($"--user-agent={userAgent}");
 
-            // Дополнительные опции для стабильности
             options.AddArgument("--no-sandbox");
             options.AddArgument("--disable-dev-shm-usage");
 
-            // Создание драйвера с указанием пути или без
-            if (!string.IsNullOrWhiteSpace(driverPath))
-                return new EdgeDriver(driverPath, options);
-            else
-                return new EdgeDriver(options);
+            return !string.IsNullOrWhiteSpace(driverPath)
+                ? new EdgeDriver(driverPath, options)
+                : new EdgeDriver(options);
         }
 
-        // ── Валидация ──────────────────────────────────────────────────
+        // ── Валидация ──────────────────────────────────────────────────────────
 
-        /// <summary>
-        /// Валидирует обязательные параметры активности.
-        /// </summary>
         public override ValidationResult Validate()
         {
-            var ret = new ValidationResult();
-
-            // Валидация входных параметров
-            // Prop_SessionId — выходная переменная, не требует валидации
-
-            return ret;
+            return new ValidationResult();
         }
     }
 }

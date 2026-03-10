@@ -11,6 +11,7 @@
 // ВАЖНО: Все методы thread-safe и могут использоваться из разных активностей.
 // =============================================================================
 
+using LTools.Common.Model;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Interactions;
 using OpenQA.Selenium.Support.UI;
@@ -1066,6 +1067,25 @@ namespace Primo.MIA.Common
         {
             var select = new OpenQA.Selenium.Support.UI.SelectElement(selectElement);
             return select.AllSelectedOptions.Select(o => o.Text).ToList();
+        }
+
+        /// <summary>
+        /// Вспомогательный статический класс для разрешения ID сессии браузера.
+        /// Используется всеми активностями, которым нужен WebDriver.
+        /// </summary>
+        public static class SessionResolver
+        {
+            /// <summary>
+            /// Разрешает ID сессии браузера по следующему приоритету:
+            /// 1. Явно заданный Prop_SessionId (через ScriptingData)
+            /// 2. Текущий контекст контейнера (BrowserSessionContext.Current)
+            /// </summary>
+            /// <param name="propSessionId">Значение свойства Prop_SessionId активности.</param>
+            /// <param name="propName">Имя свойства для GetPropertyValue (обычно nameof(Prop_SessionId)).</param>
+            /// <param name="component">Ссылка на компонент (this) — нужна для вызова GetPropertyValue.</param>
+            /// <param name="sd">Данные скрипта — передаются в GetPropertyValue.</param>
+            /// <returns>Валидный ID сессии браузера.</returns>
+            /// <exception cref="ArgumentException">Если сессия не найдена ни в свойстве, ни в контексте.</exception>
         }
     }
 }

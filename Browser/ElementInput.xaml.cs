@@ -2,14 +2,14 @@ using System.Windows.Controls;
 
 namespace Primo.MIA
 {
-    public partial class ElementTypeText : UserControl
+    public partial class ElementInput : UserControl
     {
-        public ElementTypeText()
+        public ElementInput()
         {
             InitializeComponent();
         }
 
-        public ElementTypeText(ElementTypeTextBack item) : this()
+        public ElementInput(ElementInputBack item) : this()
         {
             this.DataContext = item;
         }
