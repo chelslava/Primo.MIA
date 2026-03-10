@@ -1,0 +1,176 @@
+# GitHub Actions CI/CD для Browser Module Tests
+
+name: Browser Module Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'Browser/**'
+      - 'Common/SeleniumHelper.cs'
+      - 'Tests/**'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'Browser/**'
+      - 'Common/SeleniumHelper.cs'
+      - 'Tests/**'
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: Run Browser Tests
+    runs-on: windows-latest
+    
+    strategy:
+      matrix:
+        browser: [chrome, firefox, edge]
+      fail-fast: false
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '4.8.x'
+    
+    - name: Setup Chrome
+      if: matrix.browser == 'chrome'
+      uses: browser-actions/setup-chrome@latest
+      with:
+        chrome-version: stable
+    
+    - name: Setup Firefox
+      if: matrix.browser == 'firefox'
+      uses: browser-actions/setup-firefox@latest
+      with:
+        firefox-version: latest
+    
+    - name: Setup Edge
+      if: matrix.browser == 'edge'
+      uses: browser-actions/setup-edge@latest
+    
+    - name: Restore NuGet packages
+      run: nuget restore Primo.MIA.slnx
+    
+    - name: Build solution
+      run: msbuild Primo.MIA.csproj /p:Configuration=Release
+    
+    - name: Run Unit Tests
+      run: |
+        dotnet test Tests/Unit/Browser/BrowserSessionContextTests.cs --logger "trx;LogFileName=unit-tests-${{ matrix.browser }}.trx"
+        dotnet test Tests/Unit/Browser/SessionResolverTests.cs --logger "trx;LogFileName=unit-tests-resolver-${{ matrix.browser }}.trx"
+      continue-on-error: false
+    
+    - name: Run Integration Tests
+      env:
+        BROWSER_TYPE: ${{ matrix.browser }}
+      run: |
+        dotnet test Tests/Integration/Browser/SessionManagementTests.cs --logger "trx;LogFileName=integration-tests-${{ matrix.browser }}.trx"
+      continue-on-error: true
+    
+    - name: Upload Test Results
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-results-${{ matrix.browser }}
+        path: |
+          **/*.trx
+          **/TestResults/**
+    
+    - name: Publish Test Report
+      if: always()
+      uses: dorny/test-reporter@v1
+      with:
+        name: Test Results (${{ matrix.browser }})
+        path: '**/*.trx'
+        reporter: dotnet-trx
+        fail-on-error: false
+
+  coverage:
+    name: Code Coverage
+    runs-on: windows-latest
+    needs: test
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '4.8.x'
+    
+    - name: Restore packages
+      run: nuget restore Primo.MIA.slnx
+    
+    - name: Install coverage tools
+      run: |
+        dotnet tool install --global dotnet-coverage
+        dotnet tool install --global dotnet-reportgenerator-globaltool
+    
+    - name: Run tests with coverage
+      run: |
+        dotnet-coverage collect "dotnet test Tests/Unit/Browser/" -f xml -o coverage.xml
+    
+    - name: Generate coverage report
+      run: |
+        reportgenerator -reports:coverage.xml -targetdir:coverage-report -reporttypes:Html;Badges
+    
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v4
+      with:
+        file: ./coverage.xml
+        flags: browser-module
+        name: browser-coverage
+    
+    - name: Upload coverage report
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage-report
+        path: coverage-report/
+
+  lint:
+    name: Code Quality
+    runs-on: windows-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '4.8.x'
+    
+    - name: Restore packages
+      run: nuget restore Primo.MIA.slnx
+    
+    - name: Run code analysis
+      run: |
+        msbuild Primo.MIA.csproj /p:Configuration=Release /p:RunCodeAnalysis=true /p:CodeAnalysisTreatWarningsAsErrors=false
+    
+    - name: Check code formatting
+      run: |
+        dotnet format --verify-no-changes --verbosity diagnostic
+      continue-on-error: true
+
+  security:
+    name: Security Scan
+    runs-on: windows-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Run security scan
+      uses: security-code-scan/security-code-scan-action@v1
+      with:
+        project: Primo.MIA.csproj
+    
+    - name: Upload SARIF results
+      uses: github/codeql-action/upload-sarif@v3
+      with:
+        sarif_file: results.sarif
