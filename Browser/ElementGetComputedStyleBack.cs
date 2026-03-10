@@ -182,14 +182,12 @@ namespace Primo.MIA
         {
             try
             {
-                // Чтение параметров
-                string sessionId = GetPropertyValue<string>(this.Prop_SessionId, "Prop_SessionId", sd);
-                string elementId = GetPropertyValue<string>(this.Prop_ElementId, "Prop_ElementId", sd);
-                string locatorValue = GetPropertyValue<string>(this.Prop_LocatorValue, "Prop_LocatorValue", sd);
-                string cssProperty = GetPropertyValue<string>(this.Prop_CssProperty, "Prop_CssProperty", sd);
-
-                if (string.IsNullOrWhiteSpace(sessionId))
-                    throw new ArgumentException("ID сессии не может быть пустым");
+                // Чтение параметров через SessionResolver (поддержка ambient-контекста)
+                string sessionId = SessionResolver.Resolve(
+                    GetPropertyValue<string>(this.Prop_SessionId, nameof(Prop_SessionId), sd));
+                string elementId = GetPropertyValue<string>(this.Prop_ElementId, nameof(Prop_ElementId), sd);
+                string locatorValue = GetPropertyValue<string>(this.Prop_LocatorValue, nameof(Prop_LocatorValue), sd);
+                string cssProperty = GetPropertyValue<string>(this.Prop_CssProperty, nameof(Prop_CssProperty), sd);
 
                 if (string.IsNullOrWhiteSpace(cssProperty))
                     throw new ArgumentException("CSS свойство не может быть пустым");
@@ -242,7 +240,7 @@ namespace Primo.MIA
         public override ValidationResult Validate()
         {
             var ret = new ValidationResult();
-            ret.ValidateRequired(this.Prop_SessionId, ActivityStrings.Field_SessionId, "ID сессии обязателен");
+             
             ret.ValidateRequired(this.Prop_CssProperty, "CSS свойство", "CSS свойство обязательно");
             ret.ValidateRequired(this.Prop_OutValue, "Значение свойства", "Переменная для значения обязательна");
 

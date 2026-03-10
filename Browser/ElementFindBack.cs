@@ -243,12 +243,10 @@ namespace Primo.MIA
         {
             try
             {
-                // Чтение обязательных параметров
-                string sessionId    = GetPropertyValue<string>(this.Prop_SessionId,    nameof(Prop_SessionId),    sd);
+                // Чтение обязательных параметров через SessionResolver (поддержка ambient-контекста)
+                string sessionId = SessionResolver.Resolve(
+                    GetPropertyValue<string>(this.Prop_SessionId, nameof(Prop_SessionId), sd));
                 string locatorValue = GetPropertyValue<string>(this.Prop_LocatorValue, nameof(Prop_LocatorValue), sd);
-
-                if (string.IsNullOrWhiteSpace(sessionId))
-                    throw new ArgumentException("ID сессии не может быть пустым");
 
                 if (string.IsNullOrWhiteSpace(locatorValue))
                     throw new ArgumentException("Значение локатора не может быть пустым");
@@ -351,7 +349,6 @@ namespace Primo.MIA
             var ret = new ValidationResult();
 
             // Обязательные поля для обоих режимов
-            ret.ValidateRequired(this.Prop_SessionId,    ActivityStrings.Field_SessionId,    "ID сессии обязателен");
             ret.ValidateRequired(this.Prop_LocatorValue, ActivityStrings.Field_LocatorValue, "Значение локатора обязательно");
 
             return ret;

@@ -134,12 +134,10 @@ namespace Primo.MIA
         {
             try
             {
-                // Чтение параметров
-                string sessionId = GetPropertyValue<string>(this.Prop_SessionId, "Prop_SessionId", sd);
-                string inputText = GetPropertyValue<string>(this.Prop_InputText, "Prop_InputText", sd) ?? string.Empty;
-
-                if (string.IsNullOrWhiteSpace(sessionId))
-                    throw new ArgumentException("ID сессии не может быть пустым");
+                // Чтение параметров через SessionResolver (поддержка ambient-контекста)
+                string sessionId = SessionResolver.Resolve(
+                    GetPropertyValue<string>(this.Prop_SessionId, nameof(Prop_SessionId), sd));
+                string inputText = GetPropertyValue<string>(this.Prop_InputText, nameof(Prop_InputText), sd) ?? string.Empty;
 
                 // Получение драйвера
                 var driver = SeleniumHelper.GetDriver(sessionId);
@@ -213,7 +211,7 @@ namespace Primo.MIA
         public override ValidationResult Validate()
         {
             var ret = new ValidationResult();
-            ret.ValidateRequired(this.Prop_SessionId, ActivityStrings.Field_SessionId, "ID сессии обязателен");
+             
 
             // Для SendKeys текст обязателен
             if (this.Prop_Action == AlertAction.SendKeys)

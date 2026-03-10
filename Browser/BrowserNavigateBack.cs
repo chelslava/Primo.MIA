@@ -35,6 +35,17 @@ namespace Primo.MIA
 
         // ── Входные параметры ──────────────────────────────────────────
 
+        private NavigateMode _propMode;
+        /// <summary>Режим навигации.</summary>
+        [LTools.Common.Model.Serialization.StoringProperty]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main),
+         System.ComponentModel.DisplayName("Режим")]
+        public NavigateMode Prop_Mode
+        {
+            get => _propMode;
+            set { _propMode = value; InvokePropertyChanged(this, "Prop_Mode"); }
+        }
+
         private string _propSessionId;
         /// <summary>ID сессии браузера.</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
@@ -48,7 +59,7 @@ namespace Primo.MIA
         }
 
         private string _propUrl;
-        /// <summary>URL для перехода.</summary>
+        /// <summary>URL для перехода (для режима ToUrl).</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
         [System.ComponentModel.Category(ActivityStrings.Category_Main),
@@ -65,22 +76,31 @@ namespace Primo.MIA
         {
             sdkComponentName = ActivityStrings.Activity_BrowserNavigate;
             sdkComponentHelp =
-                "Переходит по указанному URL в браузере.\n" +
+                "Выполняет навигацию в браузере.\n" +
+                "\n" +
+                "── Режимы работы ──────────────────────────────\n" +
+                "ToUrl    — перейти по указанному URL\n" +
+                "Back     — назад в истории браузера\n" +
+                "Forward  — вперед в истории браузера\n" +
+                "Refresh  — обновить текущую страницу\n" +
                 "\n" +
                 "── Основные параметры ────────────────────────\n" +
+                "Режим     — тип навигации\n" +
                 "ID сессии — идентификатор сессии браузера\n" +
-                "URL       — адрес для перехода";
+                "URL       — адрес для перехода (только для ToUrl)";
 
             sdkComponentIcon = ActivityIcons.Browser;
 
             sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
+                PropertyBuilder.Enum<NavigateMode>("Prop_Mode", "Режим навигации"),
                 PropertyBuilder.Variable<string>("Prop_SessionId", "ID сессии браузера"),
-                PropertyBuilder.String("Prop_Url", "URL для перехода")
+                PropertyBuilder.String("Prop_Url", "URL для перехода (для ToUrl)")
             };
 
             InitClass(container);
 
+            this.Prop_Mode = NavigateMode.ToUrl;
             this.Prop_SessionId = "\"\"";
             this.Prop_Url = "\"https://example.com\"";
         }
@@ -88,36 +108,58 @@ namespace Primo.MIA
         // ── TimedAction — точка входа ──────────────────────────────────
 
         /// <summary>
-        /// Выполняет навигацию по указанному URL в браузере.
-        /// Получает драйвер из репозитория сессий и вызывает Navigate().GoToUrl().
+        /// Выполняет навигацию в браузере в зависимости от выбранного режима.
         /// </summary>
         public override ExecutionResult TimedAction(ScriptingData sd)
         {
             try
             {
-                // Чтение параметров
-                string sessionId = GetPropertyValue<string>(this.Prop_SessionId, "Prop_SessionId", sd);
-                string url = GetPropertyValue<string>(this.Prop_Url, "Prop_Url", sd);
-
-                if (string.IsNullOrWhiteSpace(sessionId))
-                    throw new ArgumentException("ID сессии не может быть пустым");
-
-                if (string.IsNullOrWhiteSpace(url))
-                    throw new ArgumentException("URL не может быть пустым");
+                // Чтение параметров через SessionResolver (поддержка ambient-контекста)
+                string sessionId = SessionResolver.Resolve(
+                    GetPropertyValue<string>(this.Prop_SessionId, nameof(Prop_SessionId), sd));
 
                 // Получение драйвера из репозитория сессий
                 var driver = SeleniumHelper.GetDriver(sessionId);
 
-                // Выполнение навигации
-                driver.Navigate().GoToUrl(url);
+                // Выполнение навигации в зависимости от режима
+                string message;
+                switch (this.Prop_Mode)
+                {
+                    case NavigateMode.ToUrl:
+                        string url = GetPropertyValue<string>(this.Prop_Url, "Prop_Url", sd);
+                        if (string.IsNullOrWhiteSpace(url))
+                            throw new ArgumentException("URL не может быть пустым");
+                        
+                        driver.Navigate().GoToUrl(url);
+                        message = $"[Навигация] Переход на {url}";
+                        break;
 
-                // Ожидание загрузки страницы (неявное через Selenium)
+                    case NavigateMode.Back:
+                        driver.Navigate().Back();
+                        message = "[Навигация] Назад в истории";
+                        break;
+
+                    case NavigateMode.Forward:
+                        driver.Navigate().Forward();
+                        message = "[Навигация] Вперед в истории";
+                        break;
+
+                    case NavigateMode.Refresh:
+                        driver.Navigate().Refresh();
+                        message = "[Навигация] Обновление страницы";
+                        break;
+
+                    default:
+                        throw new ArgumentException($"Неизвестный режим навигации: {this.Prop_Mode}");
+                }
+
+                // Небольшая пауза для стабилизации
                 System.Threading.Thread.Sleep(500);
 
                 return new ExecutionResult
                 {
                     IsSuccess = true,
-                    SuccessMessage = $"[Навигация] Переход на {url}"
+                    SuccessMessage = message
                 };
             }
             catch (Exception ex)
@@ -133,13 +175,18 @@ namespace Primo.MIA
         // ── Валидация ──────────────────────────────────────────────────
 
         /// <summary>
-        /// Проверяет обязательность заполнения ID сессии и URL.
+        /// Проверяет обязательность заполнения параметров в зависимости от режима.
         /// </summary>
         public override ValidationResult Validate()
         {
             var ret = new ValidationResult();
-            ret.ValidateRequired(this.Prop_SessionId, "ID сессии", "ID сессии обязателен");
-            ret.ValidateRequired(this.Prop_Url, "URL", "URL обязателен");
+            
+            // URL обязателен только для режима ToUrl
+            if (this.Prop_Mode == NavigateMode.ToUrl)
+            {
+                ret.ValidateRequired(this.Prop_Url, "URL", "URL обязателен для режима ToUrl");
+            }
+            
             return ret;
         }
     }

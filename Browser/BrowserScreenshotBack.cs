@@ -116,12 +116,10 @@ namespace Primo.MIA
         {
             try
             {
-                // Чтение параметров
-                string sessionId = GetPropertyValue<string>(this.Prop_SessionId, "Prop_SessionId", sd);
-                string filePath = GetPropertyValue<string>(this.Prop_FilePath, "Prop_FilePath", sd) ?? string.Empty;
-
-                if (string.IsNullOrWhiteSpace(sessionId))
-                    throw new ArgumentException("ID сессии не может быть пустым");
+                // Чтение параметров через SessionResolver (поддержка ambient-контекста)
+                string sessionId = SessionResolver.Resolve(
+                    GetPropertyValue<string>(this.Prop_SessionId, nameof(Prop_SessionId), sd));
+                string filePath = GetPropertyValue<string>(this.Prop_FilePath, nameof(Prop_FilePath), sd) ?? string.Empty;
 
                 // Получение драйвера
                 var driver = SeleniumHelper.GetDriver(sessionId);
@@ -171,7 +169,7 @@ namespace Primo.MIA
         public override ValidationResult Validate()
         {
             var ret = new ValidationResult();
-            ret.ValidateRequired(this.Prop_SessionId, ActivityStrings.Field_SessionId, "ID сессии обязателен");
+             
             return ret;
         }
     }

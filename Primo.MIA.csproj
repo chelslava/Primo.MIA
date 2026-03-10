@@ -199,6 +199,10 @@
       <DependentUpon>ElementGetComputedStyle.xaml</DependentUpon>
     </Compile>
     <Compile Include="Browser\ElementGetComputedStyleBack.cs" />
+    <Compile Include="Browser\ElementGetInfo.xaml.cs">
+      <DependentUpon>ElementGetInfo.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Browser\ElementGetInfoBack.cs" />
     <Compile Include="Browser\ElementGetProperty.xaml.cs">
       <DependentUpon>ElementGetProperty.xaml</DependentUpon>
     </Compile>
@@ -515,6 +519,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Browser\ElementGetComputedStyle.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Browser\ElementGetInfo.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

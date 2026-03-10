@@ -222,9 +222,8 @@ namespace Primo.MIA
         {
             try
             {
-                string sessionId = GetPropertyValue<string>(this.Prop_SessionId, "Prop_SessionId", sd);
-                if (string.IsNullOrWhiteSpace(sessionId))
-                    throw new ArgumentException("ID сессии не может быть пустым");
+                string sessionId = SessionResolver.Resolve(
+                    GetPropertyValue<string>(this.Prop_SessionId, nameof(Prop_SessionId), sd));
 
                 var driver = SeleniumHelper.GetDriver(sessionId);
                 string resultMsg;
@@ -313,7 +312,7 @@ namespace Primo.MIA
         public override ValidationResult Validate()
         {
             var ret = new ValidationResult();
-            ret.ValidateRequired(this.Prop_SessionId, ActivityStrings.Field_SessionId, "ID сессии обязателен");
+             
 
             switch (this.Prop_Operation)
             {

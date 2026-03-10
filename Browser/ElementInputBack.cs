@@ -555,7 +555,7 @@ namespace Primo.MIA
         public override ValidationResult Validate()
         {
             var ret = new ValidationResult();
-            ret.ValidateRequired(this.Prop_SessionId, ActivityStrings.Field_SessionId, "ID сессии обязателен");
+             
 
             // Проверяем что указан либо ElementId, либо LocatorValue
             bool hasElementId = !string.IsNullOrWhiteSpace(this.Prop_ElementId);

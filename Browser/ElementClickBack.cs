@@ -268,13 +268,11 @@ namespace Primo.MIA
         {
             try
             {
-                // Чтение обязательных параметров
-                string sessionId = GetPropertyValue<string>(this.Prop_SessionId, nameof(Prop_SessionId), sd);
+                // Чтение обязательных параметров через SessionResolver (поддержка ambient-контекста)
+                string sessionId = SessionResolver.Resolve(
+                    GetPropertyValue<string>(this.Prop_SessionId, nameof(Prop_SessionId), sd));
                 string elementId = GetPropertyValue<string>(this.Prop_ElementId, nameof(Prop_ElementId), sd);
                 string locatorValue = GetPropertyValue<string>(this.Prop_LocatorValue, nameof(Prop_LocatorValue), sd);
-
-                if (string.IsNullOrWhiteSpace(sessionId))
-                    throw new ArgumentException("ID сессии не может быть пустым");
 
                 // Получение WebDriver по ID сессии
                 var driver = SeleniumHelper.GetDriver(sessionId);
@@ -406,8 +404,6 @@ namespace Primo.MIA
         {
             var ret = new ValidationResult();
 
-            // ID сессии обязателен всегда
-            ret.ValidateRequired(this.Prop_SessionId, ActivityStrings.Field_SessionId, "ID сессии обязателен");
 
             // Должен быть указан хотя бы один идентификатор элемента
             bool hasElementId = !string.IsNullOrWhiteSpace(this.Prop_ElementId);

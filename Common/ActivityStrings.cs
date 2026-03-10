@@ -502,7 +502,6 @@ namespace Primo.MIA.Common
         public const string Field_ScrollDirection = "Направление";
         
         // Browser errors
-        public const string Error_SessionIdRequired = "ID сессии обязателен";
         public const string Error_SessionNotFound = "Сессия браузера не найдена";
         public const string Error_LocatorValueRequired = "Значение локатора обязательно";
         public const string Error_ElementIdRequired = "ID элемента обязателен";

@@ -212,12 +212,10 @@ namespace Primo.MIA
 
             try
             {
-                // Чтение параметров
-                string sessionId = GetPropertyValue<string>(this.Prop_SessionId, "Prop_SessionId", sd);
-                string timeoutStr = GetPropertyValue<string>(this.Prop_Timeout, "Prop_Timeout", sd) ?? "30";
-
-                if (string.IsNullOrWhiteSpace(sessionId))
-                    throw new ArgumentException("ID сессии не может быть пустым");
+                // Чтение параметров через SessionResolver (поддержка ambient-контекста)
+                string sessionId = SessionResolver.Resolve(
+                    GetPropertyValue<string>(this.Prop_SessionId, nameof(Prop_SessionId), sd));
+                string timeoutStr = GetPropertyValue<string>(this.Prop_Timeout, nameof(Prop_Timeout), sd) ?? "30";
 
                 int timeout = int.TryParse(timeoutStr, out int t) ? t : 30;
                 timeout = SeleniumHelper.ValidateTimeout(timeout, 30);
@@ -414,7 +412,7 @@ namespace Primo.MIA
         public override ValidationResult Validate()
         {
             var ret = new ValidationResult();
-            ret.ValidateRequired(this.Prop_SessionId, ActivityStrings.Field_SessionId, "ID сессии обязателен");
+             
 
             // Валидация в зависимости от типа условия
             switch (this.Prop_Condition)

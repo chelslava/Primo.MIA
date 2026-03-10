@@ -2,17 +2,21 @@
 // BrowserOpenBack.cs — активность-контейнер «Открыть браузер».
 //
 // Открывает браузер, регистрирует сессию в ambient-контексте и выполняет
-// вложенные активности. После выхода из контейнера браузер НЕ закрывается
-// автоматически — SDK не предоставляет хука "после контейнера".
+// вложенные активности.
 //
-// Для закрытия браузера используйте активность BrowserCloseBack.
-// Её можно поместить:
-//   - Последней внутри контейнера (браузер закроется в конце сценария)
-//   - После контейнера (если нужен доступ к sessionId снаружи)
+// ВАЖНО: Ambient-контекст (BrowserSessionContext) работает следующим образом:
+//   1. BrowserOpen вызывает Push(sessionId, isContainerEntry: true)
+//   2. Push() автоматически вызывает Pop() для предыдущей сессии (если есть)
+//   3. Все дочерние активности с пустым Prop_SessionId автоматически получают
+//      sessionId через SessionResolver.Resolve() → BrowserSessionContext.Current
+//   4. При следующем вызове BrowserOpen контекст автоматически очищается
 //
-// Жизненный цикл:
-//   SimpleAction → открыть браузер, Push контекста → дочерние активности
-//   BrowserCloseBack → Pop контекста, закрыть браузер
+// Это обеспечивает:
+//   - Автоматическую очистку при выходе из контейнера (через следующий Push)
+//   - Возможность переключения между сессиями через AttachToSessionId
+//   - Корректную работу последовательных контейнеров BrowserOpen
+//
+// BrowserClose также вызывает Pop() явно для немедленной очистки контекста.
 // =============================================================================
 
 using LTools.Common.Model;
@@ -147,6 +151,27 @@ namespace Primo.MIA
 
         #endregion
 
+        #region Prop_AttachToSessionId
+
+        private string _propAttachToSessionId;
+
+        /// <summary>
+        /// ID существующей сессии для присоединения (опционально).
+        /// Если указан — браузер не открывается, активность присоединяется к существующей сессии.
+        /// Если пуст — создается новая сессия браузера.
+        /// </summary>
+        [LTools.Common.Model.Serialization.StoringProperty]
+        [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main),
+         System.ComponentModel.DisplayName("Присоединиться к сессии")]
+        public string Prop_AttachToSessionId
+        {
+            get => _propAttachToSessionId;
+            set { _propAttachToSessionId = value; InvokePropertyChanged(this, nameof(Prop_AttachToSessionId)); }
+        }
+
+        #endregion
+
         // ── Выходные параметры ─────────────────────────────────────────────────
 
         #region Prop_SessionId
@@ -200,22 +225,24 @@ namespace Primo.MIA
             sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
                 PropertyBuilder.Enum<BrowserType>("Prop_BrowserType", "Тип браузера для запуска"),
+                PropertyBuilder.String("Prop_AttachToSessionId", "ID существующей сессии для присоединения"),
                 PropertyBuilder.BooleanObject("Prop_Headless", "Запустить в headless режиме"),
                 PropertyBuilder.BooleanObject("Prop_IncognitoMode", "Запустить в режиме инкогнито"),
                 PropertyBuilder.BooleanObject("Prop_DisableImages", "Отключить загрузку изображений"),
                 PropertyBuilder.String("Prop_UserAgent", "Пользовательский User-Agent"),
                 PropertyBuilder.FileSelector("Prop_DriverPath", "Путь к драйверу Selenium"),
-                PropertyBuilder.Variable<string>("Prop_SessionId", "ID созданной сессии")
+                PropertyBuilder.Variable<string>("Prop_SessionId", "ID созданной/присоединенной сессии")
             };
 
             InitClass(container);
 
             // Значения по умолчанию
-            this.Prop_BrowserType   = BrowserType.Chrome;
-            this.Prop_Headless      = false;
-            this.Prop_IncognitoMode = false;
-            this.Prop_DisableImages = false;
-            this.Prop_UserAgent     = "\"\"";
+            this.Prop_BrowserType       = BrowserType.Chrome;
+            this.Prop_AttachToSessionId = "\"\"";
+            this.Prop_Headless          = false;
+            this.Prop_IncognitoMode     = false;
+            this.Prop_DisableImages     = false;
+            this.Prop_UserAgent         = "\"\"";
             this.Prop_DriverPath    = "\"\"";
         }
 
@@ -228,19 +255,58 @@ namespace Primo.MIA
         /// </summary>
         public override ExecutionResult SimpleAction(ScriptingData sd)
         {
+            // ВАЖНО: Push() автоматически вызывает Pop() для предыдущей сессии.
+            // Это обеспечивает автоматическую очистку контекста при выходе из
+            // предыдущего контейнера BrowserOpen.
+
             try
             {
-                string userAgent  = GetPropertyValue<string>(this.Prop_UserAgent,  nameof(Prop_UserAgent),  sd) ?? string.Empty;
+                string attachToSessionId = GetPropertyValue<string>(this.Prop_AttachToSessionId, nameof(Prop_AttachToSessionId), sd) ?? string.Empty;
+                string sessionId;
+
+                // Режим 1: Присоединение к существующей сессии
+                if (!string.IsNullOrWhiteSpace(attachToSessionId))
+                {
+                    // Проверяем, что сессия существует в RepoDict
+                    var existingDriver = SeleniumHelper.GetDriver(attachToSessionId);
+                    if (existingDriver == null)
+                    {
+                        return new ExecutionResult
+                        {
+                            IsSuccess = false,
+                            ErrorMessage = $"[Открыть браузер] Сессия {attachToSessionId} не найдена в RepoDict"
+                        };
+                    }
+
+                    sessionId = attachToSessionId;
+
+                    // Регистрируем существующую сессию в ambient-контексте
+                    // При каждом вызове "Открыть браузер" текущий ID меняется на указанный
+                    BrowserSessionContext.Push(sessionId);
+
+                    // Записываем ID в выходную переменную (если задана)
+                    if (!string.IsNullOrWhiteSpace(this.Prop_SessionId))
+                        SetVariableValue(this.Prop_SessionId, sessionId, sd);
+
+                    return new ExecutionResult
+                    {
+                        IsSuccess = true,
+                        SuccessMessage = $"[Открыть браузер] Присоединено к сессии {sessionId}"
+                    };
+                }
+
+                // Режим 2: Создание новой сессии
+                string userAgent = GetPropertyValue<string>(this.Prop_UserAgent, nameof(Prop_UserAgent), sd) ?? string.Empty;
                 string driverPath = GetPropertyValue<string>(this.Prop_DriverPath, nameof(Prop_DriverPath), sd) ?? string.Empty;
 
                 // Генерируем ID сессии и создаём WebDriver
-                string sessionId      = SeleniumHelper.GenerateSessionId();
-                IWebDriver driver     = CreateDriver(this.Prop_BrowserType, userAgent, driverPath);
+                sessionId = SeleniumHelper.GenerateSessionId();
+                IWebDriver newDriver = CreateDriver(this.Prop_BrowserType, userAgent, driverPath);
 
                 // Сохраняем драйвер в репозитории
-                RepoDict.Set(sessionId, driver);
+                RepoDict.Set(sessionId, newDriver);
 
-                // Регистрируем сессию в ambient-контексте —
+                // Регистрируем сессию в ambient-контексте
                 // дочерние активности с пустым Prop_SessionId получат её автоматически
                 // через SessionResolver.Resolve → BrowserSessionContext.Current
                 BrowserSessionContext.Push(sessionId);
@@ -251,7 +317,7 @@ namespace Primo.MIA
 
                 return new ExecutionResult
                 {
-                    IsSuccess      = true,
+                    IsSuccess = true,
                     SuccessMessage = $"[Открыть браузер] {this.Prop_BrowserType} → сессия {sessionId}"
                 };
             }
@@ -259,7 +325,7 @@ namespace Primo.MIA
             {
                 return new ExecutionResult
                 {
-                    IsSuccess    = false,
+                    IsSuccess = false,
                     ErrorMessage = $"Ошибка [Открыть браузер]: {ex.Message}"
                 };
             }
