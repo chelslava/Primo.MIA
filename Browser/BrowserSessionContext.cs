@@ -69,14 +69,6 @@ namespace Primo.MIA.Common
                 RepoDict.Set(SESSION_STACK_KEY, stack);
             }
 
-            // Если это вход в контейнер BrowserOpen и стек не пуст,
-            // автоматически вызываем Pop() для предыдущей сессии
-            // Это обеспечивает автоматическую очистку при выходе из предыдущего контейнера
-            if (isContainerEntry && stack.Count > 0)
-            {
-                stack.Pop();
-            }
-
             stack.Push(sessionId);
         }
 
