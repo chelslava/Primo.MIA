@@ -24,8 +24,9 @@ namespace Primo.MIA
 {
     /// <summary>
     /// Активность для получения логов браузера.
+    /// REFACTORED: Использует BrowserActivityBase для устранения дублирования кода
     /// </summary>
-    public class BrowserGetLogsBack : PrimoComponentTO<BrowserGetLogs>
+    public class BrowserGetLogsBack : BrowserActivityBase<BrowserGetLogs>
     {
         public override string GroupName
         {
@@ -128,10 +129,10 @@ namespace Primo.MIA
 
             InitClass(container);
 
-            this.Prop_SessionId = "\"\"";
-            this.Prop_LogType = BrowserLogType.Browser;
-            this.Prop_OutLogs = "";
-            this.Prop_OutLogCount = "";
+            Prop_SessionId = "\"\"";
+            Prop_LogType = BrowserLogType.Browser;
+            Prop_OutLogs = "";
+            Prop_OutLogCount = "";
         }
 
         // ── TimedAction — точка входа ──────────────────────────────────
@@ -140,31 +141,24 @@ namespace Primo.MIA
         {
             try
             {
-                string sessionId = SessionResolver.Resolve(
-                    GetPropertyValue<string>(this.Prop_SessionId, nameof(Prop_SessionId), sd));
-
-                var driver = SeleniumHelper.GetDriver(sessionId);
+                // Получаем sessionId
+                string sessionId = GetPropertyValue<string>(Prop_SessionId, nameof(Prop_SessionId), sd);
+                
+                // Получение драйвера через базовый класс
+                IWebDriver driver = GetDriverFromContext(sessionId);
 
                 // Получение логов
-                var logs = SeleniumHelper.GetBrowserLogs(driver, this.Prop_LogType);
+                var logs = SeleniumHelper.GetBrowserLogs(driver, Prop_LogType);
 
                 // Запись результатов
-                SetVariableValue(this.Prop_OutLogs, logs, sd);
-                SetVariableValue(this.Prop_OutLogCount, logs.Count, sd);
+                SetVariableValue(Prop_OutLogs, logs, sd);
+                SetVariableValue(Prop_OutLogCount, logs.Count, sd);
 
-                return new ExecutionResult
-                {
-                    IsSuccess = true,
-                    SuccessMessage = $"[Получить логи] Получено записей: {logs.Count} ({this.Prop_LogType})"
-                };
+                return CreateSuccessResult($"[Получить логи] Получено записей: {logs.Count} ({Prop_LogType})");
             }
             catch (Exception ex)
             {
-                return new ExecutionResult
-                {
-                    IsSuccess = false,
-                    ErrorMessage = $"Ошибка [Получить логи]: {ex.Message}"
-                };
+                return CreateErrorResult(ex, "Получить логи");
             }
         }
 
@@ -174,7 +168,7 @@ namespace Primo.MIA
         {
             var ret = new ValidationResult();
              
-            ret.ValidateRequired(this.Prop_OutLogs, "Логи", "Переменная для логов обязательна");
+            ret.ValidateRequired(Prop_OutLogs, "Логи", "Переменная для логов обязательна");
 
             return ret;
         }

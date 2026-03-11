@@ -14,18 +14,16 @@
 using LTools.Common.Model;
 using LTools.Common.UIElements;
 using LTools.SDK;
-using OpenQA.Selenium;
 using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
-using static LTools.Common.Helpers.WFHelper.PropertiesItem;
 
 namespace Primo.MIA
 {
     /// <summary>
     /// Активность для управления Web Storage браузера.
     /// </summary>
-    public class BrowserStorageManageBack : PrimoComponentTO<BrowserStorageManage>
+    public class BrowserStorageManageBack : BrowserActivityBase<BrowserStorageManage>
     {
         public override string GroupName
         {
@@ -180,14 +178,14 @@ namespace Primo.MIA
 
             InitClass(container);
 
-            this.Prop_SessionId = "\"\"";
-            this.Prop_StorageType = StorageType.LocalStorage;
-            this.Prop_Operation = StorageOperation.GetItem;
-            this.Prop_Key = "\"\"";
-            this.Prop_Value = "\"\"";
-            this.Prop_OutValue = "";
-            this.Prop_OutKeys = "";
-            this.Prop_OutLength = "";
+            Prop_SessionId = "\"\"";
+            Prop_StorageType = StorageType.LocalStorage;
+            Prop_Operation = StorageOperation.GetItem;
+            Prop_Key = "\"\"";
+            Prop_Value = "\"\"";
+            Prop_OutValue = "";
+            Prop_OutKeys = "";
+            Prop_OutLength = "";
         }
 
         // ── TimedAction — точка входа ──────────────────────────────────
@@ -196,89 +194,79 @@ namespace Primo.MIA
         {
             try
             {
-                string sessionId = SessionResolver.Resolve(
-                    GetPropertyValue<string>(this.Prop_SessionId, nameof(Prop_SessionId), sd));
-
-                var driver = SeleniumHelper.GetDriver(sessionId);
+                string sessionId = GetPropertyValue<string>(Prop_SessionId, nameof(Prop_SessionId), sd);
+                var driver = GetDriverFromContext(sessionId);
                 string resultMsg;
 
-                switch (this.Prop_Operation)
+                switch (Prop_Operation)
                 {
                     case StorageOperation.GetItem:
                         {
-                            string key = GetPropertyValue<string>(this.Prop_Key, "Prop_Key", sd);
+                            string key = GetPropertyValue<string>(Prop_Key, "Prop_Key", sd);
                             if (string.IsNullOrWhiteSpace(key))
                                 throw new ArgumentException("Ключ не может быть пустым для операции GetItem");
 
-                            string value = SeleniumHelper.GetStorageItem(driver, this.Prop_StorageType, key);
-                            SetVariableValue(this.Prop_OutValue, value ?? string.Empty, sd);
+                            string value = SeleniumHelper.GetStorageItem(driver, Prop_StorageType, key);
+                            SetVariableValue(Prop_OutValue, value ?? string.Empty, sd);
                             resultMsg = $"[Web Storage] Получено значение для ключа '{key}'";
                         }
                         break;
 
                     case StorageOperation.SetItem:
                         {
-                            string key = GetPropertyValue<string>(this.Prop_Key, "Prop_Key", sd);
-                            string value = GetPropertyValue<string>(this.Prop_Value, "Prop_Value", sd);
+                            string key = GetPropertyValue<string>(Prop_Key, "Prop_Key", sd);
+                            string value = GetPropertyValue<string>(Prop_Value, "Prop_Value", sd);
 
                             if (string.IsNullOrWhiteSpace(key))
                                 throw new ArgumentException("Ключ не может быть пустым для операции SetItem");
 
-                            SeleniumHelper.SetStorageItem(driver, this.Prop_StorageType, key, value ?? string.Empty);
+                            SeleniumHelper.SetStorageItem(driver, Prop_StorageType, key, value ?? string.Empty);
                             resultMsg = $"[Web Storage] Установлено значение для ключа '{key}'";
                         }
                         break;
 
                     case StorageOperation.RemoveItem:
                         {
-                            string key = GetPropertyValue<string>(this.Prop_Key, "Prop_Key", sd);
+                            string key = GetPropertyValue<string>(Prop_Key, "Prop_Key", sd);
                             if (string.IsNullOrWhiteSpace(key))
                                 throw new ArgumentException("Ключ не может быть пустым для операции RemoveItem");
 
-                            SeleniumHelper.RemoveStorageItem(driver, this.Prop_StorageType, key);
+                            SeleniumHelper.RemoveStorageItem(driver, Prop_StorageType, key);
                             resultMsg = $"[Web Storage] Удалён ключ '{key}'";
                         }
                         break;
 
                     case StorageOperation.Clear:
-                        SeleniumHelper.ClearStorage(driver, this.Prop_StorageType);
-                        resultMsg = $"[Web Storage] Хранилище {this.Prop_StorageType} очищено";
+                        SeleniumHelper.ClearStorage(driver, Prop_StorageType);
+                        resultMsg = $"[Web Storage] Хранилище {Prop_StorageType} очищено";
                         break;
 
                     case StorageOperation.GetAllKeys:
                         {
-                            var keys = SeleniumHelper.GetStorageKeys(driver, this.Prop_StorageType);
-                            SetVariableValue(this.Prop_OutKeys, keys, sd);
-                            SetVariableValue(this.Prop_OutLength, keys.Count, sd);
+                            var keys = SeleniumHelper.GetStorageKeys(driver, Prop_StorageType);
+                            SetVariableValue(Prop_OutKeys, keys, sd);
+                            SetVariableValue(Prop_OutLength, keys.Count, sd);
                             resultMsg = $"[Web Storage] Получено ключей: {keys.Count}";
                         }
                         break;
 
                     case StorageOperation.GetLength:
                         {
-                            int length = SeleniumHelper.GetStorageLength(driver, this.Prop_StorageType);
-                            SetVariableValue(this.Prop_OutLength, length, sd);
+                            int length = SeleniumHelper.GetStorageLength(driver, Prop_StorageType);
+                            SetVariableValue(Prop_OutLength, length, sd);
                             resultMsg = $"[Web Storage] Количество элементов: {length}";
                         }
                         break;
 
                     default:
-                        throw new NotSupportedException($"Операция {this.Prop_Operation} не поддерживается");
+                        throw new NotSupportedException($"Операция {Prop_Operation} не поддерживается");
                 }
 
-                return new ExecutionResult
-                {
-                    IsSuccess = true,
-                    SuccessMessage = resultMsg
-                };
+                return CreateSuccessResult(resultMsg);
             }
             catch (Exception ex)
             {
-                return new ExecutionResult
-                {
-                    IsSuccess = false,
-                    ErrorMessage = $"Ошибка [Web Storage]: {ex.Message}"
-                };
+                return CreateErrorResult($"Ошибка [Web Storage]: {ex.Message}");
             }
         }
 
@@ -289,28 +277,28 @@ namespace Primo.MIA
             var ret = new ValidationResult();
              
 
-            switch (this.Prop_Operation)
+            switch (Prop_Operation)
             {
                 case StorageOperation.GetItem:
-                    ret.ValidateRequired(this.Prop_Key, "Ключ", "Ключ обязателен для операции GetItem");
-                    ret.ValidateRequired(this.Prop_OutValue, "Значение (результат)", "Переменная для значения обязательна");
+                    ret.ValidateRequired(Prop_Key, "Ключ", "Ключ обязателен для операции GetItem");
+                    ret.ValidateRequired(Prop_OutValue, "Значение (результат)", "Переменная для значения обязательна");
                     break;
 
                 case StorageOperation.SetItem:
-                    ret.ValidateRequired(this.Prop_Key, "Ключ", "Ключ обязателен для операции SetItem");
-                    ret.ValidateRequired(this.Prop_Value, "Значение", "Значение обязательно для операции SetItem");
+                    ret.ValidateRequired(Prop_Key, "Ключ", "Ключ обязателен для операции SetItem");
+                    ret.ValidateRequired(Prop_Value, "Значение", "Значение обязательно для операции SetItem");
                     break;
 
                 case StorageOperation.RemoveItem:
-                    ret.ValidateRequired(this.Prop_Key, "Ключ", "Ключ обязателен для операции RemoveItem");
+                    ret.ValidateRequired(Prop_Key, "Ключ", "Ключ обязателен для операции RemoveItem");
                     break;
 
                 case StorageOperation.GetAllKeys:
-                    ret.ValidateRequired(this.Prop_OutKeys, "Список ключей", "Переменная для списка ключей обязательна");
+                    ret.ValidateRequired(Prop_OutKeys, "Список ключей", "Переменная для списка ключей обязательна");
                     break;
 
                 case StorageOperation.GetLength:
-                    ret.ValidateRequired(this.Prop_OutLength, "Количество элементов", "Переменная для количества обязательна");
+                    ret.ValidateRequired(Prop_OutLength, "Количество элементов", "Переменная для количества обязательна");
                     break;
             }
 

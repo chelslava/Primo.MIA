@@ -27,8 +27,9 @@ namespace Primo.MIA
 {
     /// <summary>
     /// Активность для управления cookies браузера.
+    /// REFACTORED: Использует BrowserActivityBase для устранения дублирования кода
     /// </summary>
-    public class BrowserManageCookiesBack : PrimoComponentTO<BrowserManageCookies>
+    public class BrowserManageCookiesBack : BrowserActivityBase<BrowserManageCookies>
     {
         public override string GroupName
         {
@@ -142,10 +143,10 @@ namespace Primo.MIA
 
             InitClass(container);
 
-            this.Prop_SessionId = "\"\"";
-            this.Prop_Operation = CookieOperation.GetAll;
-            this.Prop_CookieName = "\"\"";
-            this.Prop_CookieValue = "\"\"";
+            Prop_SessionId = "\"\"";
+            Prop_Operation = CookieOperation.GetAll;
+            Prop_CookieName = "\"\"";
+            Prop_CookieValue = "\"\"";
         }
 
         // ── TimedAction — точка входа ──────────────────────────────────
@@ -154,21 +155,20 @@ namespace Primo.MIA
         {
             try
             {
-                // Чтение параметров через SessionResolver (поддержка ambient-контекста)
-                string sessionId = SessionResolver.Resolve(
-                    GetPropertyValue<string>(this.Prop_SessionId, nameof(Prop_SessionId), sd));
-                string cookieName = GetPropertyValue<string>(this.Prop_CookieName, nameof(Prop_CookieName), sd) ?? string.Empty;
-                string cookieValue = GetPropertyValue<string>(this.Prop_CookieValue, nameof(Prop_CookieValue), sd) ?? string.Empty;
+                // Получаем sessionId
+                string sessionId = GetPropertyValue<string>(Prop_SessionId, nameof(Prop_SessionId), sd);
+                string cookieName = GetPropertyValue<string>(Prop_CookieName, nameof(Prop_CookieName), sd) ?? string.Empty;
+                string cookieValue = GetPropertyValue<string>(Prop_CookieValue, nameof(Prop_CookieValue), sd) ?? string.Empty;
 
-                // Получение драйвера
-                var driver = SeleniumHelper.GetDriver(sessionId);
+                // Получение драйвера через базовый класс
+                IWebDriver driver = GetDriverFromContext(sessionId);
                 var cookieManager = driver.Manage().Cookies;
 
                 string result = string.Empty;
                 string actionMessage = string.Empty;
 
                 // Выполнение операции
-                switch (this.Prop_Operation)
+                switch (Prop_Operation)
                 {
                     case CookieOperation.Get:
                         if (string.IsNullOrWhiteSpace(cookieName))
@@ -209,26 +209,18 @@ namespace Primo.MIA
                         break;
 
                     default:
-                        throw new NotSupportedException($"Операция {this.Prop_Operation} не поддерживается");
+                        throw new NotSupportedException($"Операция {Prop_Operation} не поддерживается");
                 }
 
                 // Запись результата
-                if (!string.IsNullOrWhiteSpace(this.Prop_Result) && !string.IsNullOrEmpty(result))
-                    SetVariableValue(this.Prop_Result, result, sd);
+                if (!string.IsNullOrWhiteSpace(Prop_Result) && !string.IsNullOrEmpty(result))
+                    SetVariableValue(Prop_Result, result, sd);
 
-                return new ExecutionResult
-                {
-                    IsSuccess = true,
-                    SuccessMessage = $"[Управление cookies] {actionMessage}"
-                };
+                return CreateSuccessResult($"[Управление cookies] {actionMessage}");
             }
             catch (Exception ex)
             {
-                return new ExecutionResult
-                {
-                    IsSuccess = false,
-                    ErrorMessage = $"Ошибка [Управление cookies]: {ex.Message}"
-                };
+                return CreateErrorResult(ex, "Управление cookies");
             }
         }
 
@@ -240,17 +232,17 @@ namespace Primo.MIA
              
 
             // Для операций с конкретным cookie имя обязательно
-            if (this.Prop_Operation == CookieOperation.Get ||
-                this.Prop_Operation == CookieOperation.Set ||
-                this.Prop_Operation == CookieOperation.Delete)
+            if (Prop_Operation == CookieOperation.Get ||
+                Prop_Operation == CookieOperation.Set ||
+                Prop_Operation == CookieOperation.Delete)
             {
-                ret.ValidateRequired(this.Prop_CookieName, ActivityStrings.Field_CookieName, "Имя cookie обязательно");
+                ret.ValidateRequired(Prop_CookieName, ActivityStrings.Field_CookieName, "Имя cookie обязательно");
             }
 
             // Для Set значение обязательно
-            if (this.Prop_Operation == CookieOperation.Set)
+            if (Prop_Operation == CookieOperation.Set)
             {
-                ret.ValidateRequired(this.Prop_CookieValue, ActivityStrings.Field_CookieValue, "Значение cookie обязательно");
+                ret.ValidateRequired(Prop_CookieValue, ActivityStrings.Field_CookieValue, "Значение cookie обязательно");
             }
 
             return ret;

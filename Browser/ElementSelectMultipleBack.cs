@@ -17,14 +17,13 @@ using OpenQA.Selenium;
 using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
-using static LTools.Common.Helpers.WFHelper.PropertiesItem;
 
 namespace Primo.MIA
 {
     /// <summary>
     /// Активность для работы с multiple select элементами.
     /// </summary>
-    public class ElementSelectMultipleBack : PrimoComponentTO<ElementSelectMultiple>
+    public class ElementSelectMultipleBack : BrowserActivityBase<ElementSelectMultiple>
     {
         public override string GroupName
         {
@@ -196,15 +195,15 @@ namespace Primo.MIA
 
             InitClass(container);
 
-            this.Prop_SessionId = "\"\"";
-            this.Prop_ElementId = "\"\"";
-            this.Prop_LocatorType = ElementLocatorType.Id;
-            this.Prop_LocatorValue = "\"\"";
-            this.Prop_Operation = MultiSelectOperation.SelectByText;
-            this.Prop_Value = "\"\"";
-            this.Prop_WaitTimeout = "10";
-            this.Prop_OutOptions = "";
-            this.Prop_OutSelectedOptions = "";
+            Prop_SessionId = "\"\"";
+            Prop_ElementId = "\"\"";
+            Prop_LocatorType = ElementLocatorType.Id;
+            Prop_LocatorValue = "\"\"";
+            Prop_Operation = MultiSelectOperation.SelectByText;
+            Prop_Value = "\"\"";
+            Prop_WaitTimeout = "10";
+            Prop_OutOptions = "";
+            Prop_OutSelectedOptions = "";
         }
 
         // ── TimedAction — точка входа ──────────────────────────────────
@@ -213,22 +212,20 @@ namespace Primo.MIA
         {
             try
             {
-                string sessionId = SessionResolver.Resolve(
-                    GetPropertyValue<string>(this.Prop_SessionId, nameof(Prop_SessionId), sd));
-                string elementId = GetPropertyValue<string>(this.Prop_ElementId, nameof(Prop_ElementId), sd);
-                string locatorValue = GetPropertyValue<string>(this.Prop_LocatorValue, nameof(Prop_LocatorValue), sd);
+                string sessionId = GetPropertyValue<string>(Prop_SessionId, nameof(Prop_SessionId), sd);
+                string elementId = GetPropertyValue<string>(Prop_ElementId, nameof(Prop_ElementId), sd);
+                string locatorValue = GetPropertyValue<string>(Prop_LocatorValue, nameof(Prop_LocatorValue), sd);
 
-                var driver = SeleniumHelper.GetDriver(sessionId);
+                var driver = GetDriverFromContext(sessionId);
 
-                // Получение элемента
                 IWebElement element;
                 if (!string.IsNullOrWhiteSpace(locatorValue))
                 {
-                    string timeoutStr = GetPropertyValue<string>(this.Prop_WaitTimeout, "Prop_WaitTimeout", sd) ?? "10";
+                    string timeoutStr = GetPropertyValue<string>(Prop_WaitTimeout, "Prop_WaitTimeout", sd) ?? "10";
                     int timeout = int.TryParse(timeoutStr, out int t) ? t : 10;
                     timeout = SeleniumHelper.ValidateTimeout(timeout, 10);
 
-                    var locator = SeleniumHelper.CreateLocator(this.Prop_LocatorType, locatorValue);
+                    var locator = SeleniumHelper.CreateLocator(Prop_LocatorType, locatorValue);
                     element = SeleniumHelper.WaitForElement(driver, locator, timeout);
                 }
                 else if (!string.IsNullOrWhiteSpace(elementId))
@@ -242,11 +239,11 @@ namespace Primo.MIA
 
                 string resultMsg;
 
-                switch (this.Prop_Operation)
+                switch (Prop_Operation)
                 {
                     case MultiSelectOperation.SelectByText:
                         {
-                            string value = GetPropertyValue<string>(this.Prop_Value, "Prop_Value", sd);
+                            string value = GetPropertyValue<string>(Prop_Value, "Prop_Value", sd);
                             if (string.IsNullOrWhiteSpace(value))
                                 throw new ArgumentException("Значение не может быть пустым для операции SelectByText");
 
@@ -257,7 +254,7 @@ namespace Primo.MIA
 
                     case MultiSelectOperation.SelectByValue:
                         {
-                            string value = GetPropertyValue<string>(this.Prop_Value, "Prop_Value", sd);
+                            string value = GetPropertyValue<string>(Prop_Value, "Prop_Value", sd);
                             if (string.IsNullOrWhiteSpace(value))
                                 throw new ArgumentException("Значение не может быть пустым для операции SelectByValue");
 
@@ -268,7 +265,7 @@ namespace Primo.MIA
 
                     case MultiSelectOperation.SelectByIndex:
                         {
-                            string indexStr = GetPropertyValue<string>(this.Prop_Value, "Prop_Value", sd) ?? "0";
+                            string indexStr = GetPropertyValue<string>(Prop_Value, "Prop_Value", sd) ?? "0";
                             int index = int.TryParse(indexStr, out int idx) ? idx : 0;
 
                             SeleniumHelper.SelectMultipleByIndex(element, index);
@@ -278,7 +275,7 @@ namespace Primo.MIA
 
                     case MultiSelectOperation.DeselectByText:
                         {
-                            string value = GetPropertyValue<string>(this.Prop_Value, "Prop_Value", sd);
+                            string value = GetPropertyValue<string>(Prop_Value, "Prop_Value", sd);
                             if (string.IsNullOrWhiteSpace(value))
                                 throw new ArgumentException("Значение не может быть пустым для операции DeselectByText");
 
@@ -289,7 +286,7 @@ namespace Primo.MIA
 
                     case MultiSelectOperation.DeselectByValue:
                         {
-                            string value = GetPropertyValue<string>(this.Prop_Value, "Prop_Value", sd);
+                            string value = GetPropertyValue<string>(Prop_Value, "Prop_Value", sd);
                             if (string.IsNullOrWhiteSpace(value))
                                 throw new ArgumentException("Значение не может быть пустым для операции DeselectByValue");
 
@@ -300,7 +297,7 @@ namespace Primo.MIA
 
                     case MultiSelectOperation.DeselectByIndex:
                         {
-                            string indexStr = GetPropertyValue<string>(this.Prop_Value, "Prop_Value", sd) ?? "0";
+                            string indexStr = GetPropertyValue<string>(Prop_Value, "Prop_Value", sd) ?? "0";
                             int index = int.TryParse(indexStr, out int idx) ? idx : 0;
 
                             SeleniumHelper.DeselectByIndex(element, index);
@@ -316,7 +313,7 @@ namespace Primo.MIA
                     case MultiSelectOperation.GetAllOptions:
                         {
                             var options = SeleniumHelper.GetAllSelectOptions(element);
-                            SetVariableValue(this.Prop_OutOptions, options, sd);
+                            SetVariableValue(Prop_OutOptions, options, sd);
                             resultMsg = $"[Multiple Select] Получено опций: {options.Count}";
                         }
                         break;
@@ -324,28 +321,20 @@ namespace Primo.MIA
                     case MultiSelectOperation.GetSelectedOptions:
                         {
                             var selected = SeleniumHelper.GetSelectedSelectOptions(element);
-                            SetVariableValue(this.Prop_OutSelectedOptions, selected, sd);
+                            SetVariableValue(Prop_OutSelectedOptions, selected, sd);
                             resultMsg = $"[Multiple Select] Выбрано опций: {selected.Count}";
                         }
                         break;
 
                     default:
-                        throw new NotSupportedException($"Операция {this.Prop_Operation} не поддерживается");
+                        throw new NotSupportedException($"Операция {Prop_Operation} не поддерживается");
                 }
 
-                return new ExecutionResult
-                {
-                    IsSuccess = true,
-                    SuccessMessage = resultMsg
-                };
+                return CreateSuccessResult(resultMsg);
             }
             catch (Exception ex)
             {
-                return new ExecutionResult
-                {
-                    IsSuccess = false,
-                    ErrorMessage = $"Ошибка [Multiple Select]: {ex.Message}"
-                };
+                return CreateErrorResult($"Ошибка [Multiple Select]: {ex.Message}");
             }
         }
 
@@ -356,8 +345,8 @@ namespace Primo.MIA
             var ret = new ValidationResult();
              
 
-            bool hasElementId = !string.IsNullOrWhiteSpace(this.Prop_ElementId);
-            bool hasLocator = !string.IsNullOrWhiteSpace(this.Prop_LocatorValue);
+            bool hasElementId = !string.IsNullOrWhiteSpace(Prop_ElementId);
+            bool hasLocator = !string.IsNullOrWhiteSpace(Prop_LocatorValue);
 
             if (!hasElementId && !hasLocator)
             {
@@ -368,8 +357,7 @@ namespace Primo.MIA
                 });
             }
 
-            // Валидация в зависимости от операции
-            switch (this.Prop_Operation)
+            switch (Prop_Operation)
             {
                 case MultiSelectOperation.SelectByText:
                 case MultiSelectOperation.SelectByValue:
@@ -377,15 +365,15 @@ namespace Primo.MIA
                 case MultiSelectOperation.DeselectByText:
                 case MultiSelectOperation.DeselectByValue:
                 case MultiSelectOperation.DeselectByIndex:
-                    ret.ValidateRequired(this.Prop_Value, "Значение", "Значение обязательно для данной операции");
+                    ret.ValidateRequired(Prop_Value, "Значение", "Значение обязательно для данной операции");
                     break;
 
                 case MultiSelectOperation.GetAllOptions:
-                    ret.ValidateRequired(this.Prop_OutOptions, "Список опций", "Переменная для списка опций обязательна");
+                    ret.ValidateRequired(Prop_OutOptions, "Список опций", "Переменная для списка опций обязательна");
                     break;
 
                 case MultiSelectOperation.GetSelectedOptions:
-                    ret.ValidateRequired(this.Prop_OutSelectedOptions, "Выбранные опции", "Переменная для выбранных опций обязательна");
+                    ret.ValidateRequired(Prop_OutSelectedOptions, "Выбранные опции", "Переменная для выбранных опций обязательна");
                     break;
             }
 

@@ -23,8 +23,9 @@ namespace Primo.MIA
 {
     /// <summary>
     /// Активность для получения размера и позиции элемента.
+    /// REFACTORED: Использует BrowserActivityBase для устранения дублирования кода
     /// </summary>
-    public class ElementGetRectBack : PrimoComponentTO<ElementGetRect>
+    public class ElementGetRectBack : BrowserActivityBase<ElementGetRect>
     {
         public override string GroupName
         {
@@ -208,24 +209,20 @@ namespace Primo.MIA
         {
             try
             {
-                // Чтение параметров через SessionResolver (поддержка ambient-контекста)
-                string sessionId = SessionResolver.Resolve(
-                    GetPropertyValue<string>(this.Prop_SessionId, nameof(Prop_SessionId), sd));
-                string elementId = GetPropertyValue<string>(this.Prop_ElementId, nameof(Prop_ElementId), sd);
-                string locatorValue = GetPropertyValue<string>(this.Prop_LocatorValue, nameof(Prop_LocatorValue), sd);
+                string sessionId = GetPropertyValue<string>(Prop_SessionId, nameof(Prop_SessionId), sd);
+                string elementId = GetPropertyValue<string>(Prop_ElementId, nameof(Prop_ElementId), sd);
+                string locatorValue = GetPropertyValue<string>(Prop_LocatorValue, nameof(Prop_LocatorValue), sd);
 
-                // Получение драйвера
-                var driver = SeleniumHelper.GetDriver(sessionId);
+                IWebDriver driver = GetDriverFromContext(sessionId);
 
-                // Получение элемента
                 IWebElement element;
                 if (!string.IsNullOrWhiteSpace(locatorValue))
                 {
-                    string timeoutStr = GetPropertyValue<string>(this.Prop_WaitTimeout, "Prop_WaitTimeout", sd) ?? "10";
+                    string timeoutStr = GetPropertyValue<string>(Prop_WaitTimeout, "Prop_WaitTimeout", sd) ?? "10";
                     int timeout = int.TryParse(timeoutStr, out int t) ? t : 10;
                     timeout = SeleniumHelper.ValidateTimeout(timeout, 10);
 
-                    var locator = SeleniumHelper.CreateLocator(this.Prop_LocatorType, locatorValue);
+                    var locator = SeleniumHelper.CreateLocator(Prop_LocatorType, locatorValue);
                     element = SeleniumHelper.WaitForElement(driver, locator, timeout);
                 }
                 else if (!string.IsNullOrWhiteSpace(elementId))
@@ -237,28 +234,18 @@ namespace Primo.MIA
                     throw new ArgumentException("Необходимо указать либо ID элемента, либо локатор для поиска");
                 }
 
-                // Получение размеров и позиции
                 var (x, y, width, height) = SeleniumHelper.GetElementRect(element);
 
-                // Запись результатов
-                SetVariableValue(this.Prop_X, x, sd);
-                SetVariableValue(this.Prop_Y, y, sd);
-                SetVariableValue(this.Prop_Width, width, sd);
-                SetVariableValue(this.Prop_Height, height, sd);
+                SetVariableValue(Prop_X, x, sd);
+                SetVariableValue(Prop_Y, y, sd);
+                SetVariableValue(Prop_Width, width, sd);
+                SetVariableValue(Prop_Height, height, sd);
 
-                return new ExecutionResult
-                {
-                    IsSuccess = true,
-                    SuccessMessage = $"[Получить размер] X={x}, Y={y}, Ширина={width}, Высота={height}"
-                };
+                return CreateSuccessResult($"[Получить размер] X={x}, Y={y}, Ширина={width}, Высота={height}");
             }
             catch (Exception ex)
             {
-                return new ExecutionResult
-                {
-                    IsSuccess = false,
-                    ErrorMessage = $"Ошибка [Получить размер]: {ex.Message}"
-                };
+                return CreateErrorResult(ex, "Получить размер");
             }
         }
 
@@ -268,13 +255,13 @@ namespace Primo.MIA
         {
             var ret = new ValidationResult();
              
-            ret.ValidateRequired(this.Prop_X, "X", "Переменная для X обязательна");
-            ret.ValidateRequired(this.Prop_Y, "Y", "Переменная для Y обязательна");
-            ret.ValidateRequired(this.Prop_Width, "Ширина", "Переменная для ширины обязательна");
-            ret.ValidateRequired(this.Prop_Height, "Высота", "Переменная для высоты обязательна");
+            ret.ValidateRequired(Prop_X, "X", "Переменная для X обязательна");
+            ret.ValidateRequired(Prop_Y, "Y", "Переменная для Y обязательна");
+            ret.ValidateRequired(Prop_Width, "Ширина", "Переменная для ширины обязательна");
+            ret.ValidateRequired(Prop_Height, "Высота", "Переменная для высоты обязательна");
 
-            bool hasElementId = !string.IsNullOrWhiteSpace(this.Prop_ElementId);
-            bool hasLocator = !string.IsNullOrWhiteSpace(this.Prop_LocatorValue);
+            bool hasElementId = !string.IsNullOrWhiteSpace(Prop_ElementId);
+            bool hasLocator = !string.IsNullOrWhiteSpace(Prop_LocatorValue);
 
             if (!hasElementId && !hasLocator)
             {

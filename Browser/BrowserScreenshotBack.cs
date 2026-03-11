@@ -17,14 +17,14 @@ using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using static LTools.Common.Helpers.WFHelper.PropertiesItem;
 
 namespace Primo.MIA
 {
     /// <summary>
     /// Активность для создания скриншота страницы браузера.
+    /// REFACTORED: Использует BrowserActivityBase для устранения дублирования кода
     /// </summary>
-    public class BrowserScreenshotBack : PrimoComponentTO<BrowserScreenshot>
+    public class BrowserScreenshotBack : BrowserActivityBase<BrowserScreenshot>
     {
         public override string GroupName
         {
@@ -116,13 +116,13 @@ namespace Primo.MIA
         {
             try
             {
-                // Чтение параметров через SessionResolver (поддержка ambient-контекста)
-                string sessionId = SessionResolver.Resolve(
-                    GetPropertyValue<string>(this.Prop_SessionId, nameof(Prop_SessionId), sd));
-                string filePath = GetPropertyValue<string>(this.Prop_FilePath, nameof(Prop_FilePath), sd) ?? string.Empty;
-
-                // Получение драйвера
-                var driver = SeleniumHelper.GetDriver(sessionId);
+                // Получаем sessionId
+                string sessionId = GetPropertyValue<string>(Prop_SessionId, nameof(Prop_SessionId), sd);
+                
+                // Получение драйвера через базовый класс
+                IWebDriver driver = GetDriverFromContext(sessionId);
+                
+                string filePath = GetPropertyValue<string>(Prop_FilePath, nameof(Prop_FilePath), sd) ?? string.Empty;
 
                 // Создание скриншота
                 var screenshot = ((ITakesScreenshot)driver).GetScreenshot();
@@ -141,26 +141,18 @@ namespace Primo.MIA
                 }
 
                 // Запись Base64 в выходную переменную
-                if (!string.IsNullOrWhiteSpace(this.Prop_Base64))
-                    SetVariableValue(this.Prop_Base64, base64, sd);
+                if (!string.IsNullOrWhiteSpace(Prop_Base64))
+                    SetVariableValue(Prop_Base64, base64, sd);
 
                 string message = string.IsNullOrWhiteSpace(filePath)
                     ? "[Скриншот] Создан (Base64)"
                     : $"[Скриншот] Сохранён: {filePath}";
 
-                return new ExecutionResult
-                {
-                    IsSuccess = true,
-                    SuccessMessage = message
-                };
+                return CreateSuccessResult(message);
             }
             catch (Exception ex)
             {
-                return new ExecutionResult
-                {
-                    IsSuccess = false,
-                    ErrorMessage = $"Ошибка [Скриншот]: {ex.Message}"
-                };
+                return CreateErrorResult(ex, "Скриншот");
             }
         }
 

@@ -18,14 +18,13 @@ using OpenQA.Selenium.Support.UI;
 using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
-using static LTools.Common.Helpers.WFHelper.PropertiesItem;
 
 namespace Primo.MIA
 {
     /// <summary>
     /// Активность для выбора опции из выпадающего списка.
     /// </summary>
-    public class ElementSelectBack : PrimoComponentTO<ElementSelect>
+    public class ElementSelectBack : BrowserActivityBase<ElementSelect>
     {
         public override string GroupName
         {
@@ -166,13 +165,13 @@ namespace Primo.MIA
 
             InitClass(container);
 
-            this.Prop_SessionId = "\"\"";
-            this.Prop_ElementId = "\"\"";
-            this.Prop_LocatorType = ElementLocatorType.Id;
-            this.Prop_LocatorValue = "\"\"";
-            this.Prop_WaitTimeout = "10";
-            this.Prop_SelectMode = SelectMode.ByText;
-            this.Prop_SelectValue = "\"\"";
+            Prop_SessionId = "\"\"";
+            Prop_ElementId = "\"\"";
+            Prop_LocatorType = ElementLocatorType.Id;
+            Prop_LocatorValue = "\"\"";
+            Prop_WaitTimeout = "10";
+            Prop_SelectMode = SelectMode.ByText;
+            Prop_SelectValue = "\"\"";
         }
 
         // ── TimedAction — точка входа ──────────────────────────────────
@@ -181,34 +180,28 @@ namespace Primo.MIA
         {
             try
             {
-                // Чтение параметров через SessionResolver (поддержка ambient-контекста)
-                string sessionId = SessionResolver.Resolve(
-                    GetPropertyValue<string>(this.Prop_SessionId, nameof(Prop_SessionId), sd));
-                string elementId = GetPropertyValue<string>(this.Prop_ElementId, nameof(Prop_ElementId), sd);
-                string locatorValue = GetPropertyValue<string>(this.Prop_LocatorValue, nameof(Prop_LocatorValue), sd);
-                string selectValue = GetPropertyValue<string>(this.Prop_SelectValue, nameof(Prop_SelectValue), sd);
+                string sessionId = GetPropertyValue<string>(Prop_SessionId, nameof(Prop_SessionId), sd);
+                string elementId = GetPropertyValue<string>(Prop_ElementId, nameof(Prop_ElementId), sd);
+                string locatorValue = GetPropertyValue<string>(Prop_LocatorValue, nameof(Prop_LocatorValue), sd);
+                string selectValue = GetPropertyValue<string>(Prop_SelectValue, nameof(Prop_SelectValue), sd);
 
                 if (string.IsNullOrWhiteSpace(selectValue))
                     throw new ArgumentException("Значение для выбора не может быть пустым");
 
-                // Получение драйвера
-                var driver = SeleniumHelper.GetDriver(sessionId);
+                var driver = GetDriverFromContext(sessionId);
 
-                // Получение элемента: либо по ID, либо поиск по локатору
                 IWebElement element;
                 if (!string.IsNullOrWhiteSpace(locatorValue))
                 {
-                    // Поиск элемента по локатору
-                    string timeoutStr = GetPropertyValue<string>(this.Prop_WaitTimeout, "Prop_WaitTimeout", sd) ?? "10";
+                    string timeoutStr = GetPropertyValue<string>(Prop_WaitTimeout, "Prop_WaitTimeout", sd) ?? "10";
                     int timeout = int.TryParse(timeoutStr, out int t) ? t : 10;
                     timeout = SeleniumHelper.ValidateTimeout(timeout, 10);
 
-                    var locator = SeleniumHelper.CreateLocator(this.Prop_LocatorType, locatorValue);
+                    var locator = SeleniumHelper.CreateLocator(Prop_LocatorType, locatorValue);
                     element = SeleniumHelper.WaitForElement(driver, locator, timeout);
                 }
                 else if (!string.IsNullOrWhiteSpace(elementId))
                 {
-                    // Использование существующего элемента
                     element = SeleniumHelper.GetElement(elementId);
                 }
                 else
@@ -216,11 +209,9 @@ namespace Primo.MIA
                     throw new ArgumentException("Необходимо указать либо ID элемента, либо локатор для поиска");
                 }
 
-                // Создание SelectElement
                 var select = new SelectElement(element);
 
-                // Выбор опции в зависимости от режима
-                switch (this.Prop_SelectMode)
+                switch (Prop_SelectMode)
                 {
                     case SelectMode.ByText:
                         select.SelectByText(selectValue);
@@ -238,26 +229,18 @@ namespace Primo.MIA
                         break;
 
                     default:
-                        throw new ArgumentException($"Неизвестный режим выбора: {this.Prop_SelectMode}");
+                        throw new ArgumentException($"Неизвестный режим выбора: {Prop_SelectMode}");
                 }
 
                 string resultMsg = !string.IsNullOrWhiteSpace(locatorValue)
-                    ? $"[Выбрать из списка] Выбрано ({this.Prop_SelectMode}): {selectValue}, локатор: {this.Prop_LocatorType}={locatorValue}"
-                    : $"[Выбрать из списка] Выбрано ({this.Prop_SelectMode}): {selectValue}, элемент: {elementId}";
+                    ? $"[Выбрать из списка] Выбрано ({Prop_SelectMode}): {selectValue}, локатор: {Prop_LocatorType}={locatorValue}"
+                    : $"[Выбрать из списка] Выбрано ({Prop_SelectMode}): {selectValue}, элемент: {elementId}";
 
-                return new ExecutionResult
-                {
-                    IsSuccess = true,
-                    SuccessMessage = resultMsg
-                };
+                return CreateSuccessResult(resultMsg);
             }
             catch (Exception ex)
             {
-                return new ExecutionResult
-                {
-                    IsSuccess = false,
-                    ErrorMessage = $"Ошибка [Выбрать из списка]: {ex.Message}"
-                };
+                return CreateErrorResult($"Ошибка [Выбрать из списка]: {ex.Message}");
             }
         }
 
@@ -267,11 +250,10 @@ namespace Primo.MIA
         {
             var ret = new ValidationResult();
              
-            ret.ValidateRequired(this.Prop_SelectValue, ActivityStrings.Field_SelectValue, "Значение для выбора обязательно");
+            ret.ValidateRequired(Prop_SelectValue, ActivityStrings.Field_SelectValue, "Значение для выбора обязательно");
             
-            // Проверяем что указан либо ElementId, либо LocatorValue
-            bool hasElementId = !string.IsNullOrWhiteSpace(this.Prop_ElementId);
-            bool hasLocator = !string.IsNullOrWhiteSpace(this.Prop_LocatorValue);
+            bool hasElementId = !string.IsNullOrWhiteSpace(Prop_ElementId);
+            bool hasLocator = !string.IsNullOrWhiteSpace(Prop_LocatorValue);
             
             if (!hasElementId && !hasLocator)
             {

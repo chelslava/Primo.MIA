@@ -14,14 +14,14 @@ using OpenQA.Selenium;
 using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
-using static LTools.Common.Helpers.WFHelper.PropertiesItem;
 
 namespace Primo.MIA
 {
     /// <summary>
     /// Активность для закрытия браузера и освобождения ресурсов.
+    /// REFACTORED: Использует BrowserActivityBase для устранения дублирования кода
     /// </summary>
-    public class BrowserCloseBack : PrimoComponentTO<BrowserClose>
+    public class BrowserCloseBack : BrowserActivityBase<BrowserClose>
     {
         public override string GroupName
         {
@@ -78,41 +78,21 @@ namespace Primo.MIA
 
         public override ExecutionResult TimedAction(ScriptingData sd)
         {
-            try
-            {
-                // Чтение ID сессии через SessionResolver (поддержка ambient-контекста)
-                string sessionId = SessionResolver.Resolve(
-                    GetPropertyValue<string>(this.Prop_SessionId, nameof(Prop_SessionId), sd));
+            string sessionId = GetPropertyValue<string>(Prop_SessionId, nameof(Prop_SessionId), sd);
+            IWebDriver driver = GetDriverFromContext(sessionId);
 
-                // Получение драйвера
-                var driver = SeleniumHelper.GetDriver(sessionId);
+            // Закрытие браузера
+            driver.Quit();
+            driver.Dispose();
 
-                // Закрытие браузера
-                driver.Quit();
-                driver.Dispose();
+            // Удаление из RepoDict
+            string resolvedSessionId = SessionResolver.Resolve(sessionId);
+            RepoDict.Remove(resolvedSessionId);
 
-                // Удаление из RepoDict
-                RepoDict.Remove(sessionId);
+            // Снимаем сессию из ambient-контекста
+            BrowserSessionContext.Pop();
 
-                return new ExecutionResult
-                {
-                    IsSuccess = true,
-                    SuccessMessage = $"[Закрыть браузер] Сессия {sessionId} закрыта"
-                };
-            }
-            catch (Exception ex)
-            {
-                return new ExecutionResult
-                {
-                    IsSuccess = false,
-                    ErrorMessage = $"Ошибка [Закрыть браузер]: {ex.Message}"
-                };
-            }
-            finally
-            {
-                // Снимаем сессию из ambient-контекста
-                BrowserSessionContext.Pop();
-            }
+            return CreateSuccessResult($"[Закрыть браузер] Сессия {resolvedSessionId} закрыта");
         }
 
         // ── Валидация ──────────────────────────────────────────────────

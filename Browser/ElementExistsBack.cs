@@ -20,8 +20,9 @@ namespace Primo.MIA
 {
     /// <summary>
     /// Активность для проверки существования элемента на странице.
+    /// REFACTORED: Использует BrowserActivityBase для устранения дублирования кода
     /// </summary>
-    public class ElementExistsBack : PrimoComponentTO<ElementExists>
+    public class ElementExistsBack : BrowserActivityBase<ElementExists>
     {
         public override string GroupName
         {
@@ -118,9 +119,9 @@ namespace Primo.MIA
 
             InitClass(container);
 
-            this.Prop_SessionId = "\"\"";
-            this.Prop_LocatorType = ElementLocatorType.Id;
-            this.Prop_LocatorValue = "\"\"";
+            Prop_SessionId = "\"\"";
+            Prop_LocatorType = ElementLocatorType.Id;
+            Prop_LocatorValue = "\"\"";
         }
 
         // ── TimedAction — точка входа ──────────────────────────────────
@@ -129,40 +130,24 @@ namespace Primo.MIA
         {
             try
             {
-                // Чтение параметров через SessionResolver (поддержка ambient-контекста)
-                string sessionId = SessionResolver.Resolve(
-                    GetPropertyValue<string>(this.Prop_SessionId, nameof(Prop_SessionId), sd));
-                string locatorValue = GetPropertyValue<string>(this.Prop_LocatorValue, nameof(Prop_LocatorValue), sd);
+                string sessionId = GetPropertyValue<string>(Prop_SessionId, nameof(Prop_SessionId), sd);
+                string locatorValue = GetPropertyValue<string>(Prop_LocatorValue, nameof(Prop_LocatorValue), sd);
 
                 if (string.IsNullOrWhiteSpace(locatorValue))
                     throw new ArgumentException("Значение локатора не может быть пустым");
 
-                // Получение драйвера
-                var driver = SeleniumHelper.GetDriver(sessionId);
-
-                // Создание локатора
-                var locator = SeleniumHelper.CreateLocator(this.Prop_LocatorType, locatorValue);
-
-                // Проверка существования
+                IWebDriver driver = GetDriverFromContext(sessionId);
+                var locator = SeleniumHelper.CreateLocator(Prop_LocatorType, locatorValue);
                 bool exists = SeleniumHelper.ElementExists(driver, locator);
 
-                // Запись результата
-                if (!string.IsNullOrWhiteSpace(this.Prop_Exists))
-                    SetVariableValue(this.Prop_Exists, exists, sd);
+                if (!string.IsNullOrWhiteSpace(Prop_Exists))
+                    SetVariableValue(Prop_Exists, exists, sd);
 
-                return new ExecutionResult
-                {
-                    IsSuccess = true,
-                    SuccessMessage = $"[Проверить существование] {this.Prop_LocatorType}={locatorValue} → {exists}"
-                };
+                return CreateSuccessResult($"[Проверить существование] {Prop_LocatorType}={locatorValue} → {exists}");
             }
             catch (Exception ex)
             {
-                return new ExecutionResult
-                {
-                    IsSuccess = false,
-                    ErrorMessage = $"Ошибка [Проверить существование]: {ex.Message}"
-                };
+                return CreateErrorResult(ex, "Проверить существование");
             }
         }
 
@@ -172,7 +157,7 @@ namespace Primo.MIA
         {
             var ret = new ValidationResult();
              
-            ret.ValidateRequired(this.Prop_LocatorValue, ActivityStrings.Field_LocatorValue, "Значение локатора обязательно");
+            ret.ValidateRequired(Prop_LocatorValue, ActivityStrings.Field_LocatorValue, "Значение локатора обязательно");
             return ret;
         }
     }

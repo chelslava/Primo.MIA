@@ -23,8 +23,9 @@ namespace Primo.MIA
 {
     /// <summary>
     /// Активность для перетаскивания элемента на странице.
+    /// REFACTORED: Использует BrowserActivityBase для устранения дублирования кода
     /// </summary>
-    public class ElementDragDropBack : PrimoComponentTO<ElementDragDrop>
+    public class ElementDragDropBack : BrowserActivityBase<ElementDragDrop>
     {
         public override string GroupName
         {
@@ -234,21 +235,15 @@ namespace Primo.MIA
         {
             try
             {
-                // Чтение параметров через SessionResolver (поддержка ambient-контекста)
-                string sessionId = SessionResolver.Resolve(
-                    GetPropertyValue<string>(this.Prop_SessionId, nameof(Prop_SessionId), sd));
-
-                var driver = SeleniumHelper.GetDriver(sessionId);
-
-                // Получение исходного элемента
+                string sessionId = GetPropertyValue<string>(Prop_SessionId, nameof(Prop_SessionId), sd);
+                IWebDriver driver = GetDriverFromContext(sessionId);
                 IWebElement sourceElement = GetSourceElement(driver, sd);
 
-                // Определяем режим: перетаскивание на элемент или на смещение
-                string targetElementId = GetPropertyValue<string>(this.Prop_TargetElementId, "Prop_TargetElementId", sd);
-                string targetLocatorValue = GetPropertyValue<string>(this.Prop_TargetLocatorValue, "Prop_TargetLocatorValue", sd);
+                string targetElementId = GetPropertyValue<string>(Prop_TargetElementId, "Prop_TargetElementId", sd);
+                string targetLocatorValue = GetPropertyValue<string>(Prop_TargetLocatorValue, "Prop_TargetLocatorValue", sd);
                 
-                string offsetXStr = GetPropertyValue<string>(this.Prop_OffsetX, "Prop_OffsetX", sd) ?? "0";
-                string offsetYStr = GetPropertyValue<string>(this.Prop_OffsetY, "Prop_OffsetY", sd) ?? "0";
+                string offsetXStr = GetPropertyValue<string>(Prop_OffsetX, "Prop_OffsetX", sd) ?? "0";
+                string offsetYStr = GetPropertyValue<string>(Prop_OffsetY, "Prop_OffsetY", sd) ?? "0";
                 int offsetX = int.TryParse(offsetXStr, out int ox) ? ox : 0;
                 int offsetY = int.TryParse(offsetYStr, out int oy) ? oy : 0;
 
@@ -259,23 +254,17 @@ namespace Primo.MIA
 
                 if (hasTargetElement)
                 {
-                    // Перетаскивание на целевой элемент
                     IWebElement targetElement = GetTargetElement(driver, sd);
 
-                    if (this.Prop_UseJavaScript)
-                    {
+                    if (Prop_UseJavaScript)
                         SeleniumHelper.DragAndDropJS(driver, sourceElement, targetElement);
-                    }
                     else
-                    {
                         SeleniumHelper.DragAndDrop(driver, sourceElement, targetElement);
-                    }
 
-                    resultMsg = $"[Перетаскивание] Выполнено на целевой элемент";
+                    resultMsg = "[Перетаскивание] Выполнено на целевой элемент";
                 }
                 else if (hasOffset)
                 {
-                    // Перетаскивание на смещение
                     SeleniumHelper.DragAndDropByOffset(driver, sourceElement, offsetX, offsetY);
                     resultMsg = $"[Перетаскивание] Выполнено на смещение ({offsetX}, {offsetY})";
                 }
@@ -284,19 +273,11 @@ namespace Primo.MIA
                     throw new ArgumentException("Необходимо указать либо целевой элемент, либо смещение");
                 }
 
-                return new ExecutionResult
-                {
-                    IsSuccess = true,
-                    SuccessMessage = resultMsg
-                };
+                return CreateSuccessResult(resultMsg);
             }
             catch (Exception ex)
             {
-                return new ExecutionResult
-                {
-                    IsSuccess = false,
-                    ErrorMessage = $"Ошибка [Перетаскивание]: {ex.Message}"
-                };
+                return CreateErrorResult(ex, "Перетаскивание");
             }
         }
 
@@ -307,16 +288,16 @@ namespace Primo.MIA
         /// </summary>
         private IWebElement GetSourceElement(IWebDriver driver, ScriptingData sd)
         {
-            string elementId = GetPropertyValue<string>(this.Prop_SourceElementId, "Prop_SourceElementId", sd);
-            string locatorValue = GetPropertyValue<string>(this.Prop_SourceLocatorValue, "Prop_SourceLocatorValue", sd);
+            string elementId = GetPropertyValue<string>(Prop_SourceElementId, "Prop_SourceElementId", sd);
+            string locatorValue = GetPropertyValue<string>(Prop_SourceLocatorValue, "Prop_SourceLocatorValue", sd);
 
             if (!string.IsNullOrWhiteSpace(locatorValue))
             {
-                string timeoutStr = GetPropertyValue<string>(this.Prop_WaitTimeout, "Prop_WaitTimeout", sd) ?? "10";
+                string timeoutStr = GetPropertyValue<string>(Prop_WaitTimeout, "Prop_WaitTimeout", sd) ?? "10";
                 int timeout = int.TryParse(timeoutStr, out int t) ? t : 10;
                 timeout = SeleniumHelper.ValidateTimeout(timeout, 10);
 
-                var locator = SeleniumHelper.CreateLocator(this.Prop_SourceLocatorType, locatorValue);
+                var locator = SeleniumHelper.CreateLocator(Prop_SourceLocatorType, locatorValue);
                 return SeleniumHelper.WaitForElementVisible(driver, locator, timeout);
             }
             else if (!string.IsNullOrWhiteSpace(elementId))
@@ -329,21 +310,18 @@ namespace Primo.MIA
             }
         }
 
-        /// <summary>
-        /// Получает целевой элемент для перетаскивания.
-        /// </summary>
         private IWebElement GetTargetElement(IWebDriver driver, ScriptingData sd)
         {
-            string elementId = GetPropertyValue<string>(this.Prop_TargetElementId, "Prop_TargetElementId", sd);
-            string locatorValue = GetPropertyValue<string>(this.Prop_TargetLocatorValue, "Prop_TargetLocatorValue", sd);
+            string elementId = GetPropertyValue<string>(Prop_TargetElementId, "Prop_TargetElementId", sd);
+            string locatorValue = GetPropertyValue<string>(Prop_TargetLocatorValue, "Prop_TargetLocatorValue", sd);
 
             if (!string.IsNullOrWhiteSpace(locatorValue))
             {
-                string timeoutStr = GetPropertyValue<string>(this.Prop_WaitTimeout, "Prop_WaitTimeout", sd) ?? "10";
+                string timeoutStr = GetPropertyValue<string>(Prop_WaitTimeout, "Prop_WaitTimeout", sd) ?? "10";
                 int timeout = int.TryParse(timeoutStr, out int t) ? t : 10;
                 timeout = SeleniumHelper.ValidateTimeout(timeout, 10);
 
-                var locator = SeleniumHelper.CreateLocator(this.Prop_TargetLocatorType, locatorValue);
+                var locator = SeleniumHelper.CreateLocator(Prop_TargetLocatorType, locatorValue);
                 return SeleniumHelper.WaitForElementVisible(driver, locator, timeout);
             }
             else if (!string.IsNullOrWhiteSpace(elementId))

@@ -14,18 +14,16 @@
 using LTools.Common.Model;
 using LTools.Common.UIElements;
 using LTools.SDK;
-using OpenQA.Selenium;
 using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
-using static LTools.Common.Helpers.WFHelper.PropertiesItem;
 
 namespace Primo.MIA
 {
     /// <summary>
     /// Активность для управления вкладками браузера.
     /// </summary>
-    public class BrowserTabManageBack : PrimoComponentTO<BrowserTabManage>
+    public class BrowserTabManageBack : BrowserActivityBase<BrowserTabManage>
     {
         public override string GroupName
         {
@@ -179,14 +177,14 @@ namespace Primo.MIA
 
             InitClass(container);
 
-            this.Prop_SessionId = "\"\"";
-            this.Prop_Operation = TabOperation.OpenNewTab;
-            this.Prop_TabIndex = "0";
-            this.Prop_TabHandle = "\"\"";
-            this.Prop_Url = "\"\"";
-            this.Prop_OutHandles = "";
-            this.Prop_OutCurrentHandle = "";
-            this.Prop_OutTabCount = "";
+            Prop_SessionId = "\"\"";
+            Prop_Operation = TabOperation.OpenNewTab;
+            Prop_TabIndex = "0";
+            Prop_TabHandle = "\"\"";
+            Prop_Url = "\"\"";
+            Prop_OutHandles = "";
+            Prop_OutCurrentHandle = "";
+            Prop_OutTabCount = "";
         }
 
         // ── TimedAction — точка входа ──────────────────────────────────
@@ -195,17 +193,15 @@ namespace Primo.MIA
         {
             try
             {
-                string sessionId = SessionResolver.Resolve(
-                    GetPropertyValue<string>(this.Prop_SessionId, nameof(Prop_SessionId), sd));
-
-                var driver = SeleniumHelper.GetDriver(sessionId);
+                string sessionId = GetPropertyValue<string>(Prop_SessionId, nameof(Prop_SessionId), sd);
+                var driver = GetDriverFromContext(sessionId);
                 string resultMsg;
 
-                switch (this.Prop_Operation)
+                switch (Prop_Operation)
                 {
                     case TabOperation.OpenNewTab:
                         {
-                            string url = GetPropertyValue<string>(this.Prop_Url, "Prop_Url", sd) ?? "";
+                            string url = GetPropertyValue<string>(Prop_Url, "Prop_Url", sd) ?? "";
                             SeleniumHelper.OpenNewTab(driver, url);
                             resultMsg = string.IsNullOrWhiteSpace(url)
                                 ? "[Управление вкладками] Новая вкладка открыта"
@@ -220,7 +216,7 @@ namespace Primo.MIA
 
                     case TabOperation.CloseTabByHandle:
                         {
-                            string handle = GetPropertyValue<string>(this.Prop_TabHandle, "Prop_TabHandle", sd);
+                            string handle = GetPropertyValue<string>(Prop_TabHandle, "Prop_TabHandle", sd);
                             if (string.IsNullOrWhiteSpace(handle))
                                 throw new ArgumentException("Handle вкладки не может быть пустым");
 
@@ -232,8 +228,8 @@ namespace Primo.MIA
                     case TabOperation.GetAllHandles:
                         {
                             var handles = SeleniumHelper.GetAllWindowHandles(driver);
-                            SetVariableValue(this.Prop_OutHandles, handles, sd);
-                            SetVariableValue(this.Prop_OutTabCount, handles.Count, sd);
+                            SetVariableValue(Prop_OutHandles, handles, sd);
+                            SetVariableValue(Prop_OutTabCount, handles.Count, sd);
                             resultMsg = $"[Управление вкладками] Получено handles: {handles.Count}";
                         }
                         break;
@@ -241,14 +237,14 @@ namespace Primo.MIA
                     case TabOperation.GetCurrentHandle:
                         {
                             string currentHandle = SeleniumHelper.GetCurrentWindowHandle(driver);
-                            SetVariableValue(this.Prop_OutCurrentHandle, currentHandle, sd);
+                            SetVariableValue(Prop_OutCurrentHandle, currentHandle, sd);
                             resultMsg = $"[Управление вкладками] Текущий handle: {currentHandle}";
                         }
                         break;
 
                     case TabOperation.SwitchToTab:
                         {
-                            string indexStr = GetPropertyValue<string>(this.Prop_TabIndex, "Prop_TabIndex", sd) ?? "0";
+                            string indexStr = GetPropertyValue<string>(Prop_TabIndex, "Prop_TabIndex", sd) ?? "0";
                             int index = int.TryParse(indexStr, out int idx) ? idx : 0;
 
                             SeleniumHelper.SwitchToTabByIndex(driver, index);
@@ -257,22 +253,14 @@ namespace Primo.MIA
                         break;
 
                     default:
-                        throw new NotSupportedException($"Операция {this.Prop_Operation} не поддерживается");
+                        throw new NotSupportedException($"Операция {Prop_Operation} не поддерживается");
                 }
 
-                return new ExecutionResult
-                {
-                    IsSuccess = true,
-                    SuccessMessage = resultMsg
-                };
+                return CreateSuccessResult(resultMsg);
             }
             catch (Exception ex)
             {
-                return new ExecutionResult
-                {
-                    IsSuccess = false,
-                    ErrorMessage = $"Ошибка [Управление вкладками]: {ex.Message}"
-                };
+                return CreateErrorResult($"Ошибка [Управление вкладками]: {ex.Message}");
             }
         }
 
@@ -283,22 +271,22 @@ namespace Primo.MIA
             var ret = new ValidationResult();
              
 
-            switch (this.Prop_Operation)
+            switch (Prop_Operation)
             {
                 case TabOperation.CloseTabByHandle:
-                    ret.ValidateRequired(this.Prop_TabHandle, "Handle вкладки", "Handle обязателен для операции CloseTabByHandle");
+                    ret.ValidateRequired(Prop_TabHandle, "Handle вкладки", "Handle обязателен для операции CloseTabByHandle");
                     break;
 
                 case TabOperation.SwitchToTab:
-                    ret.ValidateRequired(this.Prop_TabIndex, "Индекс вкладки", "Индекс обязателен для операции SwitchToTab");
+                    ret.ValidateRequired(Prop_TabIndex, "Индекс вкладки", "Индекс обязателен для операции SwitchToTab");
                     break;
 
                 case TabOperation.GetAllHandles:
-                    ret.ValidateRequired(this.Prop_OutHandles, "Список handles", "Переменная для списка handles обязательна");
+                    ret.ValidateRequired(Prop_OutHandles, "Список handles", "Переменная для списка handles обязательна");
                     break;
 
                 case TabOperation.GetCurrentHandle:
-                    ret.ValidateRequired(this.Prop_OutCurrentHandle, "Текущий handle", "Переменная для текущего handle обязательна");
+                    ret.ValidateRequired(Prop_OutCurrentHandle, "Текущий handle", "Переменная для текущего handle обязательна");
                     break;
             }
 

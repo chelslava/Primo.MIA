@@ -14,18 +14,16 @@
 using LTools.Common.Model;
 using LTools.Common.UIElements;
 using LTools.SDK;
-using OpenQA.Selenium;
 using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
-using static LTools.Common.Helpers.WFHelper.PropertiesItem;
 
 namespace Primo.MIA
 {
     /// <summary>
     /// Активность для управления окном браузера.
     /// </summary>
-    public class BrowserWindowManageBack : PrimoComponentTO<BrowserWindowManage>
+    public class BrowserWindowManageBack : BrowserActivityBase<BrowserWindowManage>
     {
         public override string GroupName
         {
@@ -204,16 +202,16 @@ namespace Primo.MIA
 
             InitClass(container);
 
-            this.Prop_SessionId = "\"\"";
-            this.Prop_Operation = WindowOperation.Maximize;
-            this.Prop_Width = "1024";
-            this.Prop_Height = "768";
-            this.Prop_X = "0";
-            this.Prop_Y = "0";
-            this.Prop_OutWidth = "";
-            this.Prop_OutHeight = "";
-            this.Prop_OutX = "";
-            this.Prop_OutY = "";
+            Prop_SessionId = "\"\"";
+            Prop_Operation = WindowOperation.Maximize;
+            Prop_Width = "1024";
+            Prop_Height = "768";
+            Prop_X = "0";
+            Prop_Y = "0";
+            Prop_OutWidth = "";
+            Prop_OutHeight = "";
+            Prop_OutX = "";
+            Prop_OutY = "";
         }
 
         // ── TimedAction — точка входа ──────────────────────────────────
@@ -222,13 +220,11 @@ namespace Primo.MIA
         {
             try
             {
-                string sessionId = SessionResolver.Resolve(
-                    GetPropertyValue<string>(this.Prop_SessionId, nameof(Prop_SessionId), sd));
-
-                var driver = SeleniumHelper.GetDriver(sessionId);
+                string sessionId = GetPropertyValue<string>(Prop_SessionId, nameof(Prop_SessionId), sd);
+                var driver = GetDriverFromContext(sessionId);
                 string resultMsg;
 
-                switch (this.Prop_Operation)
+                switch (Prop_Operation)
                 {
                     case WindowOperation.Maximize:
                         SeleniumHelper.MaximizeWindow(driver);
@@ -247,8 +243,8 @@ namespace Primo.MIA
 
                     case WindowOperation.SetSize:
                         {
-                            string widthStr = GetPropertyValue<string>(this.Prop_Width, "Prop_Width", sd) ?? "1024";
-                            string heightStr = GetPropertyValue<string>(this.Prop_Height, "Prop_Height", sd) ?? "768";
+                            string widthStr = GetPropertyValue<string>(Prop_Width, "Prop_Width", sd) ?? "1024";
+                            string heightStr = GetPropertyValue<string>(Prop_Height, "Prop_Height", sd) ?? "768";
                             int width = int.TryParse(widthStr, out int w) ? w : 1024;
                             int height = int.TryParse(heightStr, out int h) ? h : 768;
 
@@ -259,8 +255,8 @@ namespace Primo.MIA
 
                     case WindowOperation.SetPosition:
                         {
-                            string xStr = GetPropertyValue<string>(this.Prop_X, "Prop_X", sd) ?? "0";
-                            string yStr = GetPropertyValue<string>(this.Prop_Y, "Prop_Y", sd) ?? "0";
+                            string xStr = GetPropertyValue<string>(Prop_X, "Prop_X", sd) ?? "0";
+                            string yStr = GetPropertyValue<string>(Prop_Y, "Prop_Y", sd) ?? "0";
                             int x = int.TryParse(xStr, out int xVal) ? xVal : 0;
                             int y = int.TryParse(yStr, out int yVal) ? yVal : 0;
 
@@ -272,8 +268,8 @@ namespace Primo.MIA
                     case WindowOperation.GetSize:
                         {
                             var (width, height) = SeleniumHelper.GetWindowSize(driver);
-                            SetVariableValue(this.Prop_OutWidth, width, sd);
-                            SetVariableValue(this.Prop_OutHeight, height, sd);
+                            SetVariableValue(Prop_OutWidth, width, sd);
+                            SetVariableValue(Prop_OutHeight, height, sd);
                             resultMsg = $"[Управление окном] Размер получен: {width}x{height}";
                         }
                         break;
@@ -281,29 +277,21 @@ namespace Primo.MIA
                     case WindowOperation.GetPosition:
                         {
                             var (x, y) = SeleniumHelper.GetWindowPosition(driver);
-                            SetVariableValue(this.Prop_OutX, x, sd);
-                            SetVariableValue(this.Prop_OutY, y, sd);
+                            SetVariableValue(Prop_OutX, x, sd);
+                            SetVariableValue(Prop_OutY, y, sd);
                             resultMsg = $"[Управление окном] Позиция получена: ({x}, {y})";
                         }
                         break;
 
                     default:
-                        throw new NotSupportedException($"Операция {this.Prop_Operation} не поддерживается");
+                        throw new NotSupportedException($"Операция {Prop_Operation} не поддерживается");
                 }
 
-                return new ExecutionResult
-                {
-                    IsSuccess = true,
-                    SuccessMessage = resultMsg
-                };
+                return CreateSuccessResult(resultMsg);
             }
             catch (Exception ex)
             {
-                return new ExecutionResult
-                {
-                    IsSuccess = false,
-                    ErrorMessage = $"Ошибка [Управление окном]: {ex.Message}"
-                };
+                return CreateErrorResult($"Ошибка [Управление окном]: {ex.Message}");
             }
         }
 
@@ -314,16 +302,16 @@ namespace Primo.MIA
             var ret = new ValidationResult();
              
 
-            switch (this.Prop_Operation)
+            switch (Prop_Operation)
             {
                 case WindowOperation.SetSize:
-                    if (string.IsNullOrWhiteSpace(this.Prop_Width))
+                    if (string.IsNullOrWhiteSpace(Prop_Width))
                         ret.Items.Add(new ValidationResult.ValidationItem()
                         {
                             PropertyName = "Width",
                             Error = "Ширина обязательна для операции SetSize"
                         });
-                    if (string.IsNullOrWhiteSpace(this.Prop_Height))
+                    if (string.IsNullOrWhiteSpace(Prop_Height))
                         ret.Items.Add(new ValidationResult.ValidationItem()
                         {
                             PropertyName = "Height",
@@ -332,13 +320,13 @@ namespace Primo.MIA
                     break;
 
                 case WindowOperation.SetPosition:
-                    if (string.IsNullOrWhiteSpace(this.Prop_X))
+                    if (string.IsNullOrWhiteSpace(Prop_X))
                         ret.Items.Add(new ValidationResult.ValidationItem()
                         {
                             PropertyName = "X",
                             Error = "Позиция X обязательна для операции SetPosition"
                         });
-                    if (string.IsNullOrWhiteSpace(this.Prop_Y))
+                    if (string.IsNullOrWhiteSpace(Prop_Y))
                         ret.Items.Add(new ValidationResult.ValidationItem()
                         {
                             PropertyName = "Y",
@@ -347,13 +335,13 @@ namespace Primo.MIA
                     break;
 
                 case WindowOperation.GetSize:
-                    ret.ValidateRequired(this.Prop_OutWidth, "Ширина (результат)", "Переменная для ширины обязательна");
-                    ret.ValidateRequired(this.Prop_OutHeight, "Высота (результат)", "Переменная для высоты обязательна");
+                    ret.ValidateRequired(Prop_OutWidth, "Ширина (результат)", "Переменная для ширины обязательна");
+                    ret.ValidateRequired(Prop_OutHeight, "Высота (результат)", "Переменная для высоты обязательна");
                     break;
 
                 case WindowOperation.GetPosition:
-                    ret.ValidateRequired(this.Prop_OutX, "Позиция X (результат)", "Переменная для X обязательна");
-                    ret.ValidateRequired(this.Prop_OutY, "Позиция Y (результат)", "Переменная для Y обязательна");
+                    ret.ValidateRequired(Prop_OutX, "Позиция X (результат)", "Переменная для X обязательна");
+                    ret.ValidateRequired(Prop_OutY, "Позиция Y (результат)", "Переменная для Y обязательна");
                     break;
             }
 

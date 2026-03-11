@@ -18,8 +18,9 @@ namespace Primo.MIA
 {
     /// <summary>
     /// Активность для навигации по URL в браузере.
+    /// REFACTORED: Использует BrowserActivityBase для устранения дублирования кода
     /// </summary>
-    public class BrowserNavigateBack : PrimoComponentTO<BrowserNavigate>
+    public class BrowserNavigateBack : BrowserActivityBase<BrowserNavigate>
     {
         public override string GroupName
         {
@@ -100,9 +101,9 @@ namespace Primo.MIA
 
             InitClass(container);
 
-            this.Prop_Mode = NavigateMode.ToUrl;
-            this.Prop_SessionId = "\"\"";
-            this.Prop_Url = "\"https://example.com\"";
+            Prop_Mode = NavigateMode.ToUrl;
+            Prop_SessionId = "\"\"";
+            Prop_Url = "\"https://example.com\"";
         }
 
         // ── TimedAction — точка входа ──────────────────────────────────
@@ -114,19 +115,18 @@ namespace Primo.MIA
         {
             try
             {
-                // Чтение параметров через SessionResolver (поддержка ambient-контекста)
-                string sessionId = SessionResolver.Resolve(
-                    GetPropertyValue<string>(this.Prop_SessionId, nameof(Prop_SessionId), sd));
-
-                // Получение драйвера из репозитория сессий
-                var driver = SeleniumHelper.GetDriver(sessionId);
+                // Получаем sessionId
+                string sessionId = GetPropertyValue<string>(Prop_SessionId, nameof(Prop_SessionId), sd);
+                
+                // Получение драйвера через базовый класс
+                IWebDriver driver = GetDriverFromContext(sessionId);
 
                 // Выполнение навигации в зависимости от режима
                 string message;
-                switch (this.Prop_Mode)
+                switch (Prop_Mode)
                 {
                     case NavigateMode.ToUrl:
-                        string url = GetPropertyValue<string>(this.Prop_Url, "Prop_Url", sd);
+                        string url = GetPropertyValue<string>(Prop_Url, "Prop_Url", sd);
                         if (string.IsNullOrWhiteSpace(url))
                             throw new ArgumentException("URL не может быть пустым");
                         
@@ -150,25 +150,17 @@ namespace Primo.MIA
                         break;
 
                     default:
-                        throw new ArgumentException($"Неизвестный режим навигации: {this.Prop_Mode}");
+                        throw new ArgumentException($"Неизвестный режим навигации: {Prop_Mode}");
                 }
 
                 // Небольшая пауза для стабилизации
                 System.Threading.Thread.Sleep(500);
 
-                return new ExecutionResult
-                {
-                    IsSuccess = true,
-                    SuccessMessage = message
-                };
+                return CreateSuccessResult(message);
             }
             catch (Exception ex)
             {
-                return new ExecutionResult
-                {
-                    IsSuccess = false,
-                    ErrorMessage = $"Ошибка [Навигация]: {ex.Message}"
-                };
+                return CreateErrorResult(ex, "Навигация");
             }
         }
 
@@ -182,9 +174,9 @@ namespace Primo.MIA
             var ret = new ValidationResult();
             
             // URL обязателен только для режима ToUrl
-            if (this.Prop_Mode == NavigateMode.ToUrl)
+            if (Prop_Mode == NavigateMode.ToUrl)
             {
-                ret.ValidateRequired(this.Prop_Url, "URL", "URL обязателен для режима ToUrl");
+                ret.ValidateRequired(Prop_Url, "URL", "URL обязателен для режима ToUrl");
             }
             
             return ret;

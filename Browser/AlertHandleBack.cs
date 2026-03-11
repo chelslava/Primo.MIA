@@ -24,8 +24,9 @@ namespace Primo.MIA
 {
     /// <summary>
     /// Активность для работы с JavaScript алертами.
+    /// REFACTORED: Использует BrowserActivityBase для устранения дублирования кода
     /// </summary>
-    public class AlertHandleBack : PrimoComponentTO<AlertHandle>
+    public class AlertHandleBack : BrowserActivityBase<AlertHandle>
     {
         public override string GroupName
         {
@@ -123,9 +124,9 @@ namespace Primo.MIA
 
             InitClass(container);
 
-            this.Prop_SessionId = "\"\"";
-            this.Prop_Action = AlertAction.Accept;
-            this.Prop_InputText = "\"\"";
+            Prop_SessionId = "\"\"";
+            Prop_Action = AlertAction.Accept;
+            Prop_InputText = "\"\"";
         }
 
         // ── TimedAction — точка входа ──────────────────────────────────
@@ -134,13 +135,12 @@ namespace Primo.MIA
         {
             try
             {
-                // Чтение параметров через SessionResolver (поддержка ambient-контекста)
-                string sessionId = SessionResolver.Resolve(
-                    GetPropertyValue<string>(this.Prop_SessionId, nameof(Prop_SessionId), sd));
-                string inputText = GetPropertyValue<string>(this.Prop_InputText, nameof(Prop_InputText), sd) ?? string.Empty;
+                // Получаем sessionId
+                string sessionId = GetPropertyValue<string>(Prop_SessionId, nameof(Prop_SessionId), sd);
+                string inputText = GetPropertyValue<string>(Prop_InputText, nameof(Prop_InputText), sd) ?? string.Empty;
 
-                // Получение драйвера
-                var driver = SeleniumHelper.GetDriver(sessionId);
+                // Получение драйвера через базовый класс
+                IWebDriver driver = GetDriverFromContext(sessionId);
 
                 // Переключение на алерт
                 IAlert alert = driver.SwitchTo().Alert();
@@ -149,7 +149,7 @@ namespace Primo.MIA
                 string actionMessage = string.Empty;
 
                 // Выполнение действия
-                switch (this.Prop_Action)
+                switch (Prop_Action)
                 {
                     case AlertAction.Accept:
                         alert.Accept();
@@ -175,34 +175,22 @@ namespace Primo.MIA
                         break;
 
                     default:
-                        throw new NotSupportedException($"Действие {this.Prop_Action} не поддерживается");
+                        throw new NotSupportedException($"Действие {Prop_Action} не поддерживается");
                 }
 
                 // Запись текста алерта
-                if (!string.IsNullOrWhiteSpace(this.Prop_AlertText) && !string.IsNullOrEmpty(alertText))
-                    SetVariableValue(this.Prop_AlertText, alertText, sd);
+                if (!string.IsNullOrWhiteSpace(Prop_AlertText) && !string.IsNullOrEmpty(alertText))
+                    SetVariableValue(Prop_AlertText, alertText, sd);
 
-                return new ExecutionResult
-                {
-                    IsSuccess = true,
-                    SuccessMessage = $"[Обработка алерта] {actionMessage}"
-                };
+                return CreateSuccessResult($"[Обработка алерта] {actionMessage}");
             }
             catch (NoAlertPresentException)
             {
-                return new ExecutionResult
-                {
-                    IsSuccess = false,
-                    ErrorMessage = "Ошибка [Обработка алерта]: Алерт не найден"
-                };
+                return CreateErrorResult("Алерт не найден");
             }
             catch (Exception ex)
             {
-                return new ExecutionResult
-                {
-                    IsSuccess = false,
-                    ErrorMessage = $"Ошибка [Обработка алерта]: {ex.Message}"
-                };
+                return CreateErrorResult(ex, "Обработка алерта");
             }
         }
 
@@ -214,8 +202,8 @@ namespace Primo.MIA
              
 
             // Для SendKeys текст обязателен
-            if (this.Prop_Action == AlertAction.SendKeys)
-                ret.ValidateRequired(this.Prop_InputText, ActivityStrings.Field_AlertInput, "Текст для ввода обязателен");
+            if (Prop_Action == AlertAction.SendKeys)
+                ret.ValidateRequired(Prop_InputText, ActivityStrings.Field_AlertInput, "Текст для ввода обязателен");
 
             return ret;
         }

@@ -20,8 +20,9 @@ namespace Primo.MIA
 {
     /// <summary>
     /// Активность для отправки HTML формы.
+    /// REFACTORED: Использует BrowserActivityBase для устранения дублирования кода
     /// </summary>
-    public class ElementSubmitBack : PrimoComponentTO<ElementSubmit>
+    public class ElementSubmitBack : BrowserActivityBase<ElementSubmit>
     {
         public override string GroupName
         {
@@ -146,30 +147,24 @@ namespace Primo.MIA
         {
             try
             {
-                // Чтение параметров через SessionResolver (поддержка ambient-контекста)
-                string sessionId = SessionResolver.Resolve(
-                    GetPropertyValue<string>(this.Prop_SessionId, nameof(Prop_SessionId), sd));
-                string elementId = GetPropertyValue<string>(this.Prop_ElementId, nameof(Prop_ElementId), sd);
-                string locatorValue = GetPropertyValue<string>(this.Prop_LocatorValue, nameof(Prop_LocatorValue), sd);
+                string sessionId = GetPropertyValue<string>(Prop_SessionId, nameof(Prop_SessionId), sd);
+                string elementId = GetPropertyValue<string>(Prop_ElementId, nameof(Prop_ElementId), sd);
+                string locatorValue = GetPropertyValue<string>(Prop_LocatorValue, nameof(Prop_LocatorValue), sd);
 
-                // Получение драйвера
-                var driver = SeleniumHelper.GetDriver(sessionId);
+                IWebDriver driver = GetDriverFromContext(sessionId);
 
-                // Получение элемента: либо по ID, либо поиск по локатору
                 IWebElement element;
                 if (!string.IsNullOrWhiteSpace(locatorValue))
                 {
-                    // Поиск элемента по локатору
-                    string timeoutStr = GetPropertyValue<string>(this.Prop_WaitTimeout, "Prop_WaitTimeout", sd) ?? "10";
+                    string timeoutStr = GetPropertyValue<string>(Prop_WaitTimeout, "Prop_WaitTimeout", sd) ?? "10";
                     int timeout = int.TryParse(timeoutStr, out int t) ? t : 10;
                     timeout = SeleniumHelper.ValidateTimeout(timeout, 10);
 
-                    var locator = SeleniumHelper.CreateLocator(this.Prop_LocatorType, locatorValue);
+                    var locator = SeleniumHelper.CreateLocator(Prop_LocatorType, locatorValue);
                     element = SeleniumHelper.WaitForElement(driver, locator, timeout);
                 }
                 else if (!string.IsNullOrWhiteSpace(elementId))
                 {
-                    // Использование существующего элемента
                     element = SeleniumHelper.GetElement(elementId);
                 }
                 else
@@ -177,26 +172,17 @@ namespace Primo.MIA
                     throw new ArgumentException("Необходимо указать либо ID элемента, либо локатор для поиска");
                 }
 
-                // Отправка формы
                 element.Submit();
 
                 string resultMsg = !string.IsNullOrWhiteSpace(locatorValue)
-                    ? $"[Отправить форму] Форма отправлена: {this.Prop_LocatorType}={locatorValue}"
+                    ? $"[Отправить форму] Форма отправлена: {Prop_LocatorType}={locatorValue}"
                     : $"[Отправить форму] Форма отправлена через {elementId}";
 
-                return new ExecutionResult
-                {
-                    IsSuccess = true,
-                    SuccessMessage = resultMsg
-                };
+                return CreateSuccessResult(resultMsg);
             }
             catch (Exception ex)
             {
-                return new ExecutionResult
-                {
-                    IsSuccess = false,
-                    ErrorMessage = $"Ошибка [Отправить форму]: {ex.Message}"
-                };
+                return CreateErrorResult(ex, "Отправить форму");
             }
         }
 

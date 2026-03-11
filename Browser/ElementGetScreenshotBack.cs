@@ -23,8 +23,9 @@ namespace Primo.MIA
 {
     /// <summary>
     /// Активность для создания скриншота элемента.
+    /// REFACTORED: Использует BrowserActivityBase для устранения дублирования кода
     /// </summary>
-    public class ElementGetScreenshotBack : PrimoComponentTO<ElementGetScreenshot>
+    public class ElementGetScreenshotBack : BrowserActivityBase<ElementGetScreenshot>
     {
         public override string GroupName
         {
@@ -181,25 +182,21 @@ namespace Primo.MIA
         {
             try
             {
-                // Чтение параметров через SessionResolver (поддержка ambient-контекста)
-                string sessionId = SessionResolver.Resolve(
-                    GetPropertyValue<string>(this.Prop_SessionId, nameof(Prop_SessionId), sd));
-                string elementId = GetPropertyValue<string>(this.Prop_ElementId, nameof(Prop_ElementId), sd);
-                string locatorValue = GetPropertyValue<string>(this.Prop_LocatorValue, nameof(Prop_LocatorValue), sd);
-                string filePath = GetPropertyValue<string>(this.Prop_FilePath, nameof(Prop_FilePath), sd);
+                string sessionId = GetPropertyValue<string>(Prop_SessionId, nameof(Prop_SessionId), sd);
+                string elementId = GetPropertyValue<string>(Prop_ElementId, nameof(Prop_ElementId), sd);
+                string locatorValue = GetPropertyValue<string>(Prop_LocatorValue, nameof(Prop_LocatorValue), sd);
+                string filePath = GetPropertyValue<string>(Prop_FilePath, nameof(Prop_FilePath), sd);
 
-                // Получение драйвера
-                var driver = SeleniumHelper.GetDriver(sessionId);
+                IWebDriver driver = GetDriverFromContext(sessionId);
 
-                // Получение элемента
                 IWebElement element;
                 if (!string.IsNullOrWhiteSpace(locatorValue))
                 {
-                    string timeoutStr = GetPropertyValue<string>(this.Prop_WaitTimeout, "Prop_WaitTimeout", sd) ?? "10";
+                    string timeoutStr = GetPropertyValue<string>(Prop_WaitTimeout, "Prop_WaitTimeout", sd) ?? "10";
                     int timeout = int.TryParse(timeoutStr, out int t) ? t : 10;
                     timeout = SeleniumHelper.ValidateTimeout(timeout, 10);
 
-                    var locator = SeleniumHelper.CreateLocator(this.Prop_LocatorType, locatorValue);
+                    var locator = SeleniumHelper.CreateLocator(Prop_LocatorType, locatorValue);
                     element = SeleniumHelper.WaitForElementVisible(driver, locator, timeout);
                 }
                 else if (!string.IsNullOrWhiteSpace(elementId))
@@ -211,33 +208,21 @@ namespace Primo.MIA
                     throw new ArgumentException("Необходимо указать либо ID элемента, либо локатор для поиска");
                 }
 
-                // Создание скриншота
                 string base64Screenshot = SeleniumHelper.TakeElementScreenshotBase64(element);
-                SetVariableValue(this.Prop_OutBase64, base64Screenshot, sd);
+                SetVariableValue(Prop_OutBase64, base64Screenshot, sd);
 
-                // Сохранение в файл если указан путь
                 if (!string.IsNullOrWhiteSpace(filePath))
-                {
                     SeleniumHelper.TakeElementScreenshotToFile(element, filePath);
-                }
 
                 string resultMsg = !string.IsNullOrWhiteSpace(filePath)
                     ? $"[Скриншот элемента] Сохранён: {filePath}"
                     : "[Скриншот элемента] Создан (Base64)";
 
-                return new ExecutionResult
-                {
-                    IsSuccess = true,
-                    SuccessMessage = resultMsg
-                };
+                return CreateSuccessResult(resultMsg);
             }
             catch (Exception ex)
             {
-                return new ExecutionResult
-                {
-                    IsSuccess = false,
-                    ErrorMessage = $"Ошибка [Скриншот элемента]: {ex.Message}"
-                };
+                return CreateErrorResult(ex, "Скриншот элемента");
             }
         }
 

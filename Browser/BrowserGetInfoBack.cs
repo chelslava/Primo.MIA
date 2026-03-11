@@ -16,14 +16,14 @@ using OpenQA.Selenium;
 using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
-using static LTools.Common.Helpers.WFHelper.PropertiesItem;
 
 namespace Primo.MIA
 {
     /// <summary>
     /// Активность для получения информации о текущем состоянии браузера.
+    /// REFACTORED: Использует BrowserActivityBase для устранения дублирования кода
     /// </summary>
-    public class BrowserGetInfoBack : PrimoComponentTO<BrowserGetInfo>
+    public class BrowserGetInfoBack : BrowserActivityBase<BrowserGetInfo>
     {
         public override string GroupName
         {
@@ -126,12 +126,11 @@ namespace Primo.MIA
         {
             try
             {
-                // Чтение ID сессии через SessionResolver (поддержка ambient-контекста)
-                string sessionId = SessionResolver.Resolve(
-                    GetPropertyValue<string>(this.Prop_SessionId, nameof(Prop_SessionId), sd));
-
-                // Получение драйвера
-                var driver = SeleniumHelper.GetDriver(sessionId);
+                // Получаем sessionId
+                string sessionId = GetPropertyValue<string>(Prop_SessionId, nameof(Prop_SessionId), sd);
+                
+                // Получение драйвера через базовый класс
+                IWebDriver driver = GetDriverFromContext(sessionId);
 
                 // Извлечение информации
                 string currentUrl = driver.Url ?? string.Empty;
@@ -139,28 +138,20 @@ namespace Primo.MIA
                 string pageSource = driver.PageSource ?? string.Empty;
 
                 // Запись в выходные переменные
-                if (!string.IsNullOrWhiteSpace(this.Prop_CurrentUrl))
-                    SetVariableValue(this.Prop_CurrentUrl, currentUrl, sd);
+                if (!string.IsNullOrWhiteSpace(Prop_CurrentUrl))
+                    SetVariableValue(Prop_CurrentUrl, currentUrl, sd);
 
-                if (!string.IsNullOrWhiteSpace(this.Prop_PageTitle))
-                    SetVariableValue(this.Prop_PageTitle, pageTitle, sd);
+                if (!string.IsNullOrWhiteSpace(Prop_PageTitle))
+                    SetVariableValue(Prop_PageTitle, pageTitle, sd);
 
-                if (!string.IsNullOrWhiteSpace(this.Prop_PageSource))
-                    SetVariableValue(this.Prop_PageSource, pageSource, sd);
+                if (!string.IsNullOrWhiteSpace(Prop_PageSource))
+                    SetVariableValue(Prop_PageSource, pageSource, sd);
 
-                return new ExecutionResult
-                {
-                    IsSuccess = true,
-                    SuccessMessage = $"[Получить информацию] URL: {currentUrl}, Title: {pageTitle}"
-                };
+                return CreateSuccessResult($"[Получить информацию] URL: {currentUrl}, Title: {pageTitle}");
             }
             catch (Exception ex)
             {
-                return new ExecutionResult
-                {
-                    IsSuccess = false,
-                    ErrorMessage = $"Ошибка [Получить информацию]: {ex.Message}"
-                };
+                return CreateErrorResult(ex, "Получить информацию");
             }
         }
 

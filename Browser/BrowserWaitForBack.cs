@@ -29,8 +29,9 @@ namespace Primo.MIA
 {
     /// <summary>
     /// Активность для ожидания различных условий в браузере.
+    /// REFACTORED: Использует BrowserActivityBase для устранения дублирования кода
     /// </summary>
-    public class BrowserWaitForBack : PrimoComponentTO<BrowserWaitFor>
+    public class BrowserWaitForBack : BrowserActivityBase<BrowserWaitFor>
     {
         public override string GroupName
         {
@@ -196,12 +197,12 @@ namespace Primo.MIA
 
             InitClass(container);
 
-            this.Prop_SessionId = "\"\"";
-            this.Prop_Condition = WaitConditionType.ElementVisible;
-            this.Prop_LocatorType = ElementLocatorType.Id;
-            this.Prop_LocatorValue = "\"\"";
-            this.Prop_Text = "\"\"";
-            this.Prop_Timeout = "30";
+            Prop_SessionId = "\"\"";
+            Prop_Condition = WaitConditionType.ElementVisible;
+            Prop_LocatorType = ElementLocatorType.Id;
+            Prop_LocatorValue = "\"\"";
+            Prop_Text = "\"\"";
+            Prop_Timeout = "30";
         }
 
         // ── TimedAction — точка входа ──────────────────────────────────
@@ -212,16 +213,15 @@ namespace Primo.MIA
 
             try
             {
-                // Чтение параметров через SessionResolver (поддержка ambient-контекста)
-                string sessionId = SessionResolver.Resolve(
-                    GetPropertyValue<string>(this.Prop_SessionId, nameof(Prop_SessionId), sd));
-                string timeoutStr = GetPropertyValue<string>(this.Prop_Timeout, nameof(Prop_Timeout), sd) ?? "30";
+                // Получаем sessionId
+                string sessionId = GetPropertyValue<string>(Prop_SessionId, nameof(Prop_SessionId), sd);
+                string timeoutStr = GetPropertyValue<string>(Prop_Timeout, nameof(Prop_Timeout), sd) ?? "30";
 
                 int timeout = int.TryParse(timeoutStr, out int t) ? t : 30;
                 timeout = SeleniumHelper.ValidateTimeout(timeout, 30);
 
-                // Получение драйвера
-                var driver = SeleniumHelper.GetDriver(sessionId);
+                // Получение драйвера через базовый класс
+                IWebDriver driver = GetDriverFromContext(sessionId);
 
                 // Выполнение ожидания в зависимости от условия
                 bool conditionMet = WaitForCondition(driver, timeout, sd);
@@ -230,25 +230,17 @@ namespace Primo.MIA
                 int waitTime = (int)(DateTime.Now - startTime).TotalMilliseconds;
 
                 // Запись результатов
-                if (!string.IsNullOrWhiteSpace(this.Prop_ConditionMet))
-                    SetVariableValue(this.Prop_ConditionMet, conditionMet, sd);
+                if (!string.IsNullOrWhiteSpace(Prop_ConditionMet))
+                    SetVariableValue(Prop_ConditionMet, conditionMet, sd);
 
-                if (!string.IsNullOrWhiteSpace(this.Prop_WaitTime))
-                    SetVariableValue(this.Prop_WaitTime, waitTime, sd);
+                if (!string.IsNullOrWhiteSpace(Prop_WaitTime))
+                    SetVariableValue(Prop_WaitTime, waitTime, sd);
 
-                return new ExecutionResult
-                {
-                    IsSuccess = true,
-                    SuccessMessage = $"[Ожидание условия] {this.Prop_Condition} → {conditionMet} ({waitTime}мс)"
-                };
+                return CreateSuccessResult($"[Ожидание условия] {Prop_Condition} → {conditionMet} ({waitTime}мс)");
             }
             catch (Exception ex)
             {
-                return new ExecutionResult
-                {
-                    IsSuccess = false,
-                    ErrorMessage = $"Ошибка [Ожидание условия]: {ex.Message}"
-                };
+                return CreateErrorResult(ex, "Ожидание условия");
             }
         }
 
@@ -263,7 +255,7 @@ namespace Primo.MIA
 
             try
             {
-                switch (this.Prop_Condition)
+                switch (Prop_Condition)
                 {
                     case WaitConditionType.ElementExists:
                         return WaitForElementExists(driver, wait);
@@ -290,7 +282,7 @@ namespace Primo.MIA
                         return WaitForAlertPresent(wait);
 
                     default:
-                        throw new NotSupportedException($"Условие {this.Prop_Condition} не поддерживается");
+                        throw new NotSupportedException($"Условие {Prop_Condition} не поддерживается");
                 }
             }
             catch (WebDriverTimeoutException)
@@ -301,16 +293,16 @@ namespace Primo.MIA
 
         private bool WaitForElementExists(IWebDriver driver, WebDriverWait wait)
         {
-            string locatorValue = GetPropertyValue<string>(this.Prop_LocatorValue, "Prop_LocatorValue", null);
-            var locator = SeleniumHelper.CreateLocator(this.Prop_LocatorType, locatorValue);
+            string locatorValue = GetPropertyValue<string>(Prop_LocatorValue, "Prop_LocatorValue", null);
+            var locator = SeleniumHelper.CreateLocator(Prop_LocatorType, locatorValue);
             wait.Until(drv => drv.FindElement(locator));
             return true;
         }
 
         private bool WaitForElementVisible(IWebDriver driver, WebDriverWait wait)
         {
-            string locatorValue = GetPropertyValue<string>(this.Prop_LocatorValue, "Prop_LocatorValue", null);
-            var locator = SeleniumHelper.CreateLocator(this.Prop_LocatorType, locatorValue);
+            string locatorValue = GetPropertyValue<string>(Prop_LocatorValue, "Prop_LocatorValue", null);
+            var locator = SeleniumHelper.CreateLocator(Prop_LocatorType, locatorValue);
             wait.Until(drv =>
             {
                 try
@@ -325,8 +317,8 @@ namespace Primo.MIA
 
         private bool WaitForElementClickable(IWebDriver driver, WebDriverWait wait)
         {
-            string locatorValue = GetPropertyValue<string>(this.Prop_LocatorValue, "Prop_LocatorValue", null);
-            var locator = SeleniumHelper.CreateLocator(this.Prop_LocatorType, locatorValue);
+            string locatorValue = GetPropertyValue<string>(Prop_LocatorValue, "Prop_LocatorValue", null);
+            var locator = SeleniumHelper.CreateLocator(Prop_LocatorType, locatorValue);
             wait.Until(drv =>
             {
                 try
@@ -341,8 +333,8 @@ namespace Primo.MIA
 
         private bool WaitForElementInvisible(IWebDriver driver, WebDriverWait wait)
         {
-            string locatorValue = GetPropertyValue<string>(this.Prop_LocatorValue, "Prop_LocatorValue", null);
-            var locator = SeleniumHelper.CreateLocator(this.Prop_LocatorType, locatorValue);
+            string locatorValue = GetPropertyValue<string>(Prop_LocatorValue, "Prop_LocatorValue", null);
+            var locator = SeleniumHelper.CreateLocator(Prop_LocatorType, locatorValue);
             wait.Until(drv =>
             {
                 try
@@ -360,9 +352,9 @@ namespace Primo.MIA
 
         private bool WaitForTextPresent(IWebDriver driver, WebDriverWait wait, ScriptingData sd)
         {
-            string locatorValue = GetPropertyValue<string>(this.Prop_LocatorValue, "Prop_LocatorValue", sd);
-            string text = GetPropertyValue<string>(this.Prop_Text, "Prop_Text", sd);
-            var locator = SeleniumHelper.CreateLocator(this.Prop_LocatorType, locatorValue);
+            string locatorValue = GetPropertyValue<string>(Prop_LocatorValue, "Prop_LocatorValue", sd);
+            string text = GetPropertyValue<string>(Prop_Text, "Prop_Text", sd);
+            var locator = SeleniumHelper.CreateLocator(Prop_LocatorType, locatorValue);
             
             wait.Until(drv =>
             {
@@ -378,14 +370,14 @@ namespace Primo.MIA
 
         private bool WaitForTitleContains(IWebDriver driver, WebDriverWait wait, ScriptingData sd)
         {
-            string text = GetPropertyValue<string>(this.Prop_Text, "Prop_Text", sd);
+            string text = GetPropertyValue<string>(Prop_Text, "Prop_Text", sd);
             wait.Until(drv => drv.Title.Contains(text));
             return true;
         }
 
         private bool WaitForUrlContains(IWebDriver driver, WebDriverWait wait, ScriptingData sd)
         {
-            string text = GetPropertyValue<string>(this.Prop_Text, "Prop_Text", sd);
+            string text = GetPropertyValue<string>(Prop_Text, "Prop_Text", sd);
             wait.Until(drv => drv.Url.Contains(text));
             return true;
         }
@@ -415,23 +407,23 @@ namespace Primo.MIA
              
 
             // Валидация в зависимости от типа условия
-            switch (this.Prop_Condition)
+            switch (Prop_Condition)
             {
                 case WaitConditionType.ElementExists:
                 case WaitConditionType.ElementVisible:
                 case WaitConditionType.ElementClickable:
                 case WaitConditionType.ElementInvisible:
-                    ret.ValidateRequired(this.Prop_LocatorValue, ActivityStrings.Field_LocatorValue, "Значение локатора обязательно");
+                    ret.ValidateRequired(Prop_LocatorValue, ActivityStrings.Field_LocatorValue, "Значение локатора обязательно");
                     break;
 
                 case WaitConditionType.TextPresent:
-                    ret.ValidateRequired(this.Prop_LocatorValue, ActivityStrings.Field_LocatorValue, "Значение локатора обязательно");
-                    ret.ValidateRequired(this.Prop_Text, ActivityStrings.Field_Text, "Текст обязателен");
+                    ret.ValidateRequired(Prop_LocatorValue, ActivityStrings.Field_LocatorValue, "Значение локатора обязательно");
+                    ret.ValidateRequired(Prop_Text, ActivityStrings.Field_Text, "Текст обязателен");
                     break;
 
                 case WaitConditionType.TitleContains:
                 case WaitConditionType.UrlContains:
-                    ret.ValidateRequired(this.Prop_Text, ActivityStrings.Field_Text, "Текст обязателен");
+                    ret.ValidateRequired(Prop_Text, ActivityStrings.Field_Text, "Текст обязателен");
                     break;
             }
 

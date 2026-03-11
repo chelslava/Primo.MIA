@@ -23,8 +23,9 @@ namespace Primo.MIA
 {
     /// <summary>
     /// Активность для выполнения JavaScript кода в браузере.
+    /// REFACTORED: Использует BrowserActivityBase для устранения дублирования кода
     /// </summary>
-    public class BrowserExecuteJavaScriptBack : PrimoComponentTO<BrowserExecuteJavaScript>
+    public class BrowserExecuteJavaScriptBack : BrowserActivityBase<BrowserExecuteJavaScript>
     {
         public override string GroupName
         {
@@ -120,8 +121,8 @@ namespace Primo.MIA
 
             InitClass(container);
 
-            this.Prop_SessionId = "\"\"";
-            this.Prop_Script = "\"return document.title;\"";
+            Prop_SessionId = "\"\"";
+            Prop_Script = "\"return document.title;\"";
         }
 
         // ── TimedAction — точка входа ──────────────────────────────────
@@ -130,23 +131,22 @@ namespace Primo.MIA
         {
             try
             {
-                // Чтение параметров через SessionResolver (поддержка ambient-контекста)
-                string sessionId = SessionResolver.Resolve(
-                    GetPropertyValue<string>(this.Prop_SessionId, nameof(Prop_SessionId), sd));
-                string script = GetPropertyValue<string>(this.Prop_Script, nameof(Prop_Script), sd);
+                // Получаем sessionId
+                string sessionId = GetPropertyValue<string>(Prop_SessionId, nameof(Prop_SessionId), sd);
+                string script = GetPropertyValue<string>(Prop_Script, nameof(Prop_Script), sd);
 
                 if (string.IsNullOrWhiteSpace(script))
                     throw new ArgumentException("JavaScript код не может быть пустым");
 
-                // Получение драйвера
-                var driver = SeleniumHelper.GetDriver(sessionId);
+                // Получение драйвера через базовый класс
+                IWebDriver driver = GetDriverFromContext(sessionId);
                 var jsExecutor = (IJavaScriptExecutor)driver;
 
                 // Получение аргументов (если есть)
                 object[] args = null;
-                if (!string.IsNullOrWhiteSpace(this.Prop_Arguments))
+                if (!string.IsNullOrWhiteSpace(Prop_Arguments))
                 {
-                    var argsList = GetPropertyValue<List<object>>(this.Prop_Arguments, "Prop_Arguments", sd);
+                    var argsList = GetPropertyValue<List<object>>(Prop_Arguments, "Prop_Arguments", sd);
                     if (argsList != null && argsList.Count > 0)
                         args = argsList.ToArray();
                 }
@@ -157,22 +157,14 @@ namespace Primo.MIA
                     : jsExecutor.ExecuteScript(script);
 
                 // Запись результата
-                if (!string.IsNullOrWhiteSpace(this.Prop_Result))
-                    SetVariableValue(this.Prop_Result, result, sd);
+                if (!string.IsNullOrWhiteSpace(Prop_Result))
+                    SetVariableValue(Prop_Result, result, sd);
 
-                return new ExecutionResult
-                {
-                    IsSuccess = true,
-                    SuccessMessage = $"[Выполнить JavaScript] Скрипт выполнен успешно"
-                };
+                return CreateSuccessResult("[Выполнить JavaScript] Скрипт выполнен успешно");
             }
             catch (Exception ex)
             {
-                return new ExecutionResult
-                {
-                    IsSuccess = false,
-                    ErrorMessage = $"Ошибка [Выполнить JavaScript]: {ex.Message}"
-                };
+                return CreateErrorResult(ex, "Выполнить JavaScript");
             }
         }
 
@@ -182,7 +174,7 @@ namespace Primo.MIA
         {
             var ret = new ValidationResult();
              
-            ret.ValidateRequired(this.Prop_Script, ActivityStrings.Field_JavaScriptCode, "JavaScript код обязателен");
+            ret.ValidateRequired(Prop_Script, ActivityStrings.Field_JavaScriptCode, "JavaScript код обязателен");
             return ret;
         }
     }

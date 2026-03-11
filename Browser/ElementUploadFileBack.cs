@@ -23,8 +23,9 @@ namespace Primo.MIA
 {
     /// <summary>
     /// Активность для загрузки файла через input[type=file] элемент.
+    /// REFACTORED: Использует BrowserActivityBase для устранения дублирования кода
     /// </summary>
-    public class ElementUploadFileBack : PrimoComponentTO<ElementUploadFile>
+    public class ElementUploadFileBack : BrowserActivityBase<ElementUploadFile>
     {
         public override string GroupName
         {
@@ -176,32 +177,27 @@ namespace Primo.MIA
         {
             try
             {
-                // Чтение параметров через SessionResolver (поддержка ambient-контекста)
-                string sessionId = SessionResolver.Resolve(
-                    GetPropertyValue<string>(this.Prop_SessionId, nameof(Prop_SessionId), sd));
-                string elementId = GetPropertyValue<string>(this.Prop_ElementId, nameof(Prop_ElementId), sd);
-                string locatorValue = GetPropertyValue<string>(this.Prop_LocatorValue, nameof(Prop_LocatorValue), sd);
-                string filePath = GetPropertyValue<string>(this.Prop_FilePath, nameof(Prop_FilePath), sd);
+                string sessionId = GetPropertyValue<string>(Prop_SessionId, nameof(Prop_SessionId), sd);
+                string elementId = GetPropertyValue<string>(Prop_ElementId, nameof(Prop_ElementId), sd);
+                string locatorValue = GetPropertyValue<string>(Prop_LocatorValue, nameof(Prop_LocatorValue), sd);
+                string filePath = GetPropertyValue<string>(Prop_FilePath, nameof(Prop_FilePath), sd);
 
                 if (string.IsNullOrWhiteSpace(filePath))
                     throw new ArgumentException("Путь к файлу не может быть пустым");
 
-                // Проверка существования файла
-                if (this.Prop_VerifyFileExists && !System.IO.File.Exists(filePath))
+                if (Prop_VerifyFileExists && !System.IO.File.Exists(filePath))
                     throw new System.IO.FileNotFoundException($"Файл не найден: {filePath}");
 
-                // Получение драйвера
-                var driver = SeleniumHelper.GetDriver(sessionId);
+                IWebDriver driver = GetDriverFromContext(sessionId);
 
-                // Получение элемента
                 IWebElement element;
                 if (!string.IsNullOrWhiteSpace(locatorValue))
                 {
-                    string timeoutStr = GetPropertyValue<string>(this.Prop_WaitTimeout, "Prop_WaitTimeout", sd) ?? "10";
+                    string timeoutStr = GetPropertyValue<string>(Prop_WaitTimeout, "Prop_WaitTimeout", sd) ?? "10";
                     int timeout = int.TryParse(timeoutStr, out int t) ? t : 10;
                     timeout = SeleniumHelper.ValidateTimeout(timeout, 10);
 
-                    var locator = SeleniumHelper.CreateLocator(this.Prop_LocatorType, locatorValue);
+                    var locator = SeleniumHelper.CreateLocator(Prop_LocatorType, locatorValue);
                     element = SeleniumHelper.WaitForElement(driver, locator, timeout);
                 }
                 else if (!string.IsNullOrWhiteSpace(elementId))
@@ -213,29 +209,17 @@ namespace Primo.MIA
                     throw new ArgumentException("Необходимо указать либо ID элемента, либо локатор для поиска");
                 }
 
-                // Проверка что это file input
                 if (!SeleniumHelper.IsFileInputElement(element))
-                {
                     throw new ArgumentException("Элемент должен быть input[type=file]");
-                }
 
-                // Загрузка файла
                 SeleniumHelper.UploadFile(element, filePath);
 
                 string fileName = System.IO.Path.GetFileName(filePath);
-                return new ExecutionResult
-                {
-                    IsSuccess = true,
-                    SuccessMessage = $"[Загрузка файла] Файл загружен: {fileName}"
-                };
+                return CreateSuccessResult($"[Загрузка файла] Файл загружен: {fileName}");
             }
             catch (Exception ex)
             {
-                return new ExecutionResult
-                {
-                    IsSuccess = false,
-                    ErrorMessage = $"Ошибка [Загрузка файла]: {ex.Message}"
-                };
+                return CreateErrorResult(ex, "Загрузка файла");
             }
         }
 

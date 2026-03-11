@@ -26,8 +26,9 @@ namespace Primo.MIA
 {
     /// <summary>
     /// Активность для переключения контекста браузера.
+    /// REFACTORED: Использует BrowserActivityBase для устранения дублирования кода
     /// </summary>
-    public class BrowserSwitchToBack : PrimoComponentTO<BrowserSwitchTo>
+    public class BrowserSwitchToBack : BrowserActivityBase<BrowserSwitchTo>
     {
         public override string GroupName
         {
@@ -131,9 +132,9 @@ namespace Primo.MIA
 
             InitClass(container);
 
-            this.Prop_SessionId = "\"\"";
-            this.Prop_SwitchType = SwitchToType.DefaultContent;
-            this.Prop_Target = "\"\"";
+            Prop_SessionId = "\"\"";
+            Prop_SwitchType = SwitchToType.DefaultContent;
+            Prop_Target = "\"\"";
         }
 
         // ── TimedAction — точка входа ──────────────────────────────────
@@ -142,18 +143,17 @@ namespace Primo.MIA
         {
             try
             {
-                // Чтение параметров через SessionResolver (поддержка ambient-контекста)
-                string sessionId = SessionResolver.Resolve(
-                    GetPropertyValue<string>(this.Prop_SessionId, nameof(Prop_SessionId), sd));
-                string target = GetPropertyValue<string>(this.Prop_Target, nameof(Prop_Target), sd) ?? string.Empty;
+                // Получаем sessionId
+                string sessionId = GetPropertyValue<string>(Prop_SessionId, nameof(Prop_SessionId), sd);
+                string target = GetPropertyValue<string>(Prop_Target, nameof(Prop_Target), sd) ?? string.Empty;
 
-                // Получение драйвера
-                var driver = SeleniumHelper.GetDriver(sessionId);
+                // Получение драйвера через базовый класс
+                IWebDriver driver = GetDriverFromContext(sessionId);
 
                 string actionMessage = string.Empty;
 
                 // Переключение в зависимости от типа
-                switch (this.Prop_SwitchType)
+                switch (Prop_SwitchType)
                 {
                     case SwitchToType.Frame:
                         if (string.IsNullOrWhiteSpace(target))
@@ -181,8 +181,8 @@ namespace Primo.MIA
 
                         // Получение списка всех handles
                         var handles = driver.WindowHandles.ToList();
-                        if (!string.IsNullOrWhiteSpace(this.Prop_WindowHandles))
-                            SetVariableValue(this.Prop_WindowHandles, handles, sd);
+                        if (!string.IsNullOrWhiteSpace(Prop_WindowHandles))
+                            SetVariableValue(Prop_WindowHandles, handles, sd);
                         break;
 
                     case SwitchToType.Alert:
@@ -201,22 +201,14 @@ namespace Primo.MIA
                         break;
 
                     default:
-                        throw new NotSupportedException($"Тип {this.Prop_SwitchType} не поддерживается");
+                        throw new NotSupportedException($"Тип {Prop_SwitchType} не поддерживается");
                 }
 
-                return new ExecutionResult
-                {
-                    IsSuccess = true,
-                    SuccessMessage = $"[Переключить контекст] {actionMessage}"
-                };
+                return CreateSuccessResult($"[Переключить контекст] {actionMessage}");
             }
             catch (Exception ex)
             {
-                return new ExecutionResult
-                {
-                    IsSuccess = false,
-                    ErrorMessage = $"Ошибка [Переключить контекст]: {ex.Message}"
-                };
+                return CreateErrorResult(ex, "Переключить контекст");
             }
         }
 
@@ -227,10 +219,10 @@ namespace Primo.MIA
             var ret = new ValidationResult();
 
             // Для Frame и Window цель обязательна
-            if (this.Prop_SwitchType == SwitchToType.Frame ||
-                this.Prop_SwitchType == SwitchToType.Window)
+            if (Prop_SwitchType == SwitchToType.Frame ||
+                Prop_SwitchType == SwitchToType.Window)
             {
-                ret.ValidateRequired(this.Prop_Target, "Цель переключения", "Цель переключения обязательна для Frame и Window");
+                ret.ValidateRequired(Prop_Target, "Цель переключения", "Цель переключения обязательна для Frame и Window");
             }
 
             return ret;

@@ -158,7 +158,9 @@
       <DependentUpon>BrowserScreenshot.xaml</DependentUpon>
     </Compile>
     <Compile Include="Browser\BrowserScreenshotBack.cs" />
+    <Compile Include="Browser\BrowserActivityBase.cs" />
     <Compile Include="Browser\BrowserSessionContext.cs" />
+    <Compile Include="Browser\Interfaces\IBrowserServices.cs" />
     <Compile Include="Browser\BrowserStorageManage.xaml.cs">
       <DependentUpon>BrowserStorageManage.xaml</DependentUpon>
     </Compile>
@@ -247,6 +249,15 @@
       <DependentUpon>ElementUploadFile.xaml</DependentUpon>
     </Compile>
     <Compile Include="Browser\ElementUploadFileBack.cs" />
+    <Compile Include="Browser\Models\CookieData.cs" />
+    <Compile Include="Browser\Models\ElementPosition.cs" />
+    <Compile Include="Browser\Models\RetryConfiguration.cs" />
+    <Compile Include="Browser\Models\ScreenshotMetadata.cs" />
+    <Compile Include="Browser\Models\WindowInfo.cs" />
+    <Compile Include="Browser\Services\ActivityLogger.cs" />
+    <Compile Include="Browser\Services\ElementLocator.cs" />
+    <Compile Include="Browser\Services\ElementRepository.cs" />
+    <Compile Include="Browser\Services\SessionManager.cs" />
     <Compile Include="Browser\SessionResolver.cs" />
     <Compile Include="Common\ActivityCategories.cs" />
     <Compile Include="Common\ActivityIcons.cs" />

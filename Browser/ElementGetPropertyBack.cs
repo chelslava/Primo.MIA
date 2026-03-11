@@ -23,8 +23,9 @@ namespace Primo.MIA
 {
     /// <summary>
     /// Активность для получения свойств элемента на странице.
+    /// REFACTORED: Использует BrowserActivityBase для устранения дублирования кода
     /// </summary>
-    public class ElementGetPropertyBack : PrimoComponentTO<ElementGetProperty>
+    public class ElementGetPropertyBack : BrowserActivityBase<ElementGetProperty>
     {
         public override string GroupName
         {
@@ -119,9 +120,8 @@ namespace Primo.MIA
         {
             try
             {
-                // Чтение параметров
-                string elementId = GetPropertyValue<string>(this.Prop_ElementId, "Prop_ElementId", sd);
-                string propertyName = GetPropertyValue<string>(this.Prop_PropertyName, "Prop_PropertyName", sd);
+                string elementId = GetPropertyValue<string>(Prop_ElementId, "Prop_ElementId", sd);
+                string propertyName = GetPropertyValue<string>(Prop_PropertyName, "Prop_PropertyName", sd);
 
                 if (string.IsNullOrWhiteSpace(elementId))
                     throw new ArgumentException("ID элемента не может быть пустым");
@@ -129,28 +129,17 @@ namespace Primo.MIA
                 if (string.IsNullOrWhiteSpace(propertyName))
                     throw new ArgumentException("Имя свойства не может быть пустым");
 
-                // Получение элемента
                 var element = SeleniumHelper.GetElement(elementId);
-
-                // Извлечение значения в зависимости от типа свойства
                 string value = GetPropertyValue(element, propertyName);
-                // Запись результата
-                if (!string.IsNullOrWhiteSpace(this.Prop_Value))
-                    SetVariableValue(this.Prop_Value, value, sd);
 
-                return new ExecutionResult
-                {
-                    IsSuccess = true,
-                    SuccessMessage = $"[Получить свойство] {propertyName} = {value}"
-                };
+                if (!string.IsNullOrWhiteSpace(Prop_Value))
+                    SetVariableValue(Prop_Value, value, sd);
+
+                return CreateSuccessResult($"[Получить свойство] {propertyName} = {value}");
             }
             catch (Exception ex)
             {
-                return new ExecutionResult
-                {
-                    IsSuccess = false,
-                    ErrorMessage = $"Ошибка [Получить свойство]: {ex.Message}"
-                };
+                return CreateErrorResult(ex, "Получить свойство");
             }
         }
 
@@ -191,8 +180,8 @@ namespace Primo.MIA
         public override ValidationResult Validate()
         {
             var ret = new ValidationResult();
-            ret.ValidateRequired(this.Prop_ElementId, ActivityStrings.Field_ElementId, "ID элемента обязателен");
-            ret.ValidateRequired(this.Prop_PropertyName, ActivityStrings.Field_PropertyName, "Имя свойства обязательно");
+            ret.ValidateRequired(Prop_ElementId, ActivityStrings.Field_ElementId, "ID элемента обязателен");
+            ret.ValidateRequired(Prop_PropertyName, ActivityStrings.Field_PropertyName, "Имя свойства обязательно");
             return ret;
         }
     }

@@ -23,8 +23,9 @@ namespace Primo.MIA
 {
     /// <summary>
     /// Активность для получения вычисленных CSS стилей элемента.
+    /// REFACTORED: Использует BrowserActivityBase для устранения дублирования кода
     /// </summary>
-    public class ElementGetComputedStyleBack : PrimoComponentTO<ElementGetComputedStyle>
+    public class ElementGetComputedStyleBack : BrowserActivityBase<ElementGetComputedStyle>
     {
         public override string GroupName
         {
@@ -182,28 +183,24 @@ namespace Primo.MIA
         {
             try
             {
-                // Чтение параметров через SessionResolver (поддержка ambient-контекста)
-                string sessionId = SessionResolver.Resolve(
-                    GetPropertyValue<string>(this.Prop_SessionId, nameof(Prop_SessionId), sd));
-                string elementId = GetPropertyValue<string>(this.Prop_ElementId, nameof(Prop_ElementId), sd);
-                string locatorValue = GetPropertyValue<string>(this.Prop_LocatorValue, nameof(Prop_LocatorValue), sd);
-                string cssProperty = GetPropertyValue<string>(this.Prop_CssProperty, nameof(Prop_CssProperty), sd);
+                string sessionId = GetPropertyValue<string>(Prop_SessionId, nameof(Prop_SessionId), sd);
+                string elementId = GetPropertyValue<string>(Prop_ElementId, nameof(Prop_ElementId), sd);
+                string locatorValue = GetPropertyValue<string>(Prop_LocatorValue, nameof(Prop_LocatorValue), sd);
+                string cssProperty = GetPropertyValue<string>(Prop_CssProperty, nameof(Prop_CssProperty), sd);
 
                 if (string.IsNullOrWhiteSpace(cssProperty))
                     throw new ArgumentException("CSS свойство не может быть пустым");
 
-                // Получение драйвера
-                var driver = SeleniumHelper.GetDriver(sessionId);
+                IWebDriver driver = GetDriverFromContext(sessionId);
 
-                // Получение элемента
                 IWebElement element;
                 if (!string.IsNullOrWhiteSpace(locatorValue))
                 {
-                    string timeoutStr = GetPropertyValue<string>(this.Prop_WaitTimeout, "Prop_WaitTimeout", sd) ?? "10";
+                    string timeoutStr = GetPropertyValue<string>(Prop_WaitTimeout, "Prop_WaitTimeout", sd) ?? "10";
                     int timeout = int.TryParse(timeoutStr, out int t) ? t : 10;
                     timeout = SeleniumHelper.ValidateTimeout(timeout, 10);
 
-                    var locator = SeleniumHelper.CreateLocator(this.Prop_LocatorType, locatorValue);
+                    var locator = SeleniumHelper.CreateLocator(Prop_LocatorType, locatorValue);
                     element = SeleniumHelper.WaitForElementVisible(driver, locator, timeout);
                 }
                 else if (!string.IsNullOrWhiteSpace(elementId))
@@ -215,23 +212,14 @@ namespace Primo.MIA
                     throw new ArgumentException("Необходимо указать либо ID элемента, либо локатор для поиска");
                 }
 
-                // Получение CSS свойства
                 string value = SeleniumHelper.GetComputedStyle(driver, element, cssProperty);
-                SetVariableValue(this.Prop_OutValue, value, sd);
+                SetVariableValue(Prop_OutValue, value, sd);
 
-                return new ExecutionResult
-                {
-                    IsSuccess = true,
-                    SuccessMessage = $"[Получить CSS стиль] {cssProperty} = {value}"
-                };
+                return CreateSuccessResult($"[Получить CSS стиль] {cssProperty} = {value}");
             }
             catch (Exception ex)
             {
-                return new ExecutionResult
-                {
-                    IsSuccess = false,
-                    ErrorMessage = $"Ошибка [Получить CSS стиль]: {ex.Message}"
-                };
+                return CreateErrorResult(ex, "Получить CSS стиль");
             }
         }
 
