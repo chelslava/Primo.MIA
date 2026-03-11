@@ -219,6 +219,7 @@ namespace Primo.MIA
 
         /// <summary>
         /// Разрешает IWebElement: сначала по локатору (если задан), затем по ID.
+        /// Ожидает видимости элемента для наведения курсора.
         /// </summary>
         private IWebElement ResolveElement(ScriptingData sd, IWebDriver driver)
         {
@@ -233,11 +234,22 @@ namespace Primo.MIA
             if (!string.IsNullOrWhiteSpace(locatorValue))
             {
                 int timeout = ParseTimeout(sd);
-                By locator = SeleniumHelper.CreateLocator(Prop_LocatorType, locatorValue);
-                return SeleniumHelper.WaitForElementVisible(driver, locator, timeout);
+                var locatorType = ConvertLocatorType(Prop_LocatorType);
+                
+                // Ожидаем видимости элемента для наведения
+                return ElementLocator.WaitForVisible(driver, locatorType, locatorValue, timeout);
             }
 
-            return SeleniumHelper.GetElement(elementId);
+            var element = SeleniumHelper.GetElement(elementId);
+            
+            // Проверяем видимость элемента из репозитория
+            if (element != null && !element.Displayed)
+            {
+                throw new ElementNotInteractableException(
+                    $"Элемент с ID '{elementId}' не видим на странице");
+            }
+            
+            return element;
         }
 
         /// <summary>

@@ -404,28 +404,7 @@ namespace Primo.MIA
         {
             var ret = new ValidationResult();
 
-
-            // Валидация в зависимости от типа условия
-            switch (Prop_Condition)
-            {
-                case WaitConditionType.ElementExists:
-                case WaitConditionType.ElementVisible:
-                case WaitConditionType.ElementClickable:
-                case WaitConditionType.ElementInvisible:
-                    ret.ValidateRequired(Prop_LocatorValue, ActivityStrings.Field_LocatorValue, "Значение локатора обязательно");
-                    break;
-
-                case WaitConditionType.TextPresent:
-                    ret.ValidateRequired(Prop_LocatorValue, ActivityStrings.Field_LocatorValue, "Значение локатора обязательно");
-                    ret.ValidateRequired(Prop_Text, ActivityStrings.Field_Text, "Текст обязателен");
-                    break;
-
-                case WaitConditionType.TitleContains:
-                case WaitConditionType.UrlContains:
-                    ret.ValidateRequired(Prop_Text, ActivityStrings.Field_Text, "Текст обязателен");
-                    break;
-            }
-
+            ret.ValidateRequired(Prop_LocatorValue, ActivityStrings.Field_LocatorValue, "Значение локатора обязательно");
             return ret;
         }
     }

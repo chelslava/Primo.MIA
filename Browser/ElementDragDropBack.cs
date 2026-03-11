@@ -146,6 +146,17 @@ namespace Primo.MIA
             set { _propOffsetY = value; InvokePropertyChanged(this, "Prop_OffsetY"); }
         }
 
+        private string _propWaitMode;
+        /// <summary>Режим ожидания элементов.</summary>
+        [LTools.Common.Model.Serialization.StoringProperty]
+        [System.ComponentModel.Category(ActivityStrings.Category_Wait),
+         System.ComponentModel.DisplayName("Режим ожидания")]
+        public ElementWaitMode Prop_WaitMode
+        {
+            get => (ElementWaitMode)Enum.Parse(typeof(ElementWaitMode), _propWaitMode ?? "Clickable");
+            set { _propWaitMode = value.ToString(); InvokePropertyChanged(this, "Prop_WaitMode"); }
+        }
+
         private string _propWaitTimeout;
         /// <summary>Таймаут ожидания элементов (сек).</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
@@ -209,6 +220,7 @@ namespace Primo.MIA
                 PropertyBuilder.String("Prop_TargetLocatorValue", "Значение локатора (целевой)"),
                 PropertyBuilder.Int("Prop_OffsetX", "Смещение X (пиксели)"),
                 PropertyBuilder.Int("Prop_OffsetY", "Смещение Y (пиксели)"),
+                PropertyBuilder.Enum<ElementWaitMode>("Prop_WaitMode", "Режим ожидания"),
                 PropertyBuilder.Int("Prop_WaitTimeout", "Таймаут ожидания элементов (сек)"),
                 PropertyBuilder.BooleanObject("Prop_UseJavaScript", "Использовать JavaScript")
             };
@@ -224,6 +236,7 @@ namespace Primo.MIA
             this.Prop_TargetLocatorValue = "\"\"";
             this.Prop_OffsetX = "0";
             this.Prop_OffsetY = "0";
+            this.Prop_WaitMode = ElementWaitMode.Clickable;
             this.Prop_WaitTimeout = "10";
             this.Prop_UseJavaScript = false;
         }
@@ -283,7 +296,7 @@ namespace Primo.MIA
         // ── Приватные методы ───────────────────────────────────────────
 
         /// <summary>
-        /// Получает исходный элемент для перетаскивания.
+        /// Получает исходный элемент для перетаскивания с ожиданием кликабельности.
         /// </summary>
         private IWebElement GetSourceElement(IWebDriver driver, ScriptingData sd)
         {
@@ -294,14 +307,30 @@ namespace Primo.MIA
             {
                 string timeoutStr = GetPropertyValue<string>(Prop_WaitTimeout, "Prop_WaitTimeout", sd) ?? "10";
                 int timeout = int.TryParse(timeoutStr, out int t) ? t : 10;
-                timeout = SeleniumHelper.ValidateTimeout(timeout, 10);
+                ValidatePositive(timeout, "Prop_WaitTimeout");
 
-                var locator = SeleniumHelper.CreateLocator(Prop_SourceLocatorType, locatorValue);
-                return SeleniumHelper.WaitForElementVisible(driver, locator, timeout);
+                var elementLocator = new ElementLocator();
+                var locatorType = ConvertLocatorType(Prop_SourceLocatorType);
+                
+                Logger.LogDebug(sdkComponentName, 
+                    "Ожидание исходного элемента: {0}='{1}', режим: {2}", 
+                    locatorType, locatorValue, Prop_WaitMode);
+
+                return elementLocator.FindElementWithWaitMode(
+                    driver, locatorType, locatorValue, timeout, Prop_WaitMode);
             }
             else if (!string.IsNullOrWhiteSpace(elementId))
             {
-                return SeleniumHelper.GetElement(elementId);
+                var element = ElementRepository.GetElement(elementId);
+                
+                // Проверяем кликабельность элемента из репозитория для drag and drop
+                if (element != null && (!element.Displayed || !element.Enabled))
+                {
+                    throw new ElementNotInteractableException(
+                        $"Исходный элемент с ID '{elementId}' не кликабельный (Displayed: {element.Displayed}, Enabled: {element.Enabled})");
+                }
+                
+                return element;
             }
             else
             {
@@ -309,6 +338,9 @@ namespace Primo.MIA
             }
         }
 
+        /// <summary>
+        /// Получает целевой элемент для перетаскивания с ожиданием видимости.
+        /// </summary>
         private IWebElement GetTargetElement(IWebDriver driver, ScriptingData sd)
         {
             string elementId = GetPropertyValue<string>(Prop_TargetElementId, "Prop_TargetElementId", sd);
@@ -318,14 +350,31 @@ namespace Primo.MIA
             {
                 string timeoutStr = GetPropertyValue<string>(Prop_WaitTimeout, "Prop_WaitTimeout", sd) ?? "10";
                 int timeout = int.TryParse(timeoutStr, out int t) ? t : 10;
-                timeout = SeleniumHelper.ValidateTimeout(timeout, 10);
+                ValidatePositive(timeout, "Prop_WaitTimeout");
 
-                var locator = SeleniumHelper.CreateLocator(Prop_TargetLocatorType, locatorValue);
-                return SeleniumHelper.WaitForElementVisible(driver, locator, timeout);
+                var elementLocator = new ElementLocator();
+                var locatorType = ConvertLocatorType(Prop_TargetLocatorType);
+                
+                Logger.LogDebug(sdkComponentName, 
+                    "Ожидание целевого элемента: {0}='{1}', режим: Visible", 
+                    locatorType, locatorValue);
+
+                // Для целевого элемента достаточно видимости
+                return elementLocator.FindElementWithWaitMode(
+                    driver, locatorType, locatorValue, timeout, ElementWaitMode.Visible);
             }
             else if (!string.IsNullOrWhiteSpace(elementId))
             {
-                return SeleniumHelper.GetElement(elementId);
+                var element = ElementRepository.GetElement(elementId);
+                
+                // Проверяем видимость целевого элемента
+                if (element != null && !element.Displayed)
+                {
+                    throw new ElementNotInteractableException(
+                        $"Целевой элемент с ID '{elementId}' не видим на странице");
+                }
+                
+                return element;
             }
             else
             {

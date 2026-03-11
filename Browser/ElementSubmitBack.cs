@@ -84,6 +84,17 @@ namespace Primo.MIA
             set { _propLocatorValue = value; InvokePropertyChanged(this, "Prop_LocatorValue"); }
         }
 
+        private string _propWaitMode;
+        /// <summary>Режим ожидания элемента.</summary>
+        [LTools.Common.Model.Serialization.StoringProperty]
+        [System.ComponentModel.Category(ActivityStrings.Category_Wait),
+         System.ComponentModel.DisplayName("Режим ожидания")]
+        public ElementWaitMode Prop_WaitMode
+        {
+            get => (ElementWaitMode)Enum.Parse(typeof(ElementWaitMode), _propWaitMode ?? "Clickable");
+            set { _propWaitMode = value.ToString(); InvokePropertyChanged(this, "Prop_WaitMode"); }
+        }
+
         private string _propWaitTimeout;
         /// <summary>Таймаут ожидания элемента (сек).</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
@@ -122,12 +133,11 @@ namespace Primo.MIA
 
             sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
-
-
                 PropertyBuilder.Variable<string>("Prop_SessionId", "ID сессии браузера"),
                 PropertyBuilder.Variable<string>("Prop_ElementId", "ID элемента (если уже найден)"),
                 PropertyBuilder.Enum<ElementLocatorType>("Prop_LocatorType", "Тип локатора"),
                 PropertyBuilder.String("Prop_LocatorValue", "Значение локатора"),
+                PropertyBuilder.Enum<ElementWaitMode>("Prop_WaitMode", "Режим ожидания"),
                 PropertyBuilder.Int("Prop_WaitTimeout", "Таймаут ожидания элемента (сек)")
             };
 
@@ -137,6 +147,7 @@ namespace Primo.MIA
             this.Prop_ElementId = "\"\"";
             this.Prop_LocatorType = ElementLocatorType.Id;
             this.Prop_LocatorValue = "\"\"";
+            this.Prop_WaitMode = ElementWaitMode.Clickable;
             this.Prop_WaitTimeout = "10";
         }
 
@@ -161,8 +172,15 @@ namespace Primo.MIA
                     int timeout = int.TryParse(timeoutStr, out int t) ? t : 10;
                     ValidatePositive(timeout, "Prop_WaitTimeout");
 
+                    var elementLocator = new ElementLocator();
                     var locatorType = ConvertLocatorType(Prop_LocatorType);
-                    element = ElementLocator.FindElement(driver, locatorType, locatorValue, timeout);
+                    
+                    Logger.LogDebug(sdkComponentName, 
+                        "Ожидание элемента формы: {0}='{1}', режим: {2}", 
+                        locatorType, locatorValue, Prop_WaitMode);
+
+                    element = elementLocator.FindElementWithWaitMode(
+                        driver, locatorType, locatorValue, timeout, Prop_WaitMode);
                     
                     Logger.LogDebug(sdkComponentName, "Элемент найден по локатору: {0}={1}", Prop_LocatorType, locatorValue);
                 }
@@ -171,6 +189,13 @@ namespace Primo.MIA
                     element = ElementRepository.GetElement(elementId);
                     if (element == null)
                         throw new ArgumentException($"Элемент с ID '{elementId}' не найден в репозитории");
+                    
+                    // Проверяем кликабельность элемента формы из репозитория
+                    if (!element.Displayed || !element.Enabled)
+                    {
+                        throw new ElementNotInteractableException(
+                            $"Элемент формы с ID '{elementId}' не кликабельный (Displayed: {element.Displayed}, Enabled: {element.Enabled})");
+                    }
                     
                     Logger.LogDebug(sdkComponentName, "Использован сохраненный элемент: {0}", elementId);
                 }

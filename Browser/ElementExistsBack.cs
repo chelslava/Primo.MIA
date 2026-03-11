@@ -12,6 +12,7 @@ using LTools.Common.UIElements;
 using LTools.SDK;
 using OpenQA.Selenium;
 using Primo.MIA.Common;
+using System;
 using System.Collections.Generic;
 
 namespace Primo.MIA
@@ -71,6 +72,29 @@ namespace Primo.MIA
             set { _propLocatorValue = value; InvokePropertyChanged(this, "Prop_LocatorValue"); }
         }
 
+        private string _propWaitMode;
+        /// <summary>Режим ожидания элемента.</summary>
+        [LTools.Common.Model.Serialization.StoringProperty]
+        [System.ComponentModel.Category(ActivityStrings.Category_Wait),
+         System.ComponentModel.DisplayName("Режим ожидания")]
+        public ElementWaitMode Prop_WaitMode
+        {
+            get => (ElementWaitMode)Enum.Parse(typeof(ElementWaitMode), _propWaitMode ?? "Present");
+            set { _propWaitMode = value.ToString(); InvokePropertyChanged(this, "Prop_WaitMode"); }
+        }
+
+        private string _propWaitTimeout;
+        /// <summary>Таймаут ожидания элемента (сек).</summary>
+        [LTools.Common.Model.Serialization.StoringProperty]
+        [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
+        [System.ComponentModel.Category(ActivityStrings.Category_Wait),
+         System.ComponentModel.DisplayName(ActivityStrings.Field_WaitTimeout)]
+        public string Prop_WaitTimeout
+        {
+            get => _propWaitTimeout;
+            set { _propWaitTimeout = value; InvokePropertyChanged(this, "Prop_WaitTimeout"); }
+        }
+
         // ── Выходные параметры ─────────────────────────────────────────
 
         private string _propExists;
@@ -112,6 +136,8 @@ namespace Primo.MIA
                 PropertyBuilder.Variable<string>("Prop_SessionId", "ID сессии браузера"),
                 PropertyBuilder.Enum<ElementLocatorType>("Prop_LocatorType", "Тип локатора"),
                 PropertyBuilder.String("Prop_LocatorValue", "Значение локатора"),
+                PropertyBuilder.Enum<ElementWaitMode>("Prop_WaitMode", "Режим ожидания"),
+                PropertyBuilder.Int("Prop_WaitTimeout", "Таймаут ожидания элемента (сек)"),
                 PropertyBuilder.Variable<bool>("Prop_Exists", "Элемент существует")
             };
 
@@ -120,6 +146,8 @@ namespace Primo.MIA
             Prop_SessionId = "\"\"";
             Prop_LocatorType = ElementLocatorType.Id;
             Prop_LocatorValue = "\"\"";
+            Prop_WaitMode = ElementWaitMode.Present;
+            Prop_WaitTimeout = "3"; // Быстрая проверка по умолчанию
         }
 
         // ── TimedAction — точка входа ──────────────────────────────────
@@ -139,12 +167,22 @@ namespace Primo.MIA
                 // Получение драйвера
                 IWebDriver driver = GetDriverFromContext(sessionId);
 
-                // Логирование начала операции
-                Logger.LogInfo(sdkComponentName, "Проверка существования элемента: {0}={1}", Prop_LocatorType, locatorValue);
+                // Парсим таймаут
+                string waitStr = GetPropertyValue<string>(Prop_WaitTimeout, "Prop_WaitTimeout", sd) ?? "3";
+                int waitTimeout = int.TryParse(waitStr, out int wt) ? wt : 3;
+                ValidatePositive(waitTimeout, "Prop_WaitTimeout");
 
-                // Использование ElementLocator сервиса для проверки существования
+                // Логирование начала операции
+                Logger.LogInfo(sdkComponentName, 
+                    "Проверка существования элемента: {0}={1}, режим: {2}, таймаут: {3}с", 
+                    Prop_LocatorType, locatorValue, Prop_WaitMode, waitTimeout);
+
+                // Использование ElementLocator с новой системой ожидания
+                var elementLocator = new ElementLocator();
                 var locatorType = ConvertLocatorType(Prop_LocatorType);
-                var element = ElementLocator.TryFindElement(driver, locatorType, locatorValue, 1); // 1 секунда таймаут для быстрой проверки
+                var element = elementLocator.TryFindElementWithWaitMode(
+                    driver, locatorType, locatorValue, waitTimeout, Prop_WaitMode);
+                
                 exists = element != null;
 
                 // Запись результата в выходную переменную
@@ -152,12 +190,14 @@ namespace Primo.MIA
                     SetVariableValue(Prop_Exists, exists, sd);
 
                 // Логирование результата
-                Logger.LogInfo(sdkComponentName, "Элемент {0}: {1}", exists ? "найден" : "не найден", locatorValue);
+                Logger.LogInfo(sdkComponentName, 
+                    "Элемент {0}: {1}={2} (режим: {3})", 
+                    exists ? "найден" : "не найден", Prop_LocatorType, locatorValue, Prop_WaitMode);
 
             }, "Проверить существование");
 
             if (result.IsSuccess)
-                result.SuccessMessage = $"[Проверить существование] {Prop_LocatorType}={locatorValue} → {exists}";
+                result.SuccessMessage = $"[Проверить существование] {Prop_LocatorType}={locatorValue} → {exists} (режим: {Prop_WaitMode})";
 
             return result;
         }

@@ -293,6 +293,7 @@ namespace Primo.MIA
 
         /// <summary>
         /// Разрешает IWebElement: сначала по локатору (если задан), затем по ID.
+        /// Ожидает кликабельности элемента для ввода текста.
         /// </summary>
         private IWebElement ResolveElement(ScriptingData sd, IWebDriver driver)
         {
@@ -307,10 +308,22 @@ namespace Primo.MIA
             if (!string.IsNullOrWhiteSpace(locatorValue))
             {
                 int timeout = ParseTimeout(sd);
-                return FindElement(driver, Prop_LocatorType, locatorValue, timeout);
+                var locatorType = ConvertLocatorType(Prop_LocatorType);
+                
+                // Ожидаем кликабельности элемента для ввода
+                return ElementLocator.WaitForClickable(driver, locatorType, locatorValue, timeout);
             }
 
-            return SeleniumHelper.GetElement(elementId);
+            var element = SeleniumHelper.GetElement(elementId);
+            
+            // Проверяем кликабельность элемента из репозитория
+            if (element != null && (!element.Displayed || !element.Enabled))
+            {
+                throw new ElementNotInteractableException(
+                    $"Элемент с ID '{elementId}' не кликабельный (Displayed: {element.Displayed}, Enabled: {element.Enabled})");
+            }
+            
+            return element;
         }
 
         /// <summary>

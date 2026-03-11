@@ -87,6 +87,17 @@ namespace Primo.MIA
             set { _propLocatorValue = value; InvokePropertyChanged(this, "Prop_LocatorValue"); }
         }
 
+        private string _propWaitMode;
+        /// <summary>Режим ожидания элемента.</summary>
+        [LTools.Common.Model.Serialization.StoringProperty]
+        [System.ComponentModel.Category(ActivityStrings.Category_Wait),
+         System.ComponentModel.DisplayName("Режим ожидания")]
+        public ElementWaitMode Prop_WaitMode
+        {
+            get => (ElementWaitMode)Enum.Parse(typeof(ElementWaitMode), _propWaitMode ?? "Visible");
+            set { _propWaitMode = value.ToString(); InvokePropertyChanged(this, "Prop_WaitMode"); }
+        }
+
         private string _propWaitTimeout;
         /// <summary>Таймаут ожидания элемента (сек).</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
@@ -182,6 +193,7 @@ namespace Primo.MIA
                 PropertyBuilder.Variable<string>("Prop_ElementId", "ID элемента (если уже найден)"),
                 PropertyBuilder.Enum<ElementLocatorType>("Prop_LocatorType", "Тип локатора"),
                 PropertyBuilder.String("Prop_LocatorValue", "Значение локатора"),
+                PropertyBuilder.Enum<ElementWaitMode>("Prop_WaitMode", "Режим ожидания"),
                 PropertyBuilder.Int("Prop_WaitTimeout", "Таймаут ожидания элемента (сек)"),
                 PropertyBuilder.Variable<int>("Prop_X", "X"),
                 PropertyBuilder.Variable<int>("Prop_Y", "Y"),
@@ -195,6 +207,7 @@ namespace Primo.MIA
             this.Prop_ElementId = "\"\"";
             this.Prop_LocatorType = ElementLocatorType.Id;
             this.Prop_LocatorValue = "\"\"";
+            this.Prop_WaitMode = ElementWaitMode.Visible;
             this.Prop_WaitTimeout = "10";
             this.Prop_X = "";
             this.Prop_Y = "";
@@ -219,14 +232,30 @@ namespace Primo.MIA
                 {
                     string timeoutStr = GetPropertyValue<string>(Prop_WaitTimeout, "Prop_WaitTimeout", sd) ?? "10";
                     int timeout = int.TryParse(timeoutStr, out int t) ? t : 10;
-                    timeout = SeleniumHelper.ValidateTimeout(timeout, 10);
+                    ValidatePositive(timeout, "Prop_WaitTimeout");
 
-                    var locator = SeleniumHelper.CreateLocator(Prop_LocatorType, locatorValue);
-                    element = SeleniumHelper.WaitForElement(driver, locator, timeout);
+                    var elementLocator = new ElementLocator();
+                    var locatorType = ConvertLocatorType(Prop_LocatorType);
+                    
+                    Logger.LogDebug(sdkComponentName, 
+                        "Ожидание элемента для получения размеров: {0}='{1}', режим: {2}", 
+                        locatorType, locatorValue, Prop_WaitMode);
+
+                    element = elementLocator.FindElementWithWaitMode(
+                        driver, locatorType, locatorValue, timeout, Prop_WaitMode);
                 }
                 else if (!string.IsNullOrWhiteSpace(elementId))
                 {
-                    element = SeleniumHelper.GetElement(elementId);
+                    element = ElementRepository.GetElement(elementId);
+                    if (element == null)
+                        throw new ArgumentException($"Элемент с ID '{elementId}' не найден в репозитории");
+                    
+                    // Проверяем видимость элемента из репозитория для получения размеров
+                    if (!element.Displayed)
+                    {
+                        throw new ElementNotInteractableException(
+                            $"Элемент с ID '{elementId}' не видим на странице для получения размеров");
+                    }
                 }
                 else
                 {

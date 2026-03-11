@@ -1,0 +1,7 @@
+<UserControl x:Class="Primo.MIA.ElementWaitAndCheck"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Grid>
+        <!-- UI будет сгенерирован автоматически на основе свойств активности -->
+    </Grid>
+</UserControl>

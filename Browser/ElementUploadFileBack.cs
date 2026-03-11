@@ -99,6 +99,17 @@ namespace Primo.MIA
             set { _propFilePath = value; InvokePropertyChanged(this, "Prop_FilePath"); }
         }
 
+        private string _propWaitMode;
+        /// <summary>Режим ожидания элемента.</summary>
+        [LTools.Common.Model.Serialization.StoringProperty]
+        [System.ComponentModel.Category(ActivityStrings.Category_Wait),
+         System.ComponentModel.DisplayName("Режим ожидания")]
+        public ElementWaitMode Prop_WaitMode
+        {
+            get => (ElementWaitMode)Enum.Parse(typeof(ElementWaitMode), _propWaitMode ?? "Clickable");
+            set { _propWaitMode = value.ToString(); InvokePropertyChanged(this, "Prop_WaitMode"); }
+        }
+
         private string _propWaitTimeout;
         /// <summary>Таймаут ожидания элемента (сек).</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
@@ -155,6 +166,7 @@ namespace Primo.MIA
                 PropertyBuilder.Enum<ElementLocatorType>("Prop_LocatorType", "Тип локатора"),
                 PropertyBuilder.String("Prop_LocatorValue", "Значение локатора"),
                 PropertyBuilder.String("Prop_FilePath", "Путь к файлу"),
+                PropertyBuilder.Enum<ElementWaitMode>("Prop_WaitMode", "Режим ожидания"),
                 PropertyBuilder.Int("Prop_WaitTimeout", "Таймаут ожидания элемента (сек)"),
                 PropertyBuilder.BooleanObject("Prop_VerifyFileExists", "Проверить существование файла")
             };
@@ -166,6 +178,7 @@ namespace Primo.MIA
             this.Prop_LocatorType = ElementLocatorType.Id;
             this.Prop_LocatorValue = "\"\"";
             this.Prop_FilePath = "\"\"";
+            this.Prop_WaitMode = ElementWaitMode.Clickable;
             this.Prop_WaitTimeout = "10";
             this.Prop_VerifyFileExists = true;
         }
@@ -197,8 +210,15 @@ namespace Primo.MIA
                     int timeout = int.TryParse(timeoutStr, out int t) ? t : 10;
                     ValidatePositive(timeout, "Prop_WaitTimeout");
 
+                    var elementLocator = new ElementLocator();
                     var locatorType = ConvertLocatorType(Prop_LocatorType);
-                    element = ElementLocator.FindElement(driver, locatorType, locatorValue, timeout);
+                    
+                    Logger.LogDebug(sdkComponentName, 
+                        "Ожидание input[type=file] элемента: {0}='{1}', режим: {2}", 
+                        locatorType, locatorValue, Prop_WaitMode);
+
+                    element = elementLocator.FindElementWithWaitMode(
+                        driver, locatorType, locatorValue, timeout, Prop_WaitMode);
                     
                     Logger.LogDebug(sdkComponentName, "Элемент найден по локатору: {0}={1}", Prop_LocatorType, locatorValue);
                 }
@@ -207,6 +227,13 @@ namespace Primo.MIA
                     element = ElementRepository.GetElement(elementId);
                     if (element == null)
                         throw new ArgumentException($"Элемент с ID '{elementId}' не найден в репозитории");
+                    
+                    // Проверяем кликабельность input[type=file] элемента из репозитория
+                    if (!element.Displayed || !element.Enabled)
+                    {
+                        throw new ElementNotInteractableException(
+                            $"Input[type=file] элемент с ID '{elementId}' не кликабельный (Displayed: {element.Displayed}, Enabled: {element.Enabled})");
+                    }
                     
                     Logger.LogDebug(sdkComponentName, "Использован сохраненный элемент: {0}", elementId);
                 }

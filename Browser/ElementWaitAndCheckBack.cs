@@ -1,8 +1,14 @@
-﻿// =============================================================================
-// ElementIsVisibleBack.cs — активность «Проверить видимость элемента».
+// =============================================================================
+// ElementWaitAndCheckBack.cs — активность «Ожидать и проверить элемент».
 //
-// Проверяет состояние элемента: видимость, включённость, выбранность.
-// Используется для условной логики и валидации состояния UI.
+// Объединяет функциональность ожидания элемента и проверки его состояния.
+// Поддерживает различные режимы ожидания через enum ElementWaitMode.
+//
+// Режимы ожидания:
+//   - Present:   элемент появился в DOM (может быть невидимым)
+//   - Visible:   элемент видим на странице (Displayed = true)
+//   - Clickable: элемент кликабельный (Displayed = true и Enabled = true)
+//   - None:      не ожидать, попытаться найти немедленно
 //
 // Проверяемые состояния:
 //   - Displayed: элемент видим на странице
@@ -11,11 +17,6 @@
 //
 // Таймаут активности (sdkTimeOut) вычисляется автоматически:
 //   Prop_WaitTimeout + 5 секунд — пользователю не показывается.
-//
-// Логика ожидания:
-//   Активность опрашивает видимость элемента в цикле до истечения
-//   Prop_WaitTimeout. Если элемент стал видим — флаги читаются по факту.
-//   Если время вышло или элемент не найден — все флаги false, успешный выход.
 // =============================================================================
 
 using LTools.Common.Model;
@@ -30,10 +31,10 @@ using System.Linq;
 namespace Primo.MIA
 {
     /// <summary>
-    /// Активность для проверки состояния элемента на странице.
-    /// REFACTORED: Использует BrowserActivityBase для устранения дублирования кода.
+    /// Активность для ожидания и проверки состояния элемента на странице.
+    /// Объединяет логику ожидания элемента с проверкой его видимости.
     /// </summary>
-    public class ElementIsVisibleBack : BrowserActivityBase<ElementIsVisible>
+    public class ElementWaitAndCheckBack : BrowserActivityBase<ElementWaitAndCheck>
     {
         public override string GroupName
         {
@@ -43,19 +44,14 @@ namespace Primo.MIA
 
         /// <summary>
         /// Таймаут SDK в миллисекундах.
-        /// Вычисляется автоматически как Prop_WaitTimeout + 5 секунд,
-        /// чтобы активность гарантированно не прерывалась раньше истечения
-        /// ожидания элемента. Пользователю не показывается.
+        /// Вычисляется автоматически как Prop_WaitTimeout + 5 секунд.
         /// </summary>
         protected override int sdkTimeOut
         {
             get
             {
-                // Парсим Prop_WaitTimeout; при ошибке — fallback 10 сек
                 string waitStr = this.Prop_WaitTimeout?.Trim('"') ?? "10";
                 int waitSec = int.TryParse(waitStr, out int w) ? w : 10;
-
-                // sdkTimeOut = время ожидания элемента + запас 5 секунд
                 return (waitSec + 5) * 1000;
             }
             set { }
@@ -110,8 +106,19 @@ namespace Primo.MIA
             set { _propLocatorValue = value; InvokePropertyChanged(this, "Prop_LocatorValue"); }
         }
 
+        private string _propWaitMode;
+        /// <summary>Режим ожидания элемента.</summary>
+        [LTools.Common.Model.Serialization.StoringProperty]
+        [System.ComponentModel.Category(ActivityStrings.Category_Wait),
+         System.ComponentModel.DisplayName("Режим ожидания")]
+        public ElementWaitMode Prop_WaitMode
+        {
+            get => (ElementWaitMode)Enum.Parse(typeof(ElementWaitMode), _propWaitMode ?? "Visible");
+            set { _propWaitMode = value.ToString(); InvokePropertyChanged(this, "Prop_WaitMode"); }
+        }
+
         private string _propWaitTimeout;
-        /// <summary>Таймаут ожидания появления элемента на странице (сек).</summary>
+        /// <summary>Таймаут ожидания элемента (сек).</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
         [System.ComponentModel.Category(ActivityStrings.Category_Wait),
@@ -160,13 +167,25 @@ namespace Primo.MIA
             set { _propIsSelected = value; InvokePropertyChanged(this, "Prop_IsSelected"); }
         }
 
+        private string _propElementFound;
+        /// <summary>Элемент найден.</summary>
+        [LTools.Common.Model.Serialization.StoringProperty]
+        [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(bool))]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output),
+         System.ComponentModel.DisplayName("Элемент найден")]
+        public string Prop_ElementFound
+        {
+            get => _propElementFound;
+            set { _propElementFound = value; InvokePropertyChanged(this, "Prop_ElementFound"); }
+        }
+
         // ── Конструктор ────────────────────────────────────────────────
 
-        public ElementIsVisibleBack(IWFContainer container) : base(container)
+        public ElementWaitAndCheckBack(IWFContainer container) : base(container)
         {
-            sdkComponentName = ActivityStrings.Activity_ElementIsVisible;
+            sdkComponentName = "Ожидать и проверить элемент";
             sdkComponentHelp =
-                "Проверяет состояние элемента на странице.\n" +
+                "Ожидает появления элемента и проверяет его состояние.\n" +
                 "\n" +
                 "── Основные параметры ────────────────────────\n" +
                 "ID сессии   — идентификатор сессии браузера\n" +
@@ -177,26 +196,32 @@ namespace Primo.MIA
                 "Значение локатора — конкретное значение для поиска\n" +
                 "\n" +
                 "── Ожидание ──────────────────────────────────\n" +
-                "Таймаут (сек) — время ожидания появления элемента\n" +
+                "Режим ожидания — стратегия ожидания элемента:\n" +
+                "  • Present   — элемент появился в DOM\n" +
+                "  • Visible   — элемент видим на странице\n" +
+                "  • Clickable — элемент кликабельный\n" +
+                "  • None      — не ожидать, найти немедленно\n" +
+                "Таймаут (сек) — время ожидания элемента\n" +
                 "\n" +
                 "── Выходные параметры ─────────────────────────\n" +
+                "Элемент найден — элемент обнаружен\n" +
                 "Видим    — элемент отображается (Displayed)\n" +
                 "Включён  — элемент активен (Enabled)\n" +
                 "Выбран   — элемент выбран (Selected)\n" +
                 "\n" +
-                "ПРИМЕЧАНИЕ: Selected применимо для checkbox и radio.\n" +
-                "Если указан локатор, элемент будет найден автоматически.";
+                "ПРИМЕЧАНИЕ: Selected применимо для checkbox и radio.";
 
             sdkComponentIcon = ActivityIcons.Browser;
 
-            // Регистрируем все свойства активности, включая новый Prop_Timeout
             sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
                 PropertyBuilder.Variable<string>("Prop_SessionId",   "ID сессии браузера"),
                 PropertyBuilder.Variable<string>("Prop_ElementId",   "ID элемента (если уже найден)"),
                 PropertyBuilder.Enum<ElementLocatorType>("Prop_LocatorType", "Тип локатора"),
                 PropertyBuilder.String("Prop_LocatorValue",          "Значение локатора"),
+                PropertyBuilder.Enum<ElementWaitMode>("Prop_WaitMode", "Режим ожидания"),
                 PropertyBuilder.Int("Prop_WaitTimeout",              "Таймаут ожидания элемента (сек)"),
+                PropertyBuilder.Variable<bool>("Prop_ElementFound",  "Элемент найден"),
                 PropertyBuilder.Variable<bool>("Prop_IsVisible",     "Элемент видим"),
                 PropertyBuilder.Variable<bool>("Prop_IsEnabled",     "Элемент включён"),
                 PropertyBuilder.Variable<bool>("Prop_IsSelected",    "Элемент выбран")
@@ -209,6 +234,7 @@ namespace Primo.MIA
             this.Prop_ElementId = "\"\"";
             this.Prop_LocatorType = ElementLocatorType.Id;
             this.Prop_LocatorValue = "\"\"";
+            this.Prop_WaitMode = ElementWaitMode.Visible;
             this.Prop_WaitTimeout = "10";
         }
 
@@ -224,24 +250,25 @@ namespace Primo.MIA
                 string locatorValue = GetPropertyValue<string>(Prop_LocatorValue, nameof(Prop_LocatorValue), sd);
 
                 Logger.LogInfo(sdkComponentName,
-                    "Начинается проверка видимости элемента для сессии: {0}", sessionId);
+                    "Начинается ожидание и проверка элемента для сессии: {0}, режим: {1}", 
+                    sessionId, Prop_WaitMode);
 
                 IWebDriver driver = GetDriverFromContext(sessionId);
 
-                // Читаем таймаут ожидания видимости
+                // Читаем таймаут ожидания
                 string waitStr = GetPropertyValue<string>(Prop_WaitTimeout, "Prop_WaitTimeout", sd) ?? "10";
                 int waitTimeout = int.TryParse(waitStr, out int wt) ? wt : 10;
                 ValidatePositive(waitTimeout, "Prop_WaitTimeout");
 
-                // Ждём появления видимого элемента в течение заданного времени
-                IWebElement element = WaitForElementVisible(driver, elementId, locatorValue, waitTimeout);
+                // Ищем элемент с указанным режимом ожидания
+                IWebElement element = FindElementWithWaitMode(driver, elementId, locatorValue, waitTimeout);
 
                 if (element == null)
                 {
-                    // Элемент не найден — присваиваем все флаги false и выходим успешно
+                    // Элемент не найден — присваиваем все флаги false
                     Logger.LogInfo(sdkComponentName, "Элемент не найден — все флаги установлены в false");
-                    SetVisibilityFlags(false, false, false, sd);
-                    return CreateSuccessResult("[Проверить видимость] Элемент не найден: Видим: False, Включён: False, Выбран: False");
+                    SetElementFlags(false, false, false, false, sd);
+                    return CreateSuccessResult("[Ожидать и проверить] Элемент не найден");
                 }
 
                 // Элемент найден — читаем его реальное состояние
@@ -253,104 +280,59 @@ namespace Primo.MIA
                     "Состояние элемента — Видим: {0}, Включён: {1}, Выбран: {2}",
                     isVisible, isEnabled, isSelected);
 
-                SetVisibilityFlags(isVisible, isEnabled, isSelected, sd);
+                SetElementFlags(true, isVisible, isEnabled, isSelected, sd);
 
-                Logger.LogInfo(sdkComponentName, "Проверка видимости завершена успешно");
+                Logger.LogInfo(sdkComponentName, "Ожидание и проверка завершены успешно");
                 return CreateSuccessResult(
-                    $"[Проверить видимость] Видим: {isVisible}, Включён: {isEnabled}, Выбран: {isSelected}");
+                    $"[Ожидать и проверить] Найден: True, Видим: {isVisible}, Включён: {isEnabled}, Выбран: {isSelected}");
 
-            }, "Проверить видимость");
+            }, "Ожидать и проверить элемент");
         }
 
         /// <summary>
-        /// Ждёт появления и видимости элемента в течение waitTimeout секунд.
-        /// Опрашивает элемент каждые PollIntervalMs миллисекунд.
-        /// При любой ошибке или истечении времени возвращает null — без исключений.
+        /// Находит элемент с указанным режимом ожидания.
         /// </summary>
-        /// <param name="driver">Драйвер браузера.</param>
-        /// <param name="elementId">ID элемента в репозитории (может быть пустым).</param>
-        /// <param name="locatorValue">Значение локатора (может быть пустым).</param>
-        /// <param name="waitTimeout">Время ожидания видимости в секундах.</param>
-        /// <returns>Видимый элемент или null если время истекло / элемент не найден.</returns>
-        private IWebElement WaitForElementVisible(
+        private IWebElement FindElementWithWaitMode(
             IWebDriver driver, string elementId, string locatorValue, int waitTimeout)
         {
-            // Интервал опроса — 500 мс, достаточно быстро и не перегружает браузер
-            const int PollIntervalMs = 500;
+            var elementLocator = new ElementLocator();
 
-            // Дедлайн — момент времени, после которого прекращаем ожидание
-            DateTime deadline = DateTime.Now.AddSeconds(waitTimeout);
-
-            Logger.LogDebug(sdkComponentName,
-                "Ожидание видимости элемента, таймаут: {0} сек", waitTimeout);
-
-            // Опрашиваем состояние элемента в цикле до истечения дедлайна
-            while (DateTime.Now < deadline)
+            // Если указан ID элемента из репозитория
+            if (!string.IsNullOrWhiteSpace(elementId))
             {
                 try
                 {
-                    IWebElement element = ResolveElement(driver, elementId, locatorValue);
-
-                    if (element != null && element.Displayed)
-                    {
-                        // Элемент найден и видим — возвращаем его
-                        Logger.LogDebug(sdkComponentName, "Элемент видим, ожидание завершено");
-                        return element;
-                    }
-
-                    // Элемент есть в DOM, но ещё не видим — ждём следующего такта
-                    Logger.LogDebug(sdkComponentName,
-                        "Элемент пока не видим, ждём {0} мс...", PollIntervalMs);
+                    return ElementRepository.GetElement(elementId);
                 }
                 catch (Exception ex)
                 {
-                    // StaleElementReferenceException, NoSuchElementException и т.д. —
-                    // элемент ещё не появился, продолжаем ждать
-                    Logger.LogDebug(sdkComponentName,
-                        "Элемент недоступен ({0}), повторяем через {1} мс", ex.Message, PollIntervalMs);
+                    Logger.LogDebug(sdkComponentName, "Элемент по ID не найден: {0}", ex.Message);
+                    return null;
                 }
-
-                System.Threading.Thread.Sleep(PollIntervalMs);
             }
 
-            // Время вышло — элемент так и не стал видим
-            Logger.LogInfo(sdkComponentName,
-                "Таймаут {0} сек истёк — элемент не стал видимым", waitTimeout);
-            return null;
-        }
-
-        /// <summary>
-        /// Разрешает элемент: по локатору (без ожидания, одна попытка)
-        /// или по ID из репозитория. Возвращает null если не найден.
-        /// Вызывается внутри цикла ожидания WaitForElementVisible.
-        /// </summary>
-        private IWebElement ResolveElement(IWebDriver driver, string elementId, string locatorValue)
-        {
+            // Если указан локатор
             if (!string.IsNullOrWhiteSpace(locatorValue))
             {
-                // Ищем без таймаута — одна мгновенная попытка в рамках цикла ожидания
                 var locatorType = ConvertLocatorType(Prop_LocatorType);
-                return ElementLocator.FindElement(driver, locatorType, locatorValue, 0);
+                return elementLocator.TryFindElementWithWaitMode(
+                    driver, locatorType, locatorValue, waitTimeout, Prop_WaitMode);
             }
-
-            if (!string.IsNullOrWhiteSpace(elementId))
-                return ElementRepository.GetElement(elementId);
 
             return null;
         }
 
         /// <summary>
-        /// Записывает значения флагов видимости в выходные переменные скрипта.
-        /// Использует LINQ + лямбда для компактного прохода по парам (имя, значение).
+        /// Записывает значения флагов элемента в выходные переменные скрипта.
         /// </summary>
-        private void SetVisibilityFlags(bool isVisible, bool isEnabled, bool isSelected, ScriptingData sd)
+        private void SetElementFlags(bool found, bool isVisible, bool isEnabled, bool isSelected, ScriptingData sd)
         {
-            // Формируем пары (имя выходной переменной, значение) и записываем каждую
             new[]
             {
-                (Name: Prop_IsVisible,  Value: (object)isVisible),
-                (Name: Prop_IsEnabled,  Value: (object)isEnabled),
-                (Name: Prop_IsSelected, Value: (object)isSelected)
+                (Name: Prop_ElementFound, Value: (object)found),
+                (Name: Prop_IsVisible,    Value: (object)isVisible),
+                (Name: Prop_IsEnabled,    Value: (object)isEnabled),
+                (Name: Prop_IsSelected,   Value: (object)isSelected)
             }
             .Where(p => !string.IsNullOrWhiteSpace(p.Name))
             .ToList()
@@ -375,7 +357,6 @@ namespace Primo.MIA
                     Error = "Необходимо указать либо ID элемента, либо локатор для поиска"
                 });
             }
-
 
             return ret;
         }

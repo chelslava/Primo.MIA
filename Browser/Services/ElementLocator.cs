@@ -32,12 +32,49 @@ namespace Primo.MIA
             string locatorValue,
             int timeoutSeconds)
         {
+            return FindElementWithWaitMode(driver, locatorType, locatorValue, timeoutSeconds, ElementWaitMode.Present);
+        }
+
+        /// <summary>
+        /// Находит элемент с указанным режимом ожидания.
+        /// </summary>
+        public IWebElement FindElementWithWaitMode(
+            IWebDriver driver,
+            LocatorType locatorType,
+            string locatorValue,
+            int timeoutSeconds,
+            ElementWaitMode waitMode)
+        {
             if (driver == null)
                 throw new ArgumentNullException(nameof(driver));
 
             if (string.IsNullOrWhiteSpace(locatorValue))
                 throw new ArgumentException("Значение локатора не может быть пустым", nameof(locatorValue));
 
+            switch (waitMode)
+            {
+                case ElementWaitMode.Present:
+                    return FindElementPresent(driver, locatorType, locatorValue, timeoutSeconds);
+                case ElementWaitMode.Visible:
+                    return WaitForVisible(driver, locatorType, locatorValue, timeoutSeconds);
+                case ElementWaitMode.Clickable:
+                    return WaitForClickable(driver, locatorType, locatorValue, timeoutSeconds);
+                case ElementWaitMode.None:
+                    return FindElementImmediate(driver, locatorType, locatorValue);
+                default:
+                    throw new ArgumentException($"Неподдерживаемый режим ожидания: {waitMode}");
+            }
+        }
+
+        /// <summary>
+        /// Находит элемент с ожиданием появления в DOM.
+        /// </summary>
+        private IWebElement FindElementPresent(
+            IWebDriver driver,
+            LocatorType locatorType,
+            string locatorValue,
+            int timeoutSeconds)
+        {
             var by = CreateLocator(locatorType, locatorValue);
             var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(timeoutSeconds));
 
@@ -51,6 +88,18 @@ namespace Primo.MIA
                     $"Элемент не найден: {locatorType}='{locatorValue}' (таймаут: {timeoutSeconds}с)",
                     ex);
             }
+        }
+
+        /// <summary>
+        /// Находит элемент немедленно без ожидания.
+        /// </summary>
+        private IWebElement FindElementImmediate(
+            IWebDriver driver,
+            LocatorType locatorType,
+            string locatorValue)
+        {
+            var by = CreateLocator(locatorType, locatorValue);
+            return driver.FindElement(by);
         }
 
         /// <summary>
@@ -80,9 +129,22 @@ namespace Primo.MIA
             string locatorValue,
             int timeoutSeconds)
         {
+            return TryFindElementWithWaitMode(driver, locatorType, locatorValue, timeoutSeconds, ElementWaitMode.Present);
+        }
+
+        /// <summary>
+        /// Пытается найти элемент с указанным режимом ожидания, возвращая null если не найден.
+        /// </summary>
+        public IWebElement TryFindElementWithWaitMode(
+            IWebDriver driver,
+            LocatorType locatorType,
+            string locatorValue,
+            int timeoutSeconds,
+            ElementWaitMode waitMode)
+        {
             try
             {
-                return FindElement(driver, locatorType, locatorValue, timeoutSeconds);
+                return FindElementWithWaitMode(driver, locatorType, locatorValue, timeoutSeconds, waitMode);
             }
             catch
             {

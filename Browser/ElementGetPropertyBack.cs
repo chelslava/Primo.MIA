@@ -40,6 +40,18 @@ namespace Primo.MIA
 
         // ── Входные параметры ──────────────────────────────────────────
 
+        private string _propSessionId;
+        /// <summary>ID сессии браузера.</summary>
+        [LTools.Common.Model.Serialization.StoringProperty]
+        [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main),
+         System.ComponentModel.DisplayName(ActivityStrings.Field_SessionId)]
+        public string Prop_SessionId
+        {
+            get => _propSessionId;
+            set { _propSessionId = value; InvokePropertyChanged(this, "Prop_SessionId"); }
+        }
+
         private string _propElementId;
         /// <summary>ID элемента.</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
@@ -50,6 +62,52 @@ namespace Primo.MIA
         {
             get => _propElementId;
             set { _propElementId = value; InvokePropertyChanged(this, "Prop_ElementId"); }
+        }
+
+        private ElementLocatorType _propLocatorType;
+        /// <summary>Тип локатора для поиска элемента.</summary>
+        [LTools.Common.Model.Serialization.StoringProperty]
+        [System.ComponentModel.Category(ActivityStrings.Category_Locator),
+         System.ComponentModel.DisplayName(ActivityStrings.Field_LocatorType)]
+        public ElementLocatorType Prop_LocatorType
+        {
+            get => _propLocatorType;
+            set { _propLocatorType = value; InvokePropertyChanged(this, "Prop_LocatorType"); }
+        }
+
+        private string _propLocatorValue;
+        /// <summary>Значение локатора для поиска элемента.</summary>
+        [LTools.Common.Model.Serialization.StoringProperty]
+        [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
+        [System.ComponentModel.Category(ActivityStrings.Category_Locator),
+         System.ComponentModel.DisplayName(ActivityStrings.Field_LocatorValue)]
+        public string Prop_LocatorValue
+        {
+            get => _propLocatorValue;
+            set { _propLocatorValue = value; InvokePropertyChanged(this, "Prop_LocatorValue"); }
+        }
+
+        private string _propWaitMode;
+        /// <summary>Режим ожидания элемента.</summary>
+        [LTools.Common.Model.Serialization.StoringProperty]
+        [System.ComponentModel.Category(ActivityStrings.Category_Wait),
+         System.ComponentModel.DisplayName("Режим ожидания")]
+        public ElementWaitMode Prop_WaitMode
+        {
+            get => (ElementWaitMode)Enum.Parse(typeof(ElementWaitMode), _propWaitMode ?? "Present");
+            set { _propWaitMode = value.ToString(); InvokePropertyChanged(this, "Prop_WaitMode"); }
+        }
+
+        private string _propWaitTimeout;
+        /// <summary>Таймаут ожидания элемента (сек).</summary>
+        [LTools.Common.Model.Serialization.StoringProperty]
+        [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
+        [System.ComponentModel.Category(ActivityStrings.Category_Wait),
+         System.ComponentModel.DisplayName(ActivityStrings.Field_WaitTimeout)]
+        public string Prop_WaitTimeout
+        {
+            get => _propWaitTimeout;
+            set { _propWaitTimeout = value; InvokePropertyChanged(this, "Prop_WaitTimeout"); }
         }
 
         private string _propPropertyName;
@@ -86,8 +144,17 @@ namespace Primo.MIA
                 "Получает свойство элемента на странице.\n" +
                 "\n" +
                 "── Основные параметры ────────────────────────\n" +
-                "ID элемента  — идентификатор элемента\n" +
+                "ID сессии    — идентификатор сессии браузера\n" +
+                "ID элемента  — идентификатор элемента (если уже найден)\n" +
                 "Имя свойства — text, attribute:name, css:property\n" +
+                "\n" +
+                "── Локатор (альтернатива ID элемента) ────────\n" +
+                "Тип локатора — способ поиска элемента\n" +
+                "Значение локатора — конкретное значение для поиска\n" +
+                "\n" +
+                "── Ожидание ──────────────────────────────────\n" +
+                "Режим ожидания — стратегия ожидания элемента\n" +
+                "Таймаут (сек) — время ожидания элемента\n" +
                 "\n" +
                 "Примеры:\n" +
                 "  text              — видимый текст элемента\n" +
@@ -102,14 +169,24 @@ namespace Primo.MIA
 
             sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
-                PropertyBuilder.String("Prop_ElementId", "ID элемента"),
+                PropertyBuilder.Variable<string>("Prop_SessionId", "ID сессии браузера"),
+                PropertyBuilder.Variable<string>("Prop_ElementId", "ID элемента (если уже найден)"),
+                PropertyBuilder.Enum<ElementLocatorType>("Prop_LocatorType", "Тип локатора"),
+                PropertyBuilder.String("Prop_LocatorValue", "Значение локатора"),
+                PropertyBuilder.Enum<ElementWaitMode>("Prop_WaitMode", "Режим ожидания"),
+                PropertyBuilder.Int("Prop_WaitTimeout", "Таймаут ожидания элемента (сек)"),
                 PropertyBuilder.String("Prop_PropertyName", "Имя свойства (text/attribute:name/css:property)"),
                 PropertyBuilder.Variable<string>("Prop_Value", "Значение свойства")
             };
 
             InitClass(container);
 
+            this.Prop_SessionId = "\"\"";
             this.Prop_ElementId = "\"\"";
+            this.Prop_LocatorType = ElementLocatorType.Id;
+            this.Prop_LocatorValue = "\"\"";
+            this.Prop_WaitMode = ElementWaitMode.Present;
+            this.Prop_WaitTimeout = "10";
             this.Prop_PropertyName = "\"text\"";
         }
 
@@ -117,29 +194,56 @@ namespace Primo.MIA
 
         public override ExecutionResult TimedAction(ScriptingData sd)
         {
-            try
+            return SafeExecute(() =>
             {
-                string elementId = GetPropertyValue<string>(Prop_ElementId, "Prop_ElementId", sd);
-                string propertyName = GetPropertyValue<string>(Prop_PropertyName, "Prop_PropertyName", sd);
+                string sessionId = GetPropertyValue<string>(Prop_SessionId, nameof(Prop_SessionId), sd);
+                string elementId = GetPropertyValue<string>(Prop_ElementId, nameof(Prop_ElementId), sd);
+                string locatorValue = GetPropertyValue<string>(Prop_LocatorValue, nameof(Prop_LocatorValue), sd);
+                string propertyName = GetPropertyValue<string>(Prop_PropertyName, nameof(Prop_PropertyName), sd);
 
-                if (string.IsNullOrWhiteSpace(elementId))
-                    throw new ArgumentException("ID элемента не может быть пустым");
+                Logger.LogInfo(sdkComponentName, "Получение свойства элемента для сессии: {0}", sessionId);
 
-                if (string.IsNullOrWhiteSpace(propertyName))
-                    throw new ArgumentException("Имя свойства не может быть пустым");
+                ValidateNotEmpty(propertyName, nameof(propertyName));
 
-                var element = SeleniumHelper.GetElement(elementId);
+                IWebDriver driver = GetDriverFromContext(sessionId);
+
+                IWebElement element;
+                if (!string.IsNullOrWhiteSpace(locatorValue))
+                {
+                    string timeoutStr = GetPropertyValue<string>(Prop_WaitTimeout, "Prop_WaitTimeout", sd) ?? "10";
+                    int timeout = int.TryParse(timeoutStr, out int t) ? t : 10;
+                    ValidatePositive(timeout, "Prop_WaitTimeout");
+
+                    var elementLocator = new ElementLocator();
+                    var locatorType = ConvertLocatorType(Prop_LocatorType);
+                    
+                    Logger.LogDebug(sdkComponentName, 
+                        "Ожидание элемента для получения свойства: {0}='{1}', режим: {2}", 
+                        locatorType, locatorValue, Prop_WaitMode);
+
+                    element = elementLocator.FindElementWithWaitMode(
+                        driver, locatorType, locatorValue, timeout, Prop_WaitMode);
+                }
+                else if (!string.IsNullOrWhiteSpace(elementId))
+                {
+                    element = ElementRepository.GetElement(elementId);
+                    if (element == null)
+                        throw new ArgumentException($"Элемент с ID '{elementId}' не найден в репозитории");
+                }
+                else
+                {
+                    throw new ArgumentException("Необходимо указать либо ID элемента, либо локатор для поиска");
+                }
+
                 string value = GetPropertyValue(element, propertyName);
 
                 if (!string.IsNullOrWhiteSpace(Prop_Value))
                     SetVariableValue(Prop_Value, value, sd);
 
+                Logger.LogInfo(sdkComponentName, "Свойство получено: {0} = {1}", propertyName, value);
                 return CreateSuccessResult($"[Получить свойство] {propertyName} = {value}");
-            }
-            catch (Exception ex)
-            {
-                return CreateErrorResult(ex, "Получить свойство");
-            }
+
+            }, "Получить свойство");
         }
 
         // ── Приватные методы ───────────────────────────────────────────
@@ -179,7 +283,20 @@ namespace Primo.MIA
         public override ValidationResult Validate()
         {
             var ret = new ValidationResult();
-            ret.ValidateRequired(Prop_ElementId, ActivityStrings.Field_ElementId, "ID элемента обязателен");
+
+            // Проверяем, что указан хотя бы один из способов идентификации элемента
+            bool hasElementId = !string.IsNullOrWhiteSpace(this.Prop_ElementId);
+            bool hasLocator = !string.IsNullOrWhiteSpace(this.Prop_LocatorValue);
+
+            if (!hasElementId && !hasLocator)
+            {
+                ret.Items.Add(new ValidationResult.ValidationItem()
+                {
+                    PropertyName = "ElementId/LocatorValue",
+                    Error = "Необходимо указать либо ID элемента, либо локатор для поиска"
+                });
+            }
+
             ret.ValidateRequired(Prop_PropertyName, ActivityStrings.Field_PropertyName, "Имя свойства обязательно");
             return ret;
         }

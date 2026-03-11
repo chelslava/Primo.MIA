@@ -111,6 +111,17 @@ namespace Primo.MIA
             set { _propValue = value; InvokePropertyChanged(this, "Prop_Value"); }
         }
 
+        private string _propWaitMode;
+        /// <summary>Режим ожидания элемента.</summary>
+        [LTools.Common.Model.Serialization.StoringProperty]
+        [System.ComponentModel.Category(ActivityStrings.Category_Wait),
+         System.ComponentModel.DisplayName("Режим ожидания")]
+        public ElementWaitMode Prop_WaitMode
+        {
+            get => (ElementWaitMode)Enum.Parse(typeof(ElementWaitMode), _propWaitMode ?? "Clickable");
+            set { _propWaitMode = value.ToString(); InvokePropertyChanged(this, "Prop_WaitMode"); }
+        }
+
         private string _propWaitTimeout;
         /// <summary>Таймаут ожидания элемента (сек).</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
@@ -190,6 +201,7 @@ namespace Primo.MIA
                 PropertyBuilder.String("Prop_LocatorValue", "Значение локатора"),
                 PropertyBuilder.Enum<MultiSelectOperation>("Prop_Operation", "Операция"),
                 PropertyBuilder.String("Prop_Value", "Значение"),
+                PropertyBuilder.Enum<ElementWaitMode>("Prop_WaitMode", "Режим ожидания"),
                 PropertyBuilder.Int("Prop_WaitTimeout", "Таймаут ожидания (сек)"),
                 PropertyBuilder.Variable<List<string>>("Prop_OutOptions", "Список опций"),
                 PropertyBuilder.Variable<List<string>>("Prop_OutSelectedOptions", "Выбранные опции")
@@ -203,6 +215,7 @@ namespace Primo.MIA
             Prop_LocatorValue = "\"\"";
             Prop_Operation = MultiSelectOperation.SelectByText;
             Prop_Value = "\"\"";
+            Prop_WaitMode = ElementWaitMode.Clickable;
             Prop_WaitTimeout = "10";
             Prop_OutOptions = "";
             Prop_OutSelectedOptions = "";
@@ -229,8 +242,15 @@ namespace Primo.MIA
                     int timeout = int.TryParse(timeoutStr, out int t) ? t : 10;
                     ValidatePositive(timeout, "Prop_WaitTimeout");
 
+                    var elementLocator = new ElementLocator();
                     var locatorType = ConvertLocatorType(Prop_LocatorType);
-                    element = ElementLocator.FindElement(driver, locatorType, locatorValue, timeout);
+                    
+                    Logger.LogDebug(sdkComponentName, 
+                        "Ожидание multiple select элемента: {0}='{1}', режим: {2}", 
+                        locatorType, locatorValue, Prop_WaitMode);
+
+                    element = elementLocator.FindElementWithWaitMode(
+                        driver, locatorType, locatorValue, timeout, Prop_WaitMode);
                     
                     Logger.LogDebug(sdkComponentName, "Элемент найден по локатору: {0}={1}", Prop_LocatorType, locatorValue);
                 }
@@ -239,6 +259,13 @@ namespace Primo.MIA
                     element = ElementRepository.GetElement(elementId);
                     if (element == null)
                         throw new ArgumentException($"Элемент с ID '{elementId}' не найден в репозитории");
+                    
+                    // Проверяем кликабельность multiple select элемента из репозитория
+                    if (!element.Displayed || !element.Enabled)
+                    {
+                        throw new ElementNotInteractableException(
+                            $"Multiple select элемент с ID '{elementId}' не кликабельный (Displayed: {element.Displayed}, Enabled: {element.Enabled})");
+                    }
                     
                     Logger.LogDebug(sdkComponentName, "Использован сохраненный элемент: {0}", elementId);
                 }
