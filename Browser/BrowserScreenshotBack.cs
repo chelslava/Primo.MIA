@@ -14,7 +14,6 @@ using LTools.Common.UIElements;
 using LTools.SDK;
 using OpenQA.Selenium;
 using Primo.MIA.Common;
-using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -22,7 +21,7 @@ namespace Primo.MIA
 {
     /// <summary>
     /// Активность для создания скриншота страницы браузера.
-    /// REFACTORED: Использует BrowserActivityBase для устранения дублирования кода
+    /// REFACTORED: Использует BrowserActivityBase и сервисы для устранения дублирования кода
     /// </summary>
     public class BrowserScreenshotBack : BrowserActivityBase<BrowserScreenshot>
     {
@@ -106,23 +105,28 @@ namespace Primo.MIA
 
             InitClass(container);
 
-            this.Prop_SessionId = "\"\"";
-            this.Prop_FilePath = "\"\"";
+            Prop_SessionId = "\"\"";
+            Prop_FilePath = "\"\"";
         }
 
         // ── TimedAction — точка входа ──────────────────────────────────
 
         public override ExecutionResult TimedAction(ScriptingData sd)
         {
-            try
+            string message = string.Empty;
+
+            var result = SafeExecute(() =>
             {
                 // Получаем sessionId
                 string sessionId = GetPropertyValue<string>(Prop_SessionId, nameof(Prop_SessionId), sd);
-                
+
                 // Получение драйвера через базовый класс
                 IWebDriver driver = GetDriverFromContext(sessionId);
-                
+
                 string filePath = GetPropertyValue<string>(Prop_FilePath, nameof(Prop_FilePath), sd) ?? string.Empty;
+
+                // Логирование начала операции
+                Logger.LogInfo(sdkComponentName, "Создание скриншота для сессии: {0}", sessionId);
 
                 // Создание скриншота
                 var screenshot = ((ITakesScreenshot)driver).GetScreenshot();
@@ -138,22 +142,25 @@ namespace Primo.MIA
 
                     // Сохранение
                     screenshot.SaveAsFile(filePath);
+                    Logger.LogInfo(sdkComponentName, "Скриншот сохранен в файл: {0}", filePath);
                 }
 
                 // Запись Base64 в выходную переменную
                 if (!string.IsNullOrWhiteSpace(Prop_Base64))
                     SetVariableValue(Prop_Base64, base64, sd);
 
-                string message = string.IsNullOrWhiteSpace(filePath)
+                message = string.IsNullOrWhiteSpace(filePath)
                     ? "[Скриншот] Создан (Base64)"
                     : $"[Скриншот] Сохранён: {filePath}";
 
-                return CreateSuccessResult(message);
-            }
-            catch (Exception ex)
-            {
-                return CreateErrorResult(ex, "Скриншот");
-            }
+                Logger.LogInfo(sdkComponentName, "Скриншот успешно создан");
+
+            }, "Скриншот");
+
+            if (result.IsSuccess)
+                result.SuccessMessage = message;
+
+            return result;
         }
 
         // ── Валидация ──────────────────────────────────────────────────
@@ -161,7 +168,7 @@ namespace Primo.MIA
         public override ValidationResult Validate()
         {
             var ret = new ValidationResult();
-             
+
             return ret;
         }
     }

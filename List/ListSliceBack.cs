@@ -18,7 +18,6 @@ using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using static LTools.Common.Helpers.WFHelper.PropertiesItem;
 
 namespace Primo.MIA
 {
@@ -29,7 +28,7 @@ namespace Primo.MIA
     /// </summary>
     public class ListSliceBack : PrimoComponentTO<ListSlice>
     {
-                public override string GroupName { get => ActivityCategories.Lists; protected set { } }
+        public override string GroupName { get => ActivityCategories.Lists; protected set { } }
 
         protected override int sdkTimeOut
         {
@@ -156,7 +155,7 @@ namespace Primo.MIA
                 "EveryNth  — каждый N-й элемент (шаг N)";
             sdkComponentIcon = ActivityIcons.List;
 
-                        sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
+            sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
                 PropertyBuilder.Script<List<string>>("Prop_List", "Входной список"),
                 PropertyBuilder.Enum<ListSliceMode>("Mode", "Способ среза"),
@@ -171,8 +170,8 @@ namespace Primo.MIA
             };
 
             InitClass(container);
-            this.Prop_N        = "10";
-            this.Prop_Page     = "1";
+            this.Prop_N = "10";
+            this.Prop_Page = "1";
             this.Prop_PageSize = "10";
         }
 
@@ -183,11 +182,11 @@ namespace Primo.MIA
                 var list = GetPropertyValue<List<string>>(this.Prop_List, "Prop_List", sd);
                 if (list == null) throw new ArgumentNullException("Prop_List", "Список не может быть null");
 
-                int n         = int.TryParse(this.Prop_N,         out int nv)   ? nv   : 10;
-                int page      = int.TryParse(this.Prop_Page,      out int pv)   ? pv   : 1;
-                int pageSize  = int.TryParse(this.Prop_PageSize,  out int psv)  ? psv  : 10;
-                int fromIndex = int.TryParse(this.Prop_FromIndex, out int fiv)  ? fiv  : 0;
-                int toIndex   = int.TryParse(this.Prop_ToIndex,   out int tiv)  ? tiv  : list.Count - 1;
+                int n = int.TryParse(this.Prop_N, out int nv) ? nv : 10;
+                int page = int.TryParse(this.Prop_Page, out int pv) ? pv : 1;
+                int pageSize = int.TryParse(this.Prop_PageSize, out int psv) ? psv : 10;
+                int fromIndex = int.TryParse(this.Prop_FromIndex, out int fiv) ? fiv : 0;
+                int toIndex = int.TryParse(this.Prop_ToIndex, out int tiv) ? tiv : list.Count - 1;
 
                 List<string> result;
                 int totalPages = 0;
@@ -219,7 +218,7 @@ namespace Primo.MIA
 
                     case ListSliceMode.Range:
                         fromIndex = Math.Max(0, fromIndex);
-                        toIndex   = Math.Min(list.Count - 1, toIndex);
+                        toIndex = Math.Min(list.Count - 1, toIndex);
                         if (fromIndex > toIndex) { result = new List<string>(); break; }
                         result = list.Skip(fromIndex).Take(toIndex - fromIndex + 1).ToList();
                         break;
@@ -238,9 +237,9 @@ namespace Primo.MIA
                         throw new InvalidOperationException($"Неизвестный режим: {this.Mode}");
                 }
 
-                SetVariableValue(this.Prop_Result,     result,       sd);
-                SetVariableValue(this.Prop_Count,      result.Count, sd);
-                SetVariableValue(this.Prop_TotalPages, totalPages,   sd);
+                SetVariableValue(this.Prop_Result, result, sd);
+                SetVariableValue(this.Prop_Count, result.Count, sd);
+                SetVariableValue(this.Prop_TotalPages, totalPages, sd);
 
                 return new ExecutionResult { IsSuccess = true, SuccessMessage = $"Срез: {result.Count} из {list.Count} элементов" };
             }
@@ -252,7 +251,7 @@ namespace Primo.MIA
 
         public override ValidationResult Validate()
         {
-                        var ret = new ValidationResult();
+            var ret = new ValidationResult();
             ret.ValidateRequired(this.Prop_List, ActivityStrings.Field_List, ActivityStrings.Error_ListRequired);
             return ret;
         }

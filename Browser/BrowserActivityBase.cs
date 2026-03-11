@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using LTools.SDK;
 using LTools.Common.UIElements;
 using OpenQA.Selenium;
@@ -16,11 +17,7 @@ namespace Primo.MIA
         where TView : UserControl, new()
     {
         #region Services
-        
-        // TODO: Раскомментировать после решения проблемы с порядком компиляции
-        // Временно закомментировано для успешной компиляции проекта
-        
-        /*
+
         /// <summary>
         /// Менеджер сессий браузера.
         /// </summary>
@@ -40,7 +37,6 @@ namespace Primo.MIA
         /// Локатор элементов (создаётся новый экземпляр при каждом обращении).
         /// </summary>
         protected IElementLocator ElementLocator => BrowserServicesFactory.CreateElementLocator();
-        */
 
         #endregion
 
@@ -66,16 +62,16 @@ namespace Primo.MIA
         protected IWebDriver GetDriverFromContext(string sessionId)
         {
             string resolvedSessionId = SessionResolver.Resolve(sessionId);
-            
+
             IWebDriver driver = SeleniumHelper.GetDriver(resolvedSessionId);
-            
+
             if (driver == null)
             {
                 throw new InvalidOperationException(
                     $"WebDriver не найден для сессии '{resolvedSessionId}'. " +
                     $"Убедитесь что браузер был открыт с этим sessionId.");
             }
-            
+
             return driver;
         }
 
@@ -277,6 +273,21 @@ namespace Primo.MIA
             }
         }
 
+        /// <summary>
+        /// Безопасно выполняет функцию, возвращающую ExecutionResult.
+        /// </summary>
+        protected ExecutionResult SafeExecute(Func<ExecutionResult> func, string context = null)
+        {
+            try
+            {
+                return func();
+            }
+            catch (Exception ex)
+            {
+                return CreateErrorResult(ex, context);
+            }
+        }
+
         #endregion
 
         #region Logging Helpers
@@ -308,8 +319,40 @@ namespace Primo.MIA
             string logMessage = ex != null
                 ? $"[ERROR] {GetType().Name}: {message} - {ex.Message}"
                 : $"[ERROR] {GetType().Name}: {message}";
-            
+
             System.Diagnostics.Debug.WriteLine(logMessage);
+        }
+
+        #endregion
+
+        #region Element Locator Conversion
+
+        /// <summary>
+        /// Преобразует ElementLocatorType в LocatorType для использования с сервисами.
+        /// </summary>
+        protected LocatorType ConvertLocatorType(ElementLocatorType elementLocatorType)
+        {
+            switch (elementLocatorType)
+            {
+                case ElementLocatorType.Id:
+                    return LocatorType.Id;
+                case ElementLocatorType.Name:
+                    return LocatorType.Name;
+                case ElementLocatorType.ClassName:
+                    return LocatorType.ClassName;
+                case ElementLocatorType.TagName:
+                    return LocatorType.TagName;
+                case ElementLocatorType.LinkText:
+                    return LocatorType.LinkText;
+                case ElementLocatorType.PartialLinkText:
+                    return LocatorType.PartialLinkText;
+                case ElementLocatorType.CssSelector:
+                    return LocatorType.CssSelector;
+                case ElementLocatorType.XPath:
+                    return LocatorType.XPath;
+                default:
+                    throw new ArgumentException($"Неподдерживаемый тип локатора: {elementLocatorType}");
+            }
         }
 
         #endregion
@@ -335,7 +378,7 @@ namespace Primo.MIA
             Primo.MIA.Models.RetryConfiguration retryConfig = null)
         {
             retryConfig = retryConfig ?? Primo.MIA.Models.RetryConfiguration.Default;
-            
+
             int attempt = 0;
             Exception lastException = null;
 
@@ -345,27 +388,27 @@ namespace Primo.MIA
                 {
                     attempt++;
                     LogInfo($"Попытка {attempt}/{retryConfig.MaxRetries} поиска элемента [{locatorType}={locatorValue}]");
-                    
+
                     IWebElement element = FindElement(driver, locatorType, locatorValue, timeout);
-                    
+
                     if (attempt > 1)
                     {
                         LogInfo($"Элемент найден после {attempt} попыток");
                     }
-                    
+
                     return element;
                 }
                 catch (Exception ex) when (IsRetryableException(ex, retryConfig))
                 {
                     lastException = ex;
                     LogWarning($"Попытка {attempt} не удалась: {ex.Message}");
-                    
+
                     if (attempt < retryConfig.MaxRetries)
                     {
                         int delay = retryConfig.ExponentialBackoff
                             ? retryConfig.RetryDelayMs * (int)Math.Pow(2, attempt - 1)
                             : retryConfig.RetryDelayMs;
-                        
+
                         LogInfo($"Ожидание {delay}ms перед следующей попыткой");
                         System.Threading.Thread.Sleep(delay);
                     }
@@ -425,7 +468,7 @@ namespace Primo.MIA
 
                 // Получаем Shadow Root
                 IWebElement shadowRoot = js.ExecuteScript("return arguments[0].shadowRoot", shadowHost) as IWebElement;
-                
+
                 if (shadowRoot == null)
                     throw new InvalidOperationException("Элемент не содержит Shadow Root");
 
@@ -465,18 +508,18 @@ namespace Primo.MIA
             {
                 // Строим JavaScript для прохода по цепочке Shadow DOM
                 string script = "let element = document;";
-                
+
                 for (int i = 0; i < shadowPath.Length; i++)
                 {
                     script += $"\nelement = element.querySelector('{shadowPath[i]}').shadowRoot;";
                 }
-                
+
                 script += $"\nreturn element.querySelector('{finalLocatorValue}');";
 
                 LogInfo($"Поиск через Shadow DOM цепочку: {string.Join(" -> ", shadowPath)} -> {finalLocatorValue}");
-                
+
                 IWebElement element = js.ExecuteScript(script) as IWebElement;
-                
+
                 if (element == null)
                     throw new NoSuchElementException($"Элемент не найден в Shadow DOM цепочке");
 
@@ -590,7 +633,7 @@ namespace Primo.MIA
 
                 // Создаем скриншот
                 Screenshot screenshot = screenshotDriver.GetScreenshot();
-                screenshot.SaveAsFile(filepath, ScreenshotImageFormat.Png);
+                screenshot.SaveAsFile(filepath);
 
                 LogInfo($"Скриншот сохранен: {filepath}");
                 return filepath;
@@ -675,7 +718,7 @@ namespace Primo.MIA
                         throw new ArgumentOutOfRangeException(
                             nameof(index),
                             $"Индекс {index} вне диапазона (доступно элементов: {elements.Count})");
-                    
+
                     LogInfo($"Возвращаем элемент #{index} из {elements.Count}");
                     return elements[index];
 
@@ -687,9 +730,6 @@ namespace Primo.MIA
         #endregion
 
         #endregion
-
-    }
-}
 
         #region Window and Tab Management (Requirement 10)
 
@@ -708,7 +748,7 @@ namespace Primo.MIA
                 try
                 {
                     driver.SwitchTo().Window(handle);
-                    
+
                     windows.Add(new Primo.MIA.Models.WindowInfo
                     {
                         Handle = handle,
@@ -726,7 +766,7 @@ namespace Primo.MIA
 
             // Возвращаемся к исходному окну
             driver.SwitchTo().Window(currentHandle);
-            
+
             LogInfo($"Найдено {windows.Count} окон");
             return windows;
         }
@@ -748,7 +788,7 @@ namespace Primo.MIA
                 try
                 {
                     driver.SwitchTo().Window(handle);
-                    
+
                     if (driver.Title.Contains(title))
                     {
                         LogInfo($"Переключено на окно с заголовком: {driver.Title}");
@@ -784,7 +824,7 @@ namespace Primo.MIA
                 try
                 {
                     driver.SwitchTo().Window(handle);
-                    
+
                     if (driver.Url.Contains(url))
                     {
                         LogInfo($"Переключено на окно с URL: {driver.Url}");
@@ -812,7 +852,7 @@ namespace Primo.MIA
         protected int CloseAllExceptMain(IWebDriver driver, string mainWindowHandle = null)
         {
             var handles = driver.WindowHandles;
-            
+
             if (handles.Count <= 1)
             {
                 LogInfo("Открыто только одно окно, нечего закрывать");
@@ -848,7 +888,7 @@ namespace Primo.MIA
             // Переключаемся на основное окно
             driver.SwitchTo().Window(mainWindowHandle);
             LogInfo($"Закрыто {closedCount} окон, осталось основное");
-            
+
             return closedCount;
         }
 
@@ -910,7 +950,7 @@ namespace Primo.MIA
             try
             {
                 var cookieCollection = Newtonsoft.Json.JsonConvert.DeserializeObject<Primo.MIA.Models.CookieCollection>(json);
-                
+
                 if (cookieCollection == null || cookieCollection.Cookies == null)
                     throw new ArgumentException("Некорректный формат JSON cookies");
 

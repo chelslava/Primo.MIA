@@ -18,7 +18,6 @@ using OpenQA.Selenium;
 using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
-using static LTools.Common.Helpers.WFHelper.PropertiesItem;
 
 namespace Primo.MIA
 {
@@ -143,7 +142,7 @@ namespace Primo.MIA
             {
                 // Получаем sessionId
                 string sessionId = GetPropertyValue<string>(Prop_SessionId, nameof(Prop_SessionId), sd);
-                
+
                 // Получение драйвера через базовый класс
                 IWebDriver driver = GetDriverFromContext(sessionId);
 
@@ -167,7 +166,7 @@ namespace Primo.MIA
         public override ValidationResult Validate()
         {
             var ret = new ValidationResult();
-             
+
             ret.ValidateRequired(Prop_OutLogs, "Логи", "Переменная для логов обязательна");
 
             return ret;

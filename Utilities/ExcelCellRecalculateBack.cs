@@ -1,13 +1,10 @@
 ﻿using LTools.Common.Model;
 using LTools.Common.UIElements;
-using LTools.Enums;
 using LTools.SDK;
 using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text.RegularExpressions;
-using static LTools.Common.Helpers.WFHelper.PropertiesItem;
 
 namespace Primo.MIA
 {
@@ -193,7 +190,7 @@ namespace Primo.MIA
 
         #endregion
 
-                public override ValidationResult Validate()
+        public override ValidationResult Validate()
         {
             var ret = new ValidationResult();
             ret.ValidateRequired(this.Prop_StartCell, ActivityStrings.Field_StartCell, ActivityStrings.Error_StartCellRequired);

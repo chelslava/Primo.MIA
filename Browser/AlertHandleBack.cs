@@ -18,7 +18,6 @@ using OpenQA.Selenium;
 using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
-using static LTools.Common.Helpers.WFHelper.PropertiesItem;
 
 namespace Primo.MIA
 {
@@ -199,7 +198,7 @@ namespace Primo.MIA
         public override ValidationResult Validate()
         {
             var ret = new ValidationResult();
-             
+
 
             // Для SendKeys текст обязателен
             if (Prop_Action == AlertAction.SendKeys)

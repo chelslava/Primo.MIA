@@ -12,13 +12,11 @@
 
 using LTools.Common.Model;
 using LTools.Common.UIElements;
-using LTools.Enums;
 using LTools.SDK;
 using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using static LTools.Common.Helpers.WFHelper.PropertiesItem;
 
 namespace Primo.MIA
 {
@@ -28,7 +26,7 @@ namespace Primo.MIA
     /// Оригинальный словарь не изменяется.
     /// Если ключ не найден — поведение задаётся флагом Prop_ThrowIfNotFound.
     /// </summary>
-        public class DictionaryRemoveKeyBack : PrimoComponentTO<DictionaryOperationsSmall>
+    public class DictionaryRemoveKeyBack : PrimoComponentTO<DictionaryOperationsSmall>
     {
         public override string GroupName { get => ActivityCategories.Dictionaries; protected set { } }
 
@@ -111,7 +109,7 @@ namespace Primo.MIA
 
             sdkComponentIcon = ActivityIcons.Dictionary;
 
-                                    sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
+            sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
                 PropertyBuilder.Script<Dictionary<string, string>>("Prop_Dictionary", "Входной словарь"),
                 PropertyBuilder.Script<string>("Prop_Key", "Ключ для удаления"),
@@ -126,8 +124,8 @@ namespace Primo.MIA
         {
             try
             {
-                var    dict = GetPropertyValue<Dictionary<string, string>>(this.Prop_Dictionary, "Prop_Dictionary", sd);
-                string key  = GetPropertyValue<string>(this.Prop_Key, "Prop_Key", sd);
+                var dict = GetPropertyValue<Dictionary<string, string>>(this.Prop_Dictionary, "Prop_Dictionary", sd);
+                string key = GetPropertyValue<string>(this.Prop_Key, "Prop_Key", sd);
 
                 if (dict == null) throw new ArgumentNullException("Prop_Dictionary", "Словарь не может быть null");
                 if (string.IsNullOrEmpty(key)) throw new ArgumentException("Ключ не может быть пустым");
@@ -144,8 +142,8 @@ namespace Primo.MIA
                     .Where(p => p.Key != key)
                     .ToDictionary(p => p.Key, p => p.Value);
 
-                SetVariableValue(this.Prop_ResultDictionary, result,  sd);
-                SetVariableValue(this.Prop_Removed,          exists,  sd);
+                SetVariableValue(this.Prop_ResultDictionary, result, sd);
+                SetVariableValue(this.Prop_Removed, exists, sd);
 
                 return new ExecutionResult { IsSuccess = true, SuccessMessage = exists ? $"Ключ '{key}' удалён" : $"Ключ '{key}' не найден" };
             }
@@ -155,7 +153,7 @@ namespace Primo.MIA
             }
         }
 
-                public override ValidationResult Validate()
+        public override ValidationResult Validate()
         {
             var ret = new ValidationResult();
             ret.ValidateRequired(this.Prop_Dictionary, ActivityStrings.Field_Dictionary, ActivityStrings.Error_DictionaryRequired);

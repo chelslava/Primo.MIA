@@ -1,12 +1,10 @@
 using LTools.Common.Model;
 using LTools.Common.UIElements;
-using LTools.Enums;
 using LTools.SDK;
 using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using static LTools.Common.Helpers.WFHelper.PropertiesItem;
 
 namespace Primo.MIA
 {
@@ -20,7 +18,7 @@ namespace Primo.MIA
     ///   Список имён + список значений → список пар для обработки в цикле.
     ///   ["Иванов","Петров"] + ["42","37"] → [("Иванов","42"), ("Петров","37")]
     /// </summary>
-        public class TupleZipBack : PrimoComponentTO<TupleZip>
+    public class TupleZipBack : PrimoComponentTO<TupleZip>
     {
         public override string GroupName { get => ActivityCategories.Tuples; protected set { } }
 
@@ -34,7 +32,7 @@ namespace Primo.MIA
 
         private string _propListA;
         /// <summary>Первый список — значения становятся Item1 каждого кортежа.</summary>
-                [LTools.Common.Model.Serialization.StoringProperty]
+        [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(List<string>))]
         [System.ComponentModel.Category(ActivityStrings.Category_Main)]
         [System.ComponentModel.DisplayName(ActivityStrings.Field_ListA_Item1)]
@@ -42,7 +40,7 @@ namespace Primo.MIA
 
         private string _propListB;
         /// <summary>Второй список — значения становятся Item2 каждого кортежа.</summary>
-                [LTools.Common.Model.Serialization.StoringProperty]
+        [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(List<string>))]
         [System.ComponentModel.Category(ActivityStrings.Category_Main)]
         [System.ComponentModel.DisplayName(ActivityStrings.Field_ListB_Item2)]
@@ -53,7 +51,7 @@ namespace Primo.MIA
         /// Третий список — необязателен. Если задан, создаются трёхэлементные кортежи Tuple&lt;string,string,string&gt;.
         /// Если не задан — создаются двухэлементные Tuple&lt;string,string&gt;.
         /// </summary>
-                [LTools.Common.Model.Serialization.StoringProperty]
+        [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(List<string>))]
         [System.ComponentModel.Category(ActivityStrings.Category_Optional)]
         [System.ComponentModel.DisplayName(ActivityStrings.Field_ListC_Item3)]
@@ -67,7 +65,7 @@ namespace Primo.MIA
         ///   ClassicTuple — List&lt;Tuple&lt;string,string&gt;&gt; (по умолчанию, без NuGet).
         ///   ValueTuple   — List&lt;ValueTuple&lt;string,string&gt;&gt; (требует System.ValueTuple).
         /// </summary>
-                [LTools.Common.Model.Serialization.StoringProperty]
+        [LTools.Common.Model.Serialization.StoringProperty]
         [System.ComponentModel.Category(ActivityStrings.Category_Main)]
         [System.ComponentModel.DisplayName(ActivityStrings.Field_TupleKind)]
         public TupleKind Kind
@@ -85,7 +83,7 @@ namespace Primo.MIA
         ///   List&lt;Tuple&lt;string,string,string&gt;&gt; если ListC задан.
         /// Используйте тип object или приводите при обходе цикла.
         /// </summary>
-                [LTools.Common.Model.Serialization.StoringProperty]
+        [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(object))]
         [System.ComponentModel.Category(ActivityStrings.Category_Output)]
         [System.ComponentModel.DisplayName(ActivityStrings.Field_TupleList)]
@@ -93,7 +91,7 @@ namespace Primo.MIA
 
         private string _propCount;
         /// <summary>Количество кортежей в результате (длина минимального из входных списков).</summary>
-                [LTools.Common.Model.Serialization.StoringProperty]
+        [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
         [System.ComponentModel.Category(ActivityStrings.Category_Output)]
         [System.ComponentModel.DisplayName(ActivityStrings.Field_Count)]
@@ -101,7 +99,7 @@ namespace Primo.MIA
 
         private string _propArity;
         /// <summary>Арность каждого кортежа в результате (2 или 3).</summary>
-                [LTools.Common.Model.Serialization.StoringProperty]
+        [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
         [System.ComponentModel.Category(ActivityStrings.Category_Output)]
         [System.ComponentModel.DisplayName(ActivityStrings.Field_TupleArity)]
@@ -123,7 +121,7 @@ namespace Primo.MIA
                 "Обратная операция — «Кортеж: Unzip списков».";
             sdkComponentIcon = ActivityIcons.Tuple;
 
-                        sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
+            sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
                 PropertyBuilder.Script<List<string>>("Prop_ListA", "Список A — значения для Item1"),
                 PropertyBuilder.Script<List<string>>("Prop_ListB", "Список B — значения для Item2"),
@@ -198,7 +196,7 @@ namespace Primo.MIA
 
         // ── ВАЛИДАЦИЯ ──────────────────────────────────────────────────────────
 
-                public override ValidationResult Validate()
+        public override ValidationResult Validate()
         {
             var ret = new ValidationResult();
             ret.ValidateRequired(this.Prop_ListA, ActivityStrings.Field_ListA_Item1, "Список A обязателен");
@@ -207,4 +205,4 @@ namespace Primo.MIA
             return ret;
         }
     }
-}    
+}

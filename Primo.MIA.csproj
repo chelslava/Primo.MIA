@@ -126,6 +126,7 @@
       <DependentUpon>AlertHandle.xaml</DependentUpon>
     </Compile>
     <Compile Include="Browser\AlertHandleBack.cs" />
+    <Compile Include="Browser\BrowserActivityBase.cs" />
     <Compile Include="Browser\BrowserClose.xaml.cs">
       <DependentUpon>BrowserClose.xaml</DependentUpon>
     </Compile>
@@ -158,7 +159,6 @@
       <DependentUpon>BrowserScreenshot.xaml</DependentUpon>
     </Compile>
     <Compile Include="Browser\BrowserScreenshotBack.cs" />
-    <Compile Include="Browser\BrowserActivityBase.cs" />
     <Compile Include="Browser\BrowserSessionContext.cs" />
     <Compile Include="Browser\Interfaces\IBrowserServices.cs" />
     <Compile Include="Browser\BrowserStorageManage.xaml.cs">
@@ -255,6 +255,7 @@
     <Compile Include="Browser\Models\ScreenshotMetadata.cs" />
     <Compile Include="Browser\Models\WindowInfo.cs" />
     <Compile Include="Browser\Services\ActivityLogger.cs" />
+    <Compile Include="Browser\Services\BrowserServicesFactory.cs" />
     <Compile Include="Browser\Services\ElementLocator.cs" />
     <Compile Include="Browser\Services\ElementRepository.cs" />
     <Compile Include="Browser\Services\SessionManager.cs" />

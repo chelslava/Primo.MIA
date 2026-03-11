@@ -6,12 +6,10 @@
 
 using LTools.Common.Model;
 using LTools.Common.UIElements;
-using LTools.Enums;
 using LTools.SDK;
 using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
-using static LTools.Common.Helpers.WFHelper.PropertiesItem;
 
 namespace Primo.MIA
 {
@@ -26,7 +24,7 @@ namespace Primo.MIA
 
 
 
-        public class TupleGetBack : PrimoComponentTO<TupleGet>
+    public class TupleGetBack : PrimoComponentTO<TupleGet>
     {
         public override string GroupName { get => ActivityCategories.Tuples; protected set { } }
 
@@ -114,7 +112,7 @@ namespace Primo.MIA
 
 
 
-                        sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
+            sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
                 PropertyBuilder.Script<object>("Prop_Tuple", "Входной кортеж"),
                 PropertyBuilder.Enum<TupleItemIndex>("Index", "Номер элемента Item1–Item7"),
@@ -172,7 +170,7 @@ namespace Primo.MIA
 
 
 
-                public override ValidationResult Validate()
+        public override ValidationResult Validate()
         {
             var ret = new ValidationResult();
             ret.ValidateRequired(this.Prop_Tuple, ActivityStrings.Field_Tuple, ActivityStrings.Error_TupleRequired);

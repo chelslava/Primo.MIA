@@ -9,7 +9,7 @@ namespace Primo.MIA.Common
         // ═══════════════════════════════════════════════════════════════════════
         // КАТЕГОРИИ
         // ═══════════════════════════════════════════════════════════════════════
-        
+
         public const string Category_Main = "1. Основные";
         public const string Category_Output = "Выходные данные";
         public const string Category_Settings = "Настройки";
@@ -37,7 +37,7 @@ namespace Primo.MIA.Common
         public const string Category_FromList = "FromList";
         public const string Category_ToString = "ToString";
         public const string Category_Optional = "Опционально";
-        
+
         // Категории для Generators
         public const string Category_Guid = "2. GUID";
         public const string Category_FileName = "3. Имя файла";
@@ -51,7 +51,7 @@ namespace Primo.MIA.Common
         // ═══════════════════════════════════════════════════════════════════════
         // НАЗВАНИЯ ПОЛЕЙ (общие)
         // ═══════════════════════════════════════════════════════════════════════
-        
+
         public const string Field_Dictionary = "Словарь";
         public const string Field_List = "Список";
         public const string Field_Tuple = "Кортеж";
@@ -83,11 +83,11 @@ namespace Primo.MIA.Common
         public const string Field_ParsedPairs = "Разобрано пар";
         public const string Field_ResultString = "Результирующая строка";
         public const string Field_PairCount = "Количество пар";
-        
+
         // ═══════════════════════════════════════════════════════════════════════
         // НАЗВАНИЯ ПОЛЕЙ (выходные)
         // ═══════════════════════════════════════════════════════════════════════
-        
+
         public const string Field_ResultDictionary = "Результирующий словарь";
         public const string Field_Count = "Количество элементов";
         public const string Field_DuplicatesCount = "Пропущено дублей (Invert)";
@@ -111,11 +111,11 @@ namespace Primo.MIA.Common
         public const string Field_FirstIndex = "Первый индекс";
         public const string Field_AllIndexes = "Все индексы";
         public const string Field_OccurrenceCount = "Кол-во вхождений";
-        
+
         // ═══════════════════════════════════════════════════════════════════════
         // СООБЩЕНИЯ ОБ ОШИБКАХ
         // ═══════════════════════════════════════════════════════════════════════
-        
+
         public const string Error_DictionaryRequired = "Словарь обязателен";
         public const string Error_ListRequired = "Список обязателен";
         public const string Error_TupleRequired = "Кортеж обязателен";
@@ -157,14 +157,14 @@ namespace Primo.MIA.Common
         public const string Error_StabilityTimeoutRequired = "Время стабильности должно быть указано";
         public const string Error_TimeoutRequired = "Таймаут должен быть указан";
         public const string Error_ListBRequired = "Список B обязателен для данной операции";
-        
+
         // ═══════════════════════════════════════════════════════════════════════
         // НАЗВАНИЯ АКТИВНОСТЕЙ
         // ═══════════════════════════════════════════════════════════════════════
-        
+
         // HTTP
         public const string Activity_HttpRequest = "HTTP запрос";
-        
+
         // Dictionary
         public const string Activity_DictionaryCreate = "Словарь: Создать";
         public const string Activity_DictionaryGetValue = "Словарь: Получить значение";
@@ -177,7 +177,7 @@ namespace Primo.MIA.Common
         public const string Activity_DictionaryFromString = "Словарь: Из строки";
         public const string Activity_DictionaryToString = "Словарь: В строку";
         public const string Activity_DictionaryOperations = "Словарь: Операции";
-        
+
         // List
         public const string Activity_ListFilter = "Список: Фильтрация";
         public const string Activity_ListTransform = "Список: Преобразование";
@@ -188,7 +188,7 @@ namespace Primo.MIA.Common
         public const string Activity_ListInspect = "Список: Анализ";
         public const string Activity_ListConvert = "Список: Конвертация";
         public const string Activity_ListGroup = "Список: Группировка";
-        
+
         // Tuple
         public const string Activity_TupleCreate = "Кортеж: Создать";
         public const string Activity_TupleDestructure = "Кортеж: Деструктуризация";
@@ -199,7 +199,7 @@ namespace Primo.MIA.Common
         public const string Activity_TupleZip = "Кортеж: Zip списков";
         public const string Activity_TupleUnzip = "Кортеж: Unzip списков";
         public const string Activity_TupleSort = "Кортеж: Сортировка списка";
-        
+
         // Utilities
         public const string Activity_LogMessage = "Логирование";
         public const string Activity_SearchFiles = "Поиск файлов";
@@ -207,14 +207,14 @@ namespace Primo.MIA.Common
         public const string Activity_Generators = "Генераторы";
         public const string Activity_ExcelCellRecalculate = "Excel: Пересчёт ячеек";
         public const string Activity_WaitForFile = "Ожидание файла";
-        
+
         // Dictionary (дополнительные)
         public const string Activity_DictionaryRemoveKey = "Словарь: Удалить ключ";
-        
+
         // ═══════════════════════════════════════════════════════════════════════
         // ДОПОЛНИТЕЛЬНЫЕ ПОЛЯ
         // ═══════════════════════════════════════════════════════════════════════
-        
+
         public const string Field_Message = "Сообщение";
         public const string Field_Level = "Уровень";
         public const string Field_OutputMode = "Режим вывода";
@@ -267,7 +267,7 @@ namespace Primo.MIA.Common
         public const string Field_Rejected = "Не прошли фильтр";
         public const string Field_MatchedCount = "Кол-во прошедших";
         public const string Field_RejectedCount = "Кол-во отсеянных";
-        
+
         // Tuple fields
         public const string Field_ItemIndex = "Номер элемента";
         public const string Field_NewValue = "Новое значение";
@@ -305,7 +305,7 @@ namespace Primo.MIA.Common
         public const string Field_SortKey = "Ключ сортировки";
         public const string Field_Direction = "Направление";
         public const string Field_SortType = "Тип сортировки";
-        
+
         // List fields
         public const string Field_GroupingMode = "Способ группировки";
         public const string Field_PrefixLength = "Длина префикса";
@@ -340,19 +340,19 @@ namespace Primo.MIA.Common
         public const string Field_NumericResult = "Числовой результат";
         public const string Field_NumericCount = "Кол-во числовых";
         public const string Field_ChangedCount = "Изменилось элементов";
-        
+
         // Dictionary fields
         public const string Field_Query = "Строка поиска / паттерн";
         public const string Field_Target = "Где искать";
         public const string Field_SearchMethod = "Метод поиска";
         public const string Field_FilteredOutCount = "Отсеяно фильтром";
-        
+
         // Excel fields
         public const string Field_StartCell = "Начальная ячейка";
         public const string Field_RowOffset = "Смещение по строке (ΔR)";
         public const string Field_ColumnOffset = "Смещение по столбцу (ΔC)";
         public const string Field_TargetCell = "Целевая ячейка";
-        
+
         // Generator fields
         public const string Field_GenerationType = "Тип генерации";
         public const string Field_GuidFormat = "Формат GUID";
@@ -372,7 +372,7 @@ namespace Primo.MIA.Common
         public const string Field_Template = "Шаблон";
         public const string Field_Variables = "Переменные";
         public const string Field_OutputVariable = "Результат";
-        
+
         // TOML Config fields
         public const string Field_FilePath = "Путь к файлу";
         public const string Field_ReadMode = "Режим чтения";
@@ -390,8 +390,8 @@ namespace Primo.MIA.Common
         public const string Field_AvailableProfiles = "Доступные профили";
         public const string Field_ProfileKeysCount = "Ключей из профиля";
         public const string Field_DefaultKeysCount = "Ключей из default";
-        
-                // WaitForFile fields
+
+        // WaitForFile fields
         public const string Field_WaitMode = "Режим ожидания";
         public const string Field_FilePattern = "Маска файла";
         public const string Field_CheckInterval = "Интервал проверки (мс)";
@@ -401,18 +401,18 @@ namespace Primo.MIA.Common
         public const string Field_FileFound = "Файл найден";
         public const string Field_FileSize = "Размер файла (байт)";
         public const string Field_WaitTime = "Время ожидания (мс)";
-        
+
         // ═══════════════════════════════════════════════════════════════════════
         // BROWSER / SELENIUM
         // ═══════════════════════════════════════════════════════════════════════
-        
+
         // Browser categories
         public const string Category_Browser = "Браузер";
         public const string Category_BrowserOptions = "2. Опции браузера";
         public const string Category_Element = "Элемент";
         public const string Category_Wait = "Ожидание";
         public const string Category_Locator = "Локатор";
-        
+
         // Browser fields
         public const string Field_SessionId = "ID сессии";
         public const string Field_BrowserType = "Тип браузера";
@@ -424,7 +424,7 @@ namespace Primo.MIA.Common
         public const string Field_WindowSize = "Размер окна";
         public const string Field_PageLoadTimeout = "Таймаут загрузки (сек)";
         public const string Field_ImplicitWait = "Неявное ожидание (сек)";
-        
+
         // Element locator fields
         public const string Field_LocatorType = "Тип локатора";
         public const string Field_LocatorValue = "Значение локатора";
@@ -432,8 +432,8 @@ namespace Primo.MIA.Common
         public const string Field_ElementIds = "Список ID элементов";
         public const string Field_WaitTimeout = "Таймаут (сек)";
         public const string Field_WaitCondition = "Условие ожидания";
-        
-                // Element interaction fields
+
+        // Element interaction fields
         public const string Field_Text = "Текст";
         public const string Field_ClearBeforeType = "Очистить перед вводом";
         public const string Field_SimulateTyping = "Эмуляция печати";
@@ -446,7 +446,7 @@ namespace Primo.MIA.Common
         public const string Field_PropertyName = "Имя свойства";
         public const string Field_AttributeName = "Имя атрибута";
         public const string Field_CssProperty = "CSS свойство";
-        
+
         // Element state fields
         public const string Field_IsVisible = "Видим";
         public const string Field_IsEnabled = "Включён";
@@ -455,27 +455,27 @@ namespace Primo.MIA.Common
         public const string Field_ElementText = "Текст элемента";
         public const string Field_ElementValue = "Значение элемента";
         public const string Field_ElementCount = "Количество элементов";
-        
+
         // Browser navigation fields
         public const string Field_NavigateUrl = "URL для перехода";
         public const string Field_CurrentUrl = "Текущий URL";
         public const string Field_PageTitle = "Заголовок страницы";
         public const string Field_PageSource = "HTML код страницы";
-        
+
         // Screenshot fields
         public const string Field_ScreenshotPath = "Путь к скриншоту";
         public const string Field_ScreenshotBase64 = "Скриншот (Base64)";
-        
+
         // JavaScript fields
         public const string Field_JavaScriptCode = "JavaScript код";
         public const string Field_ScriptArguments = "Аргументы скрипта";
         public const string Field_ScriptResult = "Результат выполнения";
-        
+
         // Select fields
         public const string Field_SelectMode = "Режим выбора";
         public const string Field_SelectValue = "Значение для выбора";
         public const string Field_SelectedOptions = "Выбранные опции";
-        
+
         // Cookie fields
         public const string Field_CookieOperation = "Операция";
         public const string Field_CookieName = "Имя cookie";
@@ -484,23 +484,23 @@ namespace Primo.MIA.Common
         public const string Field_CookiePath = "Путь";
         public const string Field_CookieExpiry = "Срок действия";
         public const string Field_Cookies = "Cookies";
-        
+
         // Switch context fields
         public const string Field_SwitchToType = "Тип контекста";
         public const string Field_FrameLocator = "Локатор фрейма";
         public const string Field_WindowHandle = "Handle окна";
         public const string Field_WindowHandles = "Список handles";
-        
+
         // Alert fields
         public const string Field_AlertAction = "Действие";
         public const string Field_AlertText = "Текст алерта";
         public const string Field_AlertInput = "Текст для ввода";
-        
+
         // Scroll fields
         public const string Field_ScrollAlignment = "Выравнивание";
         public const string Field_ScrollPixels = "Пиксели";
         public const string Field_ScrollDirection = "Направление";
-        
+
         // Browser errors
         public const string Error_SessionNotFound = "Сессия браузера не найдена";
         public const string Error_LocatorValueRequired = "Значение локатора обязательно";
@@ -510,7 +510,7 @@ namespace Primo.MIA.Common
         public const string Error_JavaScriptRequired = "JavaScript код обязателен";
         public const string Error_CookieNameRequired = "Имя cookie обязательно";
         public const string Error_InvalidWindowHandle = "Некорректный handle окна";
-        
+
         // Browser activities
         public const string Activity_BrowserOpen = "Браузер: Открыть";
         public const string Activity_BrowserClose = "Браузер: Закрыть";

@@ -17,7 +17,6 @@ using OpenQA.Selenium;
 using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
-using static LTools.Common.Helpers.WFHelper.PropertiesItem;
 
 namespace Primo.MIA
 {
@@ -241,7 +240,7 @@ namespace Primo.MIA
 
                 string targetElementId = GetPropertyValue<string>(Prop_TargetElementId, "Prop_TargetElementId", sd);
                 string targetLocatorValue = GetPropertyValue<string>(Prop_TargetLocatorValue, "Prop_TargetLocatorValue", sd);
-                
+
                 string offsetXStr = GetPropertyValue<string>(Prop_OffsetX, "Prop_OffsetX", sd) ?? "0";
                 string offsetYStr = GetPropertyValue<string>(Prop_OffsetY, "Prop_OffsetY", sd) ?? "0";
                 int offsetX = int.TryParse(offsetXStr, out int ox) ? ox : 0;
@@ -339,7 +338,7 @@ namespace Primo.MIA
         public override ValidationResult Validate()
         {
             var ret = new ValidationResult();
-             
+
 
             // Проверяем наличие исходного элемента
             bool hasSourceId = !string.IsNullOrWhiteSpace(this.Prop_SourceElementId);

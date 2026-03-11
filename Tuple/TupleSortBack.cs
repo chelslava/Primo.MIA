@@ -5,7 +5,6 @@ using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using static LTools.Common.Helpers.WFHelper.PropertiesItem;
 
 namespace Primo.MIA
 {
@@ -22,7 +21,7 @@ namespace Primo.MIA
     ///
     /// Возвращает новый список — оригинал не изменяется.
     /// </summary>
-        public class TupleSortBack : PrimoComponentTO<TupleSort>
+    public class TupleSortBack : PrimoComponentTO<TupleSort>
     {
         public override string GroupName { get => ActivityCategories.Tuples; protected set { } }
 
@@ -36,7 +35,7 @@ namespace Primo.MIA
 
         private string _propTupleList;
         /// <summary>Список кортежей для сортировки. Тип элемента — любой Tuple арности 1–7.</summary>
-                [LTools.Common.Model.Serialization.StoringProperty]
+        [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(object))]
         [System.ComponentModel.Category(ActivityStrings.Category_Main)]
         [System.ComponentModel.DisplayName(ActivityStrings.Field_TupleList)]
@@ -44,7 +43,7 @@ namespace Primo.MIA
 
         private TupleItemIndex _sortKey = TupleItemIndex.Item1;
         /// <summary>По значению какого элемента сортировать (Item1–Item7).</summary>
-                [LTools.Common.Model.Serialization.StoringProperty]
+        [LTools.Common.Model.Serialization.StoringProperty]
         [System.ComponentModel.Category(ActivityStrings.Category_Main)]
         [System.ComponentModel.DisplayName(ActivityStrings.Field_SortKey)]
         public TupleItemIndex SortKey
@@ -55,7 +54,7 @@ namespace Primo.MIA
 
         private TupleSortDirection _direction = TupleSortDirection.Ascending;
         /// <summary>Направление сортировки: по возрастанию или убыванию.</summary>
-                [LTools.Common.Model.Serialization.StoringProperty]
+        [LTools.Common.Model.Serialization.StoringProperty]
         [System.ComponentModel.Category(ActivityStrings.Category_Main)]
         [System.ComponentModel.DisplayName(ActivityStrings.Field_Direction)]
         public TupleSortDirection Direction
@@ -66,7 +65,7 @@ namespace Primo.MIA
 
         private TupleSortType _sortType = TupleSortType.Alphabetical;
         /// <summary>Тип сортировки: алфавитная, числовая или натуральная.</summary>
-                [LTools.Common.Model.Serialization.StoringProperty]
+        [LTools.Common.Model.Serialization.StoringProperty]
         [System.ComponentModel.Category(ActivityStrings.Category_Main)]
         [System.ComponentModel.DisplayName(ActivityStrings.Field_SortType)]
         public TupleSortType SortType
@@ -79,7 +78,7 @@ namespace Primo.MIA
 
         private string _propResult;
         /// <summary>Отсортированный список кортежей. Имеет тот же тип что и входной список.</summary>
-                [LTools.Common.Model.Serialization.StoringProperty]
+        [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(object))]
         [System.ComponentModel.Category(ActivityStrings.Category_Output)]
         [System.ComponentModel.DisplayName(ActivityStrings.Field_OutputVariable)]
@@ -87,7 +86,7 @@ namespace Primo.MIA
 
         private string _propCount;
         /// <summary>Количество кортежей в результате.</summary>
-                [LTools.Common.Model.Serialization.StoringProperty]
+        [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
         [System.ComponentModel.Category(ActivityStrings.Category_Output)]
         [System.ComponentModel.DisplayName(ActivityStrings.Field_Count)]
@@ -110,7 +109,7 @@ namespace Primo.MIA
                 "Оригинальный список не изменяется — возвращается новый.";
             sdkComponentIcon = ActivityIcons.Tuple;
 
-                        sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
+            sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
                 PropertyBuilder.Script<object>("Prop_TupleList", "Список кортежей для сортировки"),
                 PropertyBuilder.Enum<TupleItemIndex>("SortKey", "По какому элементу сортировать (Item1–Item7)"),
@@ -168,7 +167,7 @@ namespace Primo.MIA
                             : items.OrderByDescending(numKey);
                         break;
 
-                                        case TupleSortType.Natural:
+                    case TupleSortType.Natural:
                         sorted = this.Direction == TupleSortDirection.Ascending
                             ? items.OrderBy(getKey, NaturalComparer.Instance)
                             : items.OrderByDescending(getKey, NaturalComparer.Instance);
@@ -202,7 +201,7 @@ namespace Primo.MIA
 
         // ── ВАЛИДАЦИЯ ──────────────────────────────────────────────────────────
 
-                public override ValidationResult Validate()
+        public override ValidationResult Validate()
         {
             var ret = new ValidationResult();
             ret.ValidateRequired(this.Prop_TupleList, ActivityStrings.Field_TupleList, "Список кортежей обязателен");

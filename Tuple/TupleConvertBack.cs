@@ -1,13 +1,10 @@
 using LTools.Common.Model;
 using LTools.Common.UIElements;
-using LTools.Enums;
 using LTools.SDK;
 using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using static LTools.Common.Helpers.WFHelper.PropertiesItem;
 
 namespace Primo.MIA
 {
@@ -20,7 +17,7 @@ namespace Primo.MIA
     ///   ToDictionary — Tuple → Dictionary&lt;string,object&gt; с ключами "Item1".."ItemN"
     ///   ToString     — Tuple → строка вида "Item1=значение1; Item2=значение2"
     /// </summary>
-        public class TupleConvertBack : PrimoComponentTO<TupleConvert>
+    public class TupleConvertBack : PrimoComponentTO<TupleConvert>
     {
         public override string GroupName { get => ActivityCategories.Tuples; protected set { } }
 
@@ -143,7 +140,7 @@ namespace Primo.MIA
             this.Prop_Separator = "\"; \"";
             this.Prop_IncludeKeys = "true";
 
-                        sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
+            sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
                 PropertyBuilder.Script<object>("Prop_Tuple", "Входной кортеж (для ToList, ToDictionary, ToString)"),
                 PropertyBuilder.Enum<TupleConvertMode>("Mode", "Режим конвертации"),

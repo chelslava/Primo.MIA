@@ -28,7 +28,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using static LTools.Common.Helpers.WFHelper.PropertiesItem;
 
 namespace Primo.MIA
 {
@@ -38,7 +37,7 @@ namespace Primo.MIA
     /// </summary>
     public class ListConvertBack : PrimoComponentTO<ListConvert>
     {
-                public override string GroupName { get => ActivityCategories.Lists; protected set { } }
+        public override string GroupName { get => ActivityCategories.Lists; protected set { } }
 
         protected override int sdkTimeOut
         {
@@ -165,7 +164,7 @@ namespace Primo.MIA
                 "Chunk        — разбить List на батчи по N элементов";
             sdkComponentIcon = ActivityIcons.List;
 
-                        sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
+            sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
                 PropertyBuilder.Script<List<string>>("Prop_List", "Входной список"),
                 PropertyBuilder.Enum<ListConvertMode>("Mode", "Тип конвертации"),
@@ -188,103 +187,103 @@ namespace Primo.MIA
         {
             try
             {
-                var list   = GetPropertyValue<List<string>>(this.Prop_List,    "Prop_List",  sd);
-                var listB  = GetPropertyValue<List<string>>(this.Prop_ListB,   "Prop_ListB", sd);
-                string sep = GetPropertyValue<string>(this.Prop_Separator,     "Prop_Separator", sd) ?? "=";
-                string csv = GetPropertyValue<string>(this.Prop_CsvInput,      "Prop_CsvInput",  sd) ?? string.Empty;
+                var list = GetPropertyValue<List<string>>(this.Prop_List, "Prop_List", sd);
+                var listB = GetPropertyValue<List<string>>(this.Prop_ListB, "Prop_ListB", sd);
+                string sep = GetPropertyValue<string>(this.Prop_Separator, "Prop_Separator", sd) ?? "=";
+                string csv = GetPropertyValue<string>(this.Prop_CsvInput, "Prop_CsvInput", sd) ?? string.Empty;
                 int chunkSize = int.TryParse(this.Prop_ChunkSize, out int cs) ? cs : 10;
 
                 switch (this.Mode)
                 {
                     case ListConvertMode.ToDict:
-                    {
-                        if (list == null) throw new ArgumentNullException("Prop_List");
-                        // Разбиваем каждую строку по первому вхождению разделителя
-                        var dict = list
-                            .Where(s => !string.IsNullOrWhiteSpace(s) && s.Contains(sep))
-                            .Select(s => s.Split(new[] { sep }, 2, StringSplitOptions.None))
-                            .GroupBy(parts => parts[0].Trim())
-                            .ToDictionary(g => g.Key, g => g.Last()[1].Trim());
-                        SetVariableValue(this.Prop_ResultDict,   dict,       sd);
-                        SetVariableValue(this.Prop_Count,        dict.Count, sd);
-                        break;
-                    }
+                        {
+                            if (list == null) throw new ArgumentNullException("Prop_List");
+                            // Разбиваем каждую строку по первому вхождению разделителя
+                            var dict = list
+                                .Where(s => !string.IsNullOrWhiteSpace(s) && s.Contains(sep))
+                                .Select(s => s.Split(new[] { sep }, 2, StringSplitOptions.None))
+                                .GroupBy(parts => parts[0].Trim())
+                                .ToDictionary(g => g.Key, g => g.Last()[1].Trim());
+                            SetVariableValue(this.Prop_ResultDict, dict, sd);
+                            SetVariableValue(this.Prop_Count, dict.Count, sd);
+                            break;
+                        }
 
                     case ListConvertMode.ToDictIndexed:
-                    {
-                        if (list == null) throw new ArgumentNullException("Prop_List");
-                        var dict = list
-                            .Select((item, idx) => new { idx, item = item ?? string.Empty })
-                            .ToDictionary(x => x.idx.ToString(), x => x.item);
-                        SetVariableValue(this.Prop_ResultDict, dict,       sd);
-                        SetVariableValue(this.Prop_Count,      dict.Count, sd);
-                        break;
-                    }
+                        {
+                            if (list == null) throw new ArgumentNullException("Prop_List");
+                            var dict = list
+                                .Select((item, idx) => new { idx, item = item ?? string.Empty })
+                                .ToDictionary(x => x.idx.ToString(), x => x.item);
+                            SetVariableValue(this.Prop_ResultDict, dict, sd);
+                            SetVariableValue(this.Prop_Count, dict.Count, sd);
+                            break;
+                        }
 
                     case ListConvertMode.ToCSVRow:
-                    {
-                        if (list == null) throw new ArgumentNullException("Prop_List");
-                        // Каждый элемент оборачиваем в кавычки, внутренние кавычки экранируем удвоением
-                        string csvRow = string.Join(",",
-                            list.Select(s => "\"" + (s ?? string.Empty).Replace("\"", "\"\"") + "\""));
-                        SetVariableValue(this.Prop_ResultString, csvRow,      sd);
-                        SetVariableValue(this.Prop_Count,        list.Count,  sd);
-                        break;
-                    }
+                        {
+                            if (list == null) throw new ArgumentNullException("Prop_List");
+                            // Каждый элемент оборачиваем в кавычки, внутренние кавычки экранируем удвоением
+                            string csvRow = string.Join(",",
+                                list.Select(s => "\"" + (s ?? string.Empty).Replace("\"", "\"\"") + "\""));
+                            SetVariableValue(this.Prop_ResultString, csvRow, sd);
+                            SetVariableValue(this.Prop_Count, list.Count, sd);
+                            break;
+                        }
 
                     case ListConvertMode.FromCSVRow:
-                    {
-                        // Простой CSV-парсер с поддержкой кавычек
-                        var result = ParseCsvRow(csv);
-                        SetVariableValue(this.Prop_ResultList, result,       sd);
-                        SetVariableValue(this.Prop_Count,      result.Count, sd);
-                        break;
-                    }
+                        {
+                            // Простой CSV-парсер с поддержкой кавычек
+                            var result = ParseCsvRow(csv);
+                            SetVariableValue(this.Prop_ResultList, result, sd);
+                            SetVariableValue(this.Prop_Count, result.Count, sd);
+                            break;
+                        }
 
                     case ListConvertMode.ZipToDict:
-                    {
-                        if (list  == null) throw new ArgumentNullException("Prop_List");
-                        if (listB == null) throw new ArgumentNullException("Prop_ListB", "Список значений обязателен для ZipToDict");
-                        if (list.Count != listB.Count)
-                            throw new ArgumentException($"Списки разной длины: {list.Count} vs {listB.Count}");
-                        var dict = list
-                            .Zip(listB, (k, v) => new { k = k ?? string.Empty, v = v ?? string.Empty })
-                            .GroupBy(x => x.k)
-                            .ToDictionary(g => g.Key, g => g.Last().v);
-                        SetVariableValue(this.Prop_ResultDict, dict,       sd);
-                        SetVariableValue(this.Prop_Count,      dict.Count, sd);
-                        break;
-                    }
+                        {
+                            if (list == null) throw new ArgumentNullException("Prop_List");
+                            if (listB == null) throw new ArgumentNullException("Prop_ListB", "Список значений обязателен для ZipToDict");
+                            if (list.Count != listB.Count)
+                                throw new ArgumentException($"Списки разной длины: {list.Count} vs {listB.Count}");
+                            var dict = list
+                                .Zip(listB, (k, v) => new { k = k ?? string.Empty, v = v ?? string.Empty })
+                                .GroupBy(x => x.k)
+                                .ToDictionary(g => g.Key, g => g.Last().v);
+                            SetVariableValue(this.Prop_ResultDict, dict, sd);
+                            SetVariableValue(this.Prop_Count, dict.Count, sd);
+                            break;
+                        }
 
                     case ListConvertMode.Flatten:
-                    {
-                        if (list == null) throw new ArgumentNullException("Prop_List");
-                        // Разбиваем каждый элемент по разделителю и собираем в один плоский список
-                        var flat = list
-                            .Where(s => s != null)
-                            .SelectMany(s => s.Split(new[] { sep }, StringSplitOptions.RemoveEmptyEntries))
-                            .Select(s => s.Trim())
-                            .ToList();
-                        SetVariableValue(this.Prop_ResultList, flat,       sd);
-                        SetVariableValue(this.Prop_Count,      flat.Count, sd);
-                        break;
-                    }
+                        {
+                            if (list == null) throw new ArgumentNullException("Prop_List");
+                            // Разбиваем каждый элемент по разделителю и собираем в один плоский список
+                            var flat = list
+                                .Where(s => s != null)
+                                .SelectMany(s => s.Split(new[] { sep }, StringSplitOptions.RemoveEmptyEntries))
+                                .Select(s => s.Trim())
+                                .ToList();
+                            SetVariableValue(this.Prop_ResultList, flat, sd);
+                            SetVariableValue(this.Prop_Count, flat.Count, sd);
+                            break;
+                        }
 
                     case ListConvertMode.Chunk:
-                    {
-                        if (list == null) throw new ArgumentNullException("Prop_List");
-                        if (chunkSize < 1) throw new ArgumentException("Размер батча должен быть ≥ 1");
-                        // Разбиваем на батчи через Range + Skip/Take
-                        var chunks = Enumerable
-                            .Range(0, (int)Math.Ceiling((double)list.Count / chunkSize))
-                            .Select(i => list.Skip(i * chunkSize).Take(chunkSize).ToList())
-                            .ToList();
-                        // Chunk возвращает List<List<string>> — сохраняем кол-во батчей
-                        SetVariableValue(this.Prop_Count, chunks.Count, sd);
-                        // Дополнительно сохраняем первый батч в ResultList для удобства
-                        SetVariableValue(this.Prop_ResultList, chunks.FirstOrDefault() ?? new List<string>(), sd);
-                        break;
-                    }
+                        {
+                            if (list == null) throw new ArgumentNullException("Prop_List");
+                            if (chunkSize < 1) throw new ArgumentException("Размер батча должен быть ≥ 1");
+                            // Разбиваем на батчи через Range + Skip/Take
+                            var chunks = Enumerable
+                                .Range(0, (int)Math.Ceiling((double)list.Count / chunkSize))
+                                .Select(i => list.Skip(i * chunkSize).Take(chunkSize).ToList())
+                                .ToList();
+                            // Chunk возвращает List<List<string>> — сохраняем кол-во батчей
+                            SetVariableValue(this.Prop_Count, chunks.Count, sd);
+                            // Дополнительно сохраняем первый батч в ResultList для удобства
+                            SetVariableValue(this.Prop_ResultList, chunks.FirstOrDefault() ?? new List<string>(), sd);
+                            break;
+                        }
 
                     default:
                         throw new InvalidOperationException($"Неизвестный режим: {this.Mode}");
@@ -348,7 +347,7 @@ namespace Primo.MIA
 
         public override ValidationResult Validate()
         {
-                        var ret = new ValidationResult();
+            var ret = new ValidationResult();
             if (this.Mode != ListConvertMode.FromCSVRow)
                 ret.ValidateRequired(this.Prop_List, ActivityStrings.Field_List, ActivityStrings.Error_ListRequired);
             if (this.Mode == ListConvertMode.FromCSVRow && string.IsNullOrWhiteSpace(this.Prop_CsvInput))

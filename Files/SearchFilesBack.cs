@@ -11,7 +11,7 @@ using static LTools.Common.Helpers.WFHelper.PropertiesItem;
 
 namespace Primo.MIA
 {
-        /// <summary>
+    /// <summary>
     /// Активность для поиска файлов и папок в директории с защитой по таймауту:
     /// - Поддержка wildcard и regex фильтрации
     /// - Рекурсивный поиск в подпапках
@@ -200,7 +200,7 @@ FilesAndFolders - Искать и файлы, и папки одновремен
 
             sdkComponentIcon = ActivityIcons.FileSearch;
 
-                        sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
+            sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
                 new LTools.Common.Helpers.WFHelper.PropertiesItem()
                 {
@@ -432,7 +432,7 @@ FilesAndFolders - Искать и файлы, и папки одновремен
         /// <summary>
         /// Проверка корректности введенных данных
         /// </summary>
-                public override ValidationResult Validate()
+        public override ValidationResult Validate()
         {
             ValidationResult ret = new ValidationResult();
             ret.ValidateRequired(this.Prop_DirectoryPath, ActivityStrings.Field_DirectoryPath, ActivityStrings.Error_DirectoryRequired);

@@ -13,13 +13,11 @@
 
 using LTools.Common.Model;
 using LTools.Common.UIElements;
-using LTools.Enums;
 using LTools.SDK;
 using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using static LTools.Common.Helpers.WFHelper.PropertiesItem;
 
 namespace Primo.MIA
 {
@@ -134,7 +132,7 @@ namespace Primo.MIA
 
                 if (listA == null) throw new ArgumentNullException("Prop_ListA", "Список A не может быть null");
 
-                    var comparer = ComparisonHelper.GetStringComparer(this.Prop_CaseSensitive);
+                var comparer = ComparisonHelper.GetStringComparer(this.Prop_CaseSensitive);
 
                 List<string> result;
 
@@ -163,7 +161,7 @@ namespace Primo.MIA
                     case ListSetOperation.SymmetricDiff:
                         if (listB == null) throw new ArgumentNullException("Prop_ListB", "Список B обязателен для SymmetricDiff");
                         // (A∪B) ∖ (A∩B)
-                        var union     = listA.Union(listB, comparer);
+                        var union = listA.Union(listB, comparer);
                         var intersect = new HashSet<string>(listA.Intersect(listB, comparer), comparer);
                         result = union.Where(x => !intersect.Contains(x)).ToList();
                         break;
@@ -176,8 +174,8 @@ namespace Primo.MIA
                         throw new InvalidOperationException($"Неизвестная операция: {this.Operation}");
                 }
 
-                SetVariableValue(this.Prop_Result, result,       sd);
-                SetVariableValue(this.Prop_Count,  result.Count, sd);
+                SetVariableValue(this.Prop_Result, result, sd);
+                SetVariableValue(this.Prop_Count, result.Count, sd);
 
                 return new ExecutionResult { IsSuccess = true, SuccessMessage = $"{this.Operation}: {result.Count} элементов" };
             }

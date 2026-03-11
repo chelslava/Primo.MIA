@@ -23,7 +23,6 @@ using OpenQA.Selenium.Support.UI;
 using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
-using static LTools.Common.Helpers.WFHelper.PropertiesItem;
 
 namespace Primo.MIA
 {
@@ -355,7 +354,7 @@ namespace Primo.MIA
             string locatorValue = GetPropertyValue<string>(Prop_LocatorValue, "Prop_LocatorValue", sd);
             string text = GetPropertyValue<string>(Prop_Text, "Prop_Text", sd);
             var locator = SeleniumHelper.CreateLocator(Prop_LocatorType, locatorValue);
-            
+
             wait.Until(drv =>
             {
                 try
@@ -404,7 +403,7 @@ namespace Primo.MIA
         public override ValidationResult Validate()
         {
             var ret = new ValidationResult();
-             
+
 
             // Валидация в зависимости от типа условия
             switch (Prop_Condition)

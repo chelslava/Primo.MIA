@@ -13,13 +13,11 @@
 
 using LTools.Common.Model;
 using LTools.Common.UIElements;
-using LTools.Enums;
 using LTools.SDK;
 using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using static LTools.Common.Helpers.WFHelper.PropertiesItem;
 
 namespace Primo.MIA
 {
@@ -28,7 +26,7 @@ namespace Primo.MIA
     /// Создаёт Dictionary&lt;string, string&gt; четырьмя способами:
     /// пустой, из списков, копия или инверсия существующего.
     /// </summary>
-        public class DictionaryCreateBack : PrimoComponentTO<DictionaryCreate>
+    public class DictionaryCreateBack : PrimoComponentTO<DictionaryCreate>
     {
         public override string GroupName { get => ActivityCategories.Dictionaries; protected set { } }
 
@@ -125,7 +123,7 @@ namespace Primo.MIA
 
         private string _propCount;
         /// <summary>Количество элементов в созданном словаре</summary>
-                [LTools.Common.Model.Serialization.StoringProperty]
+        [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
         [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_Count)]
         public string Prop_Count
@@ -175,7 +173,7 @@ namespace Primo.MIA
 
             sdkComponentIcon = ActivityIcons.Dictionary;
 
-                                    sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
+            sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
                 PropertyBuilder.Enum<DictionaryCreateMode>("Mode", "Режим: CreateEmpty / FromLists / Clone / Invert"),
                 PropertyBuilder.Script<Dictionary<string, string>>("Prop_Dictionary", "Входной словарь (только для Clone и Invert)"),
@@ -198,8 +196,8 @@ namespace Primo.MIA
         {
             try
             {
-                var dict       = GetPropertyValue<Dictionary<string, string>>(this.Prop_Dictionary, "Prop_Dictionary", sd);
-                var keysList   = GetPropertyValue<List<string>>(this.Prop_KeysList,   "Prop_KeysList",   sd);
+                var dict = GetPropertyValue<Dictionary<string, string>>(this.Prop_Dictionary, "Prop_Dictionary", sd);
+                var keysList = GetPropertyValue<List<string>>(this.Prop_KeysList, "Prop_KeysList", sd);
                 var valuesList = GetPropertyValue<List<string>>(this.Prop_ValuesList, "Prop_ValuesList", sd);
 
                 switch (this.Mode)
@@ -237,7 +235,7 @@ namespace Primo.MIA
         {
             var result = new Dictionary<string, string>();
             SetVariableValue(this.Prop_ResultDictionary, result, sd);
-            SetVariableValue(this.Prop_Count,            0,      sd);
+            SetVariableValue(this.Prop_Count, 0, sd);
         }
 
         /// <summary>
@@ -265,8 +263,8 @@ namespace Primo.MIA
                     group => group.Last().Value   // при дубле побеждает последний
                 );
 
-            SetVariableValue(this.Prop_ResultDictionary, result,       sd);
-            SetVariableValue(this.Prop_Count,            result.Count, sd);
+            SetVariableValue(this.Prop_ResultDictionary, result, sd);
+            SetVariableValue(this.Prop_Count, result.Count, sd);
         }
 
         /// <summary>
@@ -280,8 +278,8 @@ namespace Primo.MIA
                 throw new ArgumentNullException("Prop_Dictionary", "Словарь не может быть null для режима Clone");
 
             var result = dict.ToDictionary(p => p.Key, p => p.Value);
-            SetVariableValue(this.Prop_ResultDictionary, result,       sd);
-            SetVariableValue(this.Prop_Count,            result.Count, sd);
+            SetVariableValue(this.Prop_ResultDictionary, result, sd);
+            SetVariableValue(this.Prop_Count, result.Count, sd);
         }
 
         /// <summary>
@@ -318,16 +316,16 @@ namespace Primo.MIA
             // Количество пропущенных = исходное кол-во - результирующее
             int skipped = dict.Count - result.Count;
 
-            SetVariableValue(this.Prop_ResultDictionary, result,  sd);
-            SetVariableValue(this.Prop_Count,            result.Count, sd);
-            SetVariableValue(this.Prop_DuplicatesCount,  skipped, sd);
+            SetVariableValue(this.Prop_ResultDictionary, result, sd);
+            SetVariableValue(this.Prop_Count, result.Count, sd);
+            SetVariableValue(this.Prop_DuplicatesCount, skipped, sd);
         }
 
         // =========================================================================
         // ВАЛИДАЦИЯ
         // =========================================================================
 
-                        public override ValidationResult Validate()
+        public override ValidationResult Validate()
         {
             var ret = new ValidationResult();
 

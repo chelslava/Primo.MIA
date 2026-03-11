@@ -17,15 +17,15 @@ using OpenQA.Selenium.Interactions;
 using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
-using static LTools.Common.Helpers.WFHelper.PropertiesItem;
 
 namespace Primo.MIA
 {
     /// <summary>
     /// Объединённая активность для наведения курсора на элемент.
     /// Режим наведения задаётся через свойство <see cref="Prop_HoverMode"/>.
+    /// REFACTORED: Использует BrowserActivityBase для устранения дублирования кода
     /// </summary>
-    public class ElementHoverBack : PrimoComponentTO<ElementHover>
+    public class ElementHoverBack : BrowserActivityBase<ElementHover>
     {
         public override string GroupName
         {
@@ -242,16 +242,17 @@ namespace Primo.MIA
 
         public override ExecutionResult TimedAction(ScriptingData sd)
         {
-            try
+            return SafeExecute(() =>
             {
-                // Чтение параметров через SessionResolver (поддержка ambient-контекста)
-                string sessionId = SessionResolver.Resolve(
-                    GetPropertyValue<string>(this.Prop_SessionId, nameof(Prop_SessionId), sd));
+                // Чтение параметров
+                string sessionId = GetPropertyValue<string>(this.Prop_SessionId, nameof(Prop_SessionId), sd);
                 string elementId = GetPropertyValue<string>(this.Prop_ElementId, nameof(Prop_ElementId), sd);
                 string locatorValue = GetPropertyValue<string>(this.Prop_LocatorValue, nameof(Prop_LocatorValue), sd);
 
+                Logger.LogInfo(sdkComponentName, "Начинается наведение курсора для сессии: {0}", sessionId);
+
                 // Получение драйвера
-                var driver = SeleniumHelper.GetDriver(sessionId);
+                var driver = GetDriverFromContext(sessionId);
 
                 // Получение элемента: либо по ID, либо поиск по локатору
                 IWebElement element;
@@ -260,15 +261,20 @@ namespace Primo.MIA
                     // Поиск элемента по локатору
                     string timeoutStr = GetPropertyValue<string>(this.Prop_WaitTimeout, "Prop_WaitTimeout", sd) ?? "10";
                     int timeout = int.TryParse(timeoutStr, out int t) ? t : 10;
-                    timeout = SeleniumHelper.ValidateTimeout(timeout, 10);
+                    ValidatePositive(timeout, "Prop_WaitTimeout");
 
-                    var locator = SeleniumHelper.CreateLocator(this.Prop_LocatorType, locatorValue);
-                    element = SeleniumHelper.WaitForElementVisible(driver, locator, timeout);
+                    var locatorType = ConvertLocatorType(this.Prop_LocatorType);
+                    element = ElementLocator.WaitForVisible(driver, locatorType, locatorValue, timeout);
+                    
+                    Logger.LogDebug(sdkComponentName, "Элемент найден по локатору: {0}={1}", this.Prop_LocatorType, locatorValue);
                 }
                 else if (!string.IsNullOrWhiteSpace(elementId))
                 {
-                    // Использование существующего элемента
-                    element = SeleniumHelper.GetElement(elementId);
+                    element = ElementRepository.GetElement(elementId);
+                    if (element == null)
+                        throw new ArgumentException($"Элемент с ID '{elementId}' не найден в репозитории");
+                    
+                    Logger.LogDebug(sdkComponentName, "Использован сохраненный элемент: {0}", elementId);
                 }
                 else
                 {
@@ -277,6 +283,8 @@ namespace Primo.MIA
 
                 // Выполнение наведения в зависимости от режима
                 string resultMsg;
+                Logger.LogDebug(sdkComponentName, "Режим наведения: {0}", this.Prop_HoverMode);
+
                 switch (this.Prop_HoverMode)
                 {
                     case HoverMode.Center:
@@ -287,6 +295,8 @@ namespace Primo.MIA
                         resultMsg = !string.IsNullOrWhiteSpace(locatorValue)
                             ? $"[Навести курсор] Курсор наведён на центр: {this.Prop_LocatorType}={locatorValue}"
                             : $"[Навести курсор] Курсор наведён на центр элемента {elementId}";
+                        
+                        Logger.LogDebug(sdkComponentName, "Курсор наведен на центр элемента");
                         break;
 
                     case HoverMode.WithOffset:
@@ -296,29 +306,20 @@ namespace Primo.MIA
                         int offsetX = int.TryParse(offsetXStr, out int ox) ? ox : 0;
                         int offsetY = int.TryParse(offsetYStr, out int oy) ? oy : 0;
 
-                        SeleniumHelper.HoverWithOffset(driver, element, offsetX, offsetY);
+                        var actionsWithOffset = new Actions(driver);
+                        actionsWithOffset.MoveToElement(element, offsetX, offsetY).Perform();
 
                         resultMsg = $"[Навести курсор] Выполнено с смещением ({offsetX}, {offsetY})";
+                        Logger.LogDebug(sdkComponentName, "Курсор наведен с смещением: ({0}, {1})", offsetX, offsetY);
                         break;
 
                     default:
                         throw new ArgumentException($"Неизвестный режим наведения: {this.Prop_HoverMode}");
                 }
 
-                return new ExecutionResult
-                {
-                    IsSuccess = true,
-                    SuccessMessage = resultMsg
-                };
-            }
-            catch (Exception ex)
-            {
-                return new ExecutionResult
-                {
-                    IsSuccess = false,
-                    ErrorMessage = $"Ошибка [Навести курсор]: {ex.Message}"
-                };
-            }
+                Logger.LogInfo(sdkComponentName, "Наведение курсора завершено успешно");
+                return CreateSuccessResult(resultMsg);
+            }, "Навести курсор");
         }
 
         // ── Валидация ──────────────────────────────────────────────────

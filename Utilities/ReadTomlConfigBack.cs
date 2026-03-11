@@ -26,7 +26,6 @@
 
 using LTools.Common.Model;
 using LTools.Common.UIElements;
-using LTools.Enums;
 using LTools.SDK;
 using Primo.MIA.Common;
 using System;
@@ -36,7 +35,6 @@ using System.Linq;
 using System.Text;
 using Tomlyn;
 using Tomlyn.Model;
-using static LTools.Common.Helpers.WFHelper.PropertiesItem;
 
 namespace Primo.MIA
 {
@@ -320,7 +318,7 @@ ReadProfile         — мёрж [default] + [production/staging/...]
 
             sdkComponentIcon = ActivityIcons.Config;
 
-                        sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
+            sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
                 PropertyBuilder.FileSelector("Prop_FilePath", "Полный путь к TOML-файлу конфигурации"),
                 PropertyBuilder.Enum<TomlReadMode>("ReadMode", "Режим чтения: SingleValue / SectionToDictionary / FullFileToDictionary / ReadProfile"),

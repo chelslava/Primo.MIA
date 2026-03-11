@@ -4,7 +4,6 @@ using LTools.SDK;
 using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
-using static LTools.Common.Helpers.WFHelper.PropertiesItem;
 
 namespace Primo.MIA
 {
@@ -13,7 +12,7 @@ namespace Primo.MIA
     /// Проверяет наличие ключа в Dictionary&lt;string, string&gt; → bool.
     /// Не изменяет словарь.
     /// </summary>
-        public class DictionaryContainsKeyBack : PrimoComponentTO<DictionaryContainsKey>
+    public class DictionaryContainsKeyBack : PrimoComponentTO<DictionaryContainsKey>
     {
         public override string GroupName { get => ActivityCategories.Dictionaries; protected set { } }
 
@@ -68,7 +67,7 @@ namespace Primo.MIA
 
             sdkComponentIcon = ActivityIcons.Dictionary;
 
-                                    sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
+            sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
                 PropertyBuilder.Script<Dictionary<string, string>>("Prop_Dictionary", "Входной словарь"),
                 PropertyBuilder.Script<string>("Prop_Key", "Ключ для проверки"),
@@ -82,8 +81,8 @@ namespace Primo.MIA
         {
             try
             {
-                var    dict = GetPropertyValue<Dictionary<string, string>>(this.Prop_Dictionary, "Prop_Dictionary", sd);
-                string key  = GetPropertyValue<string>(this.Prop_Key, "Prop_Key", sd);
+                var dict = GetPropertyValue<Dictionary<string, string>>(this.Prop_Dictionary, "Prop_Dictionary", sd);
+                string key = GetPropertyValue<string>(this.Prop_Key, "Prop_Key", sd);
 
                 if (dict == null) throw new ArgumentNullException("Prop_Dictionary", "Словарь не может быть null");
                 if (string.IsNullOrEmpty(key)) throw new ArgumentException("Ключ не может быть пустым");
@@ -99,7 +98,7 @@ namespace Primo.MIA
             }
         }
 
-                public override ValidationResult Validate()
+        public override ValidationResult Validate()
         {
             var ret = new ValidationResult();
             ret.ValidateRequired(this.Prop_Dictionary, ActivityStrings.Field_Dictionary, ActivityStrings.Error_DictionaryRequired);

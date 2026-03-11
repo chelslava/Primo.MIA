@@ -10,6 +10,6 @@ namespace Primo.MIA
         {
             InitializeComponent();
         }
- }
+    }
 
 }

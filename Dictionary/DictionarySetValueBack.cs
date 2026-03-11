@@ -8,13 +8,11 @@
 
 using LTools.Common.Model;
 using LTools.Common.UIElements;
-using LTools.Enums;
 using LTools.SDK;
 using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using static LTools.Common.Helpers.WFHelper.PropertiesItem;
 
 namespace Primo.MIA
 {
@@ -25,7 +23,7 @@ namespace Primo.MIA
     /// </summary>
     public class DictionarySetValueBack : PrimoComponentTO<DictionarySetValue>
     {
-                public override string GroupName { get => ActivityCategories.Dictionaries; protected set { } }
+        public override string GroupName { get => ActivityCategories.Dictionaries; protected set { } }
 
         protected override int sdkTimeOut
         {
@@ -122,7 +120,7 @@ namespace Primo.MIA
 
             sdkComponentIcon = ActivityIcons.Dictionary;
 
-                        sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
+            sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
                 PropertyBuilder.Script<Dictionary<string, string>>("Prop_Dictionary", "Входной словарь Dictionary<string, string>"),
                 PropertyBuilder.Script<string>("Prop_Key", "Ключ для добавления или обновления"),
@@ -142,8 +140,8 @@ namespace Primo.MIA
         {
             try
             {
-                var    dict  = GetPropertyValue<Dictionary<string, string>>(this.Prop_Dictionary, "Prop_Dictionary", sd);
-                string key   = GetPropertyValue<string>(this.Prop_Key,   "Prop_Key",   sd);
+                var dict = GetPropertyValue<Dictionary<string, string>>(this.Prop_Dictionary, "Prop_Dictionary", sd);
+                string key = GetPropertyValue<string>(this.Prop_Key, "Prop_Key", sd);
                 string value = GetPropertyValue<string>(this.Prop_Value, "Prop_Value", sd);
 
                 if (dict == null)
@@ -160,8 +158,8 @@ namespace Primo.MIA
                 var result = dict.ToDictionary(p => p.Key, p => p.Value);
                 result[key] = value;
 
-                SetVariableValue(this.Prop_ResultDictionary, result,    sd);
-                SetVariableValue(this.Prop_IsUpdate,         isUpdate,  sd);
+                SetVariableValue(this.Prop_ResultDictionary, result, sd);
+                SetVariableValue(this.Prop_IsUpdate, isUpdate, sd);
 
                 string action = isUpdate ? "обновлён" : "добавлен";
                 return new ExecutionResult { IsSuccess = true, SuccessMessage = $"Ключ '{key}' {action}" };
@@ -176,7 +174,7 @@ namespace Primo.MIA
         // ВАЛИДАЦИЯ
         // =========================================================================
 
-                public override ValidationResult Validate()
+        public override ValidationResult Validate()
         {
             var ret = new ValidationResult();
             ret.ValidateRequired(this.Prop_Dictionary, ActivityStrings.Field_Dictionary, ActivityStrings.Error_DictionaryRequired);

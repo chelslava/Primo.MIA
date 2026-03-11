@@ -6,11 +6,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
-using System.Threading.Tasks;
-using static LTools.Common.Helpers.WFHelper.PropertiesItem;
 
 namespace Primo.MIA
 {
@@ -270,7 +267,7 @@ Regex - Использование регулярных выражений. На
 
             sdkComponentIcon = ActivityIcons.FileWait;
 
-                        sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
+            sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
                 PropertyBuilder.Enum<WaitFileMode>("WaitMode", "Режим работы: ожидать новый файл или любой файл по маске"),
                 PropertyBuilder.FolderSelector("Prop_DirectoryPath", "Путь к директории для мониторинга появления файлов"),
@@ -707,7 +704,7 @@ Regex - Использование регулярных выражений. На
         /// <summary>
         /// Проверка корректности введенных данных
         /// </summary>
-                        public override ValidationResult Validate()
+        public override ValidationResult Validate()
         {
             ValidationResult ret = new ValidationResult();
             ret.ValidateRequired(this.Prop_DirectoryPath, ActivityStrings.Field_DirectoryPath, ActivityStrings.Error_DirectoryRequired);

@@ -14,9 +14,11 @@ using LTools.Common.Model;
 using LTools.Common.UIElements;
 using LTools.SDK;
 using OpenQA.Selenium;
+using OpenQA.Selenium.Support.UI;
 using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Primo.MIA
 {
@@ -210,11 +212,13 @@ namespace Primo.MIA
 
         public override ExecutionResult TimedAction(ScriptingData sd)
         {
-            try
+            return SafeExecute(() =>
             {
                 string sessionId = GetPropertyValue<string>(Prop_SessionId, nameof(Prop_SessionId), sd);
                 string elementId = GetPropertyValue<string>(Prop_ElementId, nameof(Prop_ElementId), sd);
                 string locatorValue = GetPropertyValue<string>(Prop_LocatorValue, nameof(Prop_LocatorValue), sd);
+
+                Logger.LogInfo(sdkComponentName, "Начинается операция множественного выбора для сессии: {0}", sessionId);
 
                 var driver = GetDriverFromContext(sessionId);
 
@@ -223,43 +227,52 @@ namespace Primo.MIA
                 {
                     string timeoutStr = GetPropertyValue<string>(Prop_WaitTimeout, "Prop_WaitTimeout", sd) ?? "10";
                     int timeout = int.TryParse(timeoutStr, out int t) ? t : 10;
-                    timeout = SeleniumHelper.ValidateTimeout(timeout, 10);
+                    ValidatePositive(timeout, "Prop_WaitTimeout");
 
-                    var locator = SeleniumHelper.CreateLocator(Prop_LocatorType, locatorValue);
-                    element = SeleniumHelper.WaitForElement(driver, locator, timeout);
+                    var locatorType = ConvertLocatorType(Prop_LocatorType);
+                    element = ElementLocator.FindElement(driver, locatorType, locatorValue, timeout);
+                    
+                    Logger.LogDebug(sdkComponentName, "Элемент найден по локатору: {0}={1}", Prop_LocatorType, locatorValue);
                 }
                 else if (!string.IsNullOrWhiteSpace(elementId))
                 {
-                    element = SeleniumHelper.GetElement(elementId);
+                    element = ElementRepository.GetElement(elementId);
+                    if (element == null)
+                        throw new ArgumentException($"Элемент с ID '{elementId}' не найден в репозитории");
+                    
+                    Logger.LogDebug(sdkComponentName, "Использован сохраненный элемент: {0}", elementId);
                 }
                 else
                 {
                     throw new ArgumentException("Необходимо указать либо ID элемента, либо локатор для поиска");
                 }
 
+                var select = new SelectElement(element);
                 string resultMsg;
+
+                Logger.LogDebug(sdkComponentName, "Выполняется операция: {0}", Prop_Operation);
 
                 switch (Prop_Operation)
                 {
                     case MultiSelectOperation.SelectByText:
                         {
                             string value = GetPropertyValue<string>(Prop_Value, "Prop_Value", sd);
-                            if (string.IsNullOrWhiteSpace(value))
-                                throw new ArgumentException("Значение не может быть пустым для операции SelectByText");
+                            ValidateNotEmpty(value, "Prop_Value");
 
-                            SeleniumHelper.SelectMultipleByText(element, value);
+                            select.SelectByText(value);
                             resultMsg = $"[Multiple Select] Выбрано по тексту: {value}";
+                            Logger.LogDebug(sdkComponentName, "Выбрано по тексту: {0}", value);
                         }
                         break;
 
                     case MultiSelectOperation.SelectByValue:
                         {
                             string value = GetPropertyValue<string>(Prop_Value, "Prop_Value", sd);
-                            if (string.IsNullOrWhiteSpace(value))
-                                throw new ArgumentException("Значение не может быть пустым для операции SelectByValue");
+                            ValidateNotEmpty(value, "Prop_Value");
 
-                            SeleniumHelper.SelectMultipleByValue(element, value);
+                            select.SelectByValue(value);
                             resultMsg = $"[Multiple Select] Выбрано по value: {value}";
+                            Logger.LogDebug(sdkComponentName, "Выбрано по значению: {0}", value);
                         }
                         break;
 
@@ -268,30 +281,31 @@ namespace Primo.MIA
                             string indexStr = GetPropertyValue<string>(Prop_Value, "Prop_Value", sd) ?? "0";
                             int index = int.TryParse(indexStr, out int idx) ? idx : 0;
 
-                            SeleniumHelper.SelectMultipleByIndex(element, index);
+                            select.SelectByIndex(index);
                             resultMsg = $"[Multiple Select] Выбрано по индексу: {index}";
+                            Logger.LogDebug(sdkComponentName, "Выбрано по индексу: {0}", index);
                         }
                         break;
 
                     case MultiSelectOperation.DeselectByText:
                         {
                             string value = GetPropertyValue<string>(Prop_Value, "Prop_Value", sd);
-                            if (string.IsNullOrWhiteSpace(value))
-                                throw new ArgumentException("Значение не может быть пустым для операции DeselectByText");
+                            ValidateNotEmpty(value, "Prop_Value");
 
-                            SeleniumHelper.DeselectByText(element, value);
+                            select.DeselectByText(value);
                             resultMsg = $"[Multiple Select] Снят выбор по тексту: {value}";
+                            Logger.LogDebug(sdkComponentName, "Снят выбор по тексту: {0}", value);
                         }
                         break;
 
                     case MultiSelectOperation.DeselectByValue:
                         {
                             string value = GetPropertyValue<string>(Prop_Value, "Prop_Value", sd);
-                            if (string.IsNullOrWhiteSpace(value))
-                                throw new ArgumentException("Значение не может быть пустым для операции DeselectByValue");
+                            ValidateNotEmpty(value, "Prop_Value");
 
-                            SeleniumHelper.DeselectByValue(element, value);
+                            select.DeselectByValue(value);
                             resultMsg = $"[Multiple Select] Снят выбор по value: {value}";
+                            Logger.LogDebug(sdkComponentName, "Снят выбор по значению: {0}", value);
                         }
                         break;
 
@@ -300,29 +314,33 @@ namespace Primo.MIA
                             string indexStr = GetPropertyValue<string>(Prop_Value, "Prop_Value", sd) ?? "0";
                             int index = int.TryParse(indexStr, out int idx) ? idx : 0;
 
-                            SeleniumHelper.DeselectByIndex(element, index);
+                            select.DeselectByIndex(index);
                             resultMsg = $"[Multiple Select] Снят выбор по индексу: {index}";
+                            Logger.LogDebug(sdkComponentName, "Снят выбор по индексу: {0}", index);
                         }
                         break;
 
                     case MultiSelectOperation.DeselectAll:
-                        SeleniumHelper.DeselectAll(element);
+                        select.DeselectAll();
                         resultMsg = "[Multiple Select] Сняты все выборы";
+                        Logger.LogDebug(sdkComponentName, "Сняты все выборы");
                         break;
 
                     case MultiSelectOperation.GetAllOptions:
                         {
-                            var options = SeleniumHelper.GetAllSelectOptions(element);
+                            var options = select.Options.Select(o => o.Text).ToList();
                             SetVariableValue(Prop_OutOptions, options, sd);
                             resultMsg = $"[Multiple Select] Получено опций: {options.Count}";
+                            Logger.LogDebug(sdkComponentName, "Получено опций: {0}", options.Count);
                         }
                         break;
 
                     case MultiSelectOperation.GetSelectedOptions:
                         {
-                            var selected = SeleniumHelper.GetSelectedSelectOptions(element);
+                            var selected = select.AllSelectedOptions.Select(o => o.Text).ToList();
                             SetVariableValue(Prop_OutSelectedOptions, selected, sd);
                             resultMsg = $"[Multiple Select] Выбрано опций: {selected.Count}";
+                            Logger.LogDebug(sdkComponentName, "Выбрано опций: {0}", selected.Count);
                         }
                         break;
 
@@ -330,12 +348,9 @@ namespace Primo.MIA
                         throw new NotSupportedException($"Операция {Prop_Operation} не поддерживается");
                 }
 
+                Logger.LogInfo(sdkComponentName, "Операция множественного выбора завершена успешно");
                 return CreateSuccessResult(resultMsg);
-            }
-            catch (Exception ex)
-            {
-                return CreateErrorResult($"Ошибка [Multiple Select]: {ex.Message}");
-            }
+            }, "Multiple Select");
         }
 
         // ── Валидация ──────────────────────────────────────────────────
@@ -343,7 +358,7 @@ namespace Primo.MIA
         public override ValidationResult Validate()
         {
             var ret = new ValidationResult();
-             
+
 
             bool hasElementId = !string.IsNullOrWhiteSpace(Prop_ElementId);
             bool hasLocator = !string.IsNullOrWhiteSpace(Prop_LocatorValue);

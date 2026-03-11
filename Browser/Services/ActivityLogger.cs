@@ -11,8 +11,6 @@
 //   - Интеграция с платформой Primo через PrimoApp
 // =============================================================================
 
-using LTools.Enums;
-using LTools.Workflow;
 using System;
 
 namespace Primo.MIA
@@ -46,11 +44,11 @@ namespace Primo.MIA
         public void LogError(string activityName, Exception ex, string message, params object[] args)
         {
             var formattedMessage = FormatMessage(activityName, message, args);
-            
+
             if (ex != null)
             {
                 formattedMessage += $"\nException: {ex.GetType().Name}\nMessage: {ex.Message}";
-                
+
                 if (ex.InnerException != null)
                 {
                     formattedMessage += $"\nInner Exception: {ex.InnerException.Message}";
@@ -75,8 +73,8 @@ namespace Primo.MIA
         private string FormatMessage(string activityName, string message, params object[] args)
         {
             var timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
-            var formattedMsg = args != null && args.Length > 0 
-                ? string.Format(message, args) 
+            var formattedMsg = args != null && args.Length > 0
+                ? string.Format(message, args)
                 : message;
 
             return $"[{timestamp}] [{activityName}] {formattedMsg}";

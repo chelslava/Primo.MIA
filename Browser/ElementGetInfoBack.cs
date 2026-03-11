@@ -14,14 +14,14 @@ using OpenQA.Selenium;
 using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
-using static LTools.Common.Helpers.WFHelper.PropertiesItem;
 
 namespace Primo.MIA
 {
     /// <summary>
     /// Активность для получения информации об элементе на странице.
+    /// REFACTORED: Использует BrowserActivityBase для устранения дублирования кода
     /// </summary>
-    public class ElementGetInfoBack : PrimoComponentTO<ElementGetInfo>
+    public class ElementGetInfoBack : BrowserActivityBase<ElementGetInfo>
     {
         public override string GroupName
         {
@@ -241,44 +241,46 @@ namespace Primo.MIA
 
         public override ExecutionResult TimedAction(ScriptingData sd)
         {
-            try
+            return SafeExecute(() =>
             {
-                // Чтение параметров через SessionResolver (поддержка ambient-контекста)
-                string sessionId = SessionResolver.Resolve(
-                    GetPropertyValue<string>(this.Prop_SessionId, nameof(Prop_SessionId), sd));
+                // Чтение параметров
+                string sessionId = GetPropertyValue<string>(this.Prop_SessionId, nameof(Prop_SessionId), sd);
                 string elementId = GetPropertyValue<string>(this.Prop_ElementId, nameof(Prop_ElementId), sd);
                 string locatorValue = GetPropertyValue<string>(this.Prop_LocatorValue, nameof(Prop_LocatorValue), sd);
 
+                Logger.LogInfo(sdkComponentName, "Начинается получение информации об элементе для сессии: {0}", sessionId);
+
                 // Получение драйвера
-                var driver = SeleniumHelper.GetDriver(sessionId);
+                var driver = GetDriverFromContext(sessionId);
 
                 // Получение элемента
                 IWebElement element = GetElement(driver, elementId, locatorValue, sd);
 
+                Logger.LogDebug(sdkComponentName, "Режим получения информации: {0}", this.Prop_Mode);
+
                 // Выполнение действия в зависимости от режима
+                ExecutionResult result;
                 switch (this.Prop_Mode)
                 {
                     case ElementInfoMode.Property:
-                        return ExecutePropertyMode(element, sd);
+                        result = ExecutePropertyMode(element, sd);
+                        break;
 
                     case ElementInfoMode.ComputedStyle:
-                        return ExecuteComputedStyleMode(driver, element, sd);
+                        result = ExecuteComputedStyleMode(driver, element, sd);
+                        break;
 
                     case ElementInfoMode.Rectangle:
-                        return ExecuteRectangleMode(element, sd);
+                        result = ExecuteRectangleMode(element, sd);
+                        break;
 
                     default:
                         throw new ArgumentException($"Неизвестный режим: {this.Prop_Mode}");
                 }
-            }
-            catch (Exception ex)
-            {
-                return new ExecutionResult
-                {
-                    IsSuccess = false,
-                    ErrorMessage = $"Ошибка [Получить информацию]: {ex.Message}"
-                };
-            }
+
+                Logger.LogInfo(sdkComponentName, "Получение информации об элементе завершено успешно");
+                return result;
+            }, "Получить информацию");
         }
 
         // ── Приватные методы ───────────────────────────────────────────
@@ -292,14 +294,22 @@ namespace Primo.MIA
             {
                 string timeoutStr = GetPropertyValue<string>(this.Prop_WaitTimeout, "Prop_WaitTimeout", sd) ?? "10";
                 int timeout = int.TryParse(timeoutStr, out int t) ? t : 10;
-                timeout = SeleniumHelper.ValidateTimeout(timeout, 10);
+                ValidatePositive(timeout, "Prop_WaitTimeout");
 
-                var locator = SeleniumHelper.CreateLocator(this.Prop_LocatorType, locatorValue);
-                return SeleniumHelper.WaitForElement(driver, locator, timeout);
+                var locatorType = ConvertLocatorType(this.Prop_LocatorType);
+                var element = ElementLocator.FindElement(driver, locatorType, locatorValue, timeout);
+                
+                Logger.LogDebug(sdkComponentName, "Элемент найден по локатору: {0}={1}", this.Prop_LocatorType, locatorValue);
+                return element;
             }
             else if (!string.IsNullOrWhiteSpace(elementId))
             {
-                return SeleniumHelper.GetElement(elementId);
+                var element = ElementRepository.GetElement(elementId);
+                if (element == null)
+                    throw new ArgumentException($"Элемент с ID '{elementId}' не найден в репозитории");
+                
+                Logger.LogDebug(sdkComponentName, "Использован сохраненный элемент: {0}", elementId);
+                return element;
             }
             else
             {
@@ -409,7 +419,7 @@ namespace Primo.MIA
         public override ValidationResult Validate()
         {
             var ret = new ValidationResult();
-             
+
 
             bool hasElementId = !string.IsNullOrWhiteSpace(this.Prop_ElementId);
             bool hasLocator = !string.IsNullOrWhiteSpace(this.Prop_LocatorValue);

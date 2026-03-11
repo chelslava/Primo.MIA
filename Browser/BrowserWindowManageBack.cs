@@ -300,7 +300,7 @@ namespace Primo.MIA
         public override ValidationResult Validate()
         {
             var ret = new ValidationResult();
-             
+
 
             switch (Prop_Operation)
             {

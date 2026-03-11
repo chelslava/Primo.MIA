@@ -5,7 +5,6 @@ using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using static LTools.Common.Helpers.WFHelper.PropertiesItem;
 
 namespace Primo.MIA
 {
@@ -17,7 +16,7 @@ namespace Primo.MIA
     /// </summary>
     public class ListInspectBack : PrimoComponentTO<ListInspect>
     {
-                public override string GroupName { get => ActivityCategories.Lists; protected set { } }
+        public override string GroupName { get => ActivityCategories.Lists; protected set { } }
 
         protected override int sdkTimeOut
         {
@@ -152,7 +151,7 @@ namespace Primo.MIA
                 "  Количество вхождений";
             sdkComponentIcon = ActivityIcons.List;
 
-                        sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
+            sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
                 PropertyBuilder.Script<List<string>>("Prop_List", "Входной список"),
                 PropertyBuilder.Script<string>("Prop_SearchValue", "Значение для поиска (необязательно)"),
@@ -218,10 +217,10 @@ namespace Primo.MIA
 
                 // ── Поиск элемента ──────────────────────────────────────────────
 
-                bool contains    = false;
-                int  firstIndex  = -1;
-                var  allIndexes  = new List<int>();
-                int  occurrences = 0;
+                bool contains = false;
+                int firstIndex = -1;
+                var allIndexes = new List<int>();
+                int occurrences = 0;
 
                 if (!string.IsNullOrEmpty(searchVal))
                 {
@@ -233,24 +232,24 @@ namespace Primo.MIA
                         .ToList();
 
                     occurrences = allIndexes.Count;
-                    contains    = occurrences > 0;
+                    contains = occurrences > 0;
                     firstIndex = allIndexes.Count > 0 ? allIndexes[0] : -1;
                 }
 
                 // ── Запись результатов ──────────────────────────────────────────
 
-                SetVariableValue(this.Prop_TotalCount,      totalCount,       sd);
-                SetVariableValue(this.Prop_UniqueCount,     uniqueCount,      sd);
-                SetVariableValue(this.Prop_EmptyCount,      emptyCount,       sd);
-                SetVariableValue(this.Prop_HasDuplicates,   duplicates.Any(), sd);
-                SetVariableValue(this.Prop_Duplicates,      duplicates,       sd);
-                SetVariableValue(this.Prop_MinLength,       minLen,           sd);
-                SetVariableValue(this.Prop_MaxLength,       maxLen,           sd);
-                SetVariableValue(this.Prop_AvgLength,       avgLen,           sd);
-                SetVariableValue(this.Prop_Contains,        contains,         sd);
-                SetVariableValue(this.Prop_FirstIndex,      firstIndex,       sd);
-                SetVariableValue(this.Prop_AllIndexes,      allIndexes,       sd);
-                SetVariableValue(this.Prop_OccurrenceCount, occurrences,      sd);
+                SetVariableValue(this.Prop_TotalCount, totalCount, sd);
+                SetVariableValue(this.Prop_UniqueCount, uniqueCount, sd);
+                SetVariableValue(this.Prop_EmptyCount, emptyCount, sd);
+                SetVariableValue(this.Prop_HasDuplicates, duplicates.Any(), sd);
+                SetVariableValue(this.Prop_Duplicates, duplicates, sd);
+                SetVariableValue(this.Prop_MinLength, minLen, sd);
+                SetVariableValue(this.Prop_MaxLength, maxLen, sd);
+                SetVariableValue(this.Prop_AvgLength, avgLen, sd);
+                SetVariableValue(this.Prop_Contains, contains, sd);
+                SetVariableValue(this.Prop_FirstIndex, firstIndex, sd);
+                SetVariableValue(this.Prop_AllIndexes, allIndexes, sd);
+                SetVariableValue(this.Prop_OccurrenceCount, occurrences, sd);
 
                 return new ExecutionResult
                 {
@@ -266,7 +265,7 @@ namespace Primo.MIA
 
         public override ValidationResult Validate()
         {
-                        var ret = new ValidationResult();
+            var ret = new ValidationResult();
             ret.ValidateRequired(this.Prop_List, ActivityStrings.Field_List, ActivityStrings.Error_ListRequired);
             return ret;
         }

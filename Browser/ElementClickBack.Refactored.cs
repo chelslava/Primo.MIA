@@ -1,28 +1,36 @@
 // =============================================================================
-// ElementClickUnifiedBack.cs — объединённая активность «Клик по элементу».
+// ElementClickBack.cs — активность «Клик по элементу».
 //
-// REFACTORED: Использует BrowserActivityBase для устранения дублирования кода
+// Объединяет четыре режима клика в одной активности:
+//   - Click          — обычный клик (с опциональным JS и паузой после)
+//   - DoubleClick    — двойной клик (с опциональным JS и паузой после)
+//   - RightClick     — правый клик / контекстное меню (с паузой после)
+//   - ClickAndHold   — клик с удержанием (с указанием длительности)
+//
+// Режим выбирается через enum ClickMode.
+// Поддерживает поиск элемента по ID или по локатору.
+// REFACTORED: Использует BrowserActivityBase и сервисы для устранения дублирования кода
 // =============================================================================
 
 using LTools.Common.Model;
 using LTools.Common.UIElements;
 using LTools.SDK;
 using OpenQA.Selenium;
-using Primo.MIA.Browser;
+using OpenQA.Selenium.Interactions;
 using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
-using static LTools.Common.Helpers.WFHelper.PropertiesItem;
 
 namespace Primo.MIA
 {
     /// <summary>
     /// Объединённая активность для выполнения различных типов кликов по элементу.
     /// Режим клика задаётся через свойство <see cref="Prop_ClickMode"/>.
+    /// REFACTORED: Использует BrowserActivityBase и сервисы для устранения дублирования кода
     /// </summary>
     public class ElementClickBack : BrowserActivityBase<ElementClick>
     {
-        #region Properties and Configuration
+        // ── Группа и таймаут ──────────────────────────────────────────────────
 
         public override string GroupName
         {
@@ -36,46 +44,68 @@ namespace Primo.MIA
             set { }
         }
 
-        #endregion
+        // ── Входные параметры ──────────────────────────────────────────────────
 
-        #region Input Properties
+        #region Prop_ClickMode
 
         private ClickMode _propClickMode;
+
+        /// <summary>
+        /// Режим клика: Click, DoubleClick, RightClick или ClickAndHold.
+        /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
-        [System.ComponentModel.Category(ActivityStrings.Category_Main)]
-        [System.ComponentModel.DisplayName("Режим клика")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main),
+         System.ComponentModel.DisplayName("Режим клика")]
         public ClickMode Prop_ClickMode
         {
             get => _propClickMode;
             set { _propClickMode = value; InvokePropertyChanged(this, nameof(Prop_ClickMode)); }
         }
 
+        #endregion
+
+        #region Prop_SessionId
+
         private string _propSessionId;
+
+        /// <summary>ID сессии браузера.</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
-        [System.ComponentModel.Category(ActivityStrings.Category_Main)]
-        [System.ComponentModel.DisplayName(ActivityStrings.Field_SessionId)]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main),
+         System.ComponentModel.DisplayName(ActivityStrings.Field_SessionId)]
         public string Prop_SessionId
         {
             get => _propSessionId;
             set { _propSessionId = value; InvokePropertyChanged(this, nameof(Prop_SessionId)); }
         }
 
+        #endregion
+
+        #region Prop_ElementId
+
         private string _propElementId;
+
+        /// <summary>ID элемента (если элемент уже найден ранее).</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
-        [System.ComponentModel.Category(ActivityStrings.Category_Main)]
-        [System.ComponentModel.DisplayName(ActivityStrings.Field_ElementId)]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main),
+         System.ComponentModel.DisplayName(ActivityStrings.Field_ElementId)]
         public string Prop_ElementId
         {
             get => _propElementId;
             set { _propElementId = value; InvokePropertyChanged(this, nameof(Prop_ElementId)); }
         }
 
+        #endregion
+
+        #region Локатор
+
         private ElementLocatorType _propLocatorType;
+
+        /// <summary>Тип локатора для поиска элемента.</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
-        [System.ComponentModel.Category(ActivityStrings.Category_Locator)]
-        [System.ComponentModel.DisplayName(ActivityStrings.Field_LocatorType)]
+        [System.ComponentModel.Category(ActivityStrings.Category_Locator),
+         System.ComponentModel.DisplayName(ActivityStrings.Field_LocatorType)]
         public ElementLocatorType Prop_LocatorType
         {
             get => _propLocatorType;
@@ -83,53 +113,88 @@ namespace Primo.MIA
         }
 
         private string _propLocatorValue;
+
+        /// <summary>Значение локатора для поиска элемента.</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
-        [System.ComponentModel.Category(ActivityStrings.Category_Locator)]
-        [System.ComponentModel.DisplayName(ActivityStrings.Field_LocatorValue)]
+        [System.ComponentModel.Category(ActivityStrings.Category_Locator),
+         System.ComponentModel.DisplayName(ActivityStrings.Field_LocatorValue)]
         public string Prop_LocatorValue
         {
             get => _propLocatorValue;
             set { _propLocatorValue = value; InvokePropertyChanged(this, nameof(Prop_LocatorValue)); }
         }
 
+        #endregion
+
+        #region Prop_WaitTimeout
+
         private string _propWaitTimeout;
+
+        /// <summary>Таймаут ожидания элемента (сек).</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
-        [System.ComponentModel.Category(ActivityStrings.Category_Wait)]
-        [System.ComponentModel.DisplayName(ActivityStrings.Field_WaitTimeout)]
+        [System.ComponentModel.Category(ActivityStrings.Category_Wait),
+         System.ComponentModel.DisplayName(ActivityStrings.Field_WaitTimeout)]
         public string Prop_WaitTimeout
         {
             get => _propWaitTimeout;
             set { _propWaitTimeout = value; InvokePropertyChanged(this, nameof(Prop_WaitTimeout)); }
         }
 
+        #endregion
+
+        #region Prop_UseJavaScript (только Click и DoubleClick)
+
         private bool _propUseJavaScript;
+
+        /// <summary>
+        /// Использовать JavaScript для клика.
+        /// Применяется только в режимах Click и DoubleClick.
+        /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
-        [System.ComponentModel.Category(ActivityStrings.Category_Main)]
-        [System.ComponentModel.DisplayName("Использовать JavaScript")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main),
+         System.ComponentModel.DisplayName("Использовать JavaScript")]
         public bool Prop_UseJavaScript
         {
             get => _propUseJavaScript;
             set { _propUseJavaScript = value; InvokePropertyChanged(this, nameof(Prop_UseJavaScript)); }
         }
 
+        #endregion
+
+        #region Prop_WaitAfterClick (не для ClickAndHold)
+
         private string _propWaitAfterClick;
+
+        /// <summary>
+        /// Ожидание после клика (мс).
+        /// Применяется в режимах Click, DoubleClick, RightClick.
+        /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
-        [System.ComponentModel.Category(ActivityStrings.Category_Main)]
-        [System.ComponentModel.DisplayName(ActivityStrings.Field_WaitAfterClick)]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main),
+         System.ComponentModel.DisplayName(ActivityStrings.Field_WaitAfterClick)]
         public string Prop_WaitAfterClick
         {
             get => _propWaitAfterClick;
             set { _propWaitAfterClick = value; InvokePropertyChanged(this, nameof(Prop_WaitAfterClick)); }
         }
 
+        #endregion
+
+        #region Prop_HoldDuration (только ClickAndHold)
+
         private string _propHoldDuration;
+
+        /// <summary>
+        /// Длительность удержания кнопки мыши (мс).
+        /// Применяется только в режиме ClickAndHold.
+        /// </summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
-        [System.ComponentModel.Category(ActivityStrings.Category_Main)]
-        [System.ComponentModel.DisplayName("Длительность удержания (мс)")]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main),
+         System.ComponentModel.DisplayName("Длительность удержания (мс)")]
         public string Prop_HoldDuration
         {
             get => _propHoldDuration;
@@ -138,7 +203,7 @@ namespace Primo.MIA
 
         #endregion
 
-        #region Constructor
+        // ── Конструктор ────────────────────────────────────────────────────────
 
         public ElementClickBack(IWFContainer container) : base(container)
         {
@@ -183,7 +248,7 @@ namespace Primo.MIA
 
             InitClass(container);
 
-            // Значения по умолчанию
+            // Установка значений по умолчанию
             Prop_ClickMode = ClickMode.Click;
             Prop_SessionId = "\"\"";
             Prop_ElementId = "\"\"";
@@ -195,97 +260,158 @@ namespace Primo.MIA
             Prop_HoldDuration = "1000";
         }
 
-        #endregion
-
-        #region Main Execution
+        // ── TimedAction — точка входа ──────────────────────────────────────────
 
         public override ExecutionResult TimedAction(ScriptingData sd)
         {
-            return SafeExecute(() =>
+            string resultMsg = string.Empty;
+
+            var result = SafeExecute(() =>
             {
-                // Получение драйвера через базовый класс
-                IWebDriver driver = GetDriverFromContext(sd, nameof(Prop_SessionId));
+                // Чтение обязательных параметров
+                string sessionId = GetPropertyValue<string>(Prop_SessionId, nameof(Prop_SessionId), sd);
+                string elementId = GetPropertyValue<string>(Prop_ElementId, nameof(Prop_ElementId), sd);
+                string locatorValue = GetPropertyValue<string>(Prop_LocatorValue, nameof(Prop_LocatorValue), sd);
 
-                // Поиск элемента
-                IWebElement element = ResolveElement(sd, driver);
+                // Получение WebDriver
+                IWebDriver driver = GetDriverFromContext(sessionId);
 
-                // Выполнение клика
-                string resultMsg = PerformClickAction(sd, driver, element);
+                // Логирование начала операции
+                Logger.LogInfo(sdkComponentName, "Выполнение клика {0} для сессии: {1}", Prop_ClickMode, sessionId);
 
-                return CreateSuccessResult(resultMsg);
-            }, 
-            $"Клик — {Prop_ClickMode}");
+                // ── Поиск элемента ─────────────────────────────────────────────
+                IWebElement element = ResolveElement(sd, driver, elementId, locatorValue);
+
+                // ── Выполнение нужного типа клика ──────────────────────────────
+                resultMsg = ExecuteClick(sd, driver, element, elementId, locatorValue);
+
+                // Логирование успешного завершения
+                Logger.LogInfo(sdkComponentName, "Клик {0} успешно выполнен", Prop_ClickMode);
+
+            }, $"Клик — {Prop_ClickMode}");
+
+            if (result.IsSuccess)
+                result.SuccessMessage = resultMsg;
+
+            return result;
         }
 
-        #endregion
-
-        #region Element Resolution
+        // ── Вспомогательные методы ─────────────────────────────────────────────
 
         /// <summary>
         /// Разрешает IWebElement: сначала по локатору (если задан), затем по ID.
+        /// Выбрасывает исключение, если ни один идентификатор не указан.
         /// </summary>
-        private IWebElement ResolveElement(ScriptingData sd, IWebDriver driver)
+        private IWebElement ResolveElement(ScriptingData sd, IWebDriver driver, string elementId, string locatorValue)
         {
-            string elementId = GetPropertyValue<string>(Prop_ElementId, nameof(Prop_ElementId), sd);
-            string locatorValue = GetPropertyValue<string>(Prop_LocatorValue, nameof(Prop_LocatorValue), sd);
-
-            // Guard clause: проверка что хотя бы один идентификатор указан
-            if (string.IsNullOrWhiteSpace(locatorValue) && string.IsNullOrWhiteSpace(elementId))
-                throw new ArgumentException("Необходимо указать либо ID элемента, либо локатор для поиска");
-
-            // Приоритет: локатор > elementId
             if (!string.IsNullOrWhiteSpace(locatorValue))
             {
-                int timeout = ParseTimeout(sd);
-                return FindElementByLocator(driver, locatorValue, timeout);
+                // Парсим таймаут с защитой от некорректных значений
+                string timeoutStr = GetPropertyValue<string>(Prop_WaitTimeout, nameof(Prop_WaitTimeout), sd) ?? "10";
+                int timeout = int.TryParse(timeoutStr, out int t) ? t : 10;
+                ValidatePositive(timeout, nameof(Prop_WaitTimeout));
+
+                // Использование ElementLocator сервиса
+                var locatorType = ConvertLocatorType(Prop_LocatorType);
+                return ElementLocator.WaitForClickable(driver, locatorType, locatorValue, timeout);
             }
 
-            return SeleniumHelper.GetElement(elementId);
+            if (!string.IsNullOrWhiteSpace(elementId))
+            {
+                // Получение элемента из ElementRepository
+                var element = ElementRepository.GetElement(elementId);
+                if (element == null)
+                    throw new ArgumentException($"Элемент с ID '{elementId}' не найден в репозитории");
+                return element;
+            }
+
+            throw new ArgumentException("Необходимо указать либо ID элемента, либо локатор для поиска");
         }
 
         /// <summary>
-        /// Находит элемент по локатору с ожиданием кликабельности.
+        /// Выполняет клик в соответствии с выбранным режимом <see cref="Prop_ClickMode"/>.
+        /// Возвращает строку с описанием выполненного действия.
         /// </summary>
-        private IWebElement FindElementByLocator(IWebDriver driver, string locatorValue, int timeout)
+        private string ExecuteClick(ScriptingData sd, IWebDriver driver, IWebElement element, string elementId, string locatorValue)
         {
-            By locator = SeleniumHelper.CreateLocator(Prop_LocatorType, locatorValue);
-            return SeleniumHelper.WaitForElementClickable(driver, locator, timeout);
-        }
-
-        /// <summary>
-        /// Парсит и валидирует таймаут из свойства.
-        /// </summary>
-        private int ParseTimeout(ScriptingData sd)
-        {
-            string timeoutStr = GetPropertyValue<string>(Prop_WaitTimeout, nameof(Prop_WaitTimeout), sd) ?? "10";
-            int timeout = int.TryParse(timeoutStr, out int t) ? t : 10;
-            return SeleniumHelper.ValidateTimeout(timeout, 10);
-        }
-
-        #endregion
-
-        #region Click Actions
-
-        /// <summary>
-        /// Выполняет клик в соответствии с выбранным режимом.
-        /// </summary>
-        private string PerformClickAction(ScriptingData sd, IWebDriver driver, IWebElement element)
-        {
-            string elementLabel = GetElementLabel();
+            // Формируем метку элемента для сообщения результата
+            string elementLabel = !string.IsNullOrWhiteSpace(locatorValue)
+                ? $"{Prop_LocatorType}={locatorValue}"
+                : elementId;
 
             switch (Prop_ClickMode)
             {
+                // ── Обычный клик ───────────────────────────────────────────────
                 case ClickMode.Click:
-                    return PerformSingleClick(driver, element, elementLabel, sd);
+                    {
+                        if (Prop_UseJavaScript)
+                        {
+                            ((IJavaScriptExecutor)driver).ExecuteScript("arguments[0].click();", element);
+                            Logger.LogDebug(sdkComponentName, "Выполнен JavaScript клик по элементу: {0}", elementLabel);
+                        }
+                        else
+                        {
+                            element.Click();
+                            Logger.LogDebug(sdkComponentName, "Выполнен обычный клик по элементу: {0}", elementLabel);
+                        }
 
+                        ApplyWaitAfterClick(sd);
+                        return $"[Click] Выполнен клик: {elementLabel}";
+                    }
+
+                // ── Двойной клик ───────────────────────────────────────────────
                 case ClickMode.DoubleClick:
-                    return PerformDoubleClick(driver, element, elementLabel, sd);
+                    {
+                        var actions = new Actions(driver);
+                        if (Prop_UseJavaScript)
+                        {
+                            // JavaScript двойной клик
+                            ((IJavaScriptExecutor)driver).ExecuteScript(
+                                "var evt = new MouseEvent('dblclick', {bubbles: true, cancelable: true}); arguments[0].dispatchEvent(evt);", 
+                                element);
+                            Logger.LogDebug(sdkComponentName, "Выполнен JavaScript двойной клик по элементу: {0}", elementLabel);
+                        }
+                        else
+                        {
+                            actions.DoubleClick(element).Perform();
+                            Logger.LogDebug(sdkComponentName, "Выполнен обычный двойной клик по элементу: {0}", elementLabel);
+                        }
 
+                        ApplyWaitAfterClick(sd);
+                        return $"[DoubleClick] Выполнен двойной клик: {elementLabel}";
+                    }
+
+                // ── Правый клик ────────────────────────────────────────────────
                 case ClickMode.RightClick:
-                    return PerformRightClick(driver, element, elementLabel, sd);
+                    {
+                        var actions = new Actions(driver);
+                        actions.ContextClick(element).Perform();
+                        Logger.LogDebug(sdkComponentName, "Выполнен правый клик по элементу: {0}", elementLabel);
 
+                        ApplyWaitAfterClick(sd);
+                        return $"[RightClick] Выполнен правый клик: {elementLabel}";
+                    }
+
+                // ── Клик с удержанием ──────────────────────────────────────────
                 case ClickMode.ClickAndHold:
-                    return PerformClickAndHold(driver, element, elementLabel, sd);
+                    {
+                        // Читаем и валидируем длительность удержания
+                        string durationStr = GetPropertyValue<string>(Prop_HoldDuration, nameof(Prop_HoldDuration), sd) ?? "1000";
+                        int duration = int.TryParse(durationStr, out int d) ? Math.Max(d, 0) : 1000;
+
+                        var actions = new Actions(driver);
+                        actions.ClickAndHold(element).Perform();
+                        Logger.LogDebug(sdkComponentName, "Начато удержание клика по элементу: {0}, длительность: {1}мс", elementLabel, duration);
+
+                        // Ожидание
+                        System.Threading.Thread.Sleep(duration);
+
+                        // Отпускание
+                        actions.Release(element).Perform();
+                        Logger.LogDebug(sdkComponentName, "Завершено удержание клика по элементу: {0}", elementLabel);
+
+                        return $"[ClickAndHold] Удержание {duration}мс: {elementLabel}";
+                    }
 
                 default:
                     throw new ArgumentOutOfRangeException(nameof(Prop_ClickMode),
@@ -293,80 +419,21 @@ namespace Primo.MIA
             }
         }
 
-        private string PerformSingleClick(IWebDriver driver, IWebElement element, string label, ScriptingData sd)
-        {
-            if (Prop_UseJavaScript)
-                ((IJavaScriptExecutor)driver).ExecuteScript("arguments[0].click();", element);
-            else
-                element.Click();
-
-            ApplyWaitAfterClick(sd);
-            return $"[Click] Выполнен клик: {label}";
-        }
-
-        private string PerformDoubleClick(IWebDriver driver, IWebElement element, string label, ScriptingData sd)
-        {
-            if (Prop_UseJavaScript)
-                SeleniumHelper.DoubleClickJS(driver, element);
-            else
-                SeleniumHelper.DoubleClick(driver, element);
-
-            ApplyWaitAfterClick(sd);
-            return $"[DoubleClick] Выполнен двойной клик: {label}";
-        }
-
-        private string PerformRightClick(IWebDriver driver, IWebElement element, string label, ScriptingData sd)
-        {
-            SeleniumHelper.RightClick(driver, element);
-            ApplyWaitAfterClick(sd);
-            return $"[RightClick] Выполнен правый клик: {label}";
-        }
-
-        private string PerformClickAndHold(IWebDriver driver, IWebElement element, string label, ScriptingData sd)
-        {
-            int duration = ParseHoldDuration(sd);
-            SeleniumHelper.ClickAndHold(driver, element, duration);
-            return $"[ClickAndHold] Удержание {duration}мс: {label}";
-        }
-
-        #endregion
-
-        #region Helper Methods
-
         /// <summary>
-        /// Формирует метку элемента для сообщения результата.
-        /// </summary>
-        private string GetElementLabel()
-        {
-            if (!string.IsNullOrWhiteSpace(Prop_LocatorValue))
-                return $"{Prop_LocatorType}={Prop_LocatorValue}";
-            
-            return Prop_ElementId;
-        }
-
-        /// <summary>
-        /// Выполняет паузу после клика, если задано положительное значение.
+        /// Выполняет паузу после клика, если задано положительное значение Prop_WaitAfterClick.
         /// </summary>
         private void ApplyWaitAfterClick(ScriptingData sd)
         {
+            // Читаем паузу и применяем только если она больше нуля
             string waitStr = GetPropertyValue<string>(Prop_WaitAfterClick, nameof(Prop_WaitAfterClick), sd) ?? "0";
             if (int.TryParse(waitStr, out int waitMs) && waitMs > 0)
+            {
+                Logger.LogDebug(sdkComponentName, "Ожидание после клика: {0}мс", waitMs);
                 System.Threading.Thread.Sleep(waitMs);
+            }
         }
 
-        /// <summary>
-        /// Парсит и валидирует длительность удержания.
-        /// </summary>
-        private int ParseHoldDuration(ScriptingData sd)
-        {
-            string durationStr = GetPropertyValue<string>(Prop_HoldDuration, nameof(Prop_HoldDuration), sd) ?? "1000";
-            int duration = int.TryParse(durationStr, out int d) ? Math.Max(d, 0) : 1000;
-            return duration;
-        }
-
-        #endregion
-
-        #region Validation
+        // ── Валидация ──────────────────────────────────────────────────────────
 
         public override ValidationResult Validate()
         {
@@ -385,7 +452,7 @@ namespace Primo.MIA
                 });
             }
 
-            // Валидация длительности удержания
+            // Дополнительная валидация: длительность удержания должна быть неотрицательной
             if (Prop_ClickMode == ClickMode.ClickAndHold
                 && int.TryParse(Prop_HoldDuration, out int dur)
                 && dur < 0)
@@ -399,7 +466,5 @@ namespace Primo.MIA
 
             return ret;
         }
-
-        #endregion
     }
 }

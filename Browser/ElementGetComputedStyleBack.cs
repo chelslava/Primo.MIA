@@ -17,7 +17,6 @@ using OpenQA.Selenium;
 using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
-using static LTools.Common.Helpers.WFHelper.PropertiesItem;
 
 namespace Primo.MIA
 {
@@ -228,7 +227,7 @@ namespace Primo.MIA
         public override ValidationResult Validate()
         {
             var ret = new ValidationResult();
-             
+
             ret.ValidateRequired(this.Prop_CssProperty, "CSS свойство", "CSS свойство обязательно");
             ret.ValidateRequired(this.Prop_OutValue, "Значение свойства", "Переменная для значения обязательна");
 

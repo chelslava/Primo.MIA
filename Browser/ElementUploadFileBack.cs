@@ -17,7 +17,6 @@ using OpenQA.Selenium;
 using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
-using static LTools.Common.Helpers.WFHelper.PropertiesItem;
 
 namespace Primo.MIA
 {
@@ -175,15 +174,16 @@ namespace Primo.MIA
 
         public override ExecutionResult TimedAction(ScriptingData sd)
         {
-            try
+            return SafeExecute(() =>
             {
                 string sessionId = GetPropertyValue<string>(Prop_SessionId, nameof(Prop_SessionId), sd);
                 string elementId = GetPropertyValue<string>(Prop_ElementId, nameof(Prop_ElementId), sd);
                 string locatorValue = GetPropertyValue<string>(Prop_LocatorValue, nameof(Prop_LocatorValue), sd);
                 string filePath = GetPropertyValue<string>(Prop_FilePath, nameof(Prop_FilePath), sd);
 
-                if (string.IsNullOrWhiteSpace(filePath))
-                    throw new ArgumentException("Путь к файлу не может быть пустым");
+                Logger.LogInfo(sdkComponentName, "Начинается загрузка файла для сессии: {0}", sessionId);
+
+                ValidateNotEmpty(filePath, nameof(filePath));
 
                 if (Prop_VerifyFileExists && !System.IO.File.Exists(filePath))
                     throw new System.IO.FileNotFoundException($"Файл не найден: {filePath}");
@@ -195,32 +195,38 @@ namespace Primo.MIA
                 {
                     string timeoutStr = GetPropertyValue<string>(Prop_WaitTimeout, "Prop_WaitTimeout", sd) ?? "10";
                     int timeout = int.TryParse(timeoutStr, out int t) ? t : 10;
-                    timeout = SeleniumHelper.ValidateTimeout(timeout, 10);
+                    ValidatePositive(timeout, "Prop_WaitTimeout");
 
-                    var locator = SeleniumHelper.CreateLocator(Prop_LocatorType, locatorValue);
-                    element = SeleniumHelper.WaitForElement(driver, locator, timeout);
+                    var locatorType = ConvertLocatorType(Prop_LocatorType);
+                    element = ElementLocator.FindElement(driver, locatorType, locatorValue, timeout);
+                    
+                    Logger.LogDebug(sdkComponentName, "Элемент найден по локатору: {0}={1}", Prop_LocatorType, locatorValue);
                 }
                 else if (!string.IsNullOrWhiteSpace(elementId))
                 {
-                    element = SeleniumHelper.GetElement(elementId);
+                    element = ElementRepository.GetElement(elementId);
+                    if (element == null)
+                        throw new ArgumentException($"Элемент с ID '{elementId}' не найден в репозитории");
+                    
+                    Logger.LogDebug(sdkComponentName, "Использован сохраненный элемент: {0}", elementId);
                 }
                 else
                 {
                     throw new ArgumentException("Необходимо указать либо ID элемента, либо локатор для поиска");
                 }
 
-                if (!SeleniumHelper.IsFileInputElement(element))
+                // Проверяем что это input[type=file]
+                if (element.TagName.ToLower() != "input" || element.GetAttribute("type")?.ToLower() != "file")
                     throw new ArgumentException("Элемент должен быть input[type=file]");
 
-                SeleniumHelper.UploadFile(element, filePath);
+                // Загружаем файл
+                element.SendKeys(filePath);
 
                 string fileName = System.IO.Path.GetFileName(filePath);
+                Logger.LogInfo(sdkComponentName, "Файл успешно загружен: {0}", fileName);
+                
                 return CreateSuccessResult($"[Загрузка файла] Файл загружен: {fileName}");
-            }
-            catch (Exception ex)
-            {
-                return CreateErrorResult(ex, "Загрузка файла");
-            }
+            }, "Загрузка файла");
         }
 
         // ── Валидация ──────────────────────────────────────────────────
@@ -228,7 +234,7 @@ namespace Primo.MIA
         public override ValidationResult Validate()
         {
             var ret = new ValidationResult();
-             
+
             ret.ValidateRequired(this.Prop_FilePath, "Путь к файлу", "Путь к файлу обязателен");
 
             bool hasElementId = !string.IsNullOrWhiteSpace(this.Prop_ElementId);

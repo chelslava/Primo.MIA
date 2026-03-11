@@ -17,7 +17,6 @@ using OpenQA.Selenium;
 using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
-using static LTools.Common.Helpers.WFHelper.PropertiesItem;
 
 namespace Primo.MIA
 {
@@ -254,7 +253,7 @@ namespace Primo.MIA
         public override ValidationResult Validate()
         {
             var ret = new ValidationResult();
-             
+
             ret.ValidateRequired(Prop_X, "X", "Переменная для X обязательна");
             ret.ValidateRequired(Prop_Y, "Y", "Переменная для Y обязательна");
             ret.ValidateRequired(Prop_Width, "Ширина", "Переменная для ширины обязательна");

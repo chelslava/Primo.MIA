@@ -124,11 +124,11 @@ namespace Primo.MIA
 
         public override ExecutionResult TimedAction(ScriptingData sd)
         {
-            try
+            return SafeExecute(() =>
             {
                 // Получаем sessionId
                 string sessionId = GetPropertyValue<string>(Prop_SessionId, nameof(Prop_SessionId), sd);
-                
+
                 // Получение драйвера через базовый класс
                 IWebDriver driver = GetDriverFromContext(sessionId);
 
@@ -147,12 +147,11 @@ namespace Primo.MIA
                 if (!string.IsNullOrWhiteSpace(Prop_PageSource))
                     SetVariableValue(Prop_PageSource, pageSource, sd);
 
+                // Логирование через сервис
+                Logger.LogInfo(sdkComponentName, "Информация о браузере получена: URL={0}, Title={1}", currentUrl, pageTitle);
+
                 return CreateSuccessResult($"[Получить информацию] URL: {currentUrl}, Title: {pageTitle}");
-            }
-            catch (Exception ex)
-            {
-                return CreateErrorResult(ex, "Получить информацию");
-            }
+            }, "Получить информацию");
         }
 
         // ── Валидация ──────────────────────────────────────────────────
@@ -160,7 +159,7 @@ namespace Primo.MIA
         public override ValidationResult Validate()
         {
             var ret = new ValidationResult();
-             
+
             return ret;
         }
     }

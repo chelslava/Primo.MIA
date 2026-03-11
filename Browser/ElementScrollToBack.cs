@@ -17,14 +17,14 @@ using OpenQA.Selenium;
 using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
-using static LTools.Common.Helpers.WFHelper.PropertiesItem;
 
 namespace Primo.MIA
 {
     /// <summary>
     /// Активность для прокрутки страницы к элементу.
+    /// REFACTORED: Использует BrowserActivityBase для устранения дублирования кода
     /// </summary>
-    public class ElementScrollToBack : PrimoComponentTO<ElementScrollTo>
+    public class ElementScrollToBack : BrowserActivityBase<ElementScrollTo>
     {
         public override string GroupName
         {
@@ -163,16 +163,17 @@ namespace Primo.MIA
 
         public override ExecutionResult TimedAction(ScriptingData sd)
         {
-            try
+            return SafeExecute(() =>
             {
-                // Чтение параметров через SessionResolver (поддержка ambient-контекста)
-                string sessionId = SessionResolver.Resolve(
-                    GetPropertyValue<string>(this.Prop_SessionId, nameof(Prop_SessionId), sd));
+                // Чтение параметров
+                string sessionId = GetPropertyValue<string>(this.Prop_SessionId, nameof(Prop_SessionId), sd);
                 string elementId = GetPropertyValue<string>(this.Prop_ElementId, nameof(Prop_ElementId), sd);
                 string locatorValue = GetPropertyValue<string>(this.Prop_LocatorValue, nameof(Prop_LocatorValue), sd);
 
+                Logger.LogInfo(sdkComponentName, "Начинается прокрутка к элементу для сессии: {0}", sessionId);
+
                 // Получение драйвера
-                var driver = SeleniumHelper.GetDriver(sessionId);
+                var driver = GetDriverFromContext(sessionId);
 
                 // Получение элемента: либо по ID, либо поиск по локатору
                 IWebElement element;
@@ -181,15 +182,20 @@ namespace Primo.MIA
                     // Поиск элемента по локатору
                     string timeoutStr = GetPropertyValue<string>(this.Prop_WaitTimeout, "Prop_WaitTimeout", sd) ?? "10";
                     int timeout = int.TryParse(timeoutStr, out int t) ? t : 10;
-                    timeout = SeleniumHelper.ValidateTimeout(timeout, 10);
+                    ValidatePositive(timeout, "Prop_WaitTimeout");
 
-                    var locator = SeleniumHelper.CreateLocator(this.Prop_LocatorType, locatorValue);
-                    element = SeleniumHelper.WaitForElement(driver, locator, timeout);
+                    var locatorType = ConvertLocatorType(this.Prop_LocatorType);
+                    element = ElementLocator.FindElement(driver, locatorType, locatorValue, timeout);
+                    
+                    Logger.LogDebug(sdkComponentName, "Элемент найден по локатору: {0}={1}", this.Prop_LocatorType, locatorValue);
                 }
                 else if (!string.IsNullOrWhiteSpace(elementId))
                 {
-                    // Использование существующего элемента
-                    element = SeleniumHelper.GetElement(elementId);
+                    element = ElementRepository.GetElement(elementId);
+                    if (element == null)
+                        throw new ArgumentException($"Элемент с ID '{elementId}' не найден в репозитории");
+                    
+                    Logger.LogDebug(sdkComponentName, "Использован сохраненный элемент: {0}", elementId);
                 }
                 else
                 {
@@ -197,26 +203,37 @@ namespace Primo.MIA
                 }
 
                 // Прокрутка к элементу
-                SeleniumHelper.ScrollToElement(driver, element, this.Prop_Alignment);
+                IJavaScriptExecutor js = driver as IJavaScriptExecutor;
+                if (js != null)
+                {
+                    string script;
+                    switch (this.Prop_Alignment)
+                    {
+                        case ScrollAlignment.Top:
+                            script = "arguments[0].scrollIntoView(true);";
+                            break;
+                        case ScrollAlignment.Bottom:
+                            script = "arguments[0].scrollIntoView(false);";
+                            break;
+                        case ScrollAlignment.Center:
+                            script = "arguments[0].scrollIntoView({block: 'center'});";
+                            break;
+                        default:
+                            script = "arguments[0].scrollIntoView(true);";
+                            break;
+                    }
+                    
+                    js.ExecuteScript(script, element);
+                    Logger.LogDebug(sdkComponentName, "Прокрутка выполнена с выравниванием: {0}", this.Prop_Alignment);
+                }
 
                 string resultMsg = !string.IsNullOrWhiteSpace(locatorValue)
                     ? $"[Прокрутить к элементу] {this.Prop_LocatorType}={locatorValue} ({this.Prop_Alignment})"
                     : $"[Прокрутить к элементу] {elementId} ({this.Prop_Alignment})";
 
-                return new ExecutionResult
-                {
-                    IsSuccess = true,
-                    SuccessMessage = resultMsg
-                };
-            }
-            catch (Exception ex)
-            {
-                return new ExecutionResult
-                {
-                    IsSuccess = false,
-                    ErrorMessage = $"Ошибка [Прокрутить к элементу]: {ex.Message}"
-                };
-            }
+                Logger.LogInfo(sdkComponentName, "Прокрутка к элементу завершена успешно");
+                return CreateSuccessResult(resultMsg);
+            }, "Прокрутить к элементу");
         }
 
         // ── Валидация ──────────────────────────────────────────────────
@@ -224,12 +241,12 @@ namespace Primo.MIA
         public override ValidationResult Validate()
         {
             var ret = new ValidationResult();
-             
-            
+
+
             // Проверяем что указан либо ElementId, либо LocatorValue
             bool hasElementId = !string.IsNullOrWhiteSpace(this.Prop_ElementId);
             bool hasLocator = !string.IsNullOrWhiteSpace(this.Prop_LocatorValue);
-            
+
             if (!hasElementId && !hasLocator)
             {
                 ret.Items.Add(new ValidationResult.ValidationItem()
@@ -238,7 +255,7 @@ namespace Primo.MIA
                     Error = "Необходимо указать либо ID элемента, либо локатор для поиска"
                 });
             }
-            
+
             return ret;
         }
     }

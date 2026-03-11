@@ -17,7 +17,6 @@ using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using static LTools.Common.Helpers.WFHelper.PropertiesItem;
 
 namespace Primo.MIA
 {
@@ -27,7 +26,7 @@ namespace Primo.MIA
     /// количество элементов, список ключей и список значений.
     /// Не изменяет словарь.
     /// </summary>
-        public class DictionaryGetInfoBack : PrimoComponentTO<DictionaryGetInfo>
+    public class DictionaryGetInfoBack : PrimoComponentTO<DictionaryGetInfo>
     {
         public override string GroupName { get => ActivityCategories.Dictionaries; protected set { } }
 
@@ -112,7 +111,7 @@ namespace Primo.MIA
 
             sdkComponentIcon = ActivityIcons.Dictionary;
 
-                                    sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
+            sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
                 PropertyBuilder.Script<Dictionary<string, string>>("Prop_Dictionary", "Входной словарь Dictionary<string, string>"),
                 PropertyBuilder.Variable<int>("Prop_Count", "Количество элементов в словаре"),
@@ -136,12 +135,12 @@ namespace Primo.MIA
                 // Сортируем один раз — и ключи и значения в одном порядке
                 var sorted = dict.OrderBy(p => p.Key).ToList();
 
-                List<string> keys   = sorted.Select(p => p.Key).ToList();
+                List<string> keys = sorted.Select(p => p.Key).ToList();
                 List<string> values = sorted.Select(p => p.Value).ToList();
 
-                SetVariableValue(this.Prop_Count,   dict.Count,      sd);
-                SetVariableValue(this.Prop_Keys,    keys,            sd);
-                SetVariableValue(this.Prop_Values,  values,          sd);
+                SetVariableValue(this.Prop_Count, dict.Count, sd);
+                SetVariableValue(this.Prop_Keys, keys, sd);
+                SetVariableValue(this.Prop_Values, values, sd);
                 SetVariableValue(this.Prop_IsEmpty, dict.Count == 0, sd);
 
                 return new ExecutionResult { IsSuccess = true, SuccessMessage = $"Словарь содержит {dict.Count} элементов" };
@@ -152,7 +151,7 @@ namespace Primo.MIA
             }
         }
 
-                public override ValidationResult Validate()
+        public override ValidationResult Validate()
         {
             var ret = new ValidationResult();
             ret.ValidateRequired(this.Prop_Dictionary, ActivityStrings.Field_Dictionary, ActivityStrings.Error_DictionaryRequired);

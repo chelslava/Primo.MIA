@@ -6,10 +6,7 @@ using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
-using static LTools.Common.Helpers.WFHelper.PropertiesItem;
 
 namespace Primo.MIA
 {
@@ -25,7 +22,7 @@ namespace Primo.MIA
     /// </summary>
     public class LogMessageBack : PrimoComponentTO<LogMessage>
     {
-                /// <inheritdoc/>
+        /// <inheritdoc/>
         public override string GroupName
         {
             get => ActivityCategories.Utilities;
@@ -304,7 +301,7 @@ Custom – пользовательский паттерн (по умолчан�
 
             sdkComponentIcon = ActivityIcons.Log;
 
-                        sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
+            sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
                 PropertyBuilder.Script<string>("Prop_Message", "Текст сообщения для логирования"),
                 PropertyBuilder.Enum<LogLevel>("Level", "Уровень важности сообщения: Debug, Info, Warning, Error, Critical"),
@@ -745,7 +742,7 @@ Custom – пользовательский паттерн (по умолчан�
                 case LogLevel.Info:
                     return LogMessageType.Info;
                 case LogLevel.Warning:
-                    return LogMessageType.Error; 
+                    return LogMessageType.Error;
                 case LogLevel.Error:
                     return LogMessageType.Error;
                 case LogLevel.Critical:

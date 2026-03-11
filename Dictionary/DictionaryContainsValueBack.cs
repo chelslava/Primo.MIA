@@ -5,7 +5,6 @@ using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using static LTools.Common.Helpers.WFHelper.PropertiesItem;
 
 namespace Primo.MIA
 {
@@ -15,7 +14,7 @@ namespace Primo.MIA
     /// Поддерживает регистрозависимый и регистронезависимый поиск.
     /// Не изменяет словарь.
     /// </summary>
-        public class DictionaryContainsValueBack : PrimoComponentTO<DictionaryContainsValue>
+    public class DictionaryContainsValueBack : PrimoComponentTO<DictionaryContainsValue>
     {
         public override string GroupName { get => ActivityCategories.Dictionaries; protected set { } }
 
@@ -99,7 +98,7 @@ namespace Primo.MIA
 
             sdkComponentIcon = ActivityIcons.Dictionary;
 
-                                    sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
+            sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
                 PropertyBuilder.Script<Dictionary<string, string>>("Prop_Dictionary", "Входной словарь"),
                 PropertyBuilder.Script<string>("Prop_SearchValue", "Значение для поиска (точное совпадение)"),
@@ -114,13 +113,13 @@ namespace Primo.MIA
         {
             try
             {
-                var    dict      = GetPropertyValue<Dictionary<string, string>>(this.Prop_Dictionary,  "Prop_Dictionary",  sd);
+                var dict = GetPropertyValue<Dictionary<string, string>>(this.Prop_Dictionary, "Prop_Dictionary", sd);
                 string searchVal = GetPropertyValue<string>(this.Prop_SearchValue, "Prop_SearchValue", sd);
 
                 if (dict == null) throw new ArgumentNullException("Prop_Dictionary", "Словарь не может быть null");
                 if (searchVal == null) throw new ArgumentNullException("Prop_SearchValue", "Искомое значение не может быть null");
 
-                    StringComparison comparison = ComparisonHelper.GetStringComparison(this.Prop_CaseSensitive);
+                StringComparison comparison = ComparisonHelper.GetStringComparison(this.Prop_CaseSensitive);
 
                 // Через LINQ Where собираем все ключи с совпавшим значением
                 List<string> foundKeys = dict
@@ -129,8 +128,8 @@ namespace Primo.MIA
                     .OrderBy(k => k)
                     .ToList();
 
-                SetVariableValue(this.Prop_Result,     foundKeys.Any(), sd);
-                SetVariableValue(this.Prop_FoundKeys,  foundKeys,       sd);
+                SetVariableValue(this.Prop_Result, foundKeys.Any(), sd);
+                SetVariableValue(this.Prop_FoundKeys, foundKeys, sd);
 
                 return new ExecutionResult { IsSuccess = true, SuccessMessage = $"Значение '{searchVal}': найдено у {foundKeys.Count} ключей" };
             }
@@ -140,7 +139,7 @@ namespace Primo.MIA
             }
         }
 
-                public override ValidationResult Validate()
+        public override ValidationResult Validate()
         {
             var ret = new ValidationResult();
             ret.ValidateRequired(this.Prop_Dictionary, ActivityStrings.Field_Dictionary, ActivityStrings.Error_DictionaryRequired);

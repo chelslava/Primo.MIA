@@ -1,12 +1,10 @@
 using LTools.Common.Model;
 using LTools.Common.UIElements;
-using LTools.Enums;
 using LTools.SDK;
 using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using static LTools.Common.Helpers.WFHelper.PropertiesItem;
 
 namespace Primo.MIA
 {
@@ -17,7 +15,7 @@ namespace Primo.MIA
     /// </summary>
     public class DictionaryToStringBack : PrimoComponentTO<DictionaryToString>
     {
-                public override string GroupName { get => ActivityCategories.Dictionaries; protected set { } }
+        public override string GroupName { get => ActivityCategories.Dictionaries; protected set { } }
 
         protected override int sdkTimeOut
         {
@@ -123,7 +121,7 @@ namespace Primo.MIA
 
             sdkComponentIcon = ActivityIcons.Dictionary;
 
-                        sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
+            sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
                 PropertyBuilder.Script<Dictionary<string, string>>("Prop_Dictionary", "Словарь Dictionary<string, string> для сериализации"),
                 PropertyBuilder.Script<string>("Prop_PairSeparator", "Разделитель между парами ключ-значение (по умолчанию \";\")"),
@@ -133,8 +131,8 @@ namespace Primo.MIA
             };
 
             InitClass(container);
-            this.Prop_PairSeparator      = "\";\"";
-            this.Prop_KeyValueSeparator  = "\"=\"";
+            this.Prop_PairSeparator = "\";\"";
+            this.Prop_KeyValueSeparator = "\"=\"";
         }
 
         // =========================================================================
@@ -145,16 +143,16 @@ namespace Primo.MIA
         {
             try
             {
-                var    dict    = GetPropertyValue<Dictionary<string, string>>(this.Prop_Dictionary,      "Prop_Dictionary",      sd);
-                string pairSep = GetPropertyValue<string>(this.Prop_PairSeparator,      "Prop_PairSeparator",      sd);
-                string kvSep   = GetPropertyValue<string>(this.Prop_KeyValueSeparator,  "Prop_KeyValueSeparator",  sd);
+                var dict = GetPropertyValue<Dictionary<string, string>>(this.Prop_Dictionary, "Prop_Dictionary", sd);
+                string pairSep = GetPropertyValue<string>(this.Prop_PairSeparator, "Prop_PairSeparator", sd);
+                string kvSep = GetPropertyValue<string>(this.Prop_KeyValueSeparator, "Prop_KeyValueSeparator", sd);
 
                 if (dict == null)
                     throw new ArgumentNullException("Prop_Dictionary", "Словарь не может быть null");
 
                 // Нормализация разделителей
                 if (string.IsNullOrEmpty(pairSep)) pairSep = ";";
-                if (string.IsNullOrEmpty(kvSep))   kvSep   = "=";
+                if (string.IsNullOrEmpty(kvSep)) kvSep = "=";
 
                 // Сортируем по ключу для стабильного воспроизводимого вывода
                 // Каждую пару форматируем через Select, объединяем через string.Join
@@ -164,8 +162,8 @@ namespace Primo.MIA
                         .Select(p => $"{p.Key}{kvSep}{p.Value}")
                 );
 
-                SetVariableValue(this.Prop_Result, result,      sd);
-                SetVariableValue(this.Prop_Count,  dict.Count,  sd);
+                SetVariableValue(this.Prop_Result, result, sd);
+                SetVariableValue(this.Prop_Count, dict.Count, sd);
 
                 return new ExecutionResult { IsSuccess = true, SuccessMessage = $"Словарь сериализован: {dict.Count} пар" };
             }
@@ -181,7 +179,7 @@ namespace Primo.MIA
 
         public override ValidationResult Validate()
         {
-                        var ret = new ValidationResult();
+            var ret = new ValidationResult();
             ret.ValidateRequired(this.Prop_Dictionary, ActivityStrings.Field_Dictionary, ActivityStrings.Error_DictionaryRequired);
             return ret;
         }

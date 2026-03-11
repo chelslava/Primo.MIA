@@ -4,7 +4,7 @@ using System.Windows.Markup;
 namespace Primo.MIA
 {
 
-        [ContentProperty("NestedActivity")]
+    [ContentProperty("NestedActivity")]
     public partial class BrowserTabManage : UserControl
     {
         public BrowserTabManage()

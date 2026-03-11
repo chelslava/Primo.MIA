@@ -21,7 +21,6 @@
 
 using LTools.Common.Model;
 using LTools.Common.UIElements;
-using LTools.Enums;
 using LTools.SDK;
 using Primo.MIA.Common;
 using System;
@@ -30,7 +29,6 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
-using static LTools.Common.Helpers.WFHelper.PropertiesItem;
 
 namespace Primo.MIA
 {
@@ -43,7 +41,7 @@ namespace Primo.MIA
     /// </summary>
     public class GeneratorsBack : PrimoComponentTO<Generators>
     {
-                /// <inheritdoc/>
+        /// <inheritdoc/>
         public override string GroupName { get => ActivityCategories.Utilities; protected set { } }
 
         protected override int sdkTimeOut
@@ -471,7 +469,7 @@ namespace Primo.MIA
 
             sdkComponentIcon = ActivityIcons.Generator;
 
-                        sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
+            sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
                 // Тип генерации
                 PropertyBuilder.Enum<GeneratorType>("Type", "Выбор типа генерации"),
@@ -632,10 +630,10 @@ namespace Primo.MIA
                 ? baseName + ext
                 : Path.Combine(dir, baseName + ext);
 
-                        return FileHelper.GenerateUniqueFilePath(
-                Path.GetDirectoryName(fullPath),
-                Path.GetFileNameWithoutExtension(fullPath),
-                Path.GetExtension(fullPath));
+            return FileHelper.GenerateUniqueFilePath(
+    Path.GetDirectoryName(fullPath),
+    Path.GetFileNameWithoutExtension(fullPath),
+    Path.GetExtension(fullPath));
         }
 
         /// <summary>
@@ -863,7 +861,7 @@ namespace Primo.MIA
             });
         }
 
-        
+
 
         // =========================================================================
         // ВАЛИДАЦИЯ
@@ -873,7 +871,7 @@ namespace Primo.MIA
         /// Проверяет корректность заполнения свойств в дизайнере.
         /// Проверяет только обязательные поля для выбранного типа генератора.
         /// </summary>
-                public override ValidationResult Validate()
+        public override ValidationResult Validate()
         {
             var ret = new ValidationResult();
 

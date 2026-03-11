@@ -5,7 +5,6 @@ using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using static LTools.Common.Helpers.WFHelper.PropertiesItem;
 
 namespace Primo.MIA
 {
@@ -19,7 +18,7 @@ namespace Primo.MIA
     ///   [(«Иванов»,«42»), («Петров»,«37»)]
     ///   → ListA = [«Иванов»,«Петров»], ListB = [«42»,«37»]
     /// </summary>
-        public class TupleUnzipBack : PrimoComponentTO<TupleUnzip>
+    public class TupleUnzipBack : PrimoComponentTO<TupleUnzip>
     {
         public override string GroupName { get => ActivityCategories.Tuples; protected set { } }
 
@@ -104,7 +103,7 @@ namespace Primo.MIA
 
             sdkComponentIcon = ActivityIcons.Tuple;
 
-                        sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
+            sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
                 PropertyBuilder.Script<object>("Prop_TupleList", "Список кортежей для разбора"),
                 PropertyBuilder.Variable<List<string>>("Prop_ListA", "Значения Item1 каждого кортежа"),
@@ -181,7 +180,7 @@ namespace Primo.MIA
 
         // ── ВАЛИДАЦИЯ ──────────────────────────────────────────────────────────
 
-                public override ValidationResult Validate()
+        public override ValidationResult Validate()
         {
             var ret = new ValidationResult();
             ret.ValidateRequired(this.Prop_TupleList, ActivityStrings.Field_TupleList, "Список кортежей обязателен");

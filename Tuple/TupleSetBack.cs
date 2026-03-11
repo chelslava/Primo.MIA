@@ -4,7 +4,6 @@ using LTools.SDK;
 using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
-using static LTools.Common.Helpers.WFHelper.PropertiesItem;
 
 namespace Primo.MIA
 {
@@ -20,7 +19,7 @@ namespace Primo.MIA
     ///
     /// Новый кортеж можно записать в ту же переменную — эффект «изменения».
     /// </summary>
-        public class TupleSetBack : PrimoComponentTO<TupleSet>
+    public class TupleSetBack : PrimoComponentTO<TupleSet>
     {
         public override string GroupName { get => ActivityCategories.Tuples; protected set { } }
 
@@ -87,7 +86,7 @@ namespace Primo.MIA
                 "Ошибка: Номер элемента > арности кортежа.";
             sdkComponentIcon = ActivityIcons.Tuple;
 
-                        sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
+            sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
                 PropertyBuilder.Script<object>("Prop_Tuple", "Исходный кортеж (не изменяется)"),
                 PropertyBuilder.Enum<TupleItemIndex>("Index", "Номер заменяемого элемента"),
@@ -130,7 +129,7 @@ namespace Primo.MIA
 
         // ── ВАЛИДАЦИЯ ──────────────────────────────────────────────────────────
 
-                public override ValidationResult Validate()
+        public override ValidationResult Validate()
         {
             var ret = new ValidationResult();
             ret.ValidateRequired(this.Prop_Tuple, ActivityStrings.Field_Tuple, ActivityStrings.Error_TupleRequired);

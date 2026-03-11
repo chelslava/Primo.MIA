@@ -21,14 +21,12 @@
 
 using LTools.Common.Model;
 using LTools.Common.UIElements;
-using LTools.Enums;
 using LTools.SDK;
 using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using static LTools.Common.Helpers.WFHelper.PropertiesItem;
 
 namespace Primo.MIA
 {
@@ -189,7 +187,7 @@ namespace Primo.MIA
                 "NumericOnly — строки являющиеся числами";
             sdkComponentIcon = ActivityIcons.List;
 
-                        sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
+            sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
                 PropertyBuilder.Script<List<string>>("Prop_List", "Входной список"),
                 PropertyBuilder.Enum<ListFilterMode>("Mode", "Условие фильтрации"),
@@ -212,8 +210,8 @@ namespace Primo.MIA
         {
             try
             {
-                var list    = GetPropertyValue<List<string>>(this.Prop_List,    "Prop_List",    sd);
-                string pat  = GetPropertyValue<string>(this.Prop_Pattern, "Prop_Pattern", sd);
+                var list = GetPropertyValue<List<string>>(this.Prop_List, "Prop_List", sd);
+                string pat = GetPropertyValue<string>(this.Prop_Pattern, "Prop_Pattern", sd);
 
                 if (list == null) throw new ArgumentNullException("Prop_List", "Список не может быть null");
 
@@ -221,14 +219,14 @@ namespace Primo.MIA
                 Func<string, bool> predicate = BuildPredicate(pat ?? string.Empty, sd);
 
                 // Разбиваем на две части через LINQ ToLookup
-                var lookup  = list.ToLookup(predicate);
-                var matched  = lookup[true].ToList();
+                var lookup = list.ToLookup(predicate);
+                var matched = lookup[true].ToList();
                 var rejected = lookup[false].ToList();
 
-                SetVariableValue(this.Prop_Matched,       matched,         sd);
-                SetVariableValue(this.Prop_Rejected,      rejected,        sd);
-                SetVariableValue(this.Prop_MatchedCount,  matched.Count,   sd);
-                SetVariableValue(this.Prop_RejectedCount, rejected.Count,  sd);
+                SetVariableValue(this.Prop_Matched, matched, sd);
+                SetVariableValue(this.Prop_Rejected, rejected, sd);
+                SetVariableValue(this.Prop_MatchedCount, matched.Count, sd);
+                SetVariableValue(this.Prop_RejectedCount, rejected.Count, sd);
 
                 return new ExecutionResult { IsSuccess = true, SuccessMessage = $"Прошло: {matched.Count}, отсеяно: {rejected.Count}" };
             }
@@ -244,7 +242,7 @@ namespace Primo.MIA
         /// </summary>
         private Func<string, bool> BuildPredicate(string pattern, ScriptingData sd)
         {
-                        StringComparison sc = ComparisonHelper.GetStringComparison(this.Prop_CaseSensitive);
+            StringComparison sc = ComparisonHelper.GetStringComparison(this.Prop_CaseSensitive);
 
             switch (this.Mode)
             {
@@ -264,22 +262,22 @@ namespace Primo.MIA
                     return s => string.Equals(s, pattern, sc);
 
                 case ListFilterMode.Regex:
-                {
-                    var opts = this.Prop_CaseSensitive
-                        ? RegexOptions.Compiled
-                        : RegexOptions.Compiled | RegexOptions.IgnoreCase;
-                    var rx = new Regex(pattern, opts);
-                    return s => s != null && rx.IsMatch(s);
-                }
+                    {
+                        var opts = this.Prop_CaseSensitive
+                            ? RegexOptions.Compiled
+                            : RegexOptions.Compiled | RegexOptions.IgnoreCase;
+                        var rx = new Regex(pattern, opts);
+                        return s => s != null && rx.IsMatch(s);
+                    }
 
                 case ListFilterMode.NotRegex:
-                {
-                    var opts = this.Prop_CaseSensitive
-                        ? RegexOptions.Compiled
-                        : RegexOptions.Compiled | RegexOptions.IgnoreCase;
-                    var rx = new Regex(pattern, opts);
-                    return s => s == null || !rx.IsMatch(s);
-                }
+                    {
+                        var opts = this.Prop_CaseSensitive
+                            ? RegexOptions.Compiled
+                            : RegexOptions.Compiled | RegexOptions.IgnoreCase;
+                        var rx = new Regex(pattern, opts);
+                        return s => s == null || !rx.IsMatch(s);
+                    }
 
                 case ListFilterMode.NotEmpty:
                     return s => !string.IsNullOrWhiteSpace(s);
@@ -287,15 +285,15 @@ namespace Primo.MIA
                 case ListFilterMode.EmptyOnly:
                     return s => string.IsNullOrWhiteSpace(s);
 
-                                case ListFilterMode.LengthRange:
-                {
-                    // Читаем min/max через GetPropertyValue для разрешения скриптовых выражений
-                    string minStr = GetPropertyValue<string>(this.Prop_MinLength, "Prop_MinLength", sd) ?? "0";
-                    string maxStr = GetPropertyValue<string>(this.Prop_MaxLength, "Prop_MaxLength", sd) ?? int.MaxValue.ToString();
-                    int min = int.TryParse(minStr, out int mn) ? mn : 0;
-                    int max = int.TryParse(maxStr, out int mx) ? mx : int.MaxValue;
-                    return s => s != null && s.Length >= min && s.Length <= max;
-                }
+                case ListFilterMode.LengthRange:
+                    {
+                        // Читаем min/max через GetPropertyValue для разрешения скриптовых выражений
+                        string minStr = GetPropertyValue<string>(this.Prop_MinLength, "Prop_MinLength", sd) ?? "0";
+                        string maxStr = GetPropertyValue<string>(this.Prop_MaxLength, "Prop_MaxLength", sd) ?? int.MaxValue.ToString();
+                        int min = int.TryParse(minStr, out int mn) ? mn : 0;
+                        int max = int.TryParse(maxStr, out int mx) ? mx : int.MaxValue;
+                        return s => s != null && s.Length >= min && s.Length <= max;
+                    }
 
                 case ListFilterMode.NumericOnly:
                     return s => !string.IsNullOrWhiteSpace(s)
@@ -311,7 +309,7 @@ namespace Primo.MIA
 
         public override ValidationResult Validate()
         {
-                        var ret = new ValidationResult();
+            var ret = new ValidationResult();
             ret.ValidateRequired(this.Prop_List, ActivityStrings.Field_List, ActivityStrings.Error_ListRequired);
 
             // Паттерн обязателен для текстовых и regex режимов

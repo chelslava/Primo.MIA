@@ -16,14 +16,11 @@
 
 using LTools.Common.Model;
 using LTools.Common.UIElements;
-using LTools.Enums;
 using LTools.SDK;
 using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
-using static LTools.Common.Helpers.WFHelper.PropertiesItem;
 
 namespace Primo.MIA
 {
@@ -34,7 +31,7 @@ namespace Primo.MIA
     /// </summary>
     public class ListSortBack : PrimoComponentTO<ListSort>
     {
-                public override string GroupName { get => ActivityCategories.Lists; protected set { } }
+        public override string GroupName { get => ActivityCategories.Lists; protected set { } }
 
         protected override int sdkTimeOut
         {
@@ -124,7 +121,7 @@ namespace Primo.MIA
 
             sdkComponentIcon = ActivityIcons.List;
 
-                        sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
+            sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
                 PropertyBuilder.Script<List<string>>("Prop_List", "Входной список"),
                 PropertyBuilder.Enum<ListSortMode>("Mode", "Способ сортировки"),
@@ -147,8 +144,8 @@ namespace Primo.MIA
 
                 List<string> result = Sort(list);
 
-                SetVariableValue(this.Prop_Result, result,       sd);
-                SetVariableValue(this.Prop_Count,  result.Count, sd);
+                SetVariableValue(this.Prop_Result, result, sd);
+                SetVariableValue(this.Prop_Count, result.Count, sd);
 
                 return new ExecutionResult { IsSuccess = true, SuccessMessage = $"Отсортировано {result.Count} элементов ({this.Mode})" };
             }
@@ -181,7 +178,7 @@ namespace Primo.MIA
                 case ListSortMode.ByLengthDesc:
                     return list.OrderByDescending(x => x?.Length ?? 0).ThenBy(x => x).ToList();
 
-                                case ListSortMode.Natural:
+                case ListSortMode.Natural:
                     return list.OrderBy(x => x, NaturalComparer.Instance).ToList();
 
                 case ListSortMode.Reverse:
@@ -219,8 +216,8 @@ namespace Primo.MIA
             {
                 int j = rng.Next(i + 1);
                 string tmp = result[i];
-                result[i]  = result[j];
-                result[j]  = tmp;
+                result[i] = result[j];
+                result[j] = tmp;
             }
 
             return result;
@@ -228,10 +225,10 @@ namespace Primo.MIA
 
         public override ValidationResult Validate()
         {
-                        var ret = new ValidationResult();
+            var ret = new ValidationResult();
             ret.ValidateRequired(this.Prop_List, ActivityStrings.Field_List, ActivityStrings.Error_ListRequired);
             return ret;
         }
     }
 
-    }
+}

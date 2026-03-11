@@ -13,13 +13,10 @@
 
 using LTools.Common.Model;
 using LTools.Common.UIElements;
-using LTools.Enums;
 using LTools.SDK;
 using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using static LTools.Common.Helpers.WFHelper.PropertiesItem;
 
 namespace Primo.MIA
 {
@@ -33,7 +30,7 @@ namespace Primo.MIA
     /// Арность определяется автоматически по последнему заполненному полю.
     /// Все остальные активности группы принимают оба типа прозрачно.
     /// </summary>
-        public class TupleCreateBack : PrimoComponentTO<TupleCreate>
+    public class TupleCreateBack : PrimoComponentTO<TupleCreate>
     {
         public override string GroupName { get => ActivityCategories.Tuples; protected set { } }
 
@@ -51,7 +48,7 @@ namespace Primo.MIA
         /// ClassicTuple — System.Tuple (по умолчанию, не требует NuGet).
         /// ValueTuple   — System.ValueTuple (требует NuGet System.ValueTuple 4.5.0).
         /// </summary>
-                [LTools.Common.Model.Serialization.StoringProperty]
+        [LTools.Common.Model.Serialization.StoringProperty]
         [System.ComponentModel.Category(ActivityStrings.Category_Main)]
         [System.ComponentModel.DisplayName(ActivityStrings.Field_TupleKind)]
         public TupleKind Kind
@@ -96,7 +93,7 @@ namespace Primo.MIA
 
         private string _propItem5;
         /// <summary>Item5 — пятый элемент.</summary>
-                [LTools.Common.Model.Serialization.StoringProperty]
+        [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(object))]
         [System.ComponentModel.Category(ActivityStrings.Category_Elements)]
         [System.ComponentModel.DisplayName(ActivityStrings.Field_Item5)]
@@ -104,7 +101,7 @@ namespace Primo.MIA
 
         private string _propItem6;
         /// <summary>Item6 — шестой элемент.</summary>
-                [LTools.Common.Model.Serialization.StoringProperty]
+        [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(object))]
         [System.ComponentModel.Category(ActivityStrings.Category_Elements)]
         [System.ComponentModel.DisplayName(ActivityStrings.Field_Item6)]
@@ -112,7 +109,7 @@ namespace Primo.MIA
 
         private string _propItem7;
         /// <summary>Item7 — седьмой элемент. Максимально допустимый.</summary>
-                [LTools.Common.Model.Serialization.StoringProperty]
+        [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(object))]
         [System.ComponentModel.Category(ActivityStrings.Category_Elements)]
         [System.ComponentModel.DisplayName(ActivityStrings.Field_Item7)]
@@ -122,7 +119,7 @@ namespace Primo.MIA
 
         private string _propResult;
         /// <summary>Созданный кортеж. Тип зависит от «Тип кортежа» и арности.</summary>
-                [LTools.Common.Model.Serialization.StoringProperty]
+        [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(object))]
         [System.ComponentModel.Category(ActivityStrings.Category_Output)]
         [System.ComponentModel.DisplayName(ActivityStrings.Field_Result)]
@@ -130,7 +127,7 @@ namespace Primo.MIA
 
         private string _propArity;
         /// <summary>Арность созданного кортежа (1–7).</summary>
-                [LTools.Common.Model.Serialization.StoringProperty]
+        [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
         [System.ComponentModel.Category(ActivityStrings.Category_Output)]
         [System.ComponentModel.DisplayName(ActivityStrings.Field_Arity)]
@@ -138,7 +135,7 @@ namespace Primo.MIA
 
         private string _propKindName;
         /// <summary>Имя типа созданного кортежа: "Tuple`2" или "ValueTuple`2". Для диагностики.</summary>
-                [LTools.Common.Model.Serialization.StoringProperty]
+        [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
         [System.ComponentModel.Category(ActivityStrings.Category_Output)]
         [System.ComponentModel.DisplayName(ActivityStrings.Field_KindName)]
@@ -225,7 +222,7 @@ namespace Primo.MIA
 
         // ── ВАЛИДАЦИЯ ──────────────────────────────────────────────────────────
 
-                public override ValidationResult Validate()
+        public override ValidationResult Validate()
         {
             var ret = new ValidationResult();
             ret.ValidateRequired(this.Prop_Item1, ActivityStrings.Field_Item1, "Item1 обязателен — это первый элемент кортежа");

@@ -17,15 +17,15 @@ using OpenQA.Selenium;
 using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
-using static LTools.Common.Helpers.WFHelper.PropertiesItem;
 
 namespace Primo.MIA
 {
     /// <summary>
     /// Объединённая активность для работы с вводом в элементы.
     /// Режим работы задаётся через свойство <see cref="Prop_InputMode"/>.
+    /// REFACTORED: Использует BrowserActivityBase для устранения дублирования кода
     /// </summary>
-    public class ElementInputBack : PrimoComponentTO<ElementInput>
+    public class ElementInputBack : BrowserActivityBase<ElementInput>
     {
         public override string GroupName
         {
@@ -359,16 +359,17 @@ namespace Primo.MIA
 
         public override ExecutionResult TimedAction(ScriptingData sd)
         {
-            try
+            return SafeExecute(() =>
             {
                 // Чтение общих параметров
-                string sessionId = SessionResolver.Resolve(
-                    GetPropertyValue<string>(this.Prop_SessionId, nameof(Prop_SessionId), sd));
+                string sessionId = GetPropertyValue<string>(this.Prop_SessionId, nameof(Prop_SessionId), sd);
                 string elementId = GetPropertyValue<string>(this.Prop_ElementId, nameof(Prop_ElementId), sd);
                 string locatorValue = GetPropertyValue<string>(this.Prop_LocatorValue, nameof(Prop_LocatorValue), sd);
 
+                Logger.LogInfo(sdkComponentName, "Начинается ввод в элемент для сессии: {0}", sessionId);
+
                 // Получение драйвера
-                var driver = SeleniumHelper.GetDriver(sessionId);
+                var driver = GetDriverFromContext(sessionId);
 
                 // Получение элемента: либо по ID, либо поиск по локатору
                 IWebElement element;
@@ -376,14 +377,20 @@ namespace Primo.MIA
                 {
                     string timeoutStr = GetPropertyValue<string>(this.Prop_WaitTimeout, nameof(Prop_WaitTimeout), sd) ?? "10";
                     int timeout = int.TryParse(timeoutStr, out int t) ? t : 10;
-                    timeout = SeleniumHelper.ValidateTimeout(timeout, 10);
+                    ValidatePositive(timeout, "Prop_WaitTimeout");
 
-                    var locator = SeleniumHelper.CreateLocator(this.Prop_LocatorType, locatorValue);
-                    element = SeleniumHelper.WaitForElement(driver, locator, timeout);
+                    var locatorType = ConvertLocatorType(this.Prop_LocatorType);
+                    element = ElementLocator.FindElement(driver, locatorType, locatorValue, timeout);
+                    
+                    Logger.LogDebug(sdkComponentName, "Элемент найден по локатору: {0}={1}", this.Prop_LocatorType, locatorValue);
                 }
                 else if (!string.IsNullOrWhiteSpace(elementId))
                 {
-                    element = SeleniumHelper.GetElement(elementId);
+                    element = ElementRepository.GetElement(elementId);
+                    if (element == null)
+                        throw new ArgumentException($"Элемент с ID '{elementId}' не найден в репозитории");
+                    
+                    Logger.LogDebug(sdkComponentName, "Использован сохраненный элемент: {0}", elementId);
                 }
                 else
                 {
@@ -392,6 +399,8 @@ namespace Primo.MIA
 
                 // Выполнение действия в зависимости от режима
                 string resultMsg;
+                Logger.LogDebug(sdkComponentName, "Режим ввода: {0}", this.Prop_InputMode);
+
                 switch (this.Prop_InputMode)
                 {
                     case InputMode.TypeText:
@@ -407,26 +416,16 @@ namespace Primo.MIA
                         resultMsg = !string.IsNullOrWhiteSpace(locatorValue)
                             ? $"[Очистить поле] Поле очищено: {this.Prop_LocatorType}={locatorValue}"
                             : $"[Очистить поле] Поле очищено: {elementId}";
+                        Logger.LogDebug(sdkComponentName, "Поле очищено");
                         break;
 
                     default:
                         throw new ArgumentException($"Неизвестный режим ввода: {this.Prop_InputMode}");
                 }
 
-                return new ExecutionResult
-                {
-                    IsSuccess = true,
-                    SuccessMessage = resultMsg
-                };
-            }
-            catch (Exception ex)
-            {
-                return new ExecutionResult
-                {
-                    IsSuccess = false,
-                    ErrorMessage = $"Ошибка [Ввод в элемент]: {ex.Message}"
-                };
-            }
+                Logger.LogInfo(sdkComponentName, "Ввод в элемент завершен успешно");
+                return CreateSuccessResult(resultMsg);
+            }, "Ввод в элемент");
         }
 
         // ── Приватные методы ───────────────────────────────────────────
@@ -555,7 +554,7 @@ namespace Primo.MIA
         public override ValidationResult Validate()
         {
             var ret = new ValidationResult();
-             
+
 
             // Проверяем что указан либо ElementId, либо LocatorValue
             bool hasElementId = !string.IsNullOrWhiteSpace(this.Prop_ElementId);

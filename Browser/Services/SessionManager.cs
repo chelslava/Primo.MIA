@@ -122,7 +122,7 @@ namespace Primo.MIA
         /// </summary>
         public string GetCurrentSessionId()
         {
-            return BrowserSessionContext.CurrentSessionId;
+            return BrowserSessionContext.Current;
         }
 
         /// <summary>
@@ -132,7 +132,7 @@ namespace Primo.MIA
         {
             if (!string.IsNullOrWhiteSpace(sessionId))
             {
-                BrowserSessionContext.SetSessionId(sessionId);
+                BrowserSessionContext.Push(sessionId, false);
             }
         }
 
@@ -155,7 +155,7 @@ namespace Primo.MIA
             try
             {
                 // Попытка получить текущий URL как проверка активности
-                var _ = driver.CurrentUrl;
+                var _ = driver.Url;
                 return true;
             }
             catch

@@ -5,7 +5,6 @@ using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using static LTools.Common.Helpers.WFHelper.PropertiesItem;
 
 namespace Primo.MIA
 {
@@ -15,7 +14,7 @@ namespace Primo.MIA
     ///
     /// Все выходы вычисляются за один проход. Входной кортеж не изменяется.
     /// </summary>
-        public class TupleInspectBack : PrimoComponentTO<TupleInspect>
+    public class TupleInspectBack : PrimoComponentTO<TupleInspect>
     {
         public override string GroupName { get => ActivityCategories.Tuples; protected set { } }
 
@@ -147,7 +146,7 @@ namespace Primo.MIA
 
             sdkComponentIcon = ActivityIcons.Tuple;
 
-                        sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
+            sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
                 PropertyBuilder.Script<object>("Prop_Tuple", "Анализируемый кортеж"),
                 PropertyBuilder.Script<object>("Prop_TupleB", "Второй кортеж для сравнения (необязательно)"),
@@ -235,7 +234,7 @@ namespace Primo.MIA
 
         // ── ВАЛИДАЦИЯ ──────────────────────────────────────────────────────────
 
-                public override ValidationResult Validate()
+        public override ValidationResult Validate()
         {
             var ret = new ValidationResult();
             ret.ValidateRequired(this.Prop_Tuple, ActivityStrings.Field_Tuple, ActivityStrings.Error_TupleRequired);

@@ -25,14 +25,12 @@
 
 using LTools.Common.Model;
 using LTools.Common.UIElements;
-using LTools.Enums;
 using LTools.SDK;
 using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using static LTools.Common.Helpers.WFHelper.PropertiesItem;
 
 namespace Primo.MIA
 {
@@ -213,7 +211,7 @@ namespace Primo.MIA
                 "RemoveNonAlpha       — оставить только буквы и цифры";
             sdkComponentIcon = ActivityIcons.List;
 
-                        sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
+            sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
                 PropertyBuilder.Script<List<string>>("Prop_List", "Входной список"),
                 PropertyBuilder.Enum<ListTransformMode>("Mode", "Тип преобразования"),
@@ -243,14 +241,14 @@ namespace Primo.MIA
                 var list = GetPropertyValue<List<string>>(this.Prop_List, "Prop_List", sd);
                 if (list == null) throw new ArgumentNullException("Prop_List", "Список не может быть null");
 
-                string find        = GetPropertyValue<string>(this.Prop_Find,        "Prop_Find",        sd) ?? string.Empty;
+                string find = GetPropertyValue<string>(this.Prop_Find, "Prop_Find", sd) ?? string.Empty;
                 string replacement = GetPropertyValue<string>(this.Prop_Replacement, "Prop_Replacement", sd) ?? string.Empty;
-                string prefix      = GetPropertyValue<string>(this.Prop_Prefix,      "Prop_Prefix",      sd) ?? string.Empty;
-                string suffix      = GetPropertyValue<string>(this.Prop_Suffix,      "Prop_Suffix",      sd) ?? string.Empty;
-                string padCharStr  = GetPropertyValue<string>(this.Prop_PadChar,     "Prop_PadChar",     sd) ?? " ";
-                char   padChar     = padCharStr.Length > 0 ? padCharStr[0] : ' ';
+                string prefix = GetPropertyValue<string>(this.Prop_Prefix, "Prop_Prefix", sd) ?? string.Empty;
+                string suffix = GetPropertyValue<string>(this.Prop_Suffix, "Prop_Suffix", sd) ?? string.Empty;
+                string padCharStr = GetPropertyValue<string>(this.Prop_PadChar, "Prop_PadChar", sd) ?? " ";
+                char padChar = padCharStr.Length > 0 ? padCharStr[0] : ' ';
 
-                int padWidth  = int.TryParse(this.Prop_PadWidth,  out int pw) ? pw : 0;
+                int padWidth = int.TryParse(this.Prop_PadWidth, out int pw) ? pw : 0;
                 int maxLength = int.TryParse(this.Prop_MaxLength, out int ml) ? ml : int.MaxValue;
 
                 // Получаем функцию трансформации для выбранного режима
@@ -259,7 +257,7 @@ namespace Primo.MIA
                 // Применяем трансформацию через LINQ Select и считаем изменения
                 var result = list.Select(item =>
                 {
-                    string original  = item ?? string.Empty;
+                    string original = item ?? string.Empty;
                     string converted = transform(original);
                     return converted;
                 }).ToList();
@@ -269,9 +267,9 @@ namespace Primo.MIA
                     .Zip(result, (original, transformed) => original != transformed)
                     .Count(diff => diff);
 
-                SetVariableValue(this.Prop_Result,       result,        sd);
-                SetVariableValue(this.Prop_Count,        result.Count,  sd);
-                SetVariableValue(this.Prop_ChangedCount, changed,       sd);
+                SetVariableValue(this.Prop_Result, result, sd);
+                SetVariableValue(this.Prop_Count, result.Count, sd);
+                SetVariableValue(this.Prop_ChangedCount, changed, sd);
 
                 return new ExecutionResult { IsSuccess = true, SuccessMessage = $"Преобразовано: {result.Count} элементов, изменилось: {changed}" };
             }
@@ -306,27 +304,27 @@ namespace Primo.MIA
                 case ListTransformMode.TrimEnd:
                     return s => (s ?? string.Empty).TrimEnd();
 
-                                case ListTransformMode.Replace:
-                {
-                    StringComparison sc = ComparisonHelper.GetStringComparison(this.Prop_CaseSensitive);
-
-                    // Replace без учёта регистра через regex (string.Replace не поддерживает StringComparison)
-                    if (!this.Prop_CaseSensitive)
+                case ListTransformMode.Replace:
                     {
-                        var rx = new Regex(Regex.Escape(find), RegexOptions.IgnoreCase | RegexOptions.Compiled);
-                        return s => s == null ? string.Empty : rx.Replace(s, replacement);
+                        StringComparison sc = ComparisonHelper.GetStringComparison(this.Prop_CaseSensitive);
+
+                        // Replace без учёта регистра через regex (string.Replace не поддерживает StringComparison)
+                        if (!this.Prop_CaseSensitive)
+                        {
+                            var rx = new Regex(Regex.Escape(find), RegexOptions.IgnoreCase | RegexOptions.Compiled);
+                            return s => s == null ? string.Empty : rx.Replace(s, replacement);
+                        }
+                        return s => s == null ? string.Empty : s.Replace(find, replacement);
                     }
-                    return s => s == null ? string.Empty : s.Replace(find, replacement);
-                }
 
                 case ListTransformMode.RegexReplace:
-                {
-                    var opts = this.Prop_CaseSensitive
-                        ? RegexOptions.Compiled
-                        : RegexOptions.Compiled | RegexOptions.IgnoreCase;
-                    var rx = new Regex(find, opts);
-                    return s => s == null ? string.Empty : rx.Replace(s, replacement);
-                }
+                    {
+                        var opts = this.Prop_CaseSensitive
+                            ? RegexOptions.Compiled
+                            : RegexOptions.Compiled | RegexOptions.IgnoreCase;
+                        var rx = new Regex(find, opts);
+                        return s => s == null ? string.Empty : rx.Replace(s, replacement);
+                    }
 
                 case ListTransformMode.Prefix:
                     return s => prefix + (s ?? string.Empty);
@@ -363,7 +361,7 @@ namespace Primo.MIA
 
         public override ValidationResult Validate()
         {
-                        var ret = new ValidationResult();
+            var ret = new ValidationResult();
             ret.ValidateRequired(this.Prop_List, ActivityStrings.Field_List, ActivityStrings.Error_ListRequired);
 
             if ((this.Mode == ListTransformMode.Replace || this.Mode == ListTransformMode.RegexReplace)

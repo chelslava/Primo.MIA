@@ -21,7 +21,6 @@ using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using static LTools.Common.Helpers.WFHelper.PropertiesItem;
 
 namespace Primo.MIA
 {
@@ -173,7 +172,7 @@ namespace Primo.MIA
                     case CookieOperation.Get:
                         if (string.IsNullOrWhiteSpace(cookieName))
                             throw new ArgumentException("Имя cookie не может быть пустым");
-                        
+
                         var cookie = cookieManager.GetCookieNamed(cookieName);
                         result = cookie?.Value ?? string.Empty;
                         actionMessage = $"Получен cookie '{cookieName}': {result}";
@@ -189,7 +188,7 @@ namespace Primo.MIA
                     case CookieOperation.Set:
                         if (string.IsNullOrWhiteSpace(cookieName))
                             throw new ArgumentException("Имя cookie не может быть пустым");
-                        
+
                         var newCookie = new Cookie(cookieName, cookieValue);
                         cookieManager.AddCookie(newCookie);
                         actionMessage = $"Установлен cookie '{cookieName}'";
@@ -198,7 +197,7 @@ namespace Primo.MIA
                     case CookieOperation.Delete:
                         if (string.IsNullOrWhiteSpace(cookieName))
                             throw new ArgumentException("Имя cookie не может быть пустым");
-                        
+
                         cookieManager.DeleteCookieNamed(cookieName);
                         actionMessage = $"Удалён cookie '{cookieName}'";
                         break;
@@ -229,7 +228,7 @@ namespace Primo.MIA
         public override ValidationResult Validate()
         {
             var ret = new ValidationResult();
-             
+
 
             // Для операций с конкретным cookie имя обязательно
             if (Prop_Operation == CookieOperation.Get ||

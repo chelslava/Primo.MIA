@@ -17,7 +17,6 @@ using OpenQA.Selenium;
 using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
-using static LTools.Common.Helpers.WFHelper.PropertiesItem;
 
 namespace Primo.MIA
 {
@@ -129,18 +128,23 @@ namespace Primo.MIA
 
         public override ExecutionResult TimedAction(ScriptingData sd)
         {
-            try
+            string message = string.Empty;
+
+            var result = SafeExecute(() =>
             {
                 // Получаем sessionId
                 string sessionId = GetPropertyValue<string>(Prop_SessionId, nameof(Prop_SessionId), sd);
                 string script = GetPropertyValue<string>(Prop_Script, nameof(Prop_Script), sd);
 
-                if (string.IsNullOrWhiteSpace(script))
-                    throw new ArgumentException("JavaScript код не может быть пустым");
+                ValidateNotEmpty(script, nameof(Prop_Script));
 
                 // Получение драйвера через базовый класс
                 IWebDriver driver = GetDriverFromContext(sessionId);
                 var jsExecutor = (IJavaScriptExecutor)driver;
+
+                // Логирование начала операции
+                Logger.LogInfo(sdkComponentName, "Выполнение JavaScript для сессии: {0}", sessionId);
+                Logger.LogDebug(sdkComponentName, "JavaScript код: {0}", script.Length > 100 ? script.Substring(0, 100) + "..." : script);
 
                 // Получение аргументов (если есть)
                 object[] args = null;
@@ -148,24 +152,33 @@ namespace Primo.MIA
                 {
                     var argsList = GetPropertyValue<List<object>>(Prop_Arguments, "Prop_Arguments", sd);
                     if (argsList != null && argsList.Count > 0)
+                    {
                         args = argsList.ToArray();
+                        Logger.LogDebug(sdkComponentName, "Передано аргументов: {0}", args.Length);
+                    }
                 }
 
                 // Выполнение скрипта
-                object result = args != null 
+                object scriptResult = args != null
                     ? jsExecutor.ExecuteScript(script, args)
                     : jsExecutor.ExecuteScript(script);
 
                 // Запись результата
                 if (!string.IsNullOrWhiteSpace(Prop_Result))
-                    SetVariableValue(Prop_Result, result, sd);
+                {
+                    SetVariableValue(Prop_Result, scriptResult, sd);
+                    Logger.LogDebug(sdkComponentName, "Результат записан в переменную: {0}", Prop_Result);
+                }
 
-                return CreateSuccessResult("[Выполнить JavaScript] Скрипт выполнен успешно");
-            }
-            catch (Exception ex)
-            {
-                return CreateErrorResult(ex, "Выполнить JavaScript");
-            }
+                message = "[Выполнить JavaScript] Скрипт выполнен успешно";
+                Logger.LogInfo(sdkComponentName, "JavaScript успешно выполнен");
+
+            }, "Выполнить JavaScript");
+
+            if (result.IsSuccess)
+                result.SuccessMessage = message;
+
+            return result;
         }
 
         // ── Валидация ──────────────────────────────────────────────────
@@ -173,7 +186,7 @@ namespace Primo.MIA
         public override ValidationResult Validate()
         {
             var ret = new ValidationResult();
-             
+
             ret.ValidateRequired(Prop_Script, ActivityStrings.Field_JavaScriptCode, "JavaScript код обязателен");
             return ret;
         }

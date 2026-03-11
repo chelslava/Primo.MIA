@@ -18,7 +18,6 @@ using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using static LTools.Common.Helpers.WFHelper.PropertiesItem;
 
 namespace Primo.MIA
 {
@@ -230,8 +229,8 @@ namespace Primo.MIA
             InitClass(container);
 
             // Значения по умолчанию
-            this.Prop_FindMode    = FindMode.FindOne;
-            this.Prop_SessionId   = "\"\"";
+            this.Prop_FindMode = FindMode.FindOne;
+            this.Prop_SessionId = "\"\"";
             this.Prop_LocatorType = ElementLocatorType.Id;
             this.Prop_LocatorValue = "\"\"";
             this.Prop_WaitTimeout = "10";
@@ -256,8 +255,8 @@ namespace Primo.MIA
 
                 // Парсинг и валидация таймаута
                 string timeoutStr = GetPropertyValue<string>(this.Prop_WaitTimeout, nameof(Prop_WaitTimeout), sd) ?? "10";
-                int timeout       = int.TryParse(timeoutStr, out int t) ? t : 10;
-                timeout           = SeleniumHelper.ValidateTimeout(timeout, 10);
+                int timeout = int.TryParse(timeoutStr, out int t) ? t : 10;
+                timeout = SeleniumHelper.ValidateTimeout(timeout, 10);
 
                 // Создание локатора один раз для обоих режимов
                 var locator = SeleniumHelper.CreateLocator(this.Prop_LocatorType, locatorValue);
@@ -271,7 +270,7 @@ namespace Primo.MIA
             {
                 return new ExecutionResult
                 {
-                    IsSuccess    = false,
+                    IsSuccess = false,
                     ErrorMessage = $"Ошибка [Найти — {this.Prop_FindMode}]: {ex.Message}"
                 };
             }
@@ -299,7 +298,7 @@ namespace Primo.MIA
 
             return new ExecutionResult
             {
-                IsSuccess      = true,
+                IsSuccess = true,
                 SuccessMessage = $"[FindOne] Элемент найден: {this.Prop_LocatorType}={locatorValue}, ID={elementId}"
             };
         }
@@ -337,7 +336,7 @@ namespace Primo.MIA
 
             return new ExecutionResult
             {
-                IsSuccess      = true,
+                IsSuccess = true,
                 SuccessMessage = $"[FindAll] Найдено {elementIds.Count} элементов: {this.Prop_LocatorType}={locatorValue}"
             };
         }

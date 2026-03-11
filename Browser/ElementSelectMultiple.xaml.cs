@@ -7,8 +7,8 @@ namespace Primo.MIA
     public partial class ElementSelectMultiple : UserControl
     {
         public ElementSelectMultiple()
- {
- InitializeComponent();
- }
- }
+        {
+            InitializeComponent();
+        }
+    }
 }

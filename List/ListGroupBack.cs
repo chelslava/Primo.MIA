@@ -1,13 +1,11 @@
 using LTools.Common.Model;
 using LTools.Common.UIElements;
-using LTools.Enums;
 using LTools.SDK;
 using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using static LTools.Common.Helpers.WFHelper.PropertiesItem;
 
 namespace Primo.MIA
 {
@@ -18,7 +16,7 @@ namespace Primo.MIA
     /// </summary>
     public class ListGroupBack : PrimoComponentTO<ListGroup>
     {
-                public override string GroupName { get => ActivityCategories.Lists; protected set { } }
+        public override string GroupName { get => ActivityCategories.Lists; protected set { } }
 
         protected override int sdkTimeOut
         {
@@ -124,7 +122,7 @@ namespace Primo.MIA
                 "TopFrequent  — топ-N самых частых значений";
             sdkComponentIcon = ActivityIcons.List;
 
-                        sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
+            sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
                 PropertyBuilder.Script<List<string>>("Prop_List", "Входной список"),
                 PropertyBuilder.Enum<ListGroupMode>("Mode", "Способ группировки"),
@@ -138,7 +136,7 @@ namespace Primo.MIA
 
             InitClass(container);
             this.Prop_PrefixLength = "3";
-            this.Prop_TopN         = "10";
+            this.Prop_TopN = "10";
         }
 
         public override ExecutionResult TimedAction(ScriptingData sd)
@@ -149,8 +147,8 @@ namespace Primo.MIA
                 if (list == null) throw new ArgumentNullException("Prop_List", "Список не может быть null");
 
                 int prefixLen = int.TryParse(this.Prop_PrefixLength, out int pl) ? pl : 3;
-                int topN      = int.TryParse(this.Prop_TopN,         out int tn) ? tn : 10;
-                string regex  = this.Prop_RegexPattern ?? string.Empty;
+                int topN = int.TryParse(this.Prop_TopN, out int tn) ? tn : 10;
+                string regex = this.Prop_RegexPattern ?? string.Empty;
 
                 // Словарь частот нужен для всех режимов — вычисляем один раз
                 var freqMap = list
@@ -187,21 +185,21 @@ namespace Primo.MIA
                         break;
 
                     case ListGroupMode.ByRegexGroup:
-                    {
-                        if (string.IsNullOrWhiteSpace(regex))
-                            throw new ArgumentException("Regex паттерн обязателен для режима ByRegexGroup");
-                        var rx = new Regex(regex, RegexOptions.Compiled | RegexOptions.IgnoreCase);
-                        grouped = list
-                            .GroupBy(s =>
-                            {
-                                if (s == null) return "(null)";
-                                var m = rx.Match(s);
-                                return m.Success && m.Groups.Count > 1 ? m.Groups[1].Value : "(нет совпадения)";
-                            })
-                            .OrderBy(g => g.Key)
-                            .ToDictionary(g => g.Key, g => g.ToList());
-                        break;
-                    }
+                        {
+                            if (string.IsNullOrWhiteSpace(regex))
+                                throw new ArgumentException("Regex паттерн обязателен для режима ByRegexGroup");
+                            var rx = new Regex(regex, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+                            grouped = list
+                                .GroupBy(s =>
+                                {
+                                    if (s == null) return "(null)";
+                                    var m = rx.Match(s);
+                                    return m.Success && m.Groups.Count > 1 ? m.Groups[1].Value : "(нет совпадения)";
+                                })
+                                .OrderBy(g => g.Key)
+                                .ToDictionary(g => g.Key, g => g.ToList());
+                            break;
+                        }
 
                     case ListGroupMode.TopFrequent:
                         // Топ-N по частоте → группируем как одну группу для каждого элемента
@@ -218,9 +216,9 @@ namespace Primo.MIA
                         throw new InvalidOperationException($"Неизвестный режим: {this.Mode}");
                 }
 
-                SetVariableValue(this.Prop_GroupedResult, grouped,             sd);
-                SetVariableValue(this.Prop_GroupCount,    grouped.Count,       sd);
-                SetVariableValue(this.Prop_FrequencyMap,  freqMap,             sd);
+                SetVariableValue(this.Prop_GroupedResult, grouped, sd);
+                SetVariableValue(this.Prop_GroupCount, grouped.Count, sd);
+                SetVariableValue(this.Prop_FrequencyMap, freqMap, sd);
 
                 return new ExecutionResult { IsSuccess = true, SuccessMessage = $"Сгруппировано в {grouped.Count} групп" };
             }
@@ -232,7 +230,7 @@ namespace Primo.MIA
 
         public override ValidationResult Validate()
         {
-                        var ret = new ValidationResult();
+            var ret = new ValidationResult();
             ret.ValidateRequired(this.Prop_List, ActivityStrings.Field_List, ActivityStrings.Error_ListRequired);
             if (this.Mode == ListGroupMode.ByRegexGroup)
                 ret.ValidateRequired(this.Prop_RegexPattern, ActivityStrings.Field_RegexPattern, ActivityStrings.Error_RegexPatternRequired);

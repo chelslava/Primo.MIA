@@ -13,10 +13,8 @@
 
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
-using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Primo.MIA
 {
@@ -29,9 +27,9 @@ namespace Primo.MIA
         /// Находит элемент по локатору с ожиданием.
         /// </summary>
         public IWebElement FindElement(
-            IWebDriver driver, 
-            LocatorType locatorType, 
-            string locatorValue, 
+            IWebDriver driver,
+            LocatorType locatorType,
+            string locatorValue,
             int timeoutSeconds)
         {
             if (driver == null)
@@ -59,8 +57,8 @@ namespace Primo.MIA
         /// Находит все элементы по локатору.
         /// </summary>
         public IReadOnlyCollection<IWebElement> FindElements(
-            IWebDriver driver, 
-            LocatorType locatorType, 
+            IWebDriver driver,
+            LocatorType locatorType,
             string locatorValue)
         {
             if (driver == null)
@@ -77,9 +75,9 @@ namespace Primo.MIA
         /// Пытается найти элемент, возвращая null если не найден.
         /// </summary>
         public IWebElement TryFindElement(
-            IWebDriver driver, 
-            LocatorType locatorType, 
-            string locatorValue, 
+            IWebDriver driver,
+            LocatorType locatorType,
+            string locatorValue,
             int timeoutSeconds)
         {
             try
@@ -96,9 +94,9 @@ namespace Primo.MIA
         /// Ожидает пока элемент станет кликабельным.
         /// </summary>
         public IWebElement WaitForClickable(
-            IWebDriver driver, 
-            LocatorType locatorType, 
-            string locatorValue, 
+            IWebDriver driver,
+            LocatorType locatorType,
+            string locatorValue,
             int timeoutSeconds)
         {
             if (driver == null)
@@ -112,7 +110,11 @@ namespace Primo.MIA
 
             try
             {
-                return wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementToBeClickable(by));
+                return wait.Until(webDriver => 
+                {
+                    var element = webDriver.FindElement(by);
+                    return element.Enabled && element.Displayed ? element : null;
+                });
             }
             catch (WebDriverTimeoutException ex)
             {
@@ -126,9 +128,9 @@ namespace Primo.MIA
         /// Ожидает пока элемент станет видимым.
         /// </summary>
         public IWebElement WaitForVisible(
-            IWebDriver driver, 
-            LocatorType locatorType, 
-            string locatorValue, 
+            IWebDriver driver,
+            LocatorType locatorType,
+            string locatorValue,
             int timeoutSeconds)
         {
             if (driver == null)
@@ -142,7 +144,11 @@ namespace Primo.MIA
 
             try
             {
-                return wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementIsVisible(by));
+                return wait.Until(webDriver => 
+                {
+                    var element = webDriver.FindElement(by);
+                    return element.Displayed ? element : null;
+                });
             }
             catch (WebDriverTimeoutException ex)
             {
@@ -157,18 +163,27 @@ namespace Primo.MIA
         /// </summary>
         private By CreateLocator(LocatorType locatorType, string locatorValue)
         {
-            return locatorType switch
+            switch (locatorType)
             {
-                LocatorType.Id => By.Id(locatorValue),
-                LocatorType.Name => By.Name(locatorValue),
-                LocatorType.ClassName => By.ClassName(locatorValue),
-                LocatorType.TagName => By.TagName(locatorValue),
-                LocatorType.LinkText => By.LinkText(locatorValue),
-                LocatorType.PartialLinkText => By.PartialLinkText(locatorValue),
-                LocatorType.CssSelector => By.CssSelector(locatorValue),
-                LocatorType.XPath => By.XPath(locatorValue),
-                _ => throw new ArgumentException($"Неподдерживаемый тип локатора: {locatorType}")
-            };
+                case LocatorType.Id:
+                    return By.Id(locatorValue);
+                case LocatorType.Name:
+                    return By.Name(locatorValue);
+                case LocatorType.ClassName:
+                    return By.ClassName(locatorValue);
+                case LocatorType.TagName:
+                    return By.TagName(locatorValue);
+                case LocatorType.LinkText:
+                    return By.LinkText(locatorValue);
+                case LocatorType.PartialLinkText:
+                    return By.PartialLinkText(locatorValue);
+                case LocatorType.CssSelector:
+                    return By.CssSelector(locatorValue);
+                case LocatorType.XPath:
+                    return By.XPath(locatorValue);
+                default:
+                    throw new ArgumentException($"Неподдерживаемый тип локатора: {locatorType}");
+            }
         }
     }
 }

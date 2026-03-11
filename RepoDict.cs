@@ -104,7 +104,7 @@ namespace Primo.MIA
         /// </summary>
         public static Dictionary<string, object> ObjectDict { get; private set; }
 
-                /// <summary>
+        /// <summary>
         /// Словарь для хранения JSON данных (JToken).
         /// </summary>
         public static Dictionary<string, JToken> JsonDict { get; private set; }

@@ -29,7 +29,6 @@ using OpenQA.Selenium.Firefox;
 using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
-using static LTools.Common.Helpers.WFHelper.PropertiesItem;
 
 namespace Primo.MIA
 {
@@ -237,13 +236,13 @@ namespace Primo.MIA
             InitClass(container);
 
             // Значения по умолчанию
-            this.Prop_BrowserType       = BrowserType.Chrome;
+            this.Prop_BrowserType = BrowserType.Chrome;
             this.Prop_AttachToSessionId = "\"\"";
-            this.Prop_Headless          = false;
-            this.Prop_IncognitoMode     = false;
-            this.Prop_DisableImages     = false;
-            this.Prop_UserAgent         = "\"\"";
-            this.Prop_DriverPath    = "\"\"";
+            this.Prop_Headless = false;
+            this.Prop_IncognitoMode = false;
+            this.Prop_DisableImages = false;
+            this.Prop_UserAgent = "\"\"";
+            this.Prop_DriverPath = "\"\"";
         }
 
         // ── SimpleAction — выполняется ДО дочерних активностей ────────────────
@@ -340,9 +339,9 @@ namespace Primo.MIA
         {
             switch (browserType)
             {
-                case BrowserType.Chrome:  return CreateChromeDriver(userAgent, driverPath);
+                case BrowserType.Chrome: return CreateChromeDriver(userAgent, driverPath);
                 case BrowserType.Firefox: return CreateFirefoxDriver(userAgent, driverPath);
-                case BrowserType.Edge:    return CreateEdgeDriver(userAgent, driverPath);
+                case BrowserType.Edge: return CreateEdgeDriver(userAgent, driverPath);
                 default:
                     throw new NotSupportedException($"Браузер {browserType} не поддерживается");
             }
@@ -353,7 +352,7 @@ namespace Primo.MIA
         {
             var options = new ChromeOptions();
 
-            if (this.Prop_Headless)      options.AddArgument("--headless");
+            if (this.Prop_Headless) options.AddArgument("--headless");
             if (this.Prop_IncognitoMode) options.AddArgument("--incognito");
             if (this.Prop_DisableImages) options.AddUserProfilePreference(
                 "profile.default_content_setting_values.images", 2);
@@ -373,7 +372,7 @@ namespace Primo.MIA
         {
             var options = new FirefoxOptions();
 
-            if (this.Prop_Headless)      options.AddArgument("--headless");
+            if (this.Prop_Headless) options.AddArgument("--headless");
             if (this.Prop_IncognitoMode) options.AddArgument("-private");
             if (this.Prop_DisableImages) options.SetPreference("permissions.default.image", 2);
             if (!string.IsNullOrWhiteSpace(userAgent))
@@ -389,7 +388,7 @@ namespace Primo.MIA
         {
             var options = new EdgeOptions();
 
-            if (this.Prop_Headless)      options.AddArgument("--headless");
+            if (this.Prop_Headless) options.AddArgument("--headless");
             if (this.Prop_IncognitoMode) options.AddArgument("--inprivate");
             if (this.Prop_DisableImages) options.AddUserProfilePreference(
                 "profile.default_content_setting_values.images", 2);

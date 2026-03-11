@@ -178,15 +178,16 @@ namespace Primo.MIA
 
         public override ExecutionResult TimedAction(ScriptingData sd)
         {
-            try
+            return SafeExecute(() =>
             {
                 string sessionId = GetPropertyValue<string>(Prop_SessionId, nameof(Prop_SessionId), sd);
                 string elementId = GetPropertyValue<string>(Prop_ElementId, nameof(Prop_ElementId), sd);
                 string locatorValue = GetPropertyValue<string>(Prop_LocatorValue, nameof(Prop_LocatorValue), sd);
                 string selectValue = GetPropertyValue<string>(Prop_SelectValue, nameof(Prop_SelectValue), sd);
 
-                if (string.IsNullOrWhiteSpace(selectValue))
-                    throw new ArgumentException("Значение для выбора не может быть пустым");
+                Logger.LogInfo(sdkComponentName, "Начинается выбор из списка для сессии: {0}", sessionId);
+
+                ValidateNotEmpty(selectValue, nameof(selectValue));
 
                 var driver = GetDriverFromContext(sessionId);
 
@@ -195,14 +196,20 @@ namespace Primo.MIA
                 {
                     string timeoutStr = GetPropertyValue<string>(Prop_WaitTimeout, "Prop_WaitTimeout", sd) ?? "10";
                     int timeout = int.TryParse(timeoutStr, out int t) ? t : 10;
-                    timeout = SeleniumHelper.ValidateTimeout(timeout, 10);
+                    ValidatePositive(timeout, "Prop_WaitTimeout");
 
-                    var locator = SeleniumHelper.CreateLocator(Prop_LocatorType, locatorValue);
-                    element = SeleniumHelper.WaitForElement(driver, locator, timeout);
+                    var locatorType = ConvertLocatorType(Prop_LocatorType);
+                    element = ElementLocator.FindElement(driver, locatorType, locatorValue, timeout);
+                    
+                    Logger.LogDebug(sdkComponentName, "Элемент найден по локатору: {0}={1}", Prop_LocatorType, locatorValue);
                 }
                 else if (!string.IsNullOrWhiteSpace(elementId))
                 {
-                    element = SeleniumHelper.GetElement(elementId);
+                    element = ElementRepository.GetElement(elementId);
+                    if (element == null)
+                        throw new ArgumentException($"Элемент с ID '{elementId}' не найден в репозитории");
+                    
+                    Logger.LogDebug(sdkComponentName, "Использован сохраненный элемент: {0}", elementId);
                 }
                 else
                 {
@@ -215,15 +222,20 @@ namespace Primo.MIA
                 {
                     case SelectMode.ByText:
                         select.SelectByText(selectValue);
+                        Logger.LogDebug(sdkComponentName, "Выбрано по тексту: {0}", selectValue);
                         break;
 
                     case SelectMode.ByValue:
                         select.SelectByValue(selectValue);
+                        Logger.LogDebug(sdkComponentName, "Выбрано по значению: {0}", selectValue);
                         break;
 
                     case SelectMode.ByIndex:
                         if (int.TryParse(selectValue, out int index))
+                        {
                             select.SelectByIndex(index);
+                            Logger.LogDebug(sdkComponentName, "Выбрано по индексу: {0}", index);
+                        }
                         else
                             throw new ArgumentException($"Некорректный индекс: {selectValue}");
                         break;
@@ -236,12 +248,9 @@ namespace Primo.MIA
                     ? $"[Выбрать из списка] Выбрано ({Prop_SelectMode}): {selectValue}, локатор: {Prop_LocatorType}={locatorValue}"
                     : $"[Выбрать из списка] Выбрано ({Prop_SelectMode}): {selectValue}, элемент: {elementId}";
 
+                Logger.LogInfo(sdkComponentName, "Выбор из списка завершен успешно");
                 return CreateSuccessResult(resultMsg);
-            }
-            catch (Exception ex)
-            {
-                return CreateErrorResult($"Ошибка [Выбрать из списка]: {ex.Message}");
-            }
+            }, "Выбрать из списка");
         }
 
         // ── Валидация ──────────────────────────────────────────────────
@@ -249,12 +258,12 @@ namespace Primo.MIA
         public override ValidationResult Validate()
         {
             var ret = new ValidationResult();
-             
+
             ret.ValidateRequired(Prop_SelectValue, ActivityStrings.Field_SelectValue, "Значение для выбора обязательно");
-            
+
             bool hasElementId = !string.IsNullOrWhiteSpace(Prop_ElementId);
             bool hasLocator = !string.IsNullOrWhiteSpace(Prop_LocatorValue);
-            
+
             if (!hasElementId && !hasLocator)
             {
                 ret.Items.Add(new ValidationResult.ValidationItem()
@@ -263,7 +272,7 @@ namespace Primo.MIA
                     Error = "Необходимо указать либо ID элемента, либо локатор для поиска"
                 });
             }
-            
+
             return ret;
         }
     }

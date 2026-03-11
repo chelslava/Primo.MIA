@@ -21,14 +21,12 @@
 
 using LTools.Common.Model;
 using LTools.Common.UIElements;
-using LTools.Enums;
 using LTools.SDK;
 using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using static LTools.Common.Helpers.WFHelper.PropertiesItem;
 
 namespace Primo.MIA
 {
@@ -39,7 +37,7 @@ namespace Primo.MIA
     /// Параметр Method определяет как искать (подстрока / точно / regex / wildcard).
     /// Оригинальный словарь не изменяется — всегда возвращается новый.
     /// </summary>
-        public class DictionaryFilterBack : PrimoComponentTO<DictionaryFilter>
+    public class DictionaryFilterBack : PrimoComponentTO<DictionaryFilter>
     {
         public override string GroupName { get => ActivityCategories.Dictionaries; protected set { } }
 
@@ -172,7 +170,7 @@ namespace Primo.MIA
 
             sdkComponentIcon = ActivityIcons.Dictionary;
 
-                                    sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
+            sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
                 PropertyBuilder.Script<Dictionary<string, string>>("Prop_Dictionary", "Входной словарь для фильтрации"),
                 PropertyBuilder.Script<string>("Prop_Query", "Подстрока, точная строка, regex или wildcard — зависит от Метода поиска"),
@@ -400,7 +398,7 @@ namespace Primo.MIA
             return ret;
         }
 
-                private void ValidateRegexSyntax(ValidationResult result, string pattern)
+        private void ValidateRegexSyntax(ValidationResult result, string pattern)
         {
             try
             {

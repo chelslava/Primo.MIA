@@ -12,7 +12,6 @@ using OpenQA.Selenium;
 using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
-using static LTools.Common.Helpers.WFHelper.PropertiesItem;
 
 namespace Primo.MIA
 {
@@ -113,40 +112,48 @@ namespace Primo.MIA
         /// </summary>
         public override ExecutionResult TimedAction(ScriptingData sd)
         {
-            try
+            string message = string.Empty;
+
+            var result = SafeExecute(() =>
             {
                 // Получаем sessionId
                 string sessionId = GetPropertyValue<string>(Prop_SessionId, nameof(Prop_SessionId), sd);
-                
+
                 // Получение драйвера через базовый класс
                 IWebDriver driver = GetDriverFromContext(sessionId);
 
+                // Логирование начала операции
+                Logger.LogInfo(sdkComponentName, "Начинается навигация {0} для сессии: {1}", Prop_Mode, sessionId);
+
                 // Выполнение навигации в зависимости от режима
-                string message;
                 switch (Prop_Mode)
                 {
                     case NavigateMode.ToUrl:
                         string url = GetPropertyValue<string>(Prop_Url, "Prop_Url", sd);
-                        if (string.IsNullOrWhiteSpace(url))
-                            throw new ArgumentException("URL не может быть пустым");
-                        
+                        ValidateNotEmpty(url, nameof(Prop_Url));
+                        ValidateUrl(url);
+
                         driver.Navigate().GoToUrl(url);
                         message = $"[Навигация] Переход на {url}";
+                        Logger.LogInfo(sdkComponentName, "Выполнен переход на URL: {0}", url);
                         break;
 
                     case NavigateMode.Back:
                         driver.Navigate().Back();
                         message = "[Навигация] Назад в истории";
+                        Logger.LogInfo(sdkComponentName, "Выполнен переход назад в истории");
                         break;
 
                     case NavigateMode.Forward:
                         driver.Navigate().Forward();
                         message = "[Навигация] Вперед в истории";
+                        Logger.LogInfo(sdkComponentName, "Выполнен переход вперед в истории");
                         break;
 
                     case NavigateMode.Refresh:
                         driver.Navigate().Refresh();
                         message = "[Навигация] Обновление страницы";
+                        Logger.LogInfo(sdkComponentName, "Выполнено обновление страницы");
                         break;
 
                     default:
@@ -156,12 +163,14 @@ namespace Primo.MIA
                 // Небольшая пауза для стабилизации
                 System.Threading.Thread.Sleep(500);
 
-                return CreateSuccessResult(message);
-            }
-            catch (Exception ex)
-            {
-                return CreateErrorResult(ex, "Навигация");
-            }
+                Logger.LogInfo(sdkComponentName, "Навигация {0} успешно завершена", Prop_Mode);
+
+            }, "Навигация");
+
+            if (result.IsSuccess)
+                result.SuccessMessage = message;
+
+            return result;
         }
 
         // ── Валидация ──────────────────────────────────────────────────
@@ -172,13 +181,13 @@ namespace Primo.MIA
         public override ValidationResult Validate()
         {
             var ret = new ValidationResult();
-            
+
             // URL обязателен только для режима ToUrl
             if (Prop_Mode == NavigateMode.ToUrl)
             {
                 ret.ValidateRequired(Prop_Url, "URL", "URL обязателен для режима ToUrl");
             }
-            
+
             return ret;
         }
     }

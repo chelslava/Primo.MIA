@@ -17,19 +17,14 @@
 
 using LTools.Common.Model;
 using LTools.Common.UIElements;
-using LTools.Enums;
 using LTools.SDK;
-using Newtonsoft.Json;
 using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
-using static LTools.Common.Helpers.WFHelper.PropertiesItem;
 
 namespace Primo.MIA
 {
@@ -334,14 +329,14 @@ namespace Primo.MIA
 
                 string headersJson = GetPropertyValue<string>(this.Prop_Headers, "Prop_Headers", sd) ?? "{}";
                 string body = GetPropertyValue<string>(this.Prop_Body, "Prop_Body", sd) ?? string.Empty;
-                
-                                string timeoutStr = GetPropertyValue<string>(this.Prop_Timeout, "Prop_Timeout", sd) ?? "100";
+
+                string timeoutStr = GetPropertyValue<string>(this.Prop_Timeout, "Prop_Timeout", sd) ?? "100";
                 int timeout = HttpLogic.ParseTimeout(timeoutStr, 100);
 
                 // ── Создание HttpClient с настройками ──────────────────
                 using (var client = CreateHttpClient(sd, timeout))
                 {
-                                        // Парсинг и добавление заголовков
+                    // Парсинг и добавление заголовков
                     var headers = HttpLogic.ParseHeaders(headersJson);
                     var normalizedHeaders = HttpLogic.NormalizeHeaders(headers);
                     normalizedHeaders.ToList()
@@ -350,7 +345,7 @@ namespace Primo.MIA
                     // ── Выполнение запроса ─────────────────────────────────
                     var response = ExecuteRequest(client, url, body, sd).Result;
 
-                                        // ── Обработка ответа ───────────────────────────────────
+                    // ── Обработка ответа ───────────────────────────────────
                     int statusCode = (int)response.StatusCode;
                     string responseContent = response.Content.ReadAsStringAsync().Result;
                     string responseHeaders = HttpLogic.SerializeResponseHeaders(response.Headers, response.Content.Headers);
@@ -412,7 +407,7 @@ namespace Primo.MIA
             // ── Игнорирование SSL-ошибок (только для тестовых сред) ────
             if (this.Prop_IgnoreSslErrors)
             {
-                handler.ServerCertificateCustomValidationCallback = 
+                handler.ServerCertificateCustomValidationCallback =
                     (sender, cert, chain, sslPolicyErrors) => true;
             }
 
@@ -424,7 +419,7 @@ namespace Primo.MIA
             return client;
         }
 
-        
+
 
         /// <summary>
         /// Выполняет HTTP-запрос в соответствии с выбранным методом.
@@ -481,7 +476,7 @@ namespace Primo.MIA
             return new StringContent(body, Encoding.UTF8, "application/json");
         }
 
-        
+
 
         // ── Валидация ──────────────────────────────────────────────────
 

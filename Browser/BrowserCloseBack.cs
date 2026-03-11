@@ -12,7 +12,6 @@ using LTools.Common.UIElements;
 using LTools.SDK;
 using OpenQA.Selenium;
 using Primo.MIA.Common;
-using System;
 using System.Collections.Generic;
 
 namespace Primo.MIA
@@ -78,21 +77,33 @@ namespace Primo.MIA
 
         public override ExecutionResult TimedAction(ScriptingData sd)
         {
-            string sessionId = GetPropertyValue<string>(Prop_SessionId, nameof(Prop_SessionId), sd);
-            IWebDriver driver = GetDriverFromContext(sessionId);
+            return SafeExecute(() =>
+            {
+                string sessionId = GetPropertyValue<string>(Prop_SessionId, nameof(Prop_SessionId), sd);
+                IWebDriver driver = GetDriverFromContext(sessionId);
 
-            // Закрытие браузера
-            driver.Quit();
-            driver.Dispose();
+                // Логирование начала операции
+                Logger.LogInfo(sdkComponentName, "Начинается закрытие браузера для сессии: {0}", sessionId);
 
-            // Удаление из RepoDict
-            string resolvedSessionId = SessionResolver.Resolve(sessionId);
-            RepoDict.Remove(resolvedSessionId);
+                // Закрытие браузера
+                driver.Quit();
+                driver.Dispose();
 
-            // Снимаем сессию из ambient-контекста
-            BrowserSessionContext.Pop();
+                // Удаление из SessionManager
+                string resolvedSessionId = SessionResolver.Resolve(sessionId);
+                SessionManager.RemoveSession(resolvedSessionId);
 
-            return CreateSuccessResult($"[Закрыть браузер] Сессия {resolvedSessionId} закрыта");
+                // Удаление из RepoDict (для обратной совместимости)
+                RepoDict.Remove(resolvedSessionId);
+
+                // Снимаем сессию из ambient-контекста
+                BrowserSessionContext.Pop();
+
+                // Логирование успешного завершения
+                Logger.LogInfo(sdkComponentName, "Браузер успешно закрыт для сессии: {0}", resolvedSessionId);
+
+                return CreateSuccessResult($"[Закрыть браузер] Сессия {resolvedSessionId} закрыта");
+            }, "Закрыть браузер");
         }
 
         // ── Валидация ──────────────────────────────────────────────────
@@ -100,7 +111,7 @@ namespace Primo.MIA
         public override ValidationResult Validate()
         {
             var ret = new ValidationResult();
-             
+
             return ret;
         }
     }

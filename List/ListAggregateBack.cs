@@ -18,7 +18,6 @@ using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using static LTools.Common.Helpers.WFHelper.PropertiesItem;
 
 namespace Primo.MIA
 {
@@ -114,7 +113,7 @@ namespace Primo.MIA
                 "Join           — склеить все через разделитель";
             sdkComponentIcon = ActivityIcons.List;
 
-                        sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
+            sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
                 PropertyBuilder.Script<List<string>>("Prop_List", "Входной список"),
                 PropertyBuilder.Enum<ListAggregateMode>("Mode", "Агрегатная функция"),
@@ -137,7 +136,7 @@ namespace Primo.MIA
 
                 string sep = GetPropertyValue<string>(this.Prop_Separator, "Prop_Separator", sd) ?? ", ";
 
-                                // Числа из списка — парсим один раз через LINQ для числовых режимов
+                // Числа из списка — парсим один раз через LINQ для числовых режимов
                 var numbers = list
                     .Where(s => !string.IsNullOrWhiteSpace(s))
                     .Select(s => new { Raw = s, Parsed = StringHelper.TryParseDouble(s) })
@@ -145,9 +144,9 @@ namespace Primo.MIA
                     .Select(x => x.Parsed.Value)
                     .ToList();
 
-                double numResult  = 0;
-                string strResult  = string.Empty;
-                int    numCount   = numbers.Count;
+                double numResult = 0;
+                string strResult = string.Empty;
+                int numCount = numbers.Count;
 
                 switch (this.Mode)
                 {
@@ -211,8 +210,8 @@ namespace Primo.MIA
                 }
 
                 SetVariableValue(this.Prop_NumericResult, numResult, sd);
-                SetVariableValue(this.Prop_StringResult,  strResult, sd);
-                SetVariableValue(this.Prop_NumericCount,  numCount,  sd);
+                SetVariableValue(this.Prop_StringResult, strResult, sd);
+                SetVariableValue(this.Prop_NumericCount, numCount, sd);
 
                 return new ExecutionResult { IsSuccess = true, SuccessMessage = $"{this.Mode} = {(string.IsNullOrEmpty(strResult) ? numResult.ToString() : strResult)}" };
             }
@@ -222,9 +221,9 @@ namespace Primo.MIA
             }
         }
 
-                public override ValidationResult Validate()
+        public override ValidationResult Validate()
         {
-                        var ret = new ValidationResult();
+            var ret = new ValidationResult();
             ret.ValidateRequired(this.Prop_List, ActivityStrings.Field_List, ActivityStrings.Error_ListRequired);
             return ret;
         }

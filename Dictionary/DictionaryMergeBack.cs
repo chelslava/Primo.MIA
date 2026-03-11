@@ -12,13 +12,11 @@
 
 using LTools.Common.Model;
 using LTools.Common.UIElements;
-using LTools.Enums;
 using LTools.SDK;
 using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using static LTools.Common.Helpers.WFHelper.PropertiesItem;
 
 namespace Primo.MIA
 {
@@ -27,7 +25,7 @@ namespace Primo.MIA
     /// Объединяет два Dictionary&lt;string, string&gt; в один новый словарь.
     /// Оба входных словаря остаются без изменений.
     /// </summary>
-        public class DictionaryMergeBack : PrimoComponentTO<DictionaryMerge>
+    public class DictionaryMergeBack : PrimoComponentTO<DictionaryMerge>
     {
         public override string GroupName { get => ActivityCategories.Dictionaries; protected set { } }
 
@@ -151,7 +149,7 @@ namespace Primo.MIA
 
             sdkComponentIcon = ActivityIcons.Dictionary;
 
-                                    sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
+            sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
                 PropertyBuilder.Script<Dictionary<string, string>>("Prop_FirstDictionary", "Первый (базовый) словарь для слияния"),
                 PropertyBuilder.Script<Dictionary<string, string>>("Prop_SecondDictionary", "Второй словарь для слияния"),
@@ -173,10 +171,10 @@ namespace Primo.MIA
         {
             try
             {
-                var first  = GetPropertyValue<Dictionary<string, string>>(this.Prop_FirstDictionary,  "Prop_FirstDictionary",  sd);
+                var first = GetPropertyValue<Dictionary<string, string>>(this.Prop_FirstDictionary, "Prop_FirstDictionary", sd);
                 var second = GetPropertyValue<Dictionary<string, string>>(this.Prop_SecondDictionary, "Prop_SecondDictionary", sd);
 
-                if (first  == null) throw new ArgumentNullException("Prop_FirstDictionary",  "Первый словарь не может быть null");
+                if (first == null) throw new ArgumentNullException("Prop_FirstDictionary", "Первый словарь не может быть null");
                 if (second == null) throw new ArgumentNullException("Prop_SecondDictionary", "Второй словарь не может быть null");
 
                 // Находим конфликтующие ключи через LINQ Intersect
@@ -210,10 +208,10 @@ namespace Primo.MIA
                         .ForEach(p => result[p.Key] = p.Value);
                 }
 
-                SetVariableValue(this.Prop_ResultDictionary, result,              sd);
-                SetVariableValue(this.Prop_Count,            result.Count,        sd);
-                SetVariableValue(this.Prop_HadConflicts,     conflictKeys.Any(),  sd);
-                SetVariableValue(this.Prop_ConflictKeys,     conflictKeys,        sd);
+                SetVariableValue(this.Prop_ResultDictionary, result, sd);
+                SetVariableValue(this.Prop_Count, result.Count, sd);
+                SetVariableValue(this.Prop_HadConflicts, conflictKeys.Any(), sd);
+                SetVariableValue(this.Prop_ConflictKeys, conflictKeys, sd);
 
                 string msg = conflictKeys.Any()
                     ? $"Слияние выполнено. Конфликтов: {conflictKeys.Count}, стратегия: {this.Strategy}"
@@ -231,7 +229,7 @@ namespace Primo.MIA
         // ВАЛИДАЦИЯ
         // =========================================================================
 
-                public override ValidationResult Validate()
+        public override ValidationResult Validate()
         {
             var ret = new ValidationResult();
             ret.ValidateRequired(this.Prop_FirstDictionary, ActivityStrings.Field_FirstDictionary, "Первый словарь обязателен");

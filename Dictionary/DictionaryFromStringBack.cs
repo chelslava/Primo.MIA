@@ -5,7 +5,6 @@ using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using static LTools.Common.Helpers.WFHelper.PropertiesItem;
 
 namespace Primo.MIA
 {
@@ -154,7 +153,7 @@ namespace Primo.MIA
 
             sdkComponentIcon = ActivityIcons.Dictionary;
 
-                        sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
+            sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
                 PropertyBuilder.Script<string>("Prop_InputString", "Входная строка в формате key1=val1;key2=val2"),
                 PropertyBuilder.Script<string>("Prop_PairSeparator", "Разделитель между парами (по умолчанию \";\")"),
@@ -165,7 +164,7 @@ namespace Primo.MIA
             };
 
             InitClass(container);
-            this.Prop_PairSeparator     = "\";\"";
+            this.Prop_PairSeparator = "\";\"";
             this.Prop_KeyValueSeparator = "\"=\"";
         }
 
@@ -177,16 +176,16 @@ namespace Primo.MIA
         {
             try
             {
-                string input   = GetPropertyValue<string>(this.Prop_InputString,       "Prop_InputString",       sd);
-                string pairSep = GetPropertyValue<string>(this.Prop_PairSeparator,     "Prop_PairSeparator",     sd);
-                string kvSep   = GetPropertyValue<string>(this.Prop_KeyValueSeparator, "Prop_KeyValueSeparator", sd);
+                string input = GetPropertyValue<string>(this.Prop_InputString, "Prop_InputString", sd);
+                string pairSep = GetPropertyValue<string>(this.Prop_PairSeparator, "Prop_PairSeparator", sd);
+                string kvSep = GetPropertyValue<string>(this.Prop_KeyValueSeparator, "Prop_KeyValueSeparator", sd);
 
                 if (string.IsNullOrEmpty(input))
                     throw new ArgumentException("Входная строка не может быть пустой");
 
                 // Нормализация разделителей
                 if (string.IsNullOrEmpty(pairSep)) pairSep = ";";
-                if (string.IsNullOrEmpty(kvSep))   kvSep   = "=";
+                if (string.IsNullOrEmpty(kvSep)) kvSep = "=";
 
                 // Шаг 1: разбиваем строку на сырые пары
                 string[] rawPairs = input.Split(
@@ -204,7 +203,7 @@ namespace Primo.MIA
                         !string.IsNullOrWhiteSpace(parts[0]))          // пропускаем пустые ключи
                     .Select(parts => new
                     {
-                        Key   = this.Prop_TrimWhitespace ? parts[0].Trim() : parts[0],
+                        Key = this.Prop_TrimWhitespace ? parts[0].Trim() : parts[0],
                         Value = this.Prop_TrimWhitespace ? parts[1].Trim() : parts[1]
                     })
                     .Where(pair => !string.IsNullOrEmpty(pair.Key))    // повторная проверка после Trim
@@ -216,9 +215,9 @@ namespace Primo.MIA
 
                 int skipped = totalRaw - result.Count;
 
-                SetVariableValue(this.Prop_ResultDictionary, result,       sd);
-                SetVariableValue(this.Prop_Count,            result.Count, sd);
-                SetVariableValue(this.Prop_SkippedCount,     skipped,      sd);
+                SetVariableValue(this.Prop_ResultDictionary, result, sd);
+                SetVariableValue(this.Prop_Count, result.Count, sd);
+                SetVariableValue(this.Prop_SkippedCount, skipped, sd);
 
                 string msg = skipped > 0
                     ? $"Разобрано: {result.Count} пар, пропущено: {skipped}"
@@ -238,7 +237,7 @@ namespace Primo.MIA
 
         public override ValidationResult Validate()
         {
-                        var ret = new ValidationResult();
+            var ret = new ValidationResult();
             ret.ValidateRequired(this.Prop_InputString, ActivityStrings.Field_InputString, ActivityStrings.Error_InputStringRequired);
             return ret;
         }

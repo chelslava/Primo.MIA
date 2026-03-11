@@ -17,7 +17,6 @@ using OpenQA.Selenium;
 using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
-using static LTools.Common.Helpers.WFHelper.PropertiesItem;
 
 namespace Primo.MIA
 {
@@ -192,11 +191,13 @@ namespace Primo.MIA
 
         public override ExecutionResult TimedAction(ScriptingData sd)
         {
-            try
+            return SafeExecute(() =>
             {
                 string sessionId = GetPropertyValue<string>(Prop_SessionId, nameof(Prop_SessionId), sd);
                 string elementId = GetPropertyValue<string>(Prop_ElementId, nameof(Prop_ElementId), sd);
                 string locatorValue = GetPropertyValue<string>(Prop_LocatorValue, nameof(Prop_LocatorValue), sd);
+
+                Logger.LogInfo(sdkComponentName, "Начинается проверка видимости элемента для сессии: {0}", sessionId);
 
                 IWebDriver driver = GetDriverFromContext(sessionId);
 
@@ -205,24 +206,35 @@ namespace Primo.MIA
                 {
                     string timeoutStr = GetPropertyValue<string>(Prop_WaitTimeout, "Prop_WaitTimeout", sd) ?? "10";
                     int timeout = int.TryParse(timeoutStr, out int t) ? t : 10;
-                    timeout = SeleniumHelper.ValidateTimeout(timeout, 10);
+                    ValidatePositive(timeout, "Prop_WaitTimeout");
 
-                    var locator = SeleniumHelper.CreateLocator(Prop_LocatorType, locatorValue);
-                    element = SeleniumHelper.WaitForElement(driver, locator, timeout);
+                    var locatorType = ConvertLocatorType(Prop_LocatorType);
+                    element = ElementLocator.FindElement(driver, locatorType, locatorValue, timeout);
+                    
+                    Logger.LogDebug(sdkComponentName, "Элемент найден по локатору: {0}={1}", Prop_LocatorType, locatorValue);
                 }
                 else if (!string.IsNullOrWhiteSpace(elementId))
                 {
-                    element = SeleniumHelper.GetElement(elementId);
+                    element = ElementRepository.GetElement(elementId);
+                    if (element == null)
+                        throw new ArgumentException($"Элемент с ID '{elementId}' не найден в репозитории");
+                    
+                    Logger.LogDebug(sdkComponentName, "Использован сохраненный элемент: {0}", elementId);
                 }
                 else
                 {
                     throw new ArgumentException("Необходимо указать либо ID элемента, либо локатор для поиска");
                 }
 
-                bool isVisible = SeleniumHelper.IsElementVisible(element);
-                bool isEnabled = SeleniumHelper.IsElementEnabled(element);
-                bool isSelected = SeleniumHelper.IsElementSelected(element);
+                // Проверяем состояние элемента
+                bool isVisible = element.Displayed;
+                bool isEnabled = element.Enabled;
+                bool isSelected = element.Selected;
 
+                Logger.LogDebug(sdkComponentName, "Состояние элемента - Видим: {0}, Включён: {1}, Выбран: {2}", 
+                    isVisible, isEnabled, isSelected);
+
+                // Устанавливаем выходные переменные
                 if (!string.IsNullOrWhiteSpace(Prop_IsVisible))
                     SetVariableValue(Prop_IsVisible, isVisible, sd);
 
@@ -232,12 +244,9 @@ namespace Primo.MIA
                 if (!string.IsNullOrWhiteSpace(Prop_IsSelected))
                     SetVariableValue(Prop_IsSelected, isSelected, sd);
 
+                Logger.LogInfo(sdkComponentName, "Проверка видимости завершена успешно");
                 return CreateSuccessResult($"[Проверить видимость] Видим: {isVisible}, Включён: {isEnabled}, Выбран: {isSelected}");
-            }
-            catch (Exception ex)
-            {
-                return CreateErrorResult(ex, "Проверить видимость");
-            }
+            }, "Проверить видимость");
         }
 
         // ── Валидация ──────────────────────────────────────────────────
@@ -245,12 +254,12 @@ namespace Primo.MIA
         public override ValidationResult Validate()
         {
             var ret = new ValidationResult();
-             
-            
+
+
             // Проверяем что указан либо ElementId, либо LocatorValue
             bool hasElementId = !string.IsNullOrWhiteSpace(this.Prop_ElementId);
             bool hasLocator = !string.IsNullOrWhiteSpace(this.Prop_LocatorValue);
-            
+
             if (!hasElementId && !hasLocator)
             {
                 ret.Items.Add(new ValidationResult.ValidationItem()
@@ -259,7 +268,7 @@ namespace Primo.MIA
                     Error = "Необходимо указать либо ID элемента, либо локатор для поиска"
                 });
             }
-            
+
             return ret;
         }
     }

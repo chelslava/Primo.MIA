@@ -11,7 +11,6 @@
 // ВАЖНО: Все методы thread-safe и могут использоваться из разных активностей.
 // =============================================================================
 
-using LTools.Common.Model;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Interactions;
 using OpenQA.Selenium.Support.UI;
@@ -479,12 +478,12 @@ namespace Primo.MIA.Common
         {
             var actions = new Actions(driver);
             actions.ClickAndHold(element).Perform();
-            
+
             if (durationMs > 0)
             {
                 System.Threading.Thread.Sleep(durationMs);
             }
-            
+
             actions.Release().Perform();
         }
 
@@ -570,7 +569,7 @@ namespace Primo.MIA.Common
                 var dragEndEvent = createEvent('dragend');
                 dispatchEvent(source, dragEndEvent, dragStartEvent.dataTransfer);
             ";
-            
+
             ExecuteJavaScript(driver, script, source, target);
         }
 
@@ -658,11 +657,11 @@ namespace Primo.MIA.Common
         {
             var jsExecutor = (IJavaScriptExecutor)driver;
             jsExecutor.ExecuteScript("window.open();");
-            
+
             // Переключаемся на новую вкладку
             var handles = driver.WindowHandles;
             driver.SwitchTo().Window(handles[handles.Count - 1]);
-            
+
             // Если указан URL, переходим на него
             if (!string.IsNullOrWhiteSpace(url))
             {
@@ -689,7 +688,7 @@ namespace Primo.MIA.Common
             var currentHandle = driver.CurrentWindowHandle;
             driver.SwitchTo().Window(handle);
             driver.Close();
-            
+
             // Возвращаемся на предыдущую вкладку если она ещё существует
             var handles = driver.WindowHandles;
             if (handles.Count > 0)
@@ -892,12 +891,12 @@ namespace Primo.MIA.Common
             var script = $"return Object.keys({storageName});";
             var jsExecutor = (IJavaScriptExecutor)driver;
             var result = jsExecutor.ExecuteScript(script);
-            
+
             if (result is System.Collections.IEnumerable enumerable)
             {
                 return enumerable.Cast<object>().Select(x => x?.ToString() ?? string.Empty).ToList();
             }
-            
+
             return new List<string>();
         }
 
@@ -913,12 +912,12 @@ namespace Primo.MIA.Common
             var script = $"return {storageName}.length;";
             var jsExecutor = (IJavaScriptExecutor)driver;
             var result = jsExecutor.ExecuteScript(script);
-            
+
             if (result is long longValue)
                 return (int)longValue;
             if (result is int intValue)
                 return intValue;
-                
+
             return 0;
         }
 
@@ -950,12 +949,12 @@ namespace Primo.MIA.Common
         public static List<string> GetBrowserLogs(IWebDriver driver, BrowserLogType logType)
         {
             var logs = new List<string>();
-            
+
             try
             {
                 var logTypeName = logType.ToString().ToLower();
                 var logEntries = driver.Manage().Logs.GetLog(logTypeName);
-                
+
                 logs = logEntries
                     .Select(entry => $"[{entry.Timestamp}] [{entry.Level}] {entry.Message}")
                     .ToList();
@@ -965,7 +964,7 @@ namespace Primo.MIA.Common
                 // Некоторые браузеры не поддерживают все типы логов
                 logs.Add($"Ошибка получения логов: {ex.Message}");
             }
-            
+
             return logs;
         }
 
