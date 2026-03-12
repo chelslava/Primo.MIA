@@ -160,6 +160,11 @@
     </Compile>
     <Compile Include="Browser\BrowserScreenshotBack.cs" />
     <Compile Include="Browser\BrowserSessionContext.cs" />
+    <Compile Include="Browser\ElementGetInfoBack.cs" />
+    <Compile Include="Browser\ElementSearch.xaml.cs">
+      <DependentUpon>ElementSearch.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Browser\ElementSearchBack.cs" />
     <Compile Include="Browser\Interfaces\IBrowserServices.cs" />
     <Compile Include="Browser\BrowserStorageManage.xaml.cs">
       <DependentUpon>BrowserStorageManage.xaml</DependentUpon>
@@ -189,10 +194,6 @@
       <DependentUpon>ElementDragDrop.xaml</DependentUpon>
     </Compile>
     <Compile Include="Browser\ElementDragDropBack.cs" />
-    <Compile Include="Browser\ElementExists.xaml.cs">
-      <DependentUpon>ElementExists.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Browser\ElementExistsBack.cs" />
     <Compile Include="Browser\ElementFind.xaml.cs">
       <DependentUpon>ElementFind.xaml</DependentUpon>
     </Compile>
@@ -204,7 +205,6 @@
     <Compile Include="Browser\ElementGetInfo.xaml.cs">
       <DependentUpon>ElementGetInfo.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Browser\ElementGetInfoBack.cs" />
     <Compile Include="Browser\ElementGetProperty.xaml.cs">
       <DependentUpon>ElementGetProperty.xaml</DependentUpon>
     </Compile>
@@ -221,10 +221,6 @@
       <DependentUpon>ElementHover.xaml</DependentUpon>
     </Compile>
     <Compile Include="Browser\ElementHoverBack.cs" />
-    <Compile Include="Browser\ElementIsVisible.xaml.cs">
-      <DependentUpon>ElementIsVisible.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Browser\ElementIsVisibleBack.cs" />
     <Compile Include="Browser\ElementScrollTo.xaml.cs">
       <DependentUpon>ElementScrollTo.xaml</DependentUpon>
     </Compile>
@@ -252,7 +248,6 @@
     <Compile Include="Browser\Models\CookieData.cs" />
     <Compile Include="Browser\Models\ElementPosition.cs" />
     <Compile Include="Browser\Models\RetryConfiguration.cs" />
-    <Compile Include="Browser\Models\ScreenshotMetadata.cs" />
     <Compile Include="Browser\Models\WindowInfo.cs" />
     <Compile Include="Browser\Services\ActivityLogger.cs" />
     <Compile Include="Browser\Services\BrowserServicesFactory.cs" />
@@ -423,6 +418,37 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="doc\Browser\00_INDEX.md" />
+    <None Include="doc\Browser\01_BrowserOpen.md" />
+    <None Include="doc\Browser\02_BrowserClose.md" />
+    <None Include="doc\Browser\03_BrowserNavigate.md" />
+    <None Include="doc\Browser\04_BrowserGetInfo.md" />
+    <None Include="doc\Browser\05_BrowserScreenshot.md" />
+    <None Include="doc\Browser\06_BrowserExecuteJavaScript.md" />
+    <None Include="doc\Browser\07_BrowserGetLogs.md" />
+    <None Include="doc\Browser\08_ElementClick.md" />
+    <None Include="doc\Browser\09_ElementInput.md" />
+    <None Include="doc\Browser\10_ElementHover.md" />
+    <None Include="doc\Browser\11_ElementScrollTo.md" />
+    <None Include="doc\Browser\12_ElementGetInfo.md" />
+    <None Include="doc\Browser\13_ElementExists.md" />
+    <None Include="doc\Browser\14_ElementIsVisible.md" />
+    <None Include="doc\Browser\15_ElementGetProperty.md" />
+    <None Include="doc\Browser\16_ElementGetRect.md" />
+    <None Include="doc\Browser\17_ElementGetScreenshot.md" />
+    <None Include="doc\Browser\18_ElementDragDrop.md" />
+    <None Include="doc\Browser\19_ElementSubmit.md" />
+    <None Include="doc\Browser\20_ElementUploadFile.md" />
+    <None Include="doc\Browser\21_ElementSelect.md" />
+    <None Include="doc\Browser\22_ElementSelectMultiple.md" />
+    <None Include="doc\Browser\23_BrowserWaitFor.md" />
+    <None Include="doc\Browser\24_BrowserSwitchTo.md" />
+    <None Include="doc\Browser\25_AlertHandle.md" />
+    <None Include="doc\Browser\26_BrowserManageCookies.md" />
+    <None Include="doc\Browser\27_BrowserStorageManage.md" />
+    <None Include="doc\Browser\28_BrowserTabManage.md" />
+    <None Include="doc\Browser\29_BrowserWindowManage.md" />
+    <None Include="doc\Browser\README.md" />
     <None Include="doc\Dictionary\00_INDEX.md" />
     <None Include="doc\Dictionary\01_DictionaryCreate.md" />
     <None Include="doc\Dictionary\02_DictionaryFilter.md" />
@@ -435,6 +461,7 @@
     <None Include="doc\Dictionary\09_DictionarySetValue.md" />
     <None Include="doc\Dictionary\10_DictionaryRemoveKey.md" />
     <None Include="doc\Dictionary\11_DictionaryToString.md" />
+    <None Include="doc\ExcelCellRecalculate.md" />
     <None Include="doc\Generators.md" />
     <None Include="doc\List\ListAggregate.md" />
     <None Include="doc\List\ListConvert.md" />
@@ -448,6 +475,15 @@
     <None Include="doc\LogMessage.md" />
     <None Include="doc\ReadTomlConfig.md" />
     <None Include="doc\SearchFilesBack.md" />
+    <None Include="doc\Tuple\TupleConvert.md" />
+    <None Include="doc\Tuple\TupleCreate.md" />
+    <None Include="doc\Tuple\TupleDestructure.md" />
+    <None Include="doc\Tuple\TupleGet.md" />
+    <None Include="doc\Tuple\TupleInspect.md" />
+    <None Include="doc\Tuple\TupleSet.md" />
+    <None Include="doc\Tuple\TupleSort.md" />
+    <None Include="doc\Tuple\TupleUnzip.md" />
+    <None Include="doc\Tuple\TupleZip.md" />
     <None Include="doc\WaitForFileBack.md" />
     <None Include="packages.config" />
     <None Include="Primo.MIA.nuspec" />
@@ -522,10 +558,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Browser\ElementExists.xaml">
-      <SubType>Designer</SubType>
-      <Generator>XamlIntelliSenseFileGenerator</Generator>
-    </Page>
     <Page Include="Browser\ElementFind.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -554,13 +586,13 @@
       <SubType>Designer</SubType>
       <Generator>XamlIntelliSenseFileGenerator</Generator>
     </Page>
-    <Page Include="Browser\ElementIsVisible.xaml">
-      <SubType>Designer</SubType>
-      <Generator>XamlIntelliSenseFileGenerator</Generator>
-    </Page>
     <Page Include="Browser\ElementScrollTo.xaml">
       <SubType>Designer</SubType>
       <Generator>XamlIntelliSenseFileGenerator</Generator>
+    </Page>
+    <Page Include="Browser\ElementSearch.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Browser\ElementSelect.xaml">
       <SubType>Designer</SubType>
@@ -772,9 +804,6 @@
     <Resource Include="images\browser.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Common\ActivityResources.resx" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="packages\Selenium.WebDriver.4.41.0\build\Selenium.WebDriver.targets" Condition="Exists('packages\Selenium.WebDriver.4.41.0\build\Selenium.WebDriver.targets')" />
