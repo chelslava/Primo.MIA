@@ -194,6 +194,10 @@
       <DependentUpon>ElementDragDrop.xaml</DependentUpon>
     </Compile>
     <Compile Include="Browser\ElementDragDropBack.cs" />
+    <Compile Include="Browser\ElementExists.xaml.cs">
+      <DependentUpon>ElementExists.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Browser\ElementExistsBack.cs" />
     <Compile Include="Browser\ElementFind.xaml.cs">
       <DependentUpon>ElementFind.xaml</DependentUpon>
     </Compile>
@@ -221,6 +225,10 @@
       <DependentUpon>ElementHover.xaml</DependentUpon>
     </Compile>
     <Compile Include="Browser\ElementHoverBack.cs" />
+    <Compile Include="Browser\ElementIsVisible.xaml.cs">
+      <DependentUpon>ElementIsVisible.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Browser\ElementIsVisibleBack.cs" />
     <Compile Include="Browser\ElementScrollTo.xaml.cs">
       <DependentUpon>ElementScrollTo.xaml</DependentUpon>
     </Compile>
@@ -245,6 +253,10 @@
       <DependentUpon>ElementUploadFile.xaml</DependentUpon>
     </Compile>
     <Compile Include="Browser\ElementUploadFileBack.cs" />
+    <Compile Include="Browser\ElementWaitAndCheck.xaml.cs">
+      <DependentUpon>ElementWaitAndCheck.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Browser\ElementWaitAndCheckBack.cs" />
     <Compile Include="Browser\Models\CookieData.cs" />
     <Compile Include="Browser\Models\ElementPosition.cs" />
     <Compile Include="Browser\Models\RetryConfiguration.cs" />
@@ -558,6 +570,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Browser\ElementExists.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Browser\ElementFind.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -586,6 +602,10 @@
       <SubType>Designer</SubType>
       <Generator>XamlIntelliSenseFileGenerator</Generator>
     </Page>
+    <Page Include="Browser\ElementIsVisible.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Browser\ElementScrollTo.xaml">
       <SubType>Designer</SubType>
       <Generator>XamlIntelliSenseFileGenerator</Generator>
@@ -611,6 +631,10 @@
       <Generator>XamlIntelliSenseFileGenerator</Generator>
     </Page>
     <Page Include="Browser\ElementUploadFile.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Browser\ElementWaitAndCheck.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

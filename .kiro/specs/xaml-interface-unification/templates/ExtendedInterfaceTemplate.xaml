@@ -6,7 +6,7 @@
              xmlns:system="clr-namespace:System;assembly=mscorlib"
              xmlns:local="clr-namespace:Primo.MIA"
              mc:Ignorable="d"
-             x:Class="Primo.MIA.ElementUploadFile"
+             x:Class="Primo.MIA.[ACTIVITY_CLASS_NAME]"
              d:DesignHeight="80"
              Margin="0,0,0,5">
 
@@ -26,18 +26,34 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
+        <!-- 
+            ЗАМЕНА: Укажите путь к иконке активности
+            Пример: Source="pack://application:,,,/Primo.MIA;component/images/browser.png"
+        -->
         <Image Grid.Column="0"
                Width="32" Height="32" Margin="5"
                VerticalAlignment="Center"
-               Source="pack://application:,,,/Primo.MIA;component/images/browser.png"/>
+               Source="[ICON_PATH]"/>
 
         <StackPanel Grid.Column="1"
                     VerticalAlignment="Top"
                     Margin="5,0,5,5">
 
+            <!-- 
+                ЗАМЕНА: Укажите название активности
+                Для простого заголовка используйте:
+                <TextBlock FontWeight="Bold" FontSize="12" Text="[ACTIVITY_TITLE]"/>
+                
+                Для динамического заголовка с привязками используйте:
+                <TextBlock FontWeight="Bold" FontSize="12">
+                    <Run Text="[ACTIVITY_TITLE] [" FontWeight="Bold" FontSize="12" Foreground="#FF0E0E0E"/>
+                    <Run Text="{Binding Path=Prop_[PropertyName], Mode=OneWay}" FontWeight="Bold" FontSize="12" Foreground="#FF0E0E0E"/>
+                    <Run Text="]" FontWeight="Bold" FontSize="12" Foreground="#FF0E0E0E"/>
+                </TextBlock>
+            -->
             <TextBlock FontWeight="Bold"
                        FontSize="12"
-                       Text="Загрузка файла"/>
+                       Text="[ACTIVITY_TITLE]"/>
 
             <ComboBox ItemsSource="{Binding Source={StaticResource LocatorTypeValues}}"
                       SelectedItem="{Binding Prop_LocatorType}"
