@@ -37,6 +37,7 @@
                     Margin="5,0,5,5">
             <TextBlock FontWeight="Bold" 
                        FontSize="12"
+                       Foreground="#FF0E0E0E"
                        Text="Множественный выбор опций"/>
 
             <ComboBox ItemsSource="{Binding Source={StaticResource LocatorTypeValues}}"

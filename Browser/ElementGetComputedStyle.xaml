@@ -37,7 +37,8 @@
 
             <TextBlock FontWeight="Bold"
                        FontSize="12"
-                       Text="Получение вычисленного стиля"/>
+                       Foreground="#FF0E0E0E"
+                       Text="Получение стиля"/>
 
             <ComboBox ItemsSource="{Binding Source={StaticResource LocatorTypeValues}}"
                       SelectedItem="{Binding Prop_LocatorType}"

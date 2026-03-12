@@ -37,6 +37,7 @@
 
             <TextBlock FontWeight="Bold"
                        FontSize="12"
+                       Foreground="#FF0E0E0E"
                        Text="Загрузка файла"/>
 
             <ComboBox ItemsSource="{Binding Source={StaticResource LocatorTypeValues}}"
