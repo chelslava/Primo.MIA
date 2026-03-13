@@ -1,0 +1,77 @@
+<UserControl x:Class="Primo.MIA.[ACTIVITY_CLASS_NAME]"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Primo.MIA"
+             mc:Ignorable="d"
+             d:DesignHeight="80"
+             Margin="0,0,0,5">
+    <!-- 
+        EXTENDED INTERFACE TEMPLATE для Browser активностей
+        
+        ИНСТРУКЦИИ ПО ИСПОЛЬЗОВАНИЮ:
+        1. Замените [ACTIVITY_CLASS_NAME] на имя класса активности (например, BrowserNavigate)
+        2. Замените [ICON_PATH] на путь к иконке (обычно: pack://application:,,,/Primo.MIA;component/images/browser.png)
+        3. Замените [ACTIVITY_TITLE] на название активности (например, "Навигация браузера")
+        4. Замените [PARAMETER_LABEL] на метку параметра (например, "URL")
+        5. Замените [PROPERTY_NAME] на имя свойства для привязки (например, Prop_Url)
+        
+        КЛЮЧЕВЫЕ АТРИБУТЫ EXTENDED INTERFACE:
+        - UserControl: d:DesignHeight="80", Margin="0,0,0,5"
+        - Grid: Background="{DynamicResource {x:Static SystemColors.ScrollBarBrushKey}}"
+        - Image: Margin="5", VerticalAlignment="Center"
+        - StackPanel: Margin="5,0,5,5", VerticalAlignment="Top"
+        - TextBlock (заголовок): FontWeight="Bold", FontSize="12", Foreground="#FF0E0E0E"
+        - TextBlock (параметры): FontSize="10", Foreground="Gray"
+        
+        ПРИМЕРЫ:
+        
+        Простой заголовок без параметров:
+        <TextBlock FontWeight="Bold" FontSize="12" Foreground="#FF0E0E0E">
+            <Run Text="Закрыть браузер"/>
+        </TextBlock>
+        
+        Заголовок с одним параметром:
+        <TextBlock FontSize="10" Foreground="Gray">
+            <Run Text="URL: "/>
+            <Run Text="{Binding Path=Prop_Url, Mode=OneWay}"/>
+        </TextBlock>
+        
+        Заголовок с несколькими параметрами:
+        <TextBlock FontSize="10" Foreground="Gray">
+            <Run Text="Тип: "/>
+            <Run Text="{Binding Path=Prop_BrowserType, Mode=OneWay}"/>
+            <Run Text=" | Headless: "/>
+            <Run Text="{Binding Path=Prop_Headless, Mode=OneWay}"/>
+        </TextBlock>
+    -->
+    <Grid Background="{DynamicResource {x:Static SystemColors.ScrollBarBrushKey}}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <Image Grid.Column="0" 
+               Width="32" 
+               Height="32" 
+               Margin="5"
+               VerticalAlignment="Center"
+               Source="[ICON_PATH]"/>
+
+        <StackPanel Grid.Column="1" 
+                    VerticalAlignment="Top" 
+                    Margin="5,0,5,5">
+            <TextBlock FontWeight="Bold" 
+                       FontSize="12"
+                       Foreground="#FF0E0E0E">
+                <Run Text="[ACTIVITY_TITLE]"/>
+            </TextBlock>
+            <TextBlock FontSize="10" 
+                       Foreground="Gray">
+                <Run Text="[PARAMETER_LABEL]: "/>
+                <Run Text="{Binding Path=Prop_[PROPERTY_NAME], Mode=OneWay}"/>
+            </TextBlock>
+        </StackPanel>
+    </Grid>
+</UserControl>

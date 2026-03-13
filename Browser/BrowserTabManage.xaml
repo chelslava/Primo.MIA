@@ -1,34 +1,51 @@
 <UserControl x:Class="Primo.MIA.BrowserTabManage"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:system="clr-namespace:System;assembly=mscorlib"
              xmlns:local="clr-namespace:Primo.MIA"
-             mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
-         <Grid.ColumnDefinitions>
+             mc:Ignorable="d"
+             d:DesignHeight="50"
+             Margin="0,0,0,5">
+
+    <UserControl.Resources>
+        <ObjectDataProvider x:Key="TabOperationValues"
+                            MethodName="GetValues"
+                            ObjectType="{x:Type system:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="local:TabOperation"/>
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+    </UserControl.Resources>
+
+    <Grid Background="{DynamicResource {x:Static SystemColors.ScrollBarBrushKey}}">
+        <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <Image Grid.Column="0" 
-               Width="32" 
-               Height="32" 
-               Margin="5"
+        <Image Grid.Column="0"
+               Width="32" Height="32" Margin="5"
                VerticalAlignment="Center"
                Source="pack://application:,,,/Primo.MIA;component/images/browser.png"/>
 
-        <StackPanel Grid.Column="1" 
-                    VerticalAlignment="Center" 
-                    Margin="5">
-            <TextBlock Text="Управление вкладками браузера" 
-                       FontWeight="Bold" 
-                       FontSize="12"/>
-            <TextBlock FontSize="10" 
-                       Foreground="Gray">
-                <Run Text="{Binding Path=Prop_Operation, Mode=OneWay}"/>
+        <StackPanel Grid.Column="1"
+                    VerticalAlignment="Top"
+                    Margin="5,0,5,5">
+
+            <TextBlock FontWeight="Bold"
+                       FontSize="12">
+                <Run Text="Управление вкладками [" FontWeight="Bold" FontSize="12" Foreground="#FF0E0E0E"/>
+                <Run Text="{Binding Path=Prop_Operation, Mode=OneWay}" FontWeight="Bold" FontSize="12" Foreground="#FF0E0E0E"/>
+                <Run Text="]" FontWeight="Bold" FontSize="12" Foreground="#FF0E0E0E"/>
             </TextBlock>
-        </StackPanel>        
+
+            <ComboBox ItemsSource="{Binding Source={StaticResource TabOperationValues}}"
+                      SelectedItem="{Binding Prop_Operation}"
+                      Margin="0,2,6,2"
+                      Height="22"/>
+
+        </StackPanel>
     </Grid>
 </UserControl>
