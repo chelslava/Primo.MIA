@@ -51,7 +51,7 @@
                         Margin="2,0,0,0"
                         Click="BrowseFile_Click">
                     <Button.Background>
-                        <ImageBrush TileMode="Tile" ImageSource="/Primo.MIA;component/images/folder.png"/>
+                        <ImageBrush TileMode="None" ImageSource="/Primo.MIA;component/images/folder.png" Stretch="Fill"/>
                     </Button.Background>
                 </Button>
             </Grid>
