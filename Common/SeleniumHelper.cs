@@ -5,8 +5,9 @@
 //   - Получения драйвера из RepoDict
 //   - Создания локаторов By из типа и значения
 //   - Безопасного ожидания элементов
-//   - Проверки существования элементов
-//   - Создания скриншотов
+//   - Выполнения JavaScript
+//   - Управления окном и вкладками браузера
+//   - Работы с Web Storage
 //
 // ВАЖНО: Все методы thread-safe и могут использоваться из разных активностей.
 // =============================================================================
@@ -209,39 +210,6 @@ namespace Primo.MIA.Common
         }
 
         /// <summary>
-        /// Проверяет существование элемента на странице без ожидания.
-        /// Не выбрасывает исключение если элемент не найден.
-        /// </summary>
-        /// <param name="driver">Экземпляр WebDriver</param>
-        /// <param name="locator">Локатор элемента</param>
-        /// <returns>true если элемент существует, иначе false</returns>
-        public static bool ElementExists(IWebDriver driver, By locator)
-        {
-            try
-            {
-                driver.FindElement(locator);
-                return true;
-            }
-            catch (NoSuchElementException)
-            {
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// Находит первый элемент по локатору.
-        /// Выбрасывает исключение если элемент не найден.
-        /// </summary>
-        /// <param name="driver">Экземпляр WebDriver</param>
-        /// <param name="locator">Локатор элемента</param>
-        /// <returns>Найденный элемент</returns>
-        /// <exception cref="NoSuchElementException">Если элемент не найден</exception>
-        public static IWebElement FindElement(IWebDriver driver, By locator)
-        {
-            return driver.FindElement(locator);
-        }
-
-        /// <summary>
         /// Находит все элементы по локатору.
         /// Возвращает пустой список если элементы не найдены.
         /// </summary>
@@ -258,30 +226,6 @@ namespace Primo.MIA.Common
             {
                 return new List<IWebElement>();
             }
-        }
-
-        // ── Скриншоты ──────────────────────────────────────────────────
-
-        /// <summary>
-        /// Создаёт скриншот страницы и возвращает его в формате Base64.
-        /// </summary>
-        /// <param name="driver">Экземпляр WebDriver</param>
-        /// <returns>Скриншот в формате Base64 строки</returns>
-        public static string TakeScreenshotBase64(IWebDriver driver)
-        {
-            var screenshot = ((ITakesScreenshot)driver).GetScreenshot();
-            return screenshot.AsBase64EncodedString;
-        }
-
-        /// <summary>
-        /// Создаёт скриншот страницы и сохраняет в файл.
-        /// </summary>
-        /// <param name="driver">Экземпляр WebDriver</param>
-        /// <param name="filePath">Путь для сохранения файла</param>
-        public static void TakeScreenshotToFile(IWebDriver driver, string filePath)
-        {
-            var screenshot = ((ITakesScreenshot)driver).GetScreenshot();
-            screenshot.SaveAsFile(filePath);
         }
 
         // ── Работа с JavaScript ────────────────────────────────────────
@@ -360,71 +304,6 @@ namespace Primo.MIA.Common
             return $"Browser_{Guid.NewGuid():N}";
         }
 
-        // ── Работа с состоянием элементов ──────────────────────────────
-
-        /// <summary>
-        /// Проверяет видимость элемента безопасным способом.
-        /// </summary>
-        /// <param name="element">Элемент для проверки</param>
-        /// <returns>true если элемент видим, иначе false</returns>
-        public static bool IsElementVisible(IWebElement element)
-        {
-            try
-            {
-                return element.Displayed;
-            }
-            catch (StaleElementReferenceException)
-            {
-                return false;
-            }
-            catch (NoSuchElementException)
-            {
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// Проверяет включённость элемента безопасным способом.
-        /// </summary>
-        /// <param name="element">Элемент для проверки</param>
-        /// <returns>true если элемент включён, иначе false</returns>
-        public static bool IsElementEnabled(IWebElement element)
-        {
-            try
-            {
-                return element.Enabled;
-            }
-            catch (StaleElementReferenceException)
-            {
-                return false;
-            }
-            catch (NoSuchElementException)
-            {
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// Проверяет выбранность элемента (для checkbox, radio) безопасным способом.
-        /// </summary>
-        /// <param name="element">Элемент для проверки</param>
-        /// <returns>true если элемент выбран, иначе false</returns>
-        public static bool IsElementSelected(IWebElement element)
-        {
-            try
-            {
-                return element.Selected;
-            }
-            catch (StaleElementReferenceException)
-            {
-                return false;
-            }
-            catch (NoSuchElementException)
-            {
-                return false;
-            }
-        }
-
         // ── Расширенные действия с элементами (Actions API) ────────────
 
         /// <summary>
@@ -484,16 +363,6 @@ namespace Primo.MIA.Common
                 System.Threading.Thread.Sleep(durationMs);
             }
 
-            actions.Release().Perform();
-        }
-
-        /// <summary>
-        /// Отпускает кнопку мыши (используется после ClickAndHold без автоматического Release).
-        /// </summary>
-        /// <param name="driver">Экземпляр WebDriver</param>
-        public static void ReleaseClick(IWebDriver driver)
-        {
-            var actions = new Actions(driver);
             actions.Release().Perform();
         }
 
@@ -755,25 +624,6 @@ namespace Primo.MIA.Common
         }
 
         /// <summary>
-        /// Проверяет является ли элемент input[type=file].
-        /// </summary>
-        /// <param name="element">Элемент для проверки</param>
-        /// <returns>true если это file input, иначе false</returns>
-        public static bool IsFileInputElement(IWebElement element)
-        {
-            try
-            {
-                var tagName = element.TagName?.ToLower();
-                var type = element.GetAttribute("type")?.ToLower();
-                return tagName == "input" && type == "file";
-            }
-            catch
-            {
-                return false;
-            }
-        }
-
-        /// <summary>
         /// Получает координаты и размеры элемента на странице.
         /// </summary>
         /// <param name="element">Элемент для получения размеров</param>
@@ -805,19 +655,6 @@ namespace Primo.MIA.Common
         {
             var screenshot = ((ITakesScreenshot)element).GetScreenshot();
             screenshot.SaveAsFile(filePath);
-        }
-
-        /// <summary>
-        /// Наводит курсор на элемент с указанным смещением от центра.
-        /// </summary>
-        /// <param name="driver">Экземпляр WebDriver</param>
-        /// <param name="element">Элемент для наведения</param>
-        /// <param name="offsetX">Смещение по X от центра элемента</param>
-        /// <param name="offsetY">Смещение по Y от центра элемента</param>
-        public static void HoverWithOffset(IWebDriver driver, IWebElement element, int offsetX, int offsetY)
-        {
-            var actions = new Actions(driver);
-            actions.MoveToElement(element, offsetX, offsetY).Perform();
         }
 
         // ── Работа с Web Storage (localStorage/sessionStorage) ─────────
@@ -966,125 +803,6 @@ namespace Primo.MIA.Common
             }
 
             return logs;
-        }
-
-        // ── Работа с multiple select ──────────────────────────────────────────────────────────────────────────────────
-
-        /// <summary>
-        /// Выбирает опцию в multiple select по тексту.
-        /// </summary>
-        /// <param name="selectElement">Select элемент</param>
-        /// <param name="text">Текст опции</param>
-        public static void SelectMultipleByText(IWebElement selectElement, string text)
-        {
-            var select = new OpenQA.Selenium.Support.UI.SelectElement(selectElement);
-            select.SelectByText(text);
-        }
-
-        /// <summary>
-        /// Выбирает опцию в multiple select по value.
-        /// </summary>
-        /// <param name="selectElement">Select элемент</param>
-        /// <param name="value">Value опции</param>
-        public static void SelectMultipleByValue(IWebElement selectElement, string value)
-        {
-            var select = new OpenQA.Selenium.Support.UI.SelectElement(selectElement);
-            select.SelectByValue(value);
-        }
-
-        /// <summary>
-        /// Выбирает опцию в multiple select по индексу.
-        /// </summary>
-        /// <param name="selectElement">Select элемент</param>
-        /// <param name="index">Индекс опции</param>
-        public static void SelectMultipleByIndex(IWebElement selectElement, int index)
-        {
-            var select = new OpenQA.Selenium.Support.UI.SelectElement(selectElement);
-            select.SelectByIndex(index);
-        }
-
-        /// <summary>
-        /// Снимает выбор опции по тексту.
-        /// </summary>
-        /// <param name="selectElement">Select элемент</param>
-        /// <param name="text">Текст опции</param>
-        public static void DeselectByText(IWebElement selectElement, string text)
-        {
-            var select = new OpenQA.Selenium.Support.UI.SelectElement(selectElement);
-            select.DeselectByText(text);
-        }
-
-        /// <summary>
-        /// Снимает выбор опции по value.
-        /// </summary>
-        /// <param name="selectElement">Select элемент</param>
-        /// <param name="value">Value опции</param>
-        public static void DeselectByValue(IWebElement selectElement, string value)
-        {
-            var select = new OpenQA.Selenium.Support.UI.SelectElement(selectElement);
-            select.DeselectByValue(value);
-        }
-
-        /// <summary>
-        /// Снимает выбор опции по индексу.
-        /// </summary>
-        /// <param name="selectElement">Select элемент</param>
-        /// <param name="index">Индекс опции</param>
-        public static void DeselectByIndex(IWebElement selectElement, int index)
-        {
-            var select = new OpenQA.Selenium.Support.UI.SelectElement(selectElement);
-            select.DeselectByIndex(index);
-        }
-
-        /// <summary>
-        /// Снимает все выборы в multiple select.
-        /// </summary>
-        /// <param name="selectElement">Select элемент</param>
-        public static void DeselectAll(IWebElement selectElement)
-        {
-            var select = new OpenQA.Selenium.Support.UI.SelectElement(selectElement);
-            select.DeselectAll();
-        }
-
-        /// <summary>
-        /// Получает все опции из select элемента.
-        /// </summary>
-        /// <param name="selectElement">Select элемент</param>
-        /// <returns>Список текстов всех опций</returns>
-        public static List<string> GetAllSelectOptions(IWebElement selectElement)
-        {
-            var select = new OpenQA.Selenium.Support.UI.SelectElement(selectElement);
-            return select.Options.Select(o => o.Text).ToList();
-        }
-
-        /// <summary>
-        /// Получает выбранные опции из select элемента.
-        /// </summary>
-        /// <param name="selectElement">Select элемент</param>
-        /// <returns>Список текстов выбранных опций</returns>
-        public static List<string> GetSelectedSelectOptions(IWebElement selectElement)
-        {
-            var select = new OpenQA.Selenium.Support.UI.SelectElement(selectElement);
-            return select.AllSelectedOptions.Select(o => o.Text).ToList();
-        }
-
-        /// <summary>
-        /// Вспомогательный статический класс для разрешения ID сессии браузера.
-        /// Используется всеми активностями, которым нужен WebDriver.
-        /// </summary>
-        public static class SessionResolver
-        {
-            /// <summary>
-            /// Разрешает ID сессии браузера по следующему приоритету:
-            /// 1. Явно заданный Prop_SessionId (через ScriptingData)
-            /// 2. Текущий контекст контейнера (BrowserSessionContext.Current)
-            /// </summary>
-            /// <param name="propSessionId">Значение свойства Prop_SessionId активности.</param>
-            /// <param name="propName">Имя свойства для GetPropertyValue (обычно nameof(Prop_SessionId)).</param>
-            /// <param name="component">Ссылка на компонент (this) — нужна для вызова GetPropertyValue.</param>
-            /// <param name="sd">Данные скрипта — передаются в GetPropertyValue.</param>
-            /// <returns>Валидный ID сессии браузера.</returns>
-            /// <exception cref="ArgumentException">Если сессия не найдена ни в свойстве, ни в контексте.</exception>
         }
     }
 }

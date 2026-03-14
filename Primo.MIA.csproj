@@ -262,11 +262,11 @@
     <Compile Include="Common\FileHelper.cs" />
     <Compile Include="Common\NaturalComparer.cs" />
     <Compile Include="Common\PropertyBuilder.cs" />
-    <Compile Include="Common\RegexHelper.cs" />
     <Compile Include="Common\SeleniumHelper.cs" />
     <Compile Include="Common\StringHelper.cs" />
     <Compile Include="Common\TupleHelper.cs" />
     <Compile Include="Common\ValidationHelper.cs" />
+    <Compile Include="Common\Converters\EnumToVisibilityConverter.cs" />
     <Compile Include="Files\SearchFiles.xaml.cs">
       <DependentUpon>SearchFiles.xaml</DependentUpon>
     </Compile>
@@ -357,8 +357,11 @@
     <Compile Include="List\ListAggregate.xaml.cs">
       <DependentUpon>ListAggregate.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Utilities\ReadTomlConfigBack.cs" />
     <Compile Include="Utilities\LogMessageBack.cs" />
+    <Compile Include="Utilities\ReadTomlConfigBack.cs" />
+    <Compile Include="Utilities\ReadTomlConfig.xaml.cs">
+      <DependentUpon>ReadTomlConfig.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Utilities\ExcelCellRecalculate.xaml.cs">
       <DependentUpon>ExcelCellRecalculate.xaml</DependentUpon>
     </Compile>
@@ -367,9 +370,6 @@
     </Compile>
     <Compile Include="Utilities\LogMessage.xaml.cs">
       <DependentUpon>LogMessage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Utilities\ReadTomlConfig.xaml.cs">
-      <DependentUpon>ReadTomlConfig.xaml</DependentUpon>
     </Compile>
     <Compile Include="Dictionary\DictionarySetValue.xaml.cs">
       <DependentUpon>DictionarySetValue.xaml</DependentUpon>
@@ -702,10 +702,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Utilities\ReadTomlConfig.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Dictionary\DictionarySetValue.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -715,6 +711,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Utilities\ExcelCellRecalculate.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Utilities\ReadTomlConfig.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -755,6 +755,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Tuple\TupleConvert.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Common\Styles.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

@@ -1,4 +1,19 @@
-<UserControl
+<!--
+    ElementClick.xaml
+    Визуальный интерфейс активности "Клик по элементу".
+
+    Режимы:
+      Click        — обычный клик
+      DoubleClick  — двойной клик
+      RightClick   — правый клик
+      ClickAndHold — клик с удержанием
+
+    Условная видимость полей:
+      - UseJavaScript: только для Click и DoubleClick
+      - WaitAfterClick: для Click, DoubleClick, RightClick (не для ClickAndHold)
+      - HoldDuration: только для ClickAndHold
+-->
+<UserControl x:Class="Primo.MIA.ElementClick"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -6,18 +21,35 @@
              xmlns:system="clr-namespace:System;assembly=mscorlib"
              xmlns:local="clr-namespace:Primo.MIA"
              mc:Ignorable="d"
-             x:Class="Primo.MIA.ElementClick"
              d:DesignHeight="80"
              Margin="0,0,0,5">
 
     <UserControl.Resources>
-        <ObjectDataProvider x:Key="LocatorTypeValues"
-                            MethodName="GetValues"
-                            ObjectType="{x:Type system:Enum}">
-            <ObjectDataProvider.MethodParameters>
-                <x:Type TypeName="local:ElementLocatorType"/>
-            </ObjectDataProvider.MethodParameters>
-        </ObjectDataProvider>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Primo.MIA;component/Common/Styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+
+            <ObjectDataProvider x:Key="LocatorTypeValues"
+                                MethodName="GetValues"
+                                ObjectType="{x:Type system:Enum}">
+                <ObjectDataProvider.MethodParameters>
+                    <x:Type TypeName="local:ElementLocatorType"/>
+                </ObjectDataProvider.MethodParameters>
+            </ObjectDataProvider>
+
+            <ObjectDataProvider x:Key="ClickModeValues"
+                                MethodName="GetValues"
+                                ObjectType="{x:Type system:Enum}">
+                <ObjectDataProvider.MethodParameters>
+                    <x:Type TypeName="local:ClickMode"/>
+                </ObjectDataProvider.MethodParameters>
+            </ObjectDataProvider>
+
+            <!-- Конвертеры для условной видимости -->
+            <local:EnumToVisibilityConverter x:Key="EnumToVisConverter"/>
+            <local:MultiEnumToVisibilityConverter x:Key="MultiEnumToVisConverter"/>
+        </ResourceDictionary>
     </UserControl.Resources>
 
     <Grid Background="{DynamicResource {x:Static SystemColors.ScrollBarBrushKey}}">
@@ -35,25 +67,57 @@
                     VerticalAlignment="Top"
                     Margin="5,0,5,5">
 
-            <TextBlock FontWeight="Bold"
-                       FontSize="12">
-                       <Run Text="Клик по элементу [" FontWeight="Bold" FontSize="12" Foreground="#FF0E0E0E"/>
-                       <Run Text="{Binding Path=Prop_ClickMode, Mode=OneWay}" FontWeight="Bold" FontSize="12" Foreground="#FF0E0E0E"/>
-                       <Run Text="]" FontWeight="Bold" FontSize="12" Foreground="#FF0E0E0E"/>
+            <TextBlock Style="{StaticResource ActivityHeader}">
+                <Run Text="Клик по элементу [" Foreground="#FF0E0E0E"/>
+                <Run Text="{Binding Path=Prop_ClickMode, Mode=OneWay}" Foreground="#FF1565C0"/>
+                <Run Text="]" Foreground="#FF0E0E0E"/>
             </TextBlock>
 
+            <TextBlock Text="Режим клика:" Style="{StaticResource FieldLabel}"/>
+            <ComboBox ItemsSource="{Binding Source={StaticResource ClickModeValues}}"
+                      SelectedItem="{Binding Prop_ClickMode}"
+                      Style="{StaticResource FieldComboBox}"
+                      ToolTip="Выберите тип клика: обычный, двойной, правый или с удержанием"/>
+
+            <TextBlock Text="Тип локатора:" Style="{StaticResource FieldLabel}"/>
             <ComboBox ItemsSource="{Binding Source={StaticResource LocatorTypeValues}}"
                       SelectedItem="{Binding Prop_LocatorType}"
-                      Margin="0,2,6,2"
-                      Height="22"/>
+                      Style="{StaticResource FieldComboBox}"
+                      ToolTip="Тип локатора для поиска элемента (CSS, XPath, ID и т.д.)"/>
 
-            <TextBox Text="{Binding Prop_LocatorValue}"
-                     IsReadOnly="False"
-                     BorderThickness="0"
-                     TextWrapping="NoWrap"
-                     BorderBrush="#D0D7E2"
-                     Margin="0,2,6,0"
-                     Height="22"/>
+            <TextBlock Text="Значение локатора:" Style="{StaticResource FieldLabel}"/>
+            <TextBox Text="{Binding Prop_LocatorValue, UpdateSourceTrigger=PropertyChanged}"
+                     Style="{StaticResource FieldBox}"
+                     ToolTip="Значение локатора: CSS-селектор, XPath-выражение, ID элемента и т.д."/>
+
+            <TextBlock Text="ID сессии браузера:" Style="{StaticResource FieldLabel}"/>
+            <TextBox Text="{Binding Prop_SessionId, UpdateSourceTrigger=PropertyChanged}"
+                     Style="{StaticResource FieldBox}"
+                     ToolTip="ID сессии браузера (оставьте пустым для использования текущей)"/>
+
+            <!-- Блок для режимов Click и DoubleClick: UseJavaScript -->
+            <StackPanel Visibility="{Binding Path=Prop_ClickMode, Converter={StaticResource MultiEnumToVisConverter}, ConverterParameter=Click|DoubleClick}">
+                <TextBlock Text="Использовать JavaScript:" Style="{StaticResource FieldLabel}"/>
+                <CheckBox IsChecked="{Binding Prop_UseJavaScript}"
+                          Margin="0,2,0,2"
+                          ToolTip="Выполнить клик через JavaScript вместо нативного действия браузера"/>
+            </StackPanel>
+
+            <!-- Блок для режимов Click, DoubleClick, RightClick: WaitAfterClick -->
+            <StackPanel Visibility="{Binding Path=Prop_ClickMode, Converter={StaticResource MultiEnumToVisConverter}, ConverterParameter=Click|DoubleClick|RightClick}">
+                <TextBlock Text="Ожидание после клика (мс):" Style="{StaticResource FieldLabel}"/>
+                <TextBox Text="{Binding Prop_WaitAfterClick, UpdateSourceTrigger=PropertyChanged}"
+                         Style="{StaticResource FieldBox}"
+                         ToolTip="Пауза после выполнения клика в миллисекундах"/>
+            </StackPanel>
+
+            <!-- Блок для режима ClickAndHold: HoldDuration -->
+            <StackPanel Visibility="{Binding Path=Prop_ClickMode, Converter={StaticResource EnumToVisConverter}, ConverterParameter=ClickAndHold}">
+                <TextBlock Text="Длительность удержания (мс):" Style="{StaticResource FieldLabel}"/>
+                <TextBox Text="{Binding Prop_HoldDuration, UpdateSourceTrigger=PropertyChanged}"
+                         Style="{StaticResource FieldBox}"
+                         ToolTip="Время удержания кнопки мыши в миллисекундах"/>
+            </StackPanel>
 
         </StackPanel>
     </Grid>

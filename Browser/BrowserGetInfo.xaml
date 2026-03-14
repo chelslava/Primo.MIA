@@ -1,12 +1,38 @@
+<!--
+    BrowserGetInfo.xaml
+    Визуальный интерфейс активности "Получение информации о браузере".
+
+    Функции:
+      - Получение URL текущей страницы
+      - Получение заголовка страницы
+      - Получение исходного кода страницы
+-->
 <UserControl x:Class="Primo.MIA.BrowserGetInfo"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:system="clr-namespace:System;assembly=mscorlib"
              xmlns:local="clr-namespace:Primo.MIA"
              mc:Ignorable="d"
              d:DesignHeight="80"
              Margin="0,0,0,5">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Primo.MIA;component/Common/Styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+
+            <ObjectDataProvider x:Key="InfoTypeValues"
+                                MethodName="GetValues"
+                                ObjectType="{x:Type system:Enum}">
+                <ObjectDataProvider.MethodParameters>
+                    <x:Type TypeName="local:BrowserInfoType"/>
+                </ObjectDataProvider.MethodParameters>
+            </ObjectDataProvider>
+        </ResourceDictionary>
+    </UserControl.Resources>
 
     <Grid Background="{DynamicResource {x:Static SystemColors.ScrollBarBrushKey}}">
         <Grid.ColumnDefinitions>
@@ -23,10 +49,27 @@
                     VerticalAlignment="Top"
                     Margin="5,0,5,5">
 
-            <TextBlock FontWeight="Bold"
-                       FontSize="12">
-                <Run Text="Получить информацию о браузере" FontWeight="Bold" FontSize="12" Foreground="#FF0E0E0E"/>
+            <TextBlock Style="{StaticResource ActivityHeader}">
+                <Run Text="Браузер: Получить информацию [" Foreground="#FF0E0E0E"/>
+                <Run Text="{Binding Path=Prop_InfoType, Mode=OneWay}" Foreground="#FF1565C0"/>
+                <Run Text="]" Foreground="#FF0E0E0E"/>
             </TextBlock>
+
+            <TextBlock Text="Тип информации:" Style="{StaticResource FieldLabel}"/>
+            <ComboBox ItemsSource="{Binding Source={StaticResource InfoTypeValues}}"
+                      SelectedItem="{Binding Prop_InfoType}"
+                      Style="{StaticResource FieldComboBox}"
+                      ToolTip="Выберите тип информации для получения"/>
+
+            <TextBlock Text="ID сессии браузера:" Style="{StaticResource FieldLabel}"/>
+            <TextBox Text="{Binding Prop_SessionId, UpdateSourceTrigger=PropertyChanged}"
+                     Style="{StaticResource FieldBox}"
+                     ToolTip="ID сессии браузера (оставьте пустым для использования текущей)"/>
+
+            <TextBlock Text="Переменная-результат:" Style="{StaticResource FieldLabel}"/>
+            <TextBox Text="{Binding Prop_ResultVariable, UpdateSourceTrigger=PropertyChanged}"
+                     Style="{StaticResource FieldBox}"
+                     ToolTip="Имя переменной для сохранения полученного значения"/>
 
         </StackPanel>
     </Grid>

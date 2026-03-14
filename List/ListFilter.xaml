@@ -1,4 +1,17 @@
-﻿<UserControl x:Class="Primo.MIA.ListFilter"
+﻿<!--
+    ListFilter.xaml
+    Визуальный интерфейс активности "Фильтрация списка".
+
+    Режимы:
+      - Contains/NotContains: Фильтрация по подстроке
+      - StartsWith/EndsWith: Фильтрация по началу/концу строки
+      - ExactMatch: Точное совпадение
+      - Regex/NotRegex: По регулярному выражению
+      - NotEmpty/EmptyOnly: По пустоте
+      - LengthRange: По длине строки
+      - NumericOnly: Только числа
+-->
+<UserControl x:Class="Primo.MIA.ListFilter"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -6,17 +19,27 @@
              xmlns:system="clr-namespace:System;assembly=mscorlib"
              xmlns:local="clr-namespace:Primo.MIA"
              mc:Ignorable="d"
-             d:DesignHeight="80"
+             d:DesignHeight="120"
              Margin="0,0,0,5">
 
     <UserControl.Resources>
-        <ObjectDataProvider x:Key="ModeValues"
-                            MethodName="GetValues"
-                            ObjectType="{x:Type system:Enum}">
-            <ObjectDataProvider.MethodParameters>
-                <x:Type TypeName="local:ListFilterMode"/>
-            </ObjectDataProvider.MethodParameters>
-        </ObjectDataProvider>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Primo.MIA;component/Common/Styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            
+            <ObjectDataProvider x:Key="ModeValues"
+                                MethodName="GetValues"
+                                ObjectType="{x:Type system:Enum}">
+                <ObjectDataProvider.MethodParameters>
+                    <x:Type TypeName="local:ListFilterMode"/>
+                </ObjectDataProvider.MethodParameters>
+            </ObjectDataProvider>
+
+            <!-- Конвертеры для условной видимости -->
+            <local:EnumToVisibilityConverter x:Key="EnumToVisConverter"/>
+            <local:MultiEnumToVisibilityConverter x:Key="MultiEnumToVisConverter"/>
+        </ResourceDictionary>
     </UserControl.Resources>
 
     <Grid Background="{DynamicResource {x:Static SystemColors.ScrollBarBrushKey}}">
@@ -34,23 +57,61 @@
                     VerticalAlignment="Top"
                     Margin="5,0,5,5">
 
-            <TextBlock FontWeight="Bold" FontSize="12">
-                <Run Text="Список: Фильтрация [" Foreground="#FF0E0E0E"/>
-                <Run Text="{Binding Path=Mode, Mode=OneWay}" Foreground="#FF0E0E0E"/>
-                <Run Text="]" Foreground="#FF0E0E0E"/>
+            <TextBlock Style="{StaticResource ActivityHeader}">
+                <Run Text="Список: Фильтрация ["/>
+                <Run Text="{Binding Mode, Mode=OneWay}"/>
+                <Run Text="]"/>
             </TextBlock>
 
+            <TextBlock Text="Режим фильтрации:" Style="{StaticResource FieldLabel}"/>
             <ComboBox ItemsSource="{Binding Source={StaticResource ModeValues}}"
                       SelectedItem="{Binding Mode}"
-                      Margin="0,2,6,2"
-                      Height="22"/>
+                      Style="{StaticResource FieldComboBox}"
+                      ToolTip="Выберите условие фильтрации"/>
 
-            <TextBox Text="{Binding Prop_List}"
-                     BorderThickness="0"
-                     TextWrapping="NoWrap"
-                     BorderBrush="#D0D7E2"
-                     Margin="0,2,6,0"
-                     Height="22"/>
+            <TextBlock Text="Список:" Style="{StaticResource FieldLabel}"/>
+            <TextBox Text="{Binding Prop_List, UpdateSourceTrigger=PropertyChanged}"
+                     Style="{StaticResource FieldBox}"
+                     ToolTip="Переменная со списком для фильтрации"/>
+
+            <!-- Блок для режимов с паттерном: Contains, NotContains, StartsWith, EndsWith, ExactMatch, Regex, NotRegex -->
+            <StackPanel Visibility="{Binding Mode, Converter={StaticResource MultiEnumToVisConverter}, ConverterParameter=Contains|NotContains|StartsWith|EndsWith|ExactMatch|Regex|NotRegex}">
+                <TextBlock Text="Подстрока/Regex:" Style="{StaticResource FieldLabel}"/>
+                <TextBox Text="{Binding Prop_Pattern, UpdateSourceTrigger=PropertyChanged}"
+                         Style="{StaticResource FieldBox}"
+                         ToolTip="Подстрока для поиска или регулярное выражение"/>
+            </StackPanel>
+
+            <!-- Блок для режимов с учётом регистра: Contains, NotContains, StartsWith, EndsWith, ExactMatch, Regex, NotRegex -->
+            <StackPanel Visibility="{Binding Mode, Converter={StaticResource MultiEnumToVisConverter}, ConverterParameter=Contains|NotContains|StartsWith|EndsWith|ExactMatch|Regex|NotRegex}">
+                <CheckBox IsChecked="{Binding Prop_CaseSensitive}"
+                          Margin="0,2,0,2"
+                          Content="Учитывать регистр"
+                          ToolTip="Учитывать регистр при сравнении строк"/>
+            </StackPanel>
+
+            <!-- Блок для режима LengthRange -->
+            <StackPanel Visibility="{Binding Mode, Converter={StaticResource EnumToVisConverter}, ConverterParameter=LengthRange}">
+                <TextBlock Text="Мин. длина:" Style="{StaticResource FieldLabel}"/>
+                <TextBox Text="{Binding Prop_MinLength, UpdateSourceTrigger=PropertyChanged}"
+                         Style="{StaticResource FieldBox}"
+                         ToolTip="Минимальная длина строки (включительно)"/>
+
+                <TextBlock Text="Макс. длина:" Style="{StaticResource FieldLabel}"/>
+                <TextBox Text="{Binding Prop_MaxLength, UpdateSourceTrigger=PropertyChanged}"
+                         Style="{StaticResource FieldBox}"
+                         ToolTip="Максимальная длина строки (включительно)"/>
+            </StackPanel>
+
+            <TextBlock Text="Результат (прошедшие):" Style="{StaticResource FieldLabel}"/>
+            <TextBox Text="{Binding Prop_Matched, UpdateSourceTrigger=PropertyChanged}"
+                     Style="{StaticResource FieldBox}"
+                     ToolTip="Переменная для элементов, прошедших фильтр"/>
+
+            <TextBlock Text="Результат (отклонённые):" Style="{StaticResource FieldLabel}"/>
+            <TextBox Text="{Binding Prop_Rejected, UpdateSourceTrigger=PropertyChanged}"
+                     Style="{StaticResource FieldBox}"
+                     ToolTip="Переменная для элементов, не прошедших фильтр"/>
 
         </StackPanel>
     </Grid>

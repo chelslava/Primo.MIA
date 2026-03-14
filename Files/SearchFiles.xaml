@@ -1,4 +1,12 @@
-﻿<UserControl x:Class="Primo.MIA.SearchFiles"
+﻿<!--
+    SearchFiles.xaml
+    Визуальный интерфейс активности "Поиск файлов".
+
+    Функции:
+      - Поиск файлов по шаблону
+      - Рекурсивный поиск в директориях
+-->
+<UserControl x:Class="Primo.MIA.SearchFiles"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -7,6 +15,14 @@
              mc:Ignorable="d"
              d:DesignHeight="50"
              Margin="0,0,0,5">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Primo.MIA;component/Common/Styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
 
     <Grid Background="{DynamicResource {x:Static SystemColors.ScrollBarBrushKey}}">
         <Grid.ColumnDefinitions>
@@ -23,16 +39,13 @@
                     VerticalAlignment="Top"
                     Margin="5,0,5,5">
 
-            <TextBlock FontWeight="Bold" FontSize="12" Foreground="#FF0E0E0E">
-                <Run Text="Файлы: Поиск"/>
-            </TextBlock>
+            <TextBlock Style="{StaticResource ActivityHeader}"
+                       Text="Файлы: Поиск"/>
 
-            <TextBox Text="{Binding Prop_Pattern}"
-                     BorderThickness="0"
-                     TextWrapping="NoWrap"
-                     BorderBrush="#D0D7E2"
-                     Margin="0,2,6,0"
-                     Height="22"/>
+            <TextBlock Text="Шаблон:" Style="{StaticResource FieldLabel}"/>
+            <TextBox Text="{Binding Prop_Pattern, UpdateSourceTrigger=PropertyChanged}"
+                     Style="{StaticResource FieldBox}"
+                     ToolTip="Шаблон поиска файлов (например: *.txt или C:\temp\*.log)"/>
 
         </StackPanel>
     </Grid>

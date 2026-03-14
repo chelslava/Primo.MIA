@@ -1,4 +1,15 @@
-﻿<UserControl x:Class="Primo.MIA.ListAggregate"
+﻿<!--
+    ListAggregate.xaml
+    Визуальный интерфейс активности "Агрегация списка".
+
+    Режимы:
+      - Sum: Сумма элементов
+      - Average: Среднее значение
+      - Min: Минимальное значение
+      - Max: Максимальное значение
+      - Count: Количество элементов
+-->
+<UserControl x:Class="Primo.MIA.ListAggregate"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -10,13 +21,19 @@
              Margin="0,0,0,5">
 
     <UserControl.Resources>
-        <ObjectDataProvider x:Key="ModeValues"
-                            MethodName="GetValues"
-                            ObjectType="{x:Type system:Enum}">
-            <ObjectDataProvider.MethodParameters>
-                <x:Type TypeName="local:ListAggregateMode"/>
-            </ObjectDataProvider.MethodParameters>
-        </ObjectDataProvider>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Primo.MIA;component/Common/Styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            
+            <ObjectDataProvider x:Key="ModeValues"
+                                MethodName="GetValues"
+                                ObjectType="{x:Type system:Enum}">
+                <ObjectDataProvider.MethodParameters>
+                    <x:Type TypeName="local:ListAggregateMode"/>
+                </ObjectDataProvider.MethodParameters>
+            </ObjectDataProvider>
+        </ResourceDictionary>
     </UserControl.Resources>
 
     <Grid Background="{DynamicResource {x:Static SystemColors.ScrollBarBrushKey}}">
@@ -34,23 +51,21 @@
                     VerticalAlignment="Top"
                     Margin="5,0,5,5">
 
-            <TextBlock FontWeight="Bold" FontSize="12">
-                <Run Text="Список: Агрегация [" Foreground="#FF0E0E0E"/>
-                <Run Text="{Binding Path=Mode, Mode=OneWay}" Foreground="#FF0E0E0E"/>
-                <Run Text="]" Foreground="#FF0E0E0E"/>
+            <TextBlock Style="{StaticResource ActivityHeader}">
+                <Run Text="Список: Агрегация ["/>
+                <Run Text="{Binding Mode, Mode=OneWay}"/>
+                <Run Text="]"/>
             </TextBlock>
 
             <ComboBox ItemsSource="{Binding Source={StaticResource ModeValues}}"
                       SelectedItem="{Binding Mode}"
-                      Margin="0,2,6,2"
-                      Height="22"/>
+                      Style="{StaticResource FieldComboBox}"
+                      ToolTip="Режим агрегации: Sum, Average, Min, Max, Count"/>
 
-            <TextBox Text="{Binding Prop_List}"
-                     BorderThickness="0"
-                     TextWrapping="NoWrap"
-                     BorderBrush="#D0D7E2"
-                     Margin="0,2,6,0"
-                     Height="22"/>
+            <TextBlock Text="Список:" Style="{StaticResource FieldLabel}"/>
+            <TextBox Text="{Binding Prop_List, UpdateSourceTrigger=PropertyChanged}"
+                     Style="{StaticResource FieldBox}"
+                     ToolTip="Переменная со списком для агрегации"/>
 
         </StackPanel>
     </Grid>

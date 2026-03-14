@@ -99,6 +99,7 @@
     <Style x:Key="ActivityHeader" TargetType="TextBlock">
         <Setter Property="FontWeight" Value="Bold"/>
         <Setter Property="FontSize"   Value="12"/>
+        <Setter Property="Foreground" Value="#FF0E0E0E"/>
         <Setter Property="Margin"     Value="0,2,0,4"/>
     </Style>
 

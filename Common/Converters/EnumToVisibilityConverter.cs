@@ -120,7 +120,7 @@ namespace Primo.MIA
 
     /// <summary>
     /// Конвертер для проверки вхождения в список режимов.
-    /// ConverterParameter = "Mode1,Mode2,Mode3"
+    /// ConverterParameter = "Mode1|Mode2|Mode3" (разделитель | или ;)
     /// </summary>
     public class MultiEnumToVisibilityConverter : IValueConverter
     {
@@ -129,7 +129,7 @@ namespace Primo.MIA
         /// </summary>
         /// <param name="value">Текущее значение enum.</param>
         /// <param name="targetType">Целевой тип (Visibility).</param>
-        /// <param name="parameter">Список режимов через запятую.</param>
+        /// <param name="parameter">Список режимов через | или ;.</param>
         /// <param name="culture">Культура.</param>
         /// <returns>Visible если значение входит в список, иначе Collapsed.</returns>
         public object Convert(object value, Type targetType, 
@@ -139,7 +139,11 @@ namespace Primo.MIA
                 return Visibility.Collapsed;
 
             string currentMode = value.ToString();
-            string[] targetModes = parameter.ToString().Split(',');
+            string paramStr = parameter.ToString();
+            
+            // Поддерживаем разделители | и ; (запятая не подходит для XAML Binding)
+            char[] separators = new[] { '|', ';' };
+            string[] targetModes = paramStr.Split(separators, StringSplitOptions.RemoveEmptyEntries);
 
             foreach (string mode in targetModes)
             {

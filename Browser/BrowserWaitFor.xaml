@@ -1,3 +1,20 @@
+<!--
+    BrowserWaitFor.xaml
+    Визуальный интерфейс активности "Ожидание условия браузера".
+
+    Режимы:
+      PageLoad       — ожидание загрузки страницы
+      ElementExists  — ожидание появления элемента
+      ElementVisible — ожидание видимости элемента
+      ElementClickable — ожидание кликабельности элемента
+      ElementHidden  — ожидание исчезновения элемента
+      TitleContains  — ожидание заголовка
+      UrlContains    — ожидание URL
+
+    Условная видимость полей:
+      - Поля локатора: для ElementExists, ElementVisible, ElementClickable, ElementHidden
+      - Поля текста: для TitleContains, UrlContains
+-->
 <UserControl x:Class="Primo.MIA.BrowserWaitFor"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -6,17 +23,35 @@
              xmlns:system="clr-namespace:System;assembly=mscorlib"
              xmlns:local="clr-namespace:Primo.MIA"
              mc:Ignorable="d"
-             d:DesignHeight="50"
+             d:DesignHeight="80"
              Margin="0,0,0,5">
 
     <UserControl.Resources>
-        <ObjectDataProvider x:Key="WaitConditionTypeValues"
-                            MethodName="GetValues"
-                            ObjectType="{x:Type system:Enum}">
-            <ObjectDataProvider.MethodParameters>
-                <x:Type TypeName="local:WaitConditionType"/>
-            </ObjectDataProvider.MethodParameters>
-        </ObjectDataProvider>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Primo.MIA;component/Common/Styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+
+            <ObjectDataProvider x:Key="ConditionTypeValues"
+                                MethodName="GetValues"
+                                ObjectType="{x:Type system:Enum}">
+                <ObjectDataProvider.MethodParameters>
+                    <x:Type TypeName="local:WaitConditionType"/>
+                </ObjectDataProvider.MethodParameters>
+            </ObjectDataProvider>
+
+            <ObjectDataProvider x:Key="LocatorTypeValues"
+                                MethodName="GetValues"
+                                ObjectType="{x:Type system:Enum}">
+                <ObjectDataProvider.MethodParameters>
+                    <x:Type TypeName="local:ElementLocatorType"/>
+                </ObjectDataProvider.MethodParameters>
+            </ObjectDataProvider>
+
+            <!-- Конвертеры для условной видимости -->
+            <local:EnumToVisibilityConverter x:Key="EnumToVisConverter"/>
+            <local:MultiEnumToVisibilityConverter x:Key="MultiEnumToVisConverter"/>
+        </ResourceDictionary>
     </UserControl.Resources>
 
     <Grid Background="{DynamicResource {x:Static SystemColors.ScrollBarBrushKey}}">
@@ -34,17 +69,49 @@
                     VerticalAlignment="Top"
                     Margin="5,0,5,5">
 
-            <TextBlock FontWeight="Bold"
-                       FontSize="12">
-                <Run Text="Ожидание условия [" FontWeight="Bold" FontSize="12" Foreground="#FF0E0E0E"/>
-                <Run Text="{Binding Path=Prop_Condition, Mode=OneWay}" FontWeight="Bold" FontSize="12" Foreground="#FF0E0E0E"/>
-                <Run Text="]" FontWeight="Bold" FontSize="12" Foreground="#FF0E0E0E"/>
+            <TextBlock Style="{StaticResource ActivityHeader}">
+                <Run Text="Ожидание условия [" Foreground="#FF0E0E0E"/>
+                <Run Text="{Binding Path=Prop_Condition, Mode=OneWay}" Foreground="#FF1565C0"/>
+                <Run Text="]" Foreground="#FF0E0E0E"/>
             </TextBlock>
 
-            <ComboBox ItemsSource="{Binding Source={StaticResource WaitConditionTypeValues}}"
+            <TextBlock Text="Условие ожидания:" Style="{StaticResource FieldLabel}"/>
+            <ComboBox ItemsSource="{Binding Source={StaticResource ConditionTypeValues}}"
                       SelectedItem="{Binding Prop_Condition}"
-                      Margin="0,2,6,2"
-                      Height="22"/>
+                      Style="{StaticResource FieldComboBox}"
+                      ToolTip="Выберите условие для ожидания"/>
+
+            <TextBlock Text="ID сессии браузера:" Style="{StaticResource FieldLabel}"/>
+            <TextBox Text="{Binding Prop_SessionId, UpdateSourceTrigger=PropertyChanged}"
+                     Style="{StaticResource FieldBox}"
+                     ToolTip="ID сессии браузера (оставьте пустым для использования текущей)"/>
+
+            <TextBlock Text="Таймаут (сек):" Style="{StaticResource FieldLabel}"/>
+            <TextBox Text="{Binding Prop_Timeout, UpdateSourceTrigger=PropertyChanged}"
+                     Style="{StaticResource FieldBox}"
+                     ToolTip="Максимальное время ожидания в секундах"/>
+
+            <!-- Блок для условий с элементом: ElementExists, ElementVisible, ElementClickable, ElementHidden -->
+            <StackPanel Visibility="{Binding Path=Prop_Condition, Converter={StaticResource MultiEnumToVisConverter}, ConverterParameter=ElementExists|ElementVisible|ElementClickable|ElementHidden}">
+                <TextBlock Text="Тип локатора:" Style="{StaticResource FieldLabel}"/>
+                <ComboBox ItemsSource="{Binding Source={StaticResource LocatorTypeValues}}"
+                          SelectedItem="{Binding Prop_LocatorType}"
+                          Style="{StaticResource FieldComboBox}"
+                          ToolTip="Тип локатора для поиска элемента"/>
+
+                <TextBlock Text="Значение локатора:" Style="{StaticResource FieldLabel}"/>
+                <TextBox Text="{Binding Prop_LocatorValue, UpdateSourceTrigger=PropertyChanged}"
+                         Style="{StaticResource FieldBox}"
+                         ToolTip="Значение локатора: CSS-селектор, XPath-выражение, ID элемента и т.д."/>
+            </StackPanel>
+
+            <!-- Блок для условий с текстом: TitleContains, UrlContains -->
+            <StackPanel Visibility="{Binding Path=Prop_Condition, Converter={StaticResource MultiEnumToVisConverter}, ConverterParameter=TitleContains|UrlContains}">
+                <TextBlock Text="Ожидаемый текст:" Style="{StaticResource FieldLabel}"/>
+                <TextBox Text="{Binding Prop_ExpectedText, UpdateSourceTrigger=PropertyChanged}"
+                         Style="{StaticResource FieldBox}"
+                         ToolTip="Текст, который должен содержаться в заголовке или URL"/>
+            </StackPanel>
 
         </StackPanel>
     </Grid>

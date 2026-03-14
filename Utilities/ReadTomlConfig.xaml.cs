@@ -2,23 +2,19 @@
 // ReadTomlConfig.xaml.cs — code-behind для интерфейса активности ReadTomlConfig.
 //
 // Содержит:
-//   1. Partial-класс ReadTomlConfig — инициализация UserControl и обработчик
-//      кнопки "..." для выбора TOML-файла через стандартный диалог OpenFileDialog.
-//   2. Конвертер ModeToVisibilityConverter — управляет динамической видимостью
-//      блоков полей в зависимости от выбранного TomlReadMode.
+//   - Partial-класс ReadTomlConfig — инициализация UserControl и обработчик
+//     кнопки "..." для выбора TOML-файла через стандартный диалог OpenFileDialog.
 //
-// Принцип работы конвертера:
-//   - Каждый экземпляр конвертера в XAML настроен на конкретный TargetMode
-//   - Если текущий ReadMode совпадает с TargetMode → Visibility.Visible
-//   - Иначе → Visibility.Collapsed (блок не занимает место в layout)
+// Примечание:
+//   Конвертер для динамической видимости блоков вынесен в общий файл
+//   Common/Converters/EnumToVisibilityConverter.cs и используется через
+//   ConverterParameter вместо отдельных экземпляров ModeToVisibilityConverter.
 // =============================================================================
 
 using Microsoft.Win32;
 using System;
-using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 
 namespace Primo.MIA
 {
@@ -28,6 +24,9 @@ namespace Primo.MIA
     /// </summary>
     public partial class ReadTomlConfig : UserControl
     {
+        /// <summary>
+        /// Конструктор по умолчанию — инициализирует компоненты XAML.
+        /// </summary>
         public ReadTomlConfig()
         {
             InitializeComponent();
@@ -83,55 +82,5 @@ namespace Primo.MIA
             if (DataContext is ReadTomlConfigBack backEnd)
                 backEnd.Prop_FilePath = $"\"{dialog.FileName}\"";
         }
-    }
-
-    /// <summary>
-    /// Конвертер для управления динамической видимостью блоков полей в XAML.
-    ///
-    /// Использование в XAML:
-    ///   &lt;local:ModeToVisibilityConverter x:Key="SingleValueVisConverter"
-    ///                                    TargetMode="SingleValue"/&gt;
-    ///
-    ///   Visibility="{Binding ReadMode, Converter={StaticResource SingleValueVisConverter}}"
-    ///
-    /// Логика:
-    ///   value (текущий ReadMode) == TargetMode → Visible
-    ///   value != TargetMode                    → Collapsed
-    /// </summary>
-    public class ModeToVisibilityConverter : IValueConverter
-    {
-        /// <summary>
-        /// Целевой режим, при котором блок становится видимым.
-        /// Устанавливается в XAML через свойство TargetMode.
-        /// </summary>
-        public TomlReadMode TargetMode { get; set; }
-
-        /// <summary>
-        /// Конвертирует текущий TomlReadMode в Visibility.
-        /// Если value совпадает с TargetMode — возвращает Visible, иначе Collapsed.
-        /// </summary>
-        /// <param name="value">Текущее значение ReadMode из привязки</param>
-        /// <param name="targetType">Тип возврата (Visibility)</param>
-        /// <param name="parameter">Не используется</param>
-        /// <param name="culture">Не используется</param>
-        /// <returns>Visibility.Visible или Visibility.Collapsed</returns>
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            // Проверяем что value — корректный TomlReadMode
-            if (value is TomlReadMode currentMode)
-                return currentMode == TargetMode
-                    ? Visibility.Visible
-                    : Visibility.Collapsed;
-
-            // Если привязка вернула null или неожиданный тип — скрываем блок
-            return Visibility.Collapsed;
-        }
-
-        /// <summary>
-        /// Обратная конвертация не поддерживается (одностороннее отображение).
-        /// </summary>
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-            => throw new NotSupportedException(
-                "ModeToVisibilityConverter: обратная конвертация не поддерживается");
     }
 }

@@ -1,4 +1,13 @@
-﻿<UserControl x:Class="Primo.MIA.DictionaryMerge"
+﻿<!--
+    DictionaryMerge.xaml
+    Визуальный интерфейс активности "Объединение словарей".
+
+    Стратегии:
+      - Overwrite: Перезаписывать дубликаты
+      - KeepOriginal: Сохранять оригинальные значения
+      - Concat: Конкатенировать значения
+-->
+<UserControl x:Class="Primo.MIA.DictionaryMerge"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -10,13 +19,19 @@
              Margin="0,0,0,5">
 
     <UserControl.Resources>
-        <ObjectDataProvider x:Key="StrategyValues"
-                            MethodName="GetValues"
-                            ObjectType="{x:Type system:Enum}">
-            <ObjectDataProvider.MethodParameters>
-                <x:Type TypeName="local:DictionaryMergeStrategy"/>
-            </ObjectDataProvider.MethodParameters>
-        </ObjectDataProvider>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Primo.MIA;component/Common/Styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            
+            <ObjectDataProvider x:Key="StrategyValues"
+                                MethodName="GetValues"
+                                ObjectType="{x:Type system:Enum}">
+                <ObjectDataProvider.MethodParameters>
+                    <x:Type TypeName="local:DictionaryMergeStrategy"/>
+                </ObjectDataProvider.MethodParameters>
+            </ObjectDataProvider>
+        </ResourceDictionary>
     </UserControl.Resources>
 
     <Grid Background="{DynamicResource {x:Static SystemColors.ScrollBarBrushKey}}">
@@ -34,23 +49,21 @@
                     VerticalAlignment="Top"
                     Margin="5,0,5,5">
 
-            <TextBlock FontWeight="Bold" FontSize="12">
-                <Run Text="Словарь: Объединить [" Foreground="#FF0E0E0E"/>
-                <Run Text="{Binding Path=Strategy, Mode=OneWay}" Foreground="#FF0E0E0E"/>
-                <Run Text="]" Foreground="#FF0E0E0E"/>
+            <TextBlock Style="{StaticResource ActivityHeader}">
+                <Run Text="Словарь: Объединить ["/>
+                <Run Text="{Binding Strategy, Mode=OneWay}"/>
+                <Run Text="]"/>
             </TextBlock>
 
             <ComboBox ItemsSource="{Binding Source={StaticResource StrategyValues}}"
                       SelectedItem="{Binding Strategy}"
-                      Margin="0,2,6,2"
-                      Height="22"/>
+                      Style="{StaticResource FieldComboBox}"
+                      ToolTip="Стратегия объединения: Overwrite, KeepOriginal, Concat"/>
 
-            <TextBox Text="{Binding Prop_FirstDictionary}"
-                     BorderThickness="0"
-                     TextWrapping="NoWrap"
-                     BorderBrush="#D0D7E2"
-                     Margin="0,2,6,0"
-                     Height="22"/>
+            <TextBlock Text="Первый словарь:" Style="{StaticResource FieldLabel}"/>
+            <TextBox Text="{Binding Prop_FirstDictionary, UpdateSourceTrigger=PropertyChanged}"
+                     Style="{StaticResource FieldBox}"
+                     ToolTip="Первый словарь для объединения"/>
 
         </StackPanel>
     </Grid>
