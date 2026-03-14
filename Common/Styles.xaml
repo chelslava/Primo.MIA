@@ -1,0 +1,122 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         КОНВЕРТЕРЫ (подключаются в UserControl.Resources)
+         ═══════════════════════════════════════════════════════════════════ -->
+    
+    <!-- Подключение:
+         <ResourceDictionary.MergedDictionaries>
+             <ResourceDictionary Source="/Primo.MIA;component/Common/Styles.xaml"/>
+         </ResourceDictionary.MergedDictionaries>
+    -->
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         СТИЛИ ПОЛЕЙ ВВОДА
+         ═══════════════════════════════════════════════════════════════════ -->
+
+    <!-- Лейбл поля -->
+    <Style x:Key="FieldLabel" TargetType="TextBlock">
+        <Setter Property="FontSize"   Value="11"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="Foreground" Value="#FF2C3E50"/>
+        <Setter Property="Margin"     Value="0,6,0,2"/>
+    </Style>
+
+    <!-- Стандартное текстовое поле -->
+    <Style x:Key="FieldBox" TargetType="TextBox">
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="BorderBrush"     Value="Transparent"/>
+        <Setter Property="TextWrapping"    Value="NoWrap"/>
+        <Setter Property="Height"          Value="22"/>
+        <Setter Property="Margin"          Value="0,2,6,0"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+    </Style>
+
+    <!-- Текстовое поле с валидацией -->
+    <Style x:Key="ValidatingFieldBox" 
+           TargetType="TextBox" 
+           BasedOn="{StaticResource FieldBox}">
+        <Style.Triggers>
+            <Trigger Property="Validation.HasError" Value="True">
+                <Setter Property="BorderBrush"     Value="#FFFF5252"/>
+                <Setter Property="BorderThickness" Value="1"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         СТИЛИ КНОПОК
+         ═══════════════════════════════════════════════════════════════════ -->
+
+    <!-- Кнопка обзора файла -->
+    <Style x:Key="BrowseButton" TargetType="Button">
+        <Setter Property="Width"           Value="26"/>
+        <Setter Property="Height"          Value="22"/>
+        <Setter Property="Padding"         Value="0"/>
+        <Setter Property="Foreground"      Value="#FF2C3E50"/>
+        <Setter Property="Background"      Value="#FFE8ECF0"/>
+        <Setter Property="BorderBrush"     Value="#FFB0BAC8"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Cursor"          Value="Hand"/>
+        <Setter Property="ToolTip"         Value="Выбрать файл..."/>
+    </Style>
+
+    <!-- Кнопка с иконкой -->
+    <Style x:Key="IconButton" TargetType="Button">
+        <Setter Property="Width"           Value="24"/>
+        <Setter Property="Height"          Value="24"/>
+        <Setter Property="Padding"         Value="2"/>
+        <Setter Property="Background"      Value="Transparent"/>
+        <Setter Property="BorderBrush"     Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Cursor"          Value="Hand"/>
+    </Style>
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         СТИЛИ ВЫПАДАЮЩИХ СПИСКОВ
+         ═══════════════════════════════════════════════════════════════════ -->
+
+    <!-- Стандартный ComboBox -->
+    <Style x:Key="FieldComboBox" TargetType="ComboBox">
+        <Setter Property="Height"          Value="22"/>
+        <Setter Property="Margin"          Value="0,2,6,2"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+    </Style>
+
+    <!-- ComboBox с возможностью редактирования -->
+    <Style x:Key="EditableComboBox" 
+           TargetType="ComboBox" 
+           BasedOn="{StaticResource FieldComboBox}">
+        <Setter Property="IsEditable" Value="True"/>
+    </Style>
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         СТИЛИ ЗАГОЛОВКОВ
+         ═══════════════════════════════════════════════════════════════════ -->
+
+    <!-- Заголовок активности с режимом -->
+    <Style x:Key="ActivityHeader" TargetType="TextBlock">
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="FontSize"   Value="12"/>
+        <Setter Property="Margin"     Value="0,2,0,4"/>
+    </Style>
+
+    <!-- Подзаголовок секции -->
+    <Style x:Key="SectionHeader" TargetType="TextBlock">
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="FontSize"   Value="11"/>
+        <Setter Property="Foreground" Value="#FF1565C0"/>
+        <Setter Property="Margin"     Value="0,8,0,4"/>
+    </Style>
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         СТИЛИ ДЛЯ ДИНАМИЧЕСКОГО UI
+         ═══════════════════════════════════════════════════════════════════ -->
+
+    <!-- Контейнер для группы полей режима -->
+    <Style x:Key="ModePanel" TargetType="StackPanel">
+        <Setter Property="Margin" Value="0,4,0,0"/>
+    </Style>
+
+</ResourceDictionary>
