@@ -532,5 +532,32 @@ namespace Primo.MIA.Common
         public const string Activity_AlertHandle = "Браузер: Обработка алерта";
         public const string Activity_ElementScrollTo = "Элемент: Прокрутить к элементу";
         public const string Activity_ElementSendKeys = "Элемент: Нажать клавишу";
+
+        // ═══════════════════════════════════════════════════════════════════════
+        // DATATABLE TO HTML
+        // ═══════════════════════════════════════════════════════════════════════
+
+        // Category
+        public const string Category_Style = "Стиль";
+
+        // Fields
+        public const string Field_DataTable = "Таблица данных";
+        public const string Field_HtmlTheme = "Тема оформления";
+        public const string Field_HtmlOutputMode = "Режим вывода HTML";
+        public const string Field_ShowRowNumbers = "Нумерация строк";
+        public const string Field_NullDisplay = "Текст для null";
+        public const string Field_MaxRows = "Макс. строк";
+        public const string Field_HeaderColor = "Цвет заголовка";
+        public const string Field_RowColor = "Цвет строк";
+        public const string Field_AltRowColor = "Цвет чётных строк";
+        public const string Field_BorderColor = "Цвет границ";
+        public const string Field_HtmlOutput = "HTML-код";
+        public const string Field_RowCount = "Количество строк";
+        public const string Field_ColumnCount = "Количество столбцов";
+
+        // Errors
+        public const string Error_DataTableRequired = "Исходная таблица данных не указана";
+        public const string Error_MaxRowsNegative = "Максимальное количество строк не может быть отрицательным";
+        public const string Error_CustomThemeRequiresColors = "При выборе пользовательской темы необходимо указать хотя бы один цвет";
     }
 }

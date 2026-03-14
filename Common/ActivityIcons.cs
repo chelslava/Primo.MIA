@@ -43,5 +43,8 @@ namespace Primo.MIA.Common
 
         /// <summary>Иконка для активностей работы с браузером (Selenium)</summary>
         public const string Browser = BasePath + "browser.png";
+
+        /// <summary>Иконка для активностей работы с таблицами (DataTable)</summary>
+        public const string Table = BasePath + "table.png";
     }
 }

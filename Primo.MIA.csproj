@@ -358,6 +358,7 @@
       <DependentUpon>ListAggregate.xaml</DependentUpon>
     </Compile>
     <Compile Include="Utilities\LogMessageBack.cs" />
+    <Compile Include="Utilities\DataTableToHtmlBack.cs" />
     <Compile Include="Utilities\ReadTomlConfigBack.cs" />
     <Compile Include="Utilities\ReadTomlConfig.xaml.cs">
       <DependentUpon>ReadTomlConfig.xaml</DependentUpon>
@@ -370,6 +371,9 @@
     </Compile>
     <Compile Include="Utilities\LogMessage.xaml.cs">
       <DependentUpon>LogMessage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Utilities\DataTableToHtml.xaml.cs">
+      <DependentUpon>DataTableToHtml.xaml</DependentUpon>
     </Compile>
     <Compile Include="Dictionary\DictionarySetValue.xaml.cs">
       <DependentUpon>DictionarySetValue.xaml</DependentUpon>
@@ -702,6 +706,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Utilities\DataTableToHtml.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Dictionary\DictionarySetValue.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -811,6 +819,11 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="images\folder.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="images\table.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="packages\Selenium.WebDriver.4.41.0\build\Selenium.WebDriver.targets" Condition="Exists('packages\Selenium.WebDriver.4.41.0\build\Selenium.WebDriver.targets')" />
