@@ -1,0 +1,148 @@
+<!--
+    TextTranslit.xaml
+    Визуальный интерфейс активности «Текст: Транслитерация».
+
+    Поле «Замена пробелов» всегда видно — пользователь оставляет пустым
+    если пробелы не нужно заменять.
+    «К верхнему» и «К нижнему регистру» — взаимоисключающие чекбоксы.
+-->
+<UserControl x:Class="Primo.MIA.TextTranslit"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:system="clr-namespace:System;assembly=mscorlib"
+             xmlns:local="clr-namespace:Primo.MIA"
+             mc:Ignorable="d"
+             d:DesignHeight="260"
+             Margin="0,0,0,5">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Primo.MIA;component/Common/Styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+
+            <!-- Значения направления транслитерации -->
+            <ObjectDataProvider x:Key="DirectionValues"
+                                MethodName="GetValues"
+                                ObjectType="{x:Type system:Enum}">
+                <ObjectDataProvider.MethodParameters>
+                    <x:Type TypeName="local:TranslitDirection"/>
+                </ObjectDataProvider.MethodParameters>
+            </ObjectDataProvider>
+
+            <!-- Значения схемы транслитерации -->
+            <ObjectDataProvider x:Key="SchemeValues"
+                                MethodName="GetValues"
+                                ObjectType="{x:Type system:Enum}">
+                <ObjectDataProvider.MethodParameters>
+                    <x:Type TypeName="local:TranslitScheme"/>
+                </ObjectDataProvider.MethodParameters>
+            </ObjectDataProvider>
+
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid Background="{DynamicResource {x:Static SystemColors.ScrollBarBrushKey}}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Иконка активности -->
+        <Image Grid.Column="0"
+               Width="32" Height="32" Margin="5"
+               VerticalAlignment="Center"
+               Source="pack://application:,,,/Primo.MIA;component/images/text.png"/>
+
+        <!-- Поля активности -->
+        <StackPanel Grid.Column="1"
+                    VerticalAlignment="Top"
+                    Margin="5,0,5,8">
+
+            <!-- Заголовок с направлением и схемой -->
+            <TextBlock Style="{StaticResource ActivityHeader}">
+                <Run Text="Текст: Транслитерация [" Foreground="#FF0E0E0E"/>
+                <Run Text="{Binding Prop_Scheme, Mode=OneWay}" Foreground="#FF1565C0"/>
+                <Run Text="]" Foreground="#FF0E0E0E"/>
+            </TextBlock>
+
+            <!-- Входной текст -->
+            <TextBlock Text="Входной текст:" Style="{StaticResource FieldLabel}"/>
+            <TextBox Text="{Binding Prop_InputText, UpdateSourceTrigger=PropertyChanged}"
+                     Style="{StaticResource FieldBox}"
+                     ToolTip="Текст для транслитерации"/>
+
+            <!-- Направление и схема в одной строке -->
+            <Grid Margin="0,2,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" Margin="0,0,4,0">
+                    <TextBlock Text="Направление:" Style="{StaticResource FieldLabel}"/>
+                    <ComboBox ItemsSource="{Binding Source={StaticResource DirectionValues}}"
+                              SelectedItem="{Binding Prop_Direction}"
+                              Style="{StaticResource FieldComboBox}"
+                              ToolTip="CyrillicToLatin / LatinToCyrillic / AutoDetect"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1">
+                    <TextBlock Text="Схема:" Style="{StaticResource FieldLabel}"/>
+                    <ComboBox ItemsSource="{Binding Source={StaticResource SchemeValues}}"
+                              SelectedItem="{Binding Prop_Scheme}"
+                              Style="{StaticResource FieldComboBox}"
+                              ToolTip="Simplified / Passport2013 / GOST7792000 / ISO9 / BGN_PCGN / ICAO"/>
+                </StackPanel>
+            </Grid>
+
+            <!-- Замена пробелов -->
+            <Grid Margin="0,4,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="80"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Опции регистра -->
+                <StackPanel Grid.Column="0" Margin="0,0,4,0">
+                    <TextBlock Text="Постобработка:" Style="{StaticResource FieldLabel}"/>
+                    <StackPanel Orientation="Horizontal">
+                        <CheckBox Content="Сохр. регистр"
+                                  IsChecked="{Binding Prop_PreserveCase}"
+                                  Margin="0,0,10,0"
+                                  ToolTip="Сохранять регистр оригинального символа"
+                                  Foreground="#FF0E0E0E"/>
+                        <CheckBox Content="К верхнему"
+                                  IsChecked="{Binding Prop_ToUpperCase}"
+                                  Margin="0,0,10,0"
+                                  ToolTip="Привести результат к верхнему регистру"
+                                  Foreground="#FF0E0E0E"/>
+                        <CheckBox Content="К нижнему"
+                                  IsChecked="{Binding Prop_ToLowerCase}"
+                                  ToolTip="Привести результат к нижнему регистру"
+                                  Foreground="#FF0E0E0E"/>
+                    </StackPanel>
+                </StackPanel>
+
+                <!-- Замена пробелов -->
+                <StackPanel Grid.Column="1">
+                    <TextBlock Text="Замена пробелов:" Style="{StaticResource FieldLabel}"
+                               ToolTip="Заменить пробелы: _ для файлов, . для логинов, пусто = оставить"/>
+                    <TextBox Text="{Binding Prop_ReplaceSpaces, UpdateSourceTrigger=PropertyChanged}"
+                             Style="{StaticResource FieldBox}"
+                             ToolTip="Пусто = оставить пробелы без изменений"/>
+                </StackPanel>
+            </Grid>
+
+            <!-- Сохранять нетранслитерируемые символы -->
+            <CheckBox Content="Сохранять нетранслитерируемые символы"
+                      IsChecked="{Binding Prop_PreserveNonAlpha}"
+                      Margin="0,6,0,2"
+                      ToolTip="Оставлять цифры, знаки пунктуации и пробелы без изменений"
+                      Foreground="#FF0E0E0E"/>
+
+        </StackPanel>
+    </Grid>
+</UserControl>

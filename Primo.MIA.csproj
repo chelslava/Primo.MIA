@@ -295,6 +295,18 @@
     </Compile>
     <Compile Include="HttpWeb\HttpBack.cs" />
     <Compile Include="HttpWeb\HttpLogic.cs" />
+    <Compile Include="Text\TextParse.xaml.cs">
+      <DependentUpon>TextParse.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Text\TextParseBack.cs" />
+    <Compile Include="Text\TextTemplate.xaml.cs">
+      <DependentUpon>TextTemplate.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Text\TextTemplateBack.cs" />
+    <Compile Include="Text\TextTranslit.xaml.cs">
+      <DependentUpon>TextTranslit.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Text\TextTranslitBack.cs" />
     <Compile Include="Utilities\GeneratorsBack.cs" />
     <Compile Include="Utilities\ExcelCellRecalculateBack.cs" />
     <Compile Include="Dictionary\DictionaryContainsValue.xaml.cs">
@@ -752,6 +764,18 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Text\TextParse.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Text\TextTemplate.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Text\TextTranslit.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Utilities\LogMessage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -885,6 +909,16 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="images\calendar.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="images\template.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="images\translit.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
   </ItemGroup>

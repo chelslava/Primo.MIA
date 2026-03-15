@@ -1,0 +1,504 @@
+// =============================================================================
+// TextTemplateBack.cs — активность «Текст: Шаблонизатор».
+//
+// Подставляет значения из Dictionary<string,string> в текстовый шаблон
+// с плейсхолдерами. Поддерживает три синтаксиса плейсхолдеров, три режима
+// обработки пропущенных ключей, чтение шаблона из файла и форматирование
+// числовых и датовых значений через суффикс формата ({{Сумма:N2}}).
+//
+// Синтаксисы:
+//   DoubleBrace — {{ключ}}     (по умолчанию, не конфликтует с JSON)
+//   SingleBrace — {ключ}
+//   Percent     — %ключ%       (стиль Windows-переменных окружения)
+//
+// Форматирование значений (суффикс через двоеточие):
+//   {{Сумма:N2}}          → "14 500,00"
+//   {{Дата:dd.MM.yyyy}}   → "15.03.2026"
+//   {{Процент:P1}}        → "12,5 %"
+//   Работает для любого значения, которое можно распарсить как число или дату.
+// =============================================================================
+
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
+using LTools.Common.Model;
+using LTools.Common.Model.Serialization;
+using LTools.Common.UIElements;
+using LTools.SDK;
+using Primo.MIA.Common;
+
+namespace Primo.MIA
+{
+    /// <summary>
+    /// Активность «Текст: Шаблонизатор».
+    /// Подставляет значения словаря в шаблон с плейсхолдерами.
+    /// </summary>
+    public class TextTemplateBack : PrimoComponentTO<TextTemplate>
+    {
+        // =====================================================================
+        // Статические словари — паттерны regex для каждого синтаксиса
+        // =====================================================================
+
+        /// <summary>
+        /// Regex-паттерны для каждого синтаксиса плейсхолдеров.
+        /// Группа 1: имя ключа (может содержать суффикс формата через ':').
+        /// </summary>
+        private static readonly Dictionary<TemplateSyntax, string> SyntaxPatterns =
+            new Dictionary<TemplateSyntax, string>
+            {
+                // {{ключ}} или {{ключ:формат}}
+                { TemplateSyntax.DoubleBrace, @"\{\{([^}]+)\}\}" },
+                // {ключ} или {ключ:формат}
+                { TemplateSyntax.SingleBrace, @"\{([^{}]+)\}"   },
+                // %ключ% или %ключ:формат%
+                { TemplateSyntax.Percent,     @"%([^%]+)%"      }
+            };
+
+        // =====================================================================
+        // Свойства
+        // =====================================================================
+
+        #region Prop_Template
+        private string _propTemplate;
+        /// <summary>
+        /// Шаблон с плейсхолдерами.
+        /// Если указан Prop_TemplateFile — это свойство игнорируется.
+        /// </summary>
+        [StoringProperty]
+        [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main),
+         System.ComponentModel.DisplayName(ActivityStrings.Field_Template)]
+        public string Prop_Template
+        {
+            get => _propTemplate;
+            set { _propTemplate = value; InvokePropertyChanged(this, nameof(Prop_Template)); }
+        }
+        #endregion
+
+        #region Prop_Variables
+        private string _propVariables;
+        /// <summary>Словарь переменных для подстановки Dictionary&lt;string,string&gt;.</summary>
+        [StoringProperty]
+        [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(Dictionary<string, string>))]
+        [System.ComponentModel.Category(ActivityStrings.Category_Main),
+         System.ComponentModel.DisplayName(ActivityStrings.Field_Variables)]
+        public string Prop_Variables
+        {
+            get => _propVariables;
+            set { _propVariables = value; InvokePropertyChanged(this, nameof(Prop_Variables)); }
+        }
+        #endregion
+
+        #region Prop_Syntax
+        private TemplateSyntax _propSyntax = TemplateSyntax.DoubleBrace;
+        /// <summary>Синтаксис плейсхолдеров: DoubleBrace / SingleBrace / Percent.</summary>
+        [StoringProperty]
+        [System.ComponentModel.Category(ActivityStrings.Category_Settings),
+         System.ComponentModel.DisplayName(ActivityStrings.Field_TemplateSyntax)]
+        public TemplateSyntax Prop_Syntax
+        {
+            get => _propSyntax;
+            set { _propSyntax = value; InvokePropertyChanged(this, nameof(Prop_Syntax)); }
+        }
+        #endregion
+
+        #region Prop_MissingKeyBehavior
+        private MissingKeyBehavior _propMissingKeyBehavior = MissingKeyBehavior.LeaveAsIs;
+        /// <summary>
+        /// Поведение при отсутствии ключа в словаре:
+        /// LeaveAsIs / ReplaceWithEmpty / ThrowError.
+        /// </summary>
+        [StoringProperty]
+        [System.ComponentModel.Category(ActivityStrings.Category_Settings),
+         System.ComponentModel.DisplayName(ActivityStrings.Field_MissingKeyBehavior)]
+        public MissingKeyBehavior Prop_MissingKeyBehavior
+        {
+            get => _propMissingKeyBehavior;
+            set { _propMissingKeyBehavior = value; InvokePropertyChanged(this, nameof(Prop_MissingKeyBehavior)); }
+        }
+        #endregion
+
+        #region Prop_CaseSensitive
+        private bool _propCaseSensitive = false;
+        /// <summary>
+        /// Учитывать регистр ключей при поиске в словаре.
+        /// По умолчанию false — поиск регистронезависимый.
+        /// </summary>
+        [StoringProperty]
+        [System.ComponentModel.Category(ActivityStrings.Category_Settings),
+         System.ComponentModel.DisplayName(ActivityStrings.Field_CaseSensitive)]
+        public bool Prop_CaseSensitive
+        {
+            get => _propCaseSensitive;
+            set { _propCaseSensitive = value; InvokePropertyChanged(this, nameof(Prop_CaseSensitive)); }
+        }
+        #endregion
+
+        #region Prop_TemplateFile
+        private string _propTemplateFile;
+        /// <summary>
+        /// Путь к файлу шаблона. Если указан — имеет приоритет над Prop_Template.
+        /// Удобно для больших шаблонов (письма, SQL-запросы, HTML-страницы).
+        /// </summary>
+        [StoringProperty]
+        [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
+        [System.ComponentModel.Category(ActivityStrings.Category_Settings),
+         System.ComponentModel.DisplayName(ActivityStrings.Field_FilePath)]
+        public string Prop_TemplateFile
+        {
+            get => _propTemplateFile;
+            set { _propTemplateFile = value; InvokePropertyChanged(this, nameof(Prop_TemplateFile)); }
+        }
+        #endregion
+
+        #region Prop_Encoding
+        private string _propEncoding = "UTF-8";
+        /// <summary>
+        /// Кодировка файла шаблона (по умолчанию UTF-8).
+        /// Используется только если указан Prop_TemplateFile.
+        /// </summary>
+        [StoringProperty]
+        [System.ComponentModel.Category(ActivityStrings.Category_Settings),
+         System.ComponentModel.DisplayName(ActivityStrings.Field_Encoding)]
+        public string Prop_Encoding
+        {
+            get => _propEncoding;
+            set { _propEncoding = value; InvokePropertyChanged(this, nameof(Prop_Encoding)); }
+        }
+        #endregion
+
+        #region Prop_Result (Выходной)
+        private string _propResult;
+        /// <summary>Имя переменной скрипта для записи результирующей строки.</summary>
+        [StoringProperty]
+        [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output),
+         System.ComponentModel.DisplayName(ActivityStrings.Field_OutputVariable)]
+        public string Prop_Result
+        {
+            get => _propResult;
+            set { _propResult = value; InvokePropertyChanged(this, nameof(Prop_Result)); }
+        }
+        #endregion
+
+        #region Prop_ReplacedCount (Выходной)
+        private string _propReplacedCount;
+        /// <summary>Имя переменной скрипта для записи количества выполненных замен (int).</summary>
+        [StoringProperty]
+        [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output),
+         System.ComponentModel.DisplayName(ActivityStrings.Field_TemplateReplacedCount)]
+        public string Prop_ReplacedCount
+        {
+            get => _propReplacedCount;
+            set { _propReplacedCount = value; InvokePropertyChanged(this, nameof(Prop_ReplacedCount)); }
+        }
+        #endregion
+
+        #region Prop_MissingKeys (Выходной)
+        private string _propMissingKeys;
+        /// <summary>
+        /// Имя переменной скрипта для записи списка незаполненных ключей List&lt;string&gt;.
+        /// Пустой список если все плейсхолдеры заполнены.
+        /// </summary>
+        [StoringProperty]
+        [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(List<string>))]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output),
+         System.ComponentModel.DisplayName(ActivityStrings.Field_TemplateMissingKeys)]
+        public string Prop_MissingKeys
+        {
+            get => _propMissingKeys;
+            set { _propMissingKeys = value; InvokePropertyChanged(this, nameof(Prop_MissingKeys)); }
+        }
+        #endregion
+
+        // =====================================================================
+        // Служебные свойства
+        // =====================================================================
+
+        public override string GroupName
+        {
+            get => ActivityCategories.Utilities;
+            protected set { }
+        }
+
+        protected override int sdkTimeOut
+        {
+            get => 30000;
+            set { }
+        }
+
+        // =====================================================================
+        // Конструктор
+        // =====================================================================
+
+        public TextTemplateBack(IWFContainer container) : base(container)
+        {
+            sdkComponentName = ActivityStrings.Activity_TextTemplate;
+            sdkComponentHelp =
+                "Подставляет значения словаря в текстовый шаблон с плейсхолдерами.\n" +
+                "\n" +
+                "── Синтаксисы плейсхолдеров ───────────────────\n" +
+                "DoubleBrace — {{ключ}}  (по умолчанию, не конфликтует с JSON)\n" +
+                "SingleBrace — {ключ}\n" +
+                "Percent     — %ключ%   (стиль Windows-переменных окружения)\n" +
+                "\n" +
+                "── Форматирование значений ─────────────────────\n" +
+                "Суффикс через двоеточие применяет .NET-формат к значению:\n" +
+                "  {{Сумма:N2}}         → \"14 500,00\"\n" +
+                "  {{Дата:dd.MM.yyyy}}  → \"15.03.2026\"\n" +
+                "  {{Процент:P1}}       → \"12,5 %\"\n" +
+                "Работает если значение распознаётся как число или DateTime.\n" +
+                "\n" +
+                "── При отсутствии ключа ────────────────────────\n" +
+                "LeaveAsIs      — оставить плейсхолдер (удобно для отладки)\n" +
+                "ReplaceWithEmpty — заменить пустой строкой\n" +
+                "ThrowError     — ошибка со списком незаполненных ключей\n" +
+                "\n" +
+                "── Шаблон из файла ─────────────────────────────\n" +
+                "Если указан «Файл шаблона» — он имеет приоритет над полем «Шаблон».\n" +
+                "Удобно для больших шаблонов: письма, SQL-запросы, HTML-страницы.";
+
+            sdkComponentIcon = ActivityIcons.TextTemplate;
+
+            sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
+            {
+                // Основные
+                PropertyBuilder.Script<string>("Prop_Template",       ActivityStrings.Field_Template),
+                PropertyBuilder.Script<Dictionary<string,string>>("Prop_Variables", ActivityStrings.Field_Variables),
+                // Настройки
+                PropertyBuilder.Enum<TemplateSyntax>("Prop_Syntax",   ActivityStrings.Field_TemplateSyntax),
+                PropertyBuilder.Enum<MissingKeyBehavior>("Prop_MissingKeyBehavior", ActivityStrings.Field_MissingKeyBehavior),
+                PropertyBuilder.BooleanObject("Prop_CaseSensitive",   ActivityStrings.Field_CaseSensitive),
+                PropertyBuilder.Script<string>("Prop_TemplateFile",   ActivityStrings.Field_FilePath),
+                PropertyBuilder.Script<string>("Prop_Encoding",       ActivityStrings.Field_Encoding),
+                // Выходные
+                PropertyBuilder.Variable<string>("Prop_Result",       ActivityStrings.Field_OutputVariable),
+                PropertyBuilder.Variable<int>("Prop_ReplacedCount",   ActivityStrings.Field_TemplateReplacedCount),
+                PropertyBuilder.Variable<List<string>>("Prop_MissingKeys", ActivityStrings.Field_TemplateMissingKeys)
+            };
+
+            InitClass(container);
+
+            this.Prop_Syntax              = TemplateSyntax.DoubleBrace;
+            this.Prop_MissingKeyBehavior  = MissingKeyBehavior.LeaveAsIs;
+            this.Prop_CaseSensitive       = false;
+            this.Prop_Encoding            = "UTF-8";
+        }
+
+        // =====================================================================
+        // Выполнение
+        // =====================================================================
+
+        public override ExecutionResult TimedAction(ScriptingData sd)
+        {
+            try
+            {
+                // ── Читаем словарь переменных ──────────────────────────────
+
+                var variables = GetPropertyValue<Dictionary<string, string>>(
+                    this.Prop_Variables, nameof(Prop_Variables), sd);
+
+                if (variables == null)
+                    return Fail(ActivityStrings.Error_TemplateVariablesRequired);
+
+                // ── Читаем шаблон (файл имеет приоритет над полем) ─────────
+
+                string template;
+                string templateFile = GetPropertyValue<string>(
+                    this.Prop_TemplateFile, nameof(Prop_TemplateFile), sd);
+
+                if (!string.IsNullOrWhiteSpace(templateFile))
+                {
+                    // Читаем шаблон из файла
+                    if (!File.Exists(templateFile))
+                        return Fail($"{ActivityStrings.Error_TemplateFileNotFound}: {templateFile}");
+
+                    Encoding encoding = ParseEncoding(this.Prop_Encoding);
+                    template = File.ReadAllText(templateFile, encoding);
+                }
+                else
+                {
+                    // Читаем шаблон из свойства
+                    template = GetPropertyValue<string>(
+                        this.Prop_Template, nameof(Prop_Template), sd);
+
+                    if (template == null)
+                        return Fail(ActivityStrings.Error_TemplateRequired);
+                }
+
+                // ── Выполняем подстановку ──────────────────────────────────
+
+                var  missingKeys  = new List<string>();
+                int  replacements = 0;
+
+                // Получаем regex-паттерн для выбранного синтаксиса
+                string pattern = SyntaxPatterns[this.Prop_Syntax];
+
+                // StringComparison для поиска ключей с учётом Prop_CaseSensitive
+                StringComparison comparison = this.Prop_CaseSensitive
+                    ? StringComparison.Ordinal
+                    : StringComparison.OrdinalIgnoreCase;
+
+                // Один проход по шаблону через Regex.Replace с MatchEvaluator
+                // Используем замыкание на локальные переменные вместо ref/out
+                string result = Regex.Replace(template, pattern, match =>
+                {
+                    // Полное содержимое плейсхолдера: "ключ" или "ключ:формат"
+                    string fullKey = match.Groups[1].Value.Trim();
+
+                    // Разделяем ключ и суффикс формата
+                    string key        = fullKey;
+                    string formatSpec = null;
+
+                    int colonIndex = fullKey.IndexOf(':');
+                    if (colonIndex > 0)
+                    {
+                        key        = fullKey.Substring(0, colonIndex).Trim();
+                        formatSpec = fullKey.Substring(colonIndex + 1).Trim();
+                    }
+
+                    // Ищем ключ в словаре с учётом регистра
+                    string value = variables
+                        .Where(kv => string.Compare(kv.Key, key, comparison) == 0)
+                        .Select(kv => kv.Value)
+                        .FirstOrDefault();
+
+                    if (value != null)
+                    {
+                        replacements++;
+
+                        // Применяем форматирование если задан суффикс
+                        if (!string.IsNullOrEmpty(formatSpec))
+                            value = ApplyFormat(value, formatSpec);
+
+                        return value;
+                    }
+
+                    // Ключ не найден — применяем стратегию MissingKeyBehavior
+                    missingKeys.Add(key);
+
+                    return this.Prop_MissingKeyBehavior == MissingKeyBehavior.ReplaceWithEmpty
+                        ? string.Empty
+                        : match.Value; // LeaveAsIs — возвращаем плейсхолдер как есть
+                });
+
+                // ── Проверяем строгий режим ────────────────────────────────
+
+                if (this.Prop_MissingKeyBehavior == MissingKeyBehavior.ThrowError
+                    && missingKeys.Count > 0)
+                {
+                    string keyList = string.Join(", ", missingKeys.Distinct());
+                    return Fail(
+                        $"{ActivityStrings.Error_TemplateMissingKeys}: {keyList}");
+                }
+
+                // ── Записываем выходные параметры ──────────────────────────
+
+                SetVariableValue(this.Prop_Result,         result,       sd);
+                SetVariableValue(this.Prop_ReplacedCount,  replacements, sd);
+                SetVariableValue(this.Prop_MissingKeys,    missingKeys,  sd);
+
+                // ── Формируем сообщение ────────────────────────────────────
+
+                string successMsg = missingKeys.Count == 0
+                    ? $"Выполнено {replacements} замен"
+                    : $"Выполнено {replacements} замен, незаполненных ключей: {missingKeys.Count}";
+
+                return new ExecutionResult
+                {
+                    IsSuccess      = true,
+                    SuccessMessage = successMsg
+                };
+            }
+            catch (Exception ex)
+            {
+                return Fail($"Ошибка шаблонизатора: {ex.Message}");
+            }
+        }
+
+        // =====================================================================
+        // Вспомогательные методы
+        // =====================================================================
+
+        /// <summary>
+        /// Применяет .NET-формат к строковому значению плейсхолдера.
+        /// Пытается распарсить как DateTime, затем как double.
+        /// Если не удалось — возвращает исходное значение без изменений.
+        /// </summary>
+        /// <param name="value">Строковое значение из словаря.</param>
+        /// <param name="format">.NET-формат (например "N2", "dd.MM.yyyy", "P1").</param>
+        private static string ApplyFormat(string value, string format)
+        {
+            // Пробуем DateTime
+            if (DateTime.TryParse(value, out DateTime dateValue))
+                return dateValue.ToString(format);
+
+            // Пробуем double (InvariantCulture для парсинга, CurrentCulture для вывода)
+            if (double.TryParse(value,
+                System.Globalization.NumberStyles.Any,
+                System.Globalization.CultureInfo.InvariantCulture,
+                out double numValue))
+                return numValue.ToString(format);
+
+            // Не удалось — возвращаем как есть
+            return value;
+        }
+
+        /// <summary>
+        /// Разбирает строку кодировки в объект Encoding.
+        /// Поддерживает UTF-8, UTF-16, Windows-1251, CP866 и другие IANA-имена.
+        /// При ошибке возвращает UTF-8.
+        /// </summary>
+        private static Encoding ParseEncoding(string encodingName)
+        {
+            if (string.IsNullOrWhiteSpace(encodingName))
+                return Encoding.UTF8;
+
+            try
+            {
+                return Encoding.GetEncoding(encodingName);
+            }
+            catch
+            {
+                return Encoding.UTF8;
+            }
+        }
+
+        private static ExecutionResult Fail(string msg) =>
+            new ExecutionResult { IsSuccess = false, ErrorMessage = msg };
+
+        // =====================================================================
+        // Валидация
+        // =====================================================================
+
+        public override ValidationResult Validate()
+        {
+            var ret = new ValidationResult();
+
+            // Шаблон нужен если не указан файл
+            bool hasFile     = !string.IsNullOrWhiteSpace(this.Prop_TemplateFile);
+            bool hasTemplate = !string.IsNullOrWhiteSpace(this.Prop_Template);
+
+            if (!hasFile && !hasTemplate)
+                ret.Items.Add(new ValidationResult.ValidationItem
+                {
+                    PropertyName = nameof(Prop_Template),
+                    Error        = ActivityStrings.Error_TemplateRequired
+                });
+
+            // Словарь обязателен всегда
+            if (string.IsNullOrWhiteSpace(this.Prop_Variables))
+                ret.Items.Add(new ValidationResult.ValidationItem
+                {
+                    PropertyName = nameof(Prop_Variables),
+                    Error        = ActivityStrings.Error_TemplateVariablesRequired
+                });
+
+            return ret;
+        }
+    }
+}

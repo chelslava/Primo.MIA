@@ -699,5 +699,113 @@ namespace Primo.MIA.Common
 
         /// <summary>Сколько дней от StartDate до найденного результата.</summary>
         public const string Field_DaysAhead              = "Дней вперёд";
+
+        // ═══════════════════════════════════════════════════════════════════════
+        // TEXT TEMPLATE (Шаблонизатор)
+        // ═══════════════════════════════════════════════════════════════════════
+
+        /// <summary>Название активности «Текст: Шаблонизатор».</summary>
+        public const string Activity_TextTemplate        = "Текст: Шаблонизатор";
+
+        // Fields
+        /// <summary>Синтаксис плейсхолдеров (TemplateSyntax).</summary>
+        public const string Field_TemplateSyntax         = "Синтаксис";
+
+        /// <summary>Поведение при отсутствии ключа в словаре (MissingKeyBehavior).</summary>
+        public const string Field_MissingKeyBehavior     = "При отсутствии ключа";
+
+        /// <summary>Количество выполненных замен в шаблоне.</summary>
+        public const string Field_TemplateReplacedCount  = "Количество замен";
+
+        /// <summary>Список ключей из шаблона, для которых не нашлось значений.</summary>
+        public const string Field_TemplateMissingKeys    = "Незаполненные ключи";
+
+        // Errors
+
+        /// <summary>Словарь переменных не указан.</summary>
+        public const string Error_TemplateVariablesRequired = "Словарь переменных обязателен";
+
+        /// <summary>Файл шаблона не найден по указанному пути.</summary>
+        public const string Error_TemplateFileNotFound   = "Файл шаблона не найден";
+
+        /// <summary>В шаблоне есть плейсхолдеры без значений (режим ThrowError).</summary>
+        public const string Error_TemplateMissingKeys    = "Незаполненные плейсхолдеры";
+
+        // ═══════════════════════════════════════════════════════════════════════
+        // TEXT PARSE (Разбор по шаблону)
+        // ═══════════════════════════════════════════════════════════════════════
+
+        /// <summary>Название активности «Текст: Разбор по шаблону».</summary>
+        public const string Activity_TextParse           = "Текст: Разбор по шаблону";
+
+        // Fields
+        /// <summary>Маска с плейсхолдерами для разбора строки.</summary>
+        public const string Field_ParseMask              = "Маска";
+
+        /// <summary>Признак: маска успешно совпала со строкой.</summary>
+        public const string Field_IsMatched              = "Совпало";
+
+        /// <summary>Количество совпадений или извлечённых ключей.</summary>
+        public const string Field_MatchCount           = "Количество совпадений";
+
+        /// <summary>Результат разбора — Dictionary первого совпадения.</summary>
+        public const string Field_ParseResult            = "Результат";
+
+        /// <summary>Список всех совпадений (при AllMatches=true).</summary>
+        public const string Field_AllResults             = "Все результаты";
+
+        /// <summary>Жадный захват плейсхолдеров.</summary>
+        public const string Field_GreedyMatch            = "Жадный захват";
+
+        /// <summary>Многострочный режим (. совпадает с \n).</summary>
+        public const string Field_MultiLine              = "Многострочный текст";
+
+        /// <summary>Найти все вхождения маски в тексте.</summary>
+        public const string Field_AllMatches             = "Все вхождения";
+
+        /// <summary>Скомпилированный regex-паттерн для диагностики.</summary>
+        public const string Field_CompiledPattern        = "Скомпилированный паттерн";
+
+        // Errors
+        /// <summary>Маска не указана.</summary>
+        public const string Error_ParseMaskRequired      = "Маска обязательна";
+
+        /// <summary>Маска содержит синтаксическую ошибку или недопустимые имена групп.</summary>
+        public const string Error_ParseMaskInvalid       = "Некорректная маска";
+
+        // ═══════════════════════════════════════════════════════════════════════
+        // TEXT TRANSLIT (Транслитерация)
+        // ═══════════════════════════════════════════════════════════════════════
+
+        /// <summary>Название активности «Текст: Транслитерация».</summary>
+        public const string Activity_TextTranslit = "Текст: Транслитерация";
+
+        // Fields
+        /// <summary>Направление транслитерации (TranslitDirection).</summary>
+        public const string Field_TranslitDirection = "Направление";
+
+        /// <summary>Схема транслитерации (TranslitScheme).</summary>
+        public const string Field_TranslitScheme = "Схема";
+
+        /// <summary>Сохранять регистр оригинального символа.</summary>
+        public const string Field_PreserveCase = "Сохранять регистр";
+
+        /// <summary>Оставлять нетранслитерируемые символы без изменений.</summary>
+        public const string Field_PreserveNonAlpha = "Сохранять нетранслитерируемые";
+
+        /// <summary>Привести результат к верхнему регистру.</summary>
+        public const string Field_ToUpperCase = "К верхнему регистру";
+
+        /// <summary>Привести результат к нижнему регистру.</summary>
+        public const string Field_ToLowerCase = "К нижнему регистру";
+
+        /// <summary>Заменять пробелы в результате указанной строкой.</summary>
+        public const string Field_ReplaceSpaces = "Замена пробелов";
+
+        /// <summary>Определённое направление при AutoDetect.</summary>
+        public const string Field_DetectedDirection = "Определённое направление";
+
+        /// <summary>Количество изменённых символов.</summary>
+        public const string Field_ChangedChars = "Изменено символов";
     }
 }

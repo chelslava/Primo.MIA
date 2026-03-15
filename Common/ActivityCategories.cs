@@ -33,5 +33,8 @@ namespace Primo.MIA.Common
 
         /// <summary>Категория "MIA → Календарь"</summary>
         public const string Calendar = Prefix + "Календарь";
+        
+        /// <summary>Категория "MIA → Текст"</summary>
+        public const string Text = Prefix + "Текст";
     }
 }

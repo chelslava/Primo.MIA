@@ -49,5 +49,12 @@ namespace Primo.MIA.Common
 
         /// <summary>Иконка для активностей работы с календарём</summary>
         public const string Calendar = BasePath + "calendar.png";
+
+        /// <summary>Иконка для активностей работы с текстом (Шаблонизатор)</summary>
+        public const string TextTemplate = BasePath + "template.png";
+
+        /// <summary>Иконка для активностей работы с текстом (Транслитерация)</summary>
+        public const string TextTranslit = BasePath + "translit.png";
+
     }
 }

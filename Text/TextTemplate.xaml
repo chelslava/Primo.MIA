@@ -1,0 +1,144 @@
+<!--
+    TextTemplate.xaml
+    Визуальный интерфейс активности «Текст: Шаблонизатор».
+
+    Поле «Файл шаблона» и «Кодировка» всегда видны — пользователь сам
+    решает что использовать: поле Шаблон или файл.
+    Поле «Маска дней» видно только при CustomMask.
+-->
+<UserControl x:Class="Primo.MIA.TextTemplate"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:system="clr-namespace:System;assembly=mscorlib"
+             xmlns:local="clr-namespace:Primo.MIA"
+             mc:Ignorable="d"
+             d:DesignHeight="300"
+             Margin="0,0,0,5">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Primo.MIA;component/Common/Styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+
+            <!-- Значения синтаксиса плейсхолдеров -->
+            <ObjectDataProvider x:Key="SyntaxValues"
+                                MethodName="GetValues"
+                                ObjectType="{x:Type system:Enum}">
+                <ObjectDataProvider.MethodParameters>
+                    <x:Type TypeName="local:TemplateSyntax"/>
+                </ObjectDataProvider.MethodParameters>
+            </ObjectDataProvider>
+
+            <!-- Значения поведения при пропущенном ключе -->
+            <ObjectDataProvider x:Key="MissingKeyValues"
+                                MethodName="GetValues"
+                                ObjectType="{x:Type system:Enum}">
+                <ObjectDataProvider.MethodParameters>
+                    <x:Type TypeName="local:MissingKeyBehavior"/>
+                </ObjectDataProvider.MethodParameters>
+            </ObjectDataProvider>
+
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid Background="{DynamicResource {x:Static SystemColors.ScrollBarBrushKey}}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Иконка активности -->
+        <Image Grid.Column="0"
+               Width="32" Height="32" Margin="5"
+               VerticalAlignment="Center"
+               Source="pack://application:,,,/Primo.MIA;component/images/template.png"/>
+
+        <!-- Поля активности -->
+        <StackPanel Grid.Column="1"
+                    VerticalAlignment="Top"
+                    Margin="5,0,5,8">
+
+            <!-- Заголовок -->
+            <TextBlock Style="{StaticResource ActivityHeader}">
+                <Run Text="Текст: Шаблонизатор [" Foreground="#FF0E0E0E"/>
+                <Run Text="{Binding Prop_Syntax, Mode=OneWay}" Foreground="#FF1565C0"/>
+                <Run Text="]" Foreground="#FF0E0E0E"/>
+            </TextBlock>
+
+            <!-- Шаблон (многострочный) -->
+            <TextBlock Text="Шаблон:" Style="{StaticResource FieldLabel}"/>
+            <TextBox Text="{Binding Prop_Template, UpdateSourceTrigger=PropertyChanged}"
+                     Style="{StaticResource FieldBox}"
+                     AcceptsReturn="True"
+                     MinHeight="56"
+                     TextWrapping="Wrap"
+                     VerticalScrollBarVisibility="Auto"
+                     ToolTip="Текст с плейсхолдерами. Если указан «Файл шаблона» — это поле игнорируется"/>
+
+            <!-- Словарь переменных -->
+            <TextBlock Text="Переменные (словарь):" Style="{StaticResource FieldLabel}"/>
+            <TextBox Text="{Binding Prop_Variables, UpdateSourceTrigger=PropertyChanged}"
+                     Style="{StaticResource FieldBox}"
+                     ToolTip="Переменная типа Dictionary&lt;string,string&gt; со значениями для подстановки"/>
+
+            <!-- Синтаксис и поведение при пропуске в одной строке -->
+            <Grid Margin="0,2,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" Margin="0,0,4,0">
+                    <TextBlock Text="Синтаксис:" Style="{StaticResource FieldLabel}"/>
+                    <ComboBox ItemsSource="{Binding Source={StaticResource SyntaxValues}}"
+                              SelectedItem="{Binding Prop_Syntax}"
+                              Style="{StaticResource FieldComboBox}"
+                              ToolTip="DoubleBrace={{ключ}}, SingleBrace={ключ}, Percent=%ключ%"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1">
+                    <TextBlock Text="При отсутствии ключа:" Style="{StaticResource FieldLabel}"/>
+                    <ComboBox ItemsSource="{Binding Source={StaticResource MissingKeyValues}}"
+                              SelectedItem="{Binding Prop_MissingKeyBehavior}"
+                              Style="{StaticResource FieldComboBox}"
+                              ToolTip="LeaveAsIs — оставить плейсхолдер, ReplaceWithEmpty — очистить, ThrowError — ошибка"/>
+                </StackPanel>
+            </Grid>
+
+            <!-- Учитывать регистр -->
+            <CheckBox Content="Учитывать регистр ключей"
+                      IsChecked="{Binding Prop_CaseSensitive}"
+                      Margin="0,6,0,2"
+                      ToolTip="Если включено: ключ 'ФИО' и 'фио' считаются разными"
+                      Foreground="#FF0E0E0E"/>
+
+            <!-- Файл шаблона и кодировка в одной строке -->
+            <Grid Margin="0,4,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="90"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" Margin="0,0,4,0">
+                    <TextBlock Text="Файл шаблона (необязательно):" Style="{StaticResource FieldLabel}"
+                               ToolTip="Путь к файлу шаблона. Имеет приоритет над полем «Шаблон»"/>
+                    <TextBox Text="{Binding Prop_TemplateFile, UpdateSourceTrigger=PropertyChanged}"
+                             Style="{StaticResource FieldBox}"
+                             ToolTip="Путь к файлу шаблона. Имеет приоритет над полем «Шаблон»"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1">
+                    <TextBlock Text="Кодировка:" Style="{StaticResource FieldLabel}"
+                               ToolTip="Кодировка файла шаблона: UTF-8, Windows-1251, UTF-16 и др."/>
+                    <TextBox Text="{Binding Prop_Encoding, UpdateSourceTrigger=PropertyChanged}"
+                             Style="{StaticResource FieldBox}"
+                             ToolTip="По умолчанию UTF-8"/>
+                </StackPanel>
+            </Grid>
+
+        </StackPanel>
+    </Grid>
+</UserControl>
