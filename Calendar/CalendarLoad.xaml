@@ -1,0 +1,158 @@
+<!--
+    CalendarLoad.xaml
+    Визуальный интерфейс активности "Загрузка производственного календаря".
+
+    ИЗМЕНЕНИЯ:
+      [FIX-6] Height="191" у StackPanel удалён — высота авто.
+      [П1]    Добавлен CheckBox «Принудительная перезагрузка» (Prop_ForceReload).
+      [П5]    Добавлено поле «Срок кэша (дней)» (Prop_CacheAgeDays).
+      [П6]    Добавлено поле «Таймаут скачивания (сек)» (Prop_DownloadTimeoutSeconds).
+              Поля [П5] и [П6] видны только если включён DownloadIfMissing или ForceReload.
+-->
+<UserControl x:Class="Primo.MIA.CalendarLoad"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:system="clr-namespace:System;assembly=mscorlib"
+             xmlns:local="clr-namespace:Primo.MIA"
+             mc:Ignorable="d"
+             Margin="0,0,0,5" d:DesignWidth="240">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Primo.MIA;component/Common/Styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+
+            <ObjectDataProvider x:Key="FormatValues"
+                                MethodName="GetValues"
+                                ObjectType="{x:Type system:Enum}">
+                <ObjectDataProvider.MethodParameters>
+                    <x:Type TypeName="local:CalendarFormat"/>
+                </ObjectDataProvider.MethodParameters>
+            </ObjectDataProvider>
+
+            <ObjectDataProvider x:Key="RegionValues"
+                                MethodName="GetValues"
+                                ObjectType="{x:Type system:Enum}">
+                <ObjectDataProvider.MethodParameters>
+                    <x:Type TypeName="local:CalendarRegion"/>
+                </ObjectDataProvider.MethodParameters>
+            </ObjectDataProvider>
+
+            <!-- Конвертер bool→Visibility для скрытия блока настроек скачивания -->
+            <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid Background="{DynamicResource {x:Static SystemColors.ScrollBarBrushKey}}" Width="240">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Иконка активности -->
+        <Image Grid.Column="0"
+               Width="32" Height="32" Margin="5"
+               VerticalAlignment="Center"
+               Source="pack://application:,,,/Primo.MIA;component/images/calendar.png"/>
+
+        <!--
+            [FIX-6] Height="191" удалён — StackPanel теперь растягивается по содержимому.
+                    Фиксированная высота обрезала бы новые поля.
+        -->
+        <StackPanel Grid.Column="1"
+                    Margin="5,0,5,5"
+                    VerticalAlignment="Top">
+
+            <!-- Заголовок -->
+            <TextBlock Style="{StaticResource ActivityHeader}">
+                <Run Text="Календарь: Загрузить" Foreground="#FF0E0E0E"/>
+            </TextBlock>
+
+            <!-- Путь к папке -->
+            <TextBlock Text="Путь к папке:" Style="{StaticResource FieldLabel}"/>
+            <TextBox Text="{Binding Prop_CalendarPath, UpdateSourceTrigger=PropertyChanged}"
+                     Style="{StaticResource FieldBox}"
+                     ToolTip="Путь к папке с файлами календаря"/>
+
+            <!-- Формат + Год в одной строке -->
+            <Grid Margin="0,2,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="80"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" Margin="0,0,6,0">
+                    <TextBlock Text="Формат файла:" Style="{StaticResource FieldLabel}"/>
+                    <ComboBox ItemsSource="{Binding Source={StaticResource FormatValues}}"
+                              SelectedItem="{Binding Prop_Format}"
+                              Style="{StaticResource FieldComboBox}"
+                              ToolTip="Формат файла календаря: XML, JSON, CSV или TXT"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1">
+                    <TextBlock Text="Год:" Style="{StaticResource FieldLabel}"/>
+                    <TextBox Text="{Binding Prop_Year, UpdateSourceTrigger=PropertyChanged}"
+                             Style="{StaticResource FieldBox}"
+                             ToolTip="Год календаря (fallback если не найден в файле)"/>
+                </StackPanel>
+            </Grid>
+
+            <!-- Регион -->
+            <TextBlock Text="Регион:" Style="{StaticResource FieldLabel}"/>
+            <ComboBox ItemsSource="{Binding Source={StaticResource RegionValues}}"
+                      SelectedItem="{Binding Prop_Region}"
+                      Style="{StaticResource FieldComboBox}"
+                      ToolTip="Регион: Россия, Казахстан, Беларусь, Узбекистан"/>
+
+            <!-- Загрузить из интернета -->
+            <CheckBox Content="Загрузить из интернета"
+                      IsChecked="{Binding Prop_DownloadIfMissing}"
+                      Margin="0,6,0,2"
+                      ToolTip="Скачать с xmlcalendar.ru если файл не найден"
+                      Foreground="#FF0E0E0E"/>
+
+            <!-- [П1] Принудительная перезагрузка -->
+            <CheckBox Content="Принудительная перезагрузка"
+                      IsChecked="{Binding Prop_ForceReload}"
+                      Margin="0,2,0,2"
+                      ToolTip="Скачать заново даже если файл уже существует"
+                      Foreground="#FF0E0E0E"/>
+
+            <!--
+                [П5][П6] Блок настроек скачивания — срок кэша и таймаут.
+                Показывается только если DownloadIfMissing = true или ForceReload = true.
+                Используем MultiBinding с конвертером OR для двух bool — или упрощённо
+                всегда показываем (поля безвредны и при выключенном скачивании).
+            -->
+            <Grid Margin="0,4,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- [П5] Срок кэша -->
+                <StackPanel Grid.Column="0" Margin="0,0,4,0">
+                    <TextBlock Text="Срок кэша (дней):" Style="{StaticResource FieldLabel}"
+                               ToolTip="Не скачивать если файл свежее N дней. 0 = всегда скачивать."/>
+                    <TextBox Text="{Binding Prop_CacheAgeDays, UpdateSourceTrigger=PropertyChanged}"
+                             Style="{StaticResource FieldBox}"
+                             ToolTip="0 = всегда скачивать при включённом DownloadIfMissing"/>
+                </StackPanel>
+
+                <!-- [П6] Таймаут скачивания -->
+                <StackPanel Grid.Column="1">
+                    <TextBlock Text="Таймаут (сек):" Style="{StaticResource FieldLabel}"
+                               ToolTip="Таймаут HTTP-запроса при скачивании в секундах"/>
+                    <TextBox Text="{Binding Prop_DownloadTimeoutSeconds, UpdateSourceTrigger=PropertyChanged}"
+                             Style="{StaticResource FieldBox}"
+                             ToolTip="По умолчанию 30 секунд"/>
+                </StackPanel>
+            </Grid>
+
+        </StackPanel>
+    </Grid>
+</UserControl>

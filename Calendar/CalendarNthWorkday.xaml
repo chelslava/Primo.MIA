@@ -1,0 +1,170 @@
+<!--
+    CalendarNthWorkday.xaml
+    Визуальный интерфейс активности «Календарь: Nth рабочий день».
+
+    Видимость полей зависит от выбранного периода:
+      Month   → показывается поле «Месяц»
+      Quarter → показывается поле «Квартал»
+      HalfYear→ показывается поле «Полугодие» (тот же ComboBox через Prop_Quarter)
+      Year    → дополнительных полей не нужно
+
+    Поле «Маска дней» показывается только при CustomMask.
+-->
+<UserControl x:Class="Primo.MIA.CalendarNthWorkday"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:system="clr-namespace:System;assembly=mscorlib"
+             xmlns:local="clr-namespace:Primo.MIA"
+             mc:Ignorable="d"
+             d:DesignHeight="260"
+             Margin="0,0,0,5">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Primo.MIA;component/Common/Styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+
+            <!-- Значения NthWorkdayPeriod для ComboBox периода -->
+            <ObjectDataProvider x:Key="PeriodValues"
+                                MethodName="GetValues"
+                                ObjectType="{x:Type system:Enum}">
+                <ObjectDataProvider.MethodParameters>
+                    <x:Type TypeName="local:NthWorkdayPeriod"/>
+                </ObjectDataProvider.MethodParameters>
+            </ObjectDataProvider>
+
+            <!-- Значения DayOfWeekFilter для ComboBox фильтра -->
+            <ObjectDataProvider x:Key="DayOfWeekFilterValues"
+                                MethodName="GetValues"
+                                ObjectType="{x:Type system:Enum}">
+                <ObjectDataProvider.MethodParameters>
+                    <x:Type TypeName="local:DayOfWeekFilter"/>
+                </ObjectDataProvider.MethodParameters>
+            </ObjectDataProvider>
+
+            <!--
+                Конвертеры для управления видимостью полей в зависимости от периода
+                и фильтра дней недели.
+            -->
+            <local:EnumToVisibilityConverter      x:Key="EnumToVisConverter"/>
+            <local:MultiEnumToVisibilityConverter x:Key="MultiEnumToVisConverter"/>
+
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid Background="{DynamicResource {x:Static SystemColors.ScrollBarBrushKey}}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Иконка активности -->
+        <Image Grid.Column="0"
+               Width="32" Height="32" Margin="5"
+               VerticalAlignment="Center"
+               Source="pack://application:,,,/Primo.MIA;component/images/calendar.png"/>
+
+        <!-- Поля активности -->
+        <StackPanel Grid.Column="1"
+                    VerticalAlignment="Top"
+                    Margin="5,0,5,8">
+
+            <!-- Заголовок с отображением периода -->
+            <TextBlock Style="{StaticResource ActivityHeader}">
+                <Run Text="Календарь: " Foreground="#FF0E0E0E"/>
+                <Run Text="{Binding Prop_N, Mode=OneWay}" Foreground="#FF1565C0"/>
+                <Run Text="-й рабочий день [" Foreground="#FF0E0E0E"/>
+                <Run Text="{Binding Prop_Period, Mode=OneWay}" Foreground="#FF1565C0"/>
+                <Run Text="]" Foreground="#FF0E0E0E"/>
+            </TextBlock>
+
+            <!-- ID календаря -->
+            <TextBlock Text="ID календаря:" Style="{StaticResource FieldLabel}"/>
+            <TextBox Text="{Binding Prop_CalendarId, UpdateSourceTrigger=PropertyChanged}"
+                     Style="{StaticResource FieldBox}"
+                     ToolTip="GUID из активности «Календарь: Загрузить»"/>
+
+            <!-- N и Период в одной строке -->
+            <Grid Margin="0,2,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="70"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" Margin="0,0,6,0">
+                    <TextBlock Text="N:" Style="{StaticResource FieldLabel}"
+                               ToolTip="1=первый, -1=последний, -2=предпоследний"/>
+                    <TextBox Text="{Binding Prop_N, UpdateSourceTrigger=PropertyChanged}"
+                             Style="{StaticResource FieldBox}"
+                             ToolTip="Номер рабочего дня (отрицательный = с конца)"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1">
+                    <TextBlock Text="Период:" Style="{StaticResource FieldLabel}"/>
+                    <ComboBox ItemsSource="{Binding Source={StaticResource PeriodValues}}"
+                              SelectedItem="{Binding Prop_Period}"
+                              Style="{StaticResource FieldComboBox}"
+                              ToolTip="Month / Quarter / HalfYear / Year"/>
+                </StackPanel>
+            </Grid>
+
+            <!-- Поле «Месяц» — только для Period=Month -->
+            <StackPanel Visibility="{Binding Prop_Period,
+                                    Converter={StaticResource EnumToVisConverter},
+                                    ConverterParameter=Month}">
+                <TextBlock Text="Месяц (1–12):" Style="{StaticResource FieldLabel}"/>
+                <TextBox Text="{Binding Prop_Month, UpdateSourceTrigger=PropertyChanged}"
+                         Style="{StaticResource FieldBox}"
+                         ToolTip="Номер месяца от 1 (январь) до 12 (декабрь)"/>
+            </StackPanel>
+
+            <!-- Поле «Квартал» — только для Period=Quarter -->
+            <StackPanel Visibility="{Binding Prop_Period,
+                                    Converter={StaticResource EnumToVisConverter},
+                                    ConverterParameter=Quarter}">
+                <TextBlock Text="Квартал (1–4):" Style="{StaticResource FieldLabel}"/>
+                <TextBox Text="{Binding Prop_Quarter, UpdateSourceTrigger=PropertyChanged}"
+                         Style="{StaticResource FieldBox}"
+                         ToolTip="Номер квартала: 1=янв–мар, 2=апр–июн, 3=июл–сен, 4=окт–дек"/>
+            </StackPanel>
+
+            <!-- Поле «Полугодие» — только для Period=HalfYear -->
+            <StackPanel Visibility="{Binding Prop_Period,
+                                    Converter={StaticResource EnumToVisConverter},
+                                    ConverterParameter=HalfYear}">
+                <TextBlock Text="Полугодие (1–2):" Style="{StaticResource FieldLabel}"/>
+                <TextBox Text="{Binding Prop_Quarter, UpdateSourceTrigger=PropertyChanged}"
+                         Style="{StaticResource FieldBox}"
+                         ToolTip="1 = январь–июнь, 2 = июль–декабрь"/>
+            </StackPanel>
+
+            <!-- Включать сокращённые дни -->
+            <CheckBox Content="Включать сокращённые дни"
+                      IsChecked="{Binding Prop_IncludeShortDays}"
+                      Margin="0,6,0,2"
+                      ToolTip="Учитывать ShortWorkday (например, 31 декабря) в отсчёте N"
+                      Foreground="#FF0E0E0E"/>
+
+            <!-- Фильтр по дням недели -->
+            <TextBlock Text="Фильтр дней недели:" Style="{StaticResource FieldLabel}"/>
+            <ComboBox ItemsSource="{Binding Source={StaticResource DayOfWeekFilterValues}}"
+                      SelectedItem="{Binding Prop_DayOfWeekFilter}"
+                      Style="{StaticResource FieldComboBox}"
+                      ToolTip="Искать только среди указанных дней (All = без фильтра)"/>
+
+            <!-- Маска дней — только для CustomMask -->
+            <StackPanel Visibility="{Binding Prop_DayOfWeekFilter,
+                                    Converter={StaticResource EnumToVisConverter},
+                                    ConverterParameter=CustomMask}">
+                <TextBlock Text="Маска дней (Пн=1..Вс=7):" Style="{StaticResource FieldLabel}"/>
+                <TextBox Text="{Binding Prop_DayOfWeekMask, UpdateSourceTrigger=PropertyChanged}"
+                         Style="{StaticResource FieldBox}"
+                         ToolTip="Например: 1,3,5 — понедельник, среда, пятница"/>
+            </StackPanel>
+
+        </StackPanel>
+    </Grid>
+</UserControl>

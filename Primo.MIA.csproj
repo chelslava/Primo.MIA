@@ -112,6 +112,7 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml" />
     <Reference Include="Tomlyn, Version=0.16.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>packages\Tomlyn.0.16.2\lib\netstandard2.0\Tomlyn.dll</HintPath>
@@ -255,10 +256,24 @@
     <Compile Include="Browser\Services\ElementRepository.cs" />
     <Compile Include="Browser\Services\SessionManager.cs" />
     <Compile Include="Browser\SessionResolver.cs" />
+    <Compile Include="Calendar\CalendarNextDayOfWeek.xaml.cs">
+      <DependentUpon>CalendarNextDayOfWeek.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Calendar\CalendarNextDayOfWeekBack.cs" />
+    <Compile Include="Calendar\CalendarNthWorkday.xaml.cs">
+      <DependentUpon>CalendarNthWorkday.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Calendar\CalendarNthWorkdayBack.cs" />
+    <Compile Include="Calendar\CalendarWorkdaysList.xaml.cs">
+      <DependentUpon>CalendarWorkdaysList.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Calendar\CalendarWorkdaysListBack.cs" />
+    <Compile Include="Calendar\Models\ProductionCalendar.cs" />
     <Compile Include="Common\ActivityCategories.cs" />
     <Compile Include="Common\ActivityIcons.cs" />
     <Compile Include="Common\ActivityStrings.cs" />
     <Compile Include="Common\ComparisonHelper.cs" />
+    <Compile Include="Enums.cs" />
     <Compile Include="Common\FileHelper.cs" />
     <Compile Include="Common\NaturalComparer.cs" />
     <Compile Include="Common\PropertyBuilder.cs" />
@@ -320,7 +335,6 @@
       <DependentUpon>DictionaryOperationsSmall.xaml</DependentUpon>
     </Compile>
     <Compile Include="Dictionary\DictionarySetValueBack.cs" />
-    <Compile Include="Enums.cs" />
     <Compile Include="List\ListGroup.xaml.cs">
       <DependentUpon>ListGroup.xaml</DependentUpon>
     </Compile>
@@ -418,6 +432,23 @@
     <Compile Include="Tuple\TupleZipBack.cs" />
     <Compile Include="Tuple\TupleSetBack.cs" />
     <Compile Include="RepoDict.cs" />
+    <Compile Include="Calendar\CalendarLoad.xaml.cs">
+      <DependentUpon>CalendarLoad.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Calendar\CalendarLoadBack.cs" />
+    <Compile Include="Calendar\BusinessCalendar.xaml.cs">
+      <DependentUpon>BusinessCalendar.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Calendar\BusinessCalendarBack.cs" />
+    <Compile Include="Calendar\Models\CalendarStatistics.cs" />
+    <Compile Include="Calendar\Models\CalendarDay.cs" />
+    <Compile Include="Calendar\Models\ProductionCalendar.cs" />
+    <Compile Include="Calendar\Parsers\ICalendarParser.cs" />
+    <Compile Include="Calendar\Parsers\CalendarParseException.cs" />
+    <Compile Include="Calendar\Parsers\XmlCalendarParser.cs" />
+    <Compile Include="Calendar\Parsers\JsonCalendarParser.cs" />
+    <Compile Include="Calendar\Parsers\CsvCalendarParser.cs" />
+    <Compile Include="Calendar\Parsers\TxtCalendarParser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -453,6 +484,13 @@
     <None Include="doc\Browser\28_BrowserTabManage.md" />
     <None Include="doc\Browser\29_BrowserWindowManage.md" />
     <None Include="doc\Browser\README.md" />
+    <None Include="doc\Calendar\00_INDEX.md" />
+    <None Include="doc\Calendar\01_CalendarLoad.md" />
+    <None Include="doc\Calendar\02_BusinessCalendar.md" />
+    <None Include="doc\Calendar\03_CalendarWorkdaysList.md" />
+    <None Include="doc\Calendar\04_CalendarNthWorkday.md" />
+    <None Include="doc\Calendar\05_CalendarNextDayOfWeek.md" />
+    <None Include="doc\DataTableToHtml.md" />
     <None Include="doc\Dictionary\00_INDEX.md" />
     <None Include="doc\Dictionary\01_DictionaryCreate.md" />
     <None Include="doc\Dictionary\02_DictionaryFilter.md" />
@@ -618,6 +656,18 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Calendar\CalendarNextDayOfWeek.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Calendar\CalendarNthWorkday.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Calendar\CalendarWorkdaysList.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Dictionary\DictionaryContainsValue.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -770,6 +820,14 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Calendar\CalendarLoad.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Calendar\BusinessCalendar.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Resource Include="images\config.png">
@@ -822,6 +880,11 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="images\table.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="images\calendar.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
   </ItemGroup>

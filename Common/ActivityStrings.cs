@@ -1,3 +1,19 @@
+// =============================================================================
+// ActivityStrings.cs — централизованные текстовые константы для активностей.
+//
+// ИЗМЕНЕНИЯ:
+//   Добавлены константы в секцию BUSINESS CALENDAR:
+//     Error_CalendarIdRequired     — ID календаря обязателен
+//     Error_InvalidInputDate       — некорректный формат входной даты
+//     Error_DaysCountMustBeInteger — количество дней должно быть целым числом
+//     Error_EndDateRequired        — конечная дата обязательна для CountWorkdays
+//     Field_EndDate                — конечная дата диапазона
+//     Field_WorkdaysBetween        — рабочих дней в диапазоне
+//     Field_ForceReload            — принудительная перезагрузка
+//     Field_CacheAgeDays           — срок кэша в днях
+//     Field_DownloadTimeoutSeconds — таймаут скачивания
+// =============================================================================
+
 namespace Primo.MIA.Common
 {
     /// <summary>
@@ -38,7 +54,6 @@ namespace Primo.MIA.Common
         public const string Category_ToString = "ToString";
         public const string Category_Optional = "Опционально";
 
-        // Категории для Generators
         public const string Category_Guid = "2. GUID";
         public const string Category_FileName = "3. Имя файла";
         public const string Category_RandomNumber = "4. Случайное число";
@@ -162,10 +177,7 @@ namespace Primo.MIA.Common
         // НАЗВАНИЯ АКТИВНОСТЕЙ
         // ═══════════════════════════════════════════════════════════════════════
 
-        // HTTP
         public const string Activity_HttpRequest = "HTTP запрос";
-
-        // Dictionary
         public const string Activity_DictionaryCreate = "Словарь: Создать";
         public const string Activity_DictionaryGetValue = "Словарь: Получить значение";
         public const string Activity_DictionarySetValue = "Словарь: Установить значение";
@@ -177,8 +189,7 @@ namespace Primo.MIA.Common
         public const string Activity_DictionaryFromString = "Словарь: Из строки";
         public const string Activity_DictionaryToString = "Словарь: В строку";
         public const string Activity_DictionaryOperations = "Словарь: Операции";
-
-        // List
+        public const string Activity_DictionaryRemoveKey = "Словарь: Удалить ключ";
         public const string Activity_ListFilter = "Список: Фильтрация";
         public const string Activity_ListTransform = "Список: Преобразование";
         public const string Activity_ListSort = "Список: Сортировка";
@@ -188,8 +199,6 @@ namespace Primo.MIA.Common
         public const string Activity_ListInspect = "Список: Анализ";
         public const string Activity_ListConvert = "Список: Конвертация";
         public const string Activity_ListGroup = "Список: Группировка";
-
-        // Tuple
         public const string Activity_TupleCreate = "Кортеж: Создать";
         public const string Activity_TupleDestructure = "Кортеж: Деструктуризация";
         public const string Activity_TupleGet = "Кортеж: Получить элемент";
@@ -199,8 +208,6 @@ namespace Primo.MIA.Common
         public const string Activity_TupleZip = "Кортеж: Zip списков";
         public const string Activity_TupleUnzip = "Кортеж: Unzip списков";
         public const string Activity_TupleSort = "Кортеж: Сортировка списка";
-
-        // Utilities
         public const string Activity_LogMessage = "Логирование";
         public const string Activity_SearchFiles = "Поиск файлов";
         public const string Activity_ReadTomlConfig = "Чтение TOML конфигурации";
@@ -208,11 +215,8 @@ namespace Primo.MIA.Common
         public const string Activity_ExcelCellRecalculate = "Excel: Пересчёт ячеек";
         public const string Activity_WaitForFile = "Ожидание файла";
 
-        // Dictionary (дополнительные)
-        public const string Activity_DictionaryRemoveKey = "Словарь: Удалить ключ";
-
         // ═══════════════════════════════════════════════════════════════════════
-        // ДОПОЛНИТЕЛЬНЫЕ ПОЛЯ
+        // ДОПОЛНИТЕЛЬНЫЕ ПОЛЯ (сохранены все оригинальные константы)
         // ═══════════════════════════════════════════════════════════════════════
 
         public const string Field_Message = "Сообщение";
@@ -267,8 +271,6 @@ namespace Primo.MIA.Common
         public const string Field_Rejected = "Не прошли фильтр";
         public const string Field_MatchedCount = "Кол-во прошедших";
         public const string Field_RejectedCount = "Кол-во отсеянных";
-
-        // Tuple fields
         public const string Field_ItemIndex = "Номер элемента";
         public const string Field_NewValue = "Новое значение";
         public const string Field_NewTuple = "Новый кортеж";
@@ -305,8 +307,6 @@ namespace Primo.MIA.Common
         public const string Field_SortKey = "Ключ сортировки";
         public const string Field_Direction = "Направление";
         public const string Field_SortType = "Тип сортировки";
-
-        // List fields
         public const string Field_GroupingMode = "Способ группировки";
         public const string Field_PrefixLength = "Длина префикса";
         public const string Field_RegexPattern = "Regex паттерн";
@@ -340,20 +340,14 @@ namespace Primo.MIA.Common
         public const string Field_NumericResult = "Числовой результат";
         public const string Field_NumericCount = "Кол-во числовых";
         public const string Field_ChangedCount = "Изменилось элементов";
-
-        // Dictionary fields
         public const string Field_Query = "Строка поиска / паттерн";
         public const string Field_Target = "Где искать";
         public const string Field_SearchMethod = "Метод поиска";
         public const string Field_FilteredOutCount = "Отсеяно фильтром";
-
-        // Excel fields
         public const string Field_StartCell = "Начальная ячейка";
         public const string Field_RowOffset = "Смещение по строке (ΔR)";
         public const string Field_ColumnOffset = "Смещение по столбцу (ΔC)";
         public const string Field_TargetCell = "Целевая ячейка";
-
-        // Generator fields
         public const string Field_GenerationType = "Тип генерации";
         public const string Field_GuidFormat = "Формат GUID";
         public const string Field_BaseName = "Базовое имя";
@@ -372,8 +366,6 @@ namespace Primo.MIA.Common
         public const string Field_Template = "Шаблон";
         public const string Field_Variables = "Переменные";
         public const string Field_OutputVariable = "Результат";
-
-        // TOML Config fields
         public const string Field_FilePath = "Путь к файлу";
         public const string Field_ReadMode = "Режим чтения";
         public const string Field_KeyPath = "Ключ (section.key)";
@@ -390,8 +382,6 @@ namespace Primo.MIA.Common
         public const string Field_AvailableProfiles = "Доступные профили";
         public const string Field_ProfileKeysCount = "Ключей из профиля";
         public const string Field_DefaultKeysCount = "Ключей из default";
-
-        // WaitForFile fields
         public const string Field_WaitMode = "Режим ожидания";
         public const string Field_FilePattern = "Маска файла";
         public const string Field_CheckInterval = "Интервал проверки (мс)";
@@ -406,14 +396,11 @@ namespace Primo.MIA.Common
         // BROWSER / SELENIUM
         // ═══════════════════════════════════════════════════════════════════════
 
-        // Browser categories
         public const string Category_Browser = "Браузер";
         public const string Category_BrowserOptions = "2. Опции браузера";
         public const string Category_Element = "Элемент";
         public const string Category_Wait = "Ожидание";
         public const string Category_Locator = "Локатор";
-
-        // Browser fields
         public const string Field_SessionId = "ID сессии";
         public const string Field_BrowserType = "Тип браузера";
         public const string Field_Headless = "Headless режим";
@@ -424,16 +411,12 @@ namespace Primo.MIA.Common
         public const string Field_WindowSize = "Размер окна";
         public const string Field_PageLoadTimeout = "Таймаут загрузки (сек)";
         public const string Field_ImplicitWait = "Неявное ожидание (сек)";
-
-        // Element locator fields
         public const string Field_LocatorType = "Тип локатора";
         public const string Field_LocatorValue = "Значение локатора";
         public const string Field_ElementId = "ID элемента";
         public const string Field_ElementIds = "Список ID элементов";
         public const string Field_WaitTimeout = "Таймаут (сек)";
         public const string Field_WaitCondition = "Условие ожидания";
-
-        // Element interaction fields
         public const string Field_Text = "Текст";
         public const string Field_ClearBeforeType = "Очистить перед вводом";
         public const string Field_SimulateTyping = "Эмуляция печати";
@@ -446,8 +429,6 @@ namespace Primo.MIA.Common
         public const string Field_PropertyName = "Имя свойства";
         public const string Field_AttributeName = "Имя атрибута";
         public const string Field_CssProperty = "CSS свойство";
-
-        // Element state fields
         public const string Field_IsVisible = "Видим";
         public const string Field_IsEnabled = "Включён";
         public const string Field_IsSelected = "Выбран";
@@ -455,28 +436,18 @@ namespace Primo.MIA.Common
         public const string Field_ElementText = "Текст элемента";
         public const string Field_ElementValue = "Значение элемента";
         public const string Field_ElementCount = "Количество элементов";
-
-        // Browser navigation fields
         public const string Field_NavigateUrl = "URL для перехода";
         public const string Field_CurrentUrl = "Текущий URL";
         public const string Field_PageTitle = "Заголовок страницы";
         public const string Field_PageSource = "HTML код страницы";
-
-        // Screenshot fields
         public const string Field_ScreenshotPath = "Путь к скриншоту";
         public const string Field_ScreenshotBase64 = "Скриншот (Base64)";
-
-        // JavaScript fields
         public const string Field_JavaScriptCode = "JavaScript код";
         public const string Field_ScriptArguments = "Аргументы скрипта";
         public const string Field_ScriptResult = "Результат выполнения";
-
-        // Select fields
         public const string Field_SelectMode = "Режим выбора";
         public const string Field_SelectValue = "Значение для выбора";
         public const string Field_SelectedOptions = "Выбранные опции";
-
-        // Cookie fields
         public const string Field_CookieOperation = "Операция";
         public const string Field_CookieName = "Имя cookie";
         public const string Field_CookieValue = "Значение cookie";
@@ -484,24 +455,16 @@ namespace Primo.MIA.Common
         public const string Field_CookiePath = "Путь";
         public const string Field_CookieExpiry = "Срок действия";
         public const string Field_Cookies = "Cookies";
-
-        // Switch context fields
         public const string Field_SwitchToType = "Тип контекста";
         public const string Field_FrameLocator = "Локатор фрейма";
         public const string Field_WindowHandle = "Handle окна";
         public const string Field_WindowHandles = "Список handles";
-
-        // Alert fields
         public const string Field_AlertAction = "Действие";
         public const string Field_AlertText = "Текст алерта";
         public const string Field_AlertInput = "Текст для ввода";
-
-        // Scroll fields
         public const string Field_ScrollAlignment = "Выравнивание";
         public const string Field_ScrollPixels = "Пиксели";
         public const string Field_ScrollDirection = "Направление";
-
-        // Browser errors
         public const string Error_SessionNotFound = "Сессия браузера не найдена";
         public const string Error_LocatorValueRequired = "Значение локатора обязательно";
         public const string Error_ElementIdRequired = "ID элемента обязателен";
@@ -510,8 +473,6 @@ namespace Primo.MIA.Common
         public const string Error_JavaScriptRequired = "JavaScript код обязателен";
         public const string Error_CookieNameRequired = "Имя cookie обязательно";
         public const string Error_InvalidWindowHandle = "Некорректный handle окна";
-
-        // Browser activities
         public const string Activity_BrowserOpen = "Браузер: Открыть";
         public const string Activity_BrowserClose = "Браузер: Закрыть";
         public const string Activity_BrowserNavigate = "Браузер: Навигация";
@@ -537,10 +498,7 @@ namespace Primo.MIA.Common
         // DATATABLE TO HTML
         // ═══════════════════════════════════════════════════════════════════════
 
-        // Category
         public const string Category_Style = "Стиль";
-
-        // Fields
         public const string Field_DataTable = "Таблица данных";
         public const string Field_HtmlTheme = "Тема оформления";
         public const string Field_HtmlOutputMode = "Режим вывода HTML";
@@ -554,10 +512,192 @@ namespace Primo.MIA.Common
         public const string Field_HtmlOutput = "HTML-код";
         public const string Field_RowCount = "Количество строк";
         public const string Field_ColumnCount = "Количество столбцов";
-
-        // Errors
         public const string Error_DataTableRequired = "Исходная таблица данных не указана";
         public const string Error_MaxRowsNegative = "Максимальное количество строк не может быть отрицательным";
         public const string Error_CustomThemeRequiresColors = "При выборе пользовательской темы необходимо указать хотя бы один цвет";
+
+        // ═══════════════════════════════════════════════════════════════════════
+        // BUSINESS CALENDAR (Производственный календарь)
+        // ═══════════════════════════════════════════════════════════════════════
+
+        public const string Activity_CalendarLoad      = "Календарь: Загрузить";
+        public const string Activity_BusinessCalendar  = "Календарь: Операции";
+
+        // Fields - CalendarLoad
+        public const string Field_CalendarPath     = "Путь к папке календаря";
+        public const string Field_CalendarYear     = "Год";
+        public const string Field_CalendarFormat   = "Формат файла";
+        public const string Field_CalendarRegion   = "Регион";
+        public const string Field_DownloadIfMissing = "Загрузить из интернета";
+        public const string Field_Calendar         = "Календарь";
+        public const string Field_CalendarLoaded   = "Календарь загружен";
+        public const string Field_CalendarFilePath = "Путь к файлу календаря";
+        public const string Field_LoadedFrom       = "Загружен из";
+        public const string Field_CalendarSource   = "Источник";
+        public const string Field_CalendarID       = "ID календаря";
+
+        /// <summary>[П1] Принудительно скачать файл заново.</summary>
+        public const string Field_ForceReload           = "Принудительная перезагрузка";
+
+        /// <summary>[П5] Максимальный возраст кэша в днях.</summary>
+        public const string Field_CacheAgeDays          = "Срок кэша (дней)";
+
+        /// <summary>[П6] Таймаут HTTP-скачивания в секундах.</summary>
+        public const string Field_DownloadTimeoutSeconds = "Таймаут скачивания (сек)";
+
+        // Fields - BusinessCalendar
+        public const string Field_OperationMode    = "Режим операции";
+        public const string Field_InputDate        = "Входная дата";
+        public const string Field_DaysCount        = "Количество дней";
+        public const string Field_ResultDate       = "Результат (дата)";
+        public const string Field_DayType          = "Тип дня";
+        public const string Field_IsWorkday        = "Рабочий день";
+        public const string Field_HolidayName      = "Название праздника";
+        public const string Field_WorkdaysInYear   = "Рабочих дней в году";
+        public const string Field_HolidaysInYear   = "Праздничных дней в году";
+        public const string Field_Hours40          = "Часов (40-час. неделя)";
+        public const string Field_Hours36          = "Часов (36-час. неделя)";
+        public const string Field_Hours24          = "Часов (24-час. неделя)";
+
+        /// <summary>[П2] Конечная дата диапазона для CountWorkdays.</summary>
+        public const string Field_EndDate          = "Конечная дата";
+
+        /// <summary>[П2] Количество рабочих дней в диапазоне.</summary>
+        public const string Field_WorkdaysBetween  = "Рабочих дней в диапазоне";
+
+        // Errors - Calendar (оригинальные)
+        public const string Error_CalendarPathRequired    = "Путь к папке календаря обязателен";
+        public const string Error_CalendarYearRequired    = "Год календаря обязателен";
+        public const string Error_CalendarRequired        = "Календарь не загружен";
+        public const string Error_InputDateRequired       = "Входная дата обязательна";
+        public const string Error_DaysCountRequired       = "Количество дней обязательно";
+        public const string Error_CalendarFileNotFound    = "Файл календаря не найден";
+        public const string Error_CalendarDownloadFailed  = "Не удалось скачать календарь из интернета";
+        public const string Error_CalendarParseFailed     = "Ошибка разбора файла календаря";
+        public const string Error_CalendarUnsupportedFormat = "Неподдерживаемый формат календаря";
+        public const string Error_DateOutOfRange          = "Дата вне диапазона календаря";
+        public const string Error_YearMustBeInteger       = "Год должен быть целым числом";
+
+        // Errors - Calendar (новые)
+        /// <summary>ID календаря не указан в поле «ID календаря».</summary>
+        public const string Error_CalendarIdRequired      = "ID календаря обязателен";
+
+        /// <summary>Поле «Входная дата» содержит некорректное значение.</summary>
+        public const string Error_InvalidInputDate        = "Некорректный формат входной даты. Ожидается значение типа DateTime.";
+
+        /// <summary>Поле «Количество дней» содержит нецелое значение.</summary>
+        public const string Error_DaysCountMustBeInteger  = "Количество дней должно быть целым числом";
+
+        /// <summary>[П2] Конечная дата обязательна для режима CountWorkdays.</summary>
+        public const string Error_EndDateRequired         = "Конечная дата обязательна для режима «Рабочих дней в диапазоне»";
+
+        // ═══════════════════════════════════════════════════════════════════════
+        // CALENDAR WORKDAYS LIST (Рабочие дни списком)
+        // ═══════════════════════════════════════════════════════════════════════
+
+        /// <summary>Название активности «Календарь: Рабочие дни списком».</summary>
+        public const string Activity_CalendarWorkdaysList = "Календарь: Рабочие дни списком";
+
+        // Fields
+        /// <summary>Начальная дата диапазона.</summary>
+        public const string Field_StartDate              = "Начальная дата";
+
+        /// <summary>Включать сокращённые рабочие дни (ShortWorkday).</summary>
+        public const string Field_IncludeShortDays       = "Включать сокращённые дни";
+
+        /// <summary>Фильтр по дням недели (DayOfWeekFilter).</summary>
+        public const string Field_DayOfWeekFilter        = "Фильтр дней недели";
+
+        /// <summary>Пользовательская маска дней недели (строка "1,3,5").</summary>
+        public const string Field_DayOfWeekMask          = "Маска дней (Пн=1..Вс=7)";
+
+        /// <summary>Выходной список рабочих дней List&lt;DateTime&gt;.</summary>
+        public const string Field_WorkdaysList           = "Список рабочих дней";
+
+        /// <summary>Количество найденных рабочих дней.</summary>
+        public const string Field_WorkdaysCount          = "Количество дней";
+
+        /// <summary>Первый рабочий день в диапазоне.</summary>
+        public const string Field_FirstWorkday           = "Первый рабочий день";
+
+        /// <summary>Последний рабочий день в диапазоне.</summary>
+        public const string Field_LastWorkday            = "Последний рабочий день";
+
+        // Errors
+        /// <summary>Начальная дата не указана или некорректна.</summary>
+        public const string Error_StartDateRequired      = "Начальная дата обязательна";
+
+        /// <summary>Некорректный формат начальной даты.</summary>
+        public const string Error_InvalidStartDate       = "Некорректный формат начальной даты. Ожидается значение типа DateTime.";
+
+        /// <summary>Некорректный формат конечной даты.</summary>
+        public const string Error_InvalidEndDate         = "Некорректный формат конечной даты. Ожидается значение типа DateTime.";
+
+        /// <summary>Маска дней недели обязательна при фильтре CustomMask.</summary>
+        public const string Error_DayOfWeekMaskRequired  = "Маска дней недели обязательна при выборе фильтра CustomMask. Формат: \"1,3,5\" (Пн=1..Вс=7).";
+
+        /// <summary>Строка маски дней недели содержит некорректные значения.</summary>
+        public const string Error_InvalidDayOfWeekMask   = "Некорректная маска дней недели. Используйте номера 1–7 через запятую (Пн=1, Вт=2, Ср=3, Чт=4, Пт=5, Сб=6, Вс=7). Пример: \"1,3,5\".";
+
+        // ═══════════════════════════════════════════════════════════════════════
+        // CALENDAR NTH WORKDAY (Nth рабочий день)
+        // ═══════════════════════════════════════════════════════════════════════
+
+        /// <summary>Название активности «Календарь: Nth рабочий день».</summary>
+        public const string Activity_CalendarNthWorkday  = "Календарь: Nth рабочий день";
+
+        // Fields
+        /// <summary>Номер рабочего дня N (1=первый, -1=последний).</summary>
+        public const string Field_NthNumber              = "N (номер рабочего дня)";
+
+        /// <summary>Тип периода (Month / Quarter / HalfYear / Year).</summary>
+        public const string Field_NthPeriod              = "Период";
+
+        /// <summary>Месяц периода (1–12) для Period=Month.</summary>
+        public const string Field_NthMonth               = "Месяц (1–12)";
+
+        /// <summary>Квартал (1–4) или полугодие (1–2).</summary>
+        public const string Field_NthQuarter             = "Квартал / Полугодие";
+
+        /// <summary>Общее количество рабочих дней в периоде.</summary>
+        public const string Field_TotalWorkdays          = "Рабочих дней в периоде";
+
+        /// <summary>Флаг: найден ли N-й рабочий день.</summary>
+        public const string Field_NthIsFound             = "Найден";
+
+        // Errors
+        /// <summary>N не указан или равен нулю.</summary>
+        public const string Error_NthNRequired           = "N обязателен и не может быть равен нулю (1=первый, -1=последний)";
+
+        /// <summary>Месяц не указан при Period=Month.</summary>
+        public const string Error_NthMonthRequired       = "Месяц обязателен при периоде Month";
+
+        /// <summary>Квартал/полугодие не указаны при Period=Quarter или HalfYear.</summary>
+        public const string Error_NthQuarterRequired     = "Квартал / номер полугодия обязателен для выбранного периода";
+
+        // ═══════════════════════════════════════════════════════════════════════
+        // CALENDAR NEXT DAY OF WEEK (Следующий день недели)
+        // ═══════════════════════════════════════════════════════════════════════
+
+        /// <summary>Название активности.</summary>
+        public const string Activity_CalendarNextDayOfWeek = "Календарь: Следующий день недели";
+
+        /// <summary>Искомый день недели (TargetDayOfWeek).</summary>
+        public const string Field_TargetDayOfWeek        = "День недели";
+
+        /// <summary>Режим поиска (DayOfWeekSearchMode).</summary>
+        public const string Field_DayOfWeekSearchMode    = "Режим поиска";
+
+        /// <summary>Поведение при попадании на выходной (DeadlineWeekendBehavior).</summary>
+        public const string Field_IfWeekend              = "При выходном";
+
+        /// <summary>Учитывать стартовую дату если она совпадает с нужным днём.</summary>
+        public const string Field_IncludeStartDate       = "Включать стартовую дату";
+
+        /// <summary>Максимум дней поиска вперёд.</summary>
+        public const string Field_MaxLookAhead           = "Макс. дней поиска";
+
+        /// <summary>Сколько дней от StartDate до найденного результата.</summary>
+        public const string Field_DaysAhead              = "Дней вперёд";
     }
 }

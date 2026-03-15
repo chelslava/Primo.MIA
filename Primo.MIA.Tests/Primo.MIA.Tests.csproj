@@ -24,4 +24,40 @@
     <ProjectReference Include="..\Primo.MIA.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="PresentationFramework" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="WindowsBase" />
+    <Reference Include="LTools.Common">
+      <HintPath>C:\Program Files\Primo\Primo Studio Community x64\LTools.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="LTools.Dto">
+      <HintPath>C:\Program Files\Primo\Primo Studio Community x64\LTools.Dto.dll</HintPath>
+    </Reference>
+    <Reference Include="LTools.Enums">
+      <HintPath>C:\Program Files\Primo\Primo Studio Community x64\LTools.Enums.dll</HintPath>
+    </Reference>
+    <Reference Include="LTools.Scripting">
+      <HintPath>C:\Program Files\Primo\Primo Studio Community x64\LTools.Scripting.dll</HintPath>
+    </Reference>
+    <Reference Include="LTools.SDK">
+      <HintPath>C:\Program Files\Primo\Primo Studio Community x64\LTools.SDK.dll</HintPath>
+    </Reference>
+    <Reference Include="LTools.Workflow">
+      <HintPath>C:\Program Files\Primo\Primo Studio Community x64\LTools.Workflow.dll</HintPath>
+    </Reference>
+    <Reference Include="Primo.Orchestrator.Client.Common">
+      <HintPath>C:\Program Files\Primo\Primo Studio Community x64\Primo.Orchestrator.Client.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="Primo.Orchestrator.Client.FW">
+      <HintPath>C:\Program Files\Primo\Primo Studio Community x64\Primo.Orchestrator.Client.FW.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="calendar\**\*">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

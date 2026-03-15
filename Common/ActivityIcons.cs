@@ -46,5 +46,8 @@ namespace Primo.MIA.Common
 
         /// <summary>Иконка для активностей работы с таблицами (DataTable)</summary>
         public const string Table = BasePath + "table.png";
+
+        /// <summary>Иконка для активностей работы с календарём</summary>
+        public const string Calendar = BasePath + "calendar.png";
     }
 }

@@ -1,0 +1,116 @@
+<!--
+    CalendarWorkdaysList.xaml
+    Визуальный интерфейс активности «Календарь: Рабочие дни списком».
+
+    Показывает/скрывает поле «Маска дней» в зависимости от выбранного
+    значения фильтра — только при CustomMask.
+-->
+<UserControl x:Class="Primo.MIA.CalendarWorkdaysList"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:system="clr-namespace:System;assembly=mscorlib"
+             xmlns:local="clr-namespace:Primo.MIA"
+             mc:Ignorable="d"
+             d:DesignHeight="220"
+             Margin="0,0,0,5">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Primo.MIA;component/Common/Styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+
+            <!-- Значения фильтра по дням недели для ComboBox -->
+            <ObjectDataProvider x:Key="DayOfWeekFilterValues"
+                                MethodName="GetValues"
+                                ObjectType="{x:Type system:Enum}">
+                <ObjectDataProvider.MethodParameters>
+                    <x:Type TypeName="local:DayOfWeekFilter"/>
+                </ObjectDataProvider.MethodParameters>
+            </ObjectDataProvider>
+
+            <!-- Конвертер: показывает блок «Маска» только при CustomMask -->
+            <local:EnumToVisibilityConverter x:Key="EnumToVisConverter"/>
+
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid Background="{DynamicResource {x:Static SystemColors.ScrollBarBrushKey}}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Иконка активности -->
+        <Image Grid.Column="0"
+               Width="32" Height="32" Margin="5"
+               VerticalAlignment="Center"
+               Source="pack://application:,,,/Primo.MIA;component/images/calendar.png"/>
+
+        <!-- Поля активности -->
+        <StackPanel Grid.Column="1"
+                    VerticalAlignment="Top"
+                    Margin="5,0,5,8">
+
+            <!-- Заголовок -->
+            <TextBlock Style="{StaticResource ActivityHeader}">
+                <Run Text="Календарь: Рабочие дни списком" Foreground="#FF0E0E0E"/>
+            </TextBlock>
+
+            <!-- ID календаря -->
+            <TextBlock Text="ID календаря:" Style="{StaticResource FieldLabel}"/>
+            <TextBox Text="{Binding Prop_CalendarId, UpdateSourceTrigger=PropertyChanged}"
+                     Style="{StaticResource FieldBox}"
+                     ToolTip="GUID календаря из активности «Календарь: Загрузить»"/>
+
+            <!-- Начальная и конечная дата в одной строке -->
+            <Grid Margin="0,2,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" Margin="0,0,4,0">
+                    <TextBlock Text="Начальная дата:" Style="{StaticResource FieldLabel}"/>
+                    <TextBox Text="{Binding Prop_StartDate, UpdateSourceTrigger=PropertyChanged}"
+                             Style="{StaticResource FieldBox}"
+                             ToolTip="Начало диапазона включительно"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1">
+                    <TextBlock Text="Конечная дата:" Style="{StaticResource FieldLabel}"/>
+                    <TextBox Text="{Binding Prop_EndDate, UpdateSourceTrigger=PropertyChanged}"
+                             Style="{StaticResource FieldBox}"
+                             ToolTip="Конец диапазона включительно"/>
+                </StackPanel>
+            </Grid>
+
+            <!-- Включать сокращённые дни -->
+            <CheckBox Content="Включать сокращённые дни"
+                      IsChecked="{Binding Prop_IncludeShortDays}"
+                      Margin="0,6,0,2"
+                      ToolTip="Включать в список дни типа ShortWorkday (например, 31 декабря)"
+                      Foreground="#FF0E0E0E"/>
+
+            <!-- Фильтр по дням недели -->
+            <TextBlock Text="Фильтр дней недели:" Style="{StaticResource FieldLabel}"/>
+            <ComboBox ItemsSource="{Binding Source={StaticResource DayOfWeekFilterValues}}"
+                      SelectedItem="{Binding Prop_DayOfWeekFilter}"
+                      Style="{StaticResource FieldComboBox}"
+                      ToolTip="Ограничить выборку конкретными днями недели"/>
+
+            <!-- Маска дней — видна только при CustomMask -->
+            <StackPanel Visibility="{Binding Prop_DayOfWeekFilter,
+                                    Converter={StaticResource EnumToVisConverter},
+                                    ConverterParameter=CustomMask}">
+                <TextBlock Text="Маска дней (Пн=1..Вс=7):" Style="{StaticResource FieldLabel}"/>
+                <TextBox Text="{Binding Prop_DayOfWeekMask, UpdateSourceTrigger=PropertyChanged}"
+                         Style="{StaticResource FieldBox}"
+                         ToolTip="Номера дней через запятую. Например: 1,3,5 — понедельник, среда, пятница"/>
+            </StackPanel>
+
+        </StackPanel>
+    </Grid>
+</UserControl>

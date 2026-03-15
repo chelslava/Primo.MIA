@@ -30,5 +30,8 @@ namespace Primo.MIA.Common
 
         /// <summary>Категория "MIA → Браузер"</summary>
         public const string Browser = Prefix + "Браузер";
+
+        /// <summary>Категория "MIA → Календарь"</summary>
+        public const string Calendar = Prefix + "Календарь";
     }
 }

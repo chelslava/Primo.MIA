@@ -1,0 +1,165 @@
+<!--
+    CalendarNextDayOfWeek.xaml
+    Визуальный интерфейс активности «Календарь: Следующий день недели».
+
+    Поле «При выходном» видно только для режима NearestWorkday —
+    в остальных режимах коррекция не применяется.
+-->
+<UserControl x:Class="Primo.MIA.CalendarNextDayOfWeek"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:system="clr-namespace:System;assembly=mscorlib"
+             xmlns:local="clr-namespace:Primo.MIA"
+             mc:Ignorable="d"
+             d:DesignHeight="240"
+             Margin="0,0,0,5">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Primo.MIA;component/Common/Styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+
+            <!-- Значения TargetDayOfWeek для ComboBox дня недели -->
+            <ObjectDataProvider x:Key="TargetDayValues"
+                                MethodName="GetValues"
+                                ObjectType="{x:Type system:Enum}">
+                <ObjectDataProvider.MethodParameters>
+                    <x:Type TypeName="local:TargetDayOfWeek"/>
+                </ObjectDataProvider.MethodParameters>
+            </ObjectDataProvider>
+
+            <!-- Значения DayOfWeekSearchMode для ComboBox режима -->
+            <ObjectDataProvider x:Key="SearchModeValues"
+                                MethodName="GetValues"
+                                ObjectType="{x:Type system:Enum}">
+                <ObjectDataProvider.MethodParameters>
+                    <x:Type TypeName="local:DayOfWeekSearchMode"/>
+                </ObjectDataProvider.MethodParameters>
+            </ObjectDataProvider>
+
+            <!-- Значения DeadlineWeekendBehavior для ComboBox «При выходном» -->
+            <ObjectDataProvider x:Key="WeekendBehaviorValues"
+                                MethodName="GetValues"
+                                ObjectType="{x:Type system:Enum}">
+                <ObjectDataProvider.MethodParameters>
+                    <x:Type TypeName="local:DeadlineWeekendBehavior"/>
+                </ObjectDataProvider.MethodParameters>
+            </ObjectDataProvider>
+
+            <!--
+                EnumToVisibilityConverter — показывает блок «При выходном»
+                только в режиме NearestWorkday.
+            -->
+            <local:EnumToVisibilityConverter x:Key="EnumToVisConverter"/>
+
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid Background="{DynamicResource {x:Static SystemColors.ScrollBarBrushKey}}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Иконка активности -->
+        <Image Grid.Column="0"
+               Width="32" Height="32" Margin="5"
+               VerticalAlignment="Center"
+               Source="pack://application:,,,/Primo.MIA;component/images/calendar.png"/>
+
+        <!-- Поля активности -->
+        <StackPanel Grid.Column="1"
+                    VerticalAlignment="Top"
+                    Margin="5,0,5,8">
+
+            <!-- Заголовок с отображением дня недели и режима -->
+            <TextBlock Style="{StaticResource ActivityHeader}">
+                <Run Text="Календарь: следующий " Foreground="#FF0E0E0E"/>
+                <Run Text="{Binding Prop_TargetDayOfWeek, Mode=OneWay}" Foreground="#FF1565C0"/>
+                <Run Text=" [" Foreground="#FF0E0E0E"/>
+                <Run Text="{Binding Prop_Mode, Mode=OneWay}" Foreground="#FF1565C0"/>
+                <Run Text="]" Foreground="#FF0E0E0E"/>
+            </TextBlock>
+
+            <!-- ID календаря -->
+            <TextBlock Text="ID календаря:" Style="{StaticResource FieldLabel}"/>
+            <TextBox Text="{Binding Prop_CalendarId, UpdateSourceTrigger=PropertyChanged}"
+                     Style="{StaticResource FieldBox}"
+                     ToolTip="GUID из активности «Календарь: Загрузить»"/>
+
+            <!-- Начальная дата -->
+            <TextBlock Text="Начальная дата:" Style="{StaticResource FieldLabel}"/>
+            <TextBox Text="{Binding Prop_StartDate, UpdateSourceTrigger=PropertyChanged}"
+                     Style="{StaticResource FieldBox}"
+                     ToolTip="Дата отсчёта поиска"/>
+
+            <!-- День недели и режим в одной строке -->
+            <Grid Margin="0,2,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" Margin="0,0,4,0">
+                    <TextBlock Text="День недели:" Style="{StaticResource FieldLabel}"/>
+                    <ComboBox ItemsSource="{Binding Source={StaticResource TargetDayValues}}"
+                              SelectedItem="{Binding Prop_TargetDayOfWeek}"
+                              Style="{StaticResource FieldComboBox}"
+                              ToolTip="Искомый день недели"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1">
+                    <TextBlock Text="Режим поиска:" Style="{StaticResource FieldLabel}"/>
+                    <ComboBox ItemsSource="{Binding Source={StaticResource SearchModeValues}}"
+                              SelectedItem="{Binding Prop_Mode}"
+                              Style="{StaticResource FieldComboBox}"
+                              ToolTip="NextOccurrence / NextWorkingOccurrence / NearestWorkday"/>
+                </StackPanel>
+            </Grid>
+
+            <!--
+                Блок «При выходном» — виден только для NearestWorkday.
+                В других режимах коррекция не применяется.
+            -->
+            <StackPanel Visibility="{Binding Prop_Mode,
+                                    Converter={StaticResource EnumToVisConverter},
+                                    ConverterParameter=NearestWorkday}">
+                <TextBlock Text="При выходном:" Style="{StaticResource FieldLabel}"/>
+                <ComboBox ItemsSource="{Binding Source={StaticResource WeekendBehaviorValues}}"
+                          SelectedItem="{Binding Prop_IfWeekend}"
+                          Style="{StaticResource FieldComboBox}"
+                          ToolTip="Что делать если найденный день выходной: сдвинуть вперёд, назад или оставить"/>
+            </StackPanel>
+
+            <!-- Включать стартовую дату и Макс. дней в одной строке -->
+            <Grid Margin="0,4,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="80"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Чекбокс IncludeStartDate -->
+                <CheckBox Grid.Column="0"
+                          Content="Включать стартовую дату"
+                          IsChecked="{Binding Prop_IncludeStartDate}"
+                          VerticalAlignment="Bottom"
+                          Margin="0,0,4,2"
+                          ToolTip="Вернуть StartDate если она уже нужный день недели"
+                          Foreground="#FF0E0E0E"/>
+
+                <!-- Макс. дней поиска -->
+                <StackPanel Grid.Column="1">
+                    <TextBlock Text="Макс. дней:" Style="{StaticResource FieldLabel}"
+                               ToolTip="Максимум дней поиска вперёд (защита от зависания)"/>
+                    <TextBox Text="{Binding Prop_MaxLookAhead, UpdateSourceTrigger=PropertyChanged}"
+                             Style="{StaticResource FieldBox}"
+                             ToolTip="По умолчанию 30 дней"/>
+                </StackPanel>
+            </Grid>
+
+        </StackPanel>
+    </Grid>
+</UserControl>
