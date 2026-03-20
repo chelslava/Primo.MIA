@@ -7,6 +7,7 @@ using System.Data.OleDb;
 using System.Data.SqlClient;
 using System.Globalization;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace Primo.MIA
 {
@@ -213,6 +214,27 @@ namespace Primo.MIA
             }
         }
 
+        public static NonQueryExecutionResult ExecuteNonQuery(
+            string providerInvariantName,
+            string connectionString,
+            string commandText,
+            DatabaseCommandType commandType,
+            int commandTimeoutSeconds,
+            bool splitByGoBatches,
+            Dictionary<string, string> parameters = null)
+        {
+            if (splitByGoBatches && commandType == DatabaseCommandType.Text)
+            {
+                return ExecuteNonQueryBatches(providerInvariantName, connectionString, commandText, commandTimeoutSeconds, parameters);
+            }
+
+            return new NonQueryExecutionResult
+            {
+                AffectedRows = ExecuteNonQuery(providerInvariantName, connectionString, commandText, commandType, commandTimeoutSeconds, parameters),
+                BatchCount = 1
+            };
+        }
+
         public static int ExecuteNonQuery(
             DatabaseTransactionHandle transactionHandle,
             string commandText,
@@ -232,6 +254,26 @@ namespace Primo.MIA
             {
                 return command.ExecuteNonQuery();
             }
+        }
+
+        public static NonQueryExecutionResult ExecuteNonQuery(
+            DatabaseTransactionHandle transactionHandle,
+            string commandText,
+            DatabaseCommandType commandType,
+            int commandTimeoutSeconds,
+            bool splitByGoBatches,
+            Dictionary<string, string> parameters = null)
+        {
+            if (splitByGoBatches && commandType == DatabaseCommandType.Text)
+            {
+                return ExecuteNonQueryBatches(transactionHandle, commandText, commandTimeoutSeconds, parameters);
+            }
+
+            return new NonQueryExecutionResult
+            {
+                AffectedRows = ExecuteNonQuery(transactionHandle, commandText, commandType, commandTimeoutSeconds, parameters),
+                BatchCount = 1
+            };
         }
 
         public static string ConvertScalarToString(object value)
@@ -761,6 +803,22 @@ namespace Primo.MIA
             }
         }
 
+        public static List<string> SplitSqlBatches(string commandText)
+        {
+            if (string.IsNullOrWhiteSpace(commandText))
+                return new List<string>();
+
+            var batches = Regex.Split(
+                    commandText,
+                    @"^\s*GO(?:\s+\d+)?\s*(?:--.*)?$",
+                    RegexOptions.IgnoreCase | RegexOptions.Multiline)
+                .Select(batch => batch?.Trim())
+                .Where(batch => !string.IsNullOrWhiteSpace(batch))
+                .ToList();
+
+            return batches;
+        }
+
         /// <summary>
         /// Настраивает маппинг колонок для bulk copy.
         /// Если словарь не указан, колонки маппятся по одинаковым именам.
@@ -951,6 +1009,72 @@ namespace Primo.MIA
                 throw new InvalidOperationException("Транзакция БД не инициализирована корректно.");
         }
 
+        private static NonQueryExecutionResult ExecuteNonQueryBatches(
+            string providerInvariantName,
+            string connectionString,
+            string commandText,
+            int commandTimeoutSeconds,
+            Dictionary<string, string> parameters)
+        {
+            var batches = SplitSqlBatches(commandText);
+            using (var connection = OpenConnection(providerInvariantName, connectionString))
+            using (var transaction = connection.BeginTransaction())
+            {
+                var result = ExecuteNonQueryBatchesCore(connection, transaction, batches, commandTimeoutSeconds, parameters);
+                transaction.Commit();
+                return result;
+            }
+        }
+
+        private static NonQueryExecutionResult ExecuteNonQueryBatches(
+            DatabaseTransactionHandle transactionHandle,
+            string commandText,
+            int commandTimeoutSeconds,
+            Dictionary<string, string> parameters)
+        {
+            EnsureTransactionHandle(transactionHandle);
+            var batches = SplitSqlBatches(commandText);
+            return ExecuteNonQueryBatchesCore(
+                transactionHandle.Connection,
+                transactionHandle.Transaction,
+                batches,
+                commandTimeoutSeconds,
+                parameters);
+        }
+
+        private static NonQueryExecutionResult ExecuteNonQueryBatchesCore(
+            DbConnection connection,
+            DbTransaction transaction,
+            List<string> batches,
+            int commandTimeoutSeconds,
+            Dictionary<string, string> parameters)
+        {
+            if (batches == null || batches.Count == 0)
+            {
+                return new NonQueryExecutionResult
+                {
+                    AffectedRows = 0,
+                    BatchCount = 0
+                };
+            }
+
+            var totalAffectedRows = 0;
+
+            foreach (var batch in batches)
+            {
+                using (var command = CreateCommand(connection, batch, DatabaseCommandType.Text, commandTimeoutSeconds, parameters, transaction))
+                {
+                    totalAffectedRows += command.ExecuteNonQuery();
+                }
+            }
+
+            return new NonQueryExecutionResult
+            {
+                AffectedRows = totalAffectedRows,
+                BatchCount = batches.Count
+            };
+        }
+
         private static string GetSchemaValue(DataRow row, string columnName)
         {
             if (row == null || row.Table == null)
@@ -973,6 +1097,13 @@ namespace Primo.MIA
         public int RowsWritten { get; set; }
 
         public string Mode { get; set; }
+    }
+
+    public class NonQueryExecutionResult
+    {
+        public int AffectedRows { get; set; }
+
+        public int BatchCount { get; set; }
     }
 
     internal class BulkInsertColumnMapping

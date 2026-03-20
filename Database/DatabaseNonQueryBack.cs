@@ -93,6 +93,15 @@ namespace Primo.MIA
             set { _propCommandTimeoutSeconds = value; InvokePropertyChanged(this, nameof(Prop_CommandTimeoutSeconds)); }
         }
 
+        private bool _propSplitByGoBatches;
+        [LTools.Common.Model.Serialization.StoringProperty]
+        [System.ComponentModel.Category(ActivityStrings.Category_Settings), System.ComponentModel.DisplayName(ActivityStrings.Field_SplitByGoBatches)]
+        public bool Prop_SplitByGoBatches
+        {
+            get => _propSplitByGoBatches;
+            set { _propSplitByGoBatches = value; InvokePropertyChanged(this, nameof(Prop_SplitByGoBatches)); }
+        }
+
         private string _propAffectedRows;
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
@@ -113,6 +122,16 @@ namespace Primo.MIA
             set { _propHasAffectedRows = value; InvokePropertyChanged(this, nameof(Prop_HasAffectedRows)); }
         }
 
+        private string _propBatchCount;
+        [LTools.Common.Model.Serialization.StoringProperty]
+        [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_BatchCount)]
+        public string Prop_BatchCount
+        {
+            get => _propBatchCount;
+            set { _propBatchCount = value; InvokePropertyChanged(this, nameof(Prop_BatchCount)); }
+        }
+
         public DatabaseNonQueryBack(IWFContainer container) : base(container)
         {
             sdkComponentName = ActivityStrings.Activity_DatabaseNonQuery;
@@ -129,8 +148,10 @@ namespace Primo.MIA
                 PropertyBuilder.String("Prop_CommandText", "SQL текст или имя stored procedure"),
                 PropertyBuilder.Script<Dictionary<string, string>>("Prop_Parameters", "Параметры команды"),
                 PropertyBuilder.Int("Prop_CommandTimeoutSeconds", "Таймаут выполнения в секундах"),
+                PropertyBuilder.BooleanObject("Prop_SplitByGoBatches", "Разбивать SQL-текст по batch-границам GO"),
                 PropertyBuilder.Variable<int>("Prop_AffectedRows", "Количество затронутых строк"),
-                PropertyBuilder.Variable<bool>("Prop_HasAffectedRows", "Количество затронутых строк больше нуля")
+                PropertyBuilder.Variable<bool>("Prop_HasAffectedRows", "Количество затронутых строк больше нуля"),
+                PropertyBuilder.Variable<int>("Prop_BatchCount", "Количество выполненных batch")
             };
             InitClass(container);
         }
@@ -151,17 +172,18 @@ namespace Primo.MIA
 
                 var transactionId = DatabaseTransactionResolver.ResolveOptional(explicitTransactionId);
                 var transactionHandle = DatabaseTransactionManager.Get(transactionId);
-                var affectedRows = transactionHandle != null
-                    ? DatabaseHelper.ExecuteNonQuery(transactionHandle, commandText, Prop_CommandType, timeout, parameters)
-                    : DatabaseHelper.ExecuteNonQuery(provider, connectionString, commandText, Prop_CommandType, timeout, parameters);
+                var executionResult = transactionHandle != null
+                    ? DatabaseHelper.ExecuteNonQuery(transactionHandle, commandText, Prop_CommandType, timeout, Prop_SplitByGoBatches, parameters)
+                    : DatabaseHelper.ExecuteNonQuery(provider, connectionString, commandText, Prop_CommandType, timeout, Prop_SplitByGoBatches, parameters);
 
-                SetVariableValue(Prop_AffectedRows, affectedRows, sd);
-                SetVariableValue(Prop_HasAffectedRows, affectedRows > 0, sd);
+                SetVariableValue(Prop_AffectedRows, executionResult.AffectedRows, sd);
+                SetVariableValue(Prop_HasAffectedRows, executionResult.AffectedRows > 0, sd);
+                SetVariableValue(Prop_BatchCount, executionResult.BatchCount, sd);
 
                 return new ExecutionResult
                 {
                     IsSuccess = true,
-                    SuccessMessage = $"Команда выполнена. Затронуто строк: {affectedRows}"
+                    SuccessMessage = $"Команда выполнена. Затронуто строк: {executionResult.AffectedRows}. Batch: {executionResult.BatchCount}"
                 };
             }
             catch (Exception ex)

@@ -284,6 +284,8 @@ namespace Primo.MIA.Common
         public const string Field_HasValue = "Есть значение";
         public const string Field_AffectedRows = "Затронуто строк";
         public const string Field_HasAffectedRows = "Есть затронутые строки";
+        public const string Field_SplitByGoBatches = "Разбивать по GO batch";
+        public const string Field_BatchCount = "Количество batch";
         public const string Field_DestinationTable = "Таблица-приёмник";
         public const string Field_ColumnMappings = "Маппинг колонок";
         public const string Field_BatchSize = "Размер пакета";

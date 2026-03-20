@@ -112,5 +112,24 @@ namespace Primo.MIA.Tests.Database
             DatabaseHelper.BuildPreloadCommandText("dbo.Users", DatabaseBulkPreloadMode.None)
                 .Should().BeNull();
         }
+
+        [Fact(DisplayName = "SplitSqlBatches: делит SQL по строкам GO")]
+        public void SplitSqlBatches_SplitsByGo()
+        {
+            var sql = "create table t1(id int)\r\nGO\r\ninsert into t1 values(1)\r\n GO \r\nselect * from t1";
+
+            var batches = DatabaseHelper.SplitSqlBatches(sql);
+
+            batches.Should().HaveCount(3);
+            batches[0].Should().Be("create table t1(id int)");
+            batches[1].Should().Be("insert into t1 values(1)");
+            batches[2].Should().Be("select * from t1");
+        }
+
+        [Fact(DisplayName = "SplitSqlBatches: пустой SQL -> пустой список")]
+        public void SplitSqlBatches_EmptySql_ReturnsEmptyList()
+        {
+            DatabaseHelper.SplitSqlBatches(" ").Should().BeEmpty();
+        }
     }
 }
