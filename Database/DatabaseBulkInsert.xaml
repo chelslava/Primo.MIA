@@ -3,6 +3,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:system="clr-namespace:System;assembly=mscorlib"
+             xmlns:local="clr-namespace:Primo.MIA"
              mc:Ignorable="d"
              d:DesignHeight="80"
              Margin="0,0,0,5">
@@ -11,6 +13,14 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/Primo.MIA;component/Common/Styles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
+
+            <ObjectDataProvider x:Key="PreloadModeValues"
+                                MethodName="GetValues"
+                                ObjectType="{x:Type system:Enum}">
+                <ObjectDataProvider.MethodParameters>
+                    <x:Type TypeName="local:DatabaseBulkPreloadMode"/>
+                </ObjectDataProvider.MethodParameters>
+            </ObjectDataProvider>
         </ResourceDictionary>
     </UserControl.Resources>
 
@@ -59,6 +69,11 @@
             <CheckBox Content="Keep identity (SQL Server fast path)"
                       IsChecked="{Binding Prop_KeepIdentity}"
                       Margin="0,4,0,0"/>
+
+            <TextBlock Text="Очистка перед загрузкой:" Style="{StaticResource FieldLabel}"/>
+            <ComboBox ItemsSource="{Binding Source={StaticResource PreloadModeValues}}"
+                      SelectedItem="{Binding Prop_PreloadMode}"
+                      Style="{StaticResource FieldComboBox}"/>
         </StackPanel>
     </Grid>
 </UserControl>

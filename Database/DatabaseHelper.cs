@@ -251,6 +251,123 @@ namespace Primo.MIA
             return value.ToString();
         }
 
+        public static int? ConvertScalarToInt32(object value)
+        {
+            if (value == null || value == DBNull.Value)
+                return null;
+
+            if (value is int intValue)
+                return intValue;
+
+            if (value is IConvertible)
+            {
+                try
+                {
+                    return Convert.ToInt32(value, CultureInfo.InvariantCulture);
+                }
+                catch
+                {
+                }
+            }
+
+            int parsed;
+            return int.TryParse(ConvertScalarToString(value), NumberStyles.Integer, CultureInfo.InvariantCulture, out parsed)
+                ? parsed
+                : (int?)null;
+        }
+
+        public static decimal? ConvertScalarToDecimal(object value)
+        {
+            if (value == null || value == DBNull.Value)
+                return null;
+
+            if (value is decimal decimalValue)
+                return decimalValue;
+
+            if (value is IConvertible)
+            {
+                try
+                {
+                    return Convert.ToDecimal(value, CultureInfo.InvariantCulture);
+                }
+                catch
+                {
+                }
+            }
+
+            decimal parsed;
+            return decimal.TryParse(ConvertScalarToString(value), NumberStyles.Any, CultureInfo.InvariantCulture, out parsed)
+                ? parsed
+                : (decimal?)null;
+        }
+
+        public static bool? ConvertScalarToBoolean(object value)
+        {
+            if (value == null || value == DBNull.Value)
+                return null;
+
+            if (value is bool boolValue)
+                return boolValue;
+
+            if (value is IConvertible)
+            {
+                try
+                {
+                    return Convert.ToBoolean(value, CultureInfo.InvariantCulture);
+                }
+                catch
+                {
+                }
+            }
+
+            var text = ConvertScalarToString(value);
+            if (string.IsNullOrWhiteSpace(text))
+                return null;
+
+            bool parsedBool;
+            if (bool.TryParse(text, out parsedBool))
+                return parsedBool;
+
+            if (string.Equals(text, "1", StringComparison.Ordinal))
+                return true;
+            if (string.Equals(text, "0", StringComparison.Ordinal))
+                return false;
+
+            return null;
+        }
+
+        public static DateTime? ConvertScalarToDateTime(object value)
+        {
+            if (value == null || value == DBNull.Value)
+                return null;
+
+            if (value is DateTime dateTimeValue)
+                return dateTimeValue;
+
+            if (value is DateTimeOffset dateTimeOffsetValue)
+                return dateTimeOffsetValue.UtcDateTime;
+
+            if (value is IConvertible)
+            {
+                try
+                {
+                    return Convert.ToDateTime(value, CultureInfo.InvariantCulture);
+                }
+                catch
+                {
+                }
+            }
+
+            DateTime parsed;
+            return DateTime.TryParse(
+                ConvertScalarToString(value),
+                CultureInfo.InvariantCulture,
+                DateTimeStyles.RoundtripKind | DateTimeStyles.AllowWhiteSpaces,
+                out parsed)
+                ? parsed
+                : (DateTime?)null;
+        }
+
         public static DataTable GetSchema(
             string providerInvariantName,
             string connectionString,
@@ -385,6 +502,7 @@ namespace Primo.MIA
             int bulkCopyTimeoutSeconds,
             bool useTableLock,
             bool keepIdentity,
+            DatabaseBulkPreloadMode preloadMode,
             Dictionary<string, string> columnMappings = null)
         {
             var provider = string.IsNullOrWhiteSpace(providerInvariantName)
@@ -409,6 +527,7 @@ namespace Primo.MIA
                     bulkCopyTimeoutSeconds,
                     useTableLock,
                     keepIdentity,
+                    preloadMode,
                     columnMappings);
             }
 
@@ -419,6 +538,7 @@ namespace Primo.MIA
                 destinationTableName,
                 batchSize,
                 bulkCopyTimeoutSeconds,
+                preloadMode,
                 columnMappings);
         }
 
@@ -430,6 +550,7 @@ namespace Primo.MIA
             int bulkCopyTimeoutSeconds,
             bool useTableLock,
             bool keepIdentity,
+            DatabaseBulkPreloadMode preloadMode,
             Dictionary<string, string> columnMappings)
         {
             var options = SqlBulkCopyOptions.CheckConstraints;
@@ -442,6 +563,7 @@ namespace Primo.MIA
             using (var bulkCopy = new SqlBulkCopy(connection, options, null))
             {
                 connection.Open();
+                ExecutePreloadCommand(connection, null, destinationTableName, preloadMode);
 
                 bulkCopy.DestinationTableName = destinationTableName;
                 bulkCopy.BatchSize = batchSize > 0 ? batchSize : 1000;
@@ -454,7 +576,7 @@ namespace Primo.MIA
             return new BulkInsertResult
             {
                 RowsWritten = dataTable.Rows.Count,
-                Mode = "SqlBulkCopy"
+                Mode = BuildBulkInsertModeName("SqlBulkCopy", preloadMode)
             };
         }
 
@@ -466,6 +588,7 @@ namespace Primo.MIA
             int bulkCopyTimeoutSeconds,
             bool useTableLock,
             bool keepIdentity,
+            DatabaseBulkPreloadMode preloadMode,
             Dictionary<string, string> columnMappings = null)
         {
             EnsureTransactionHandle(transactionHandle);
@@ -479,10 +602,10 @@ namespace Primo.MIA
 
             if (string.Equals(transactionHandle.ProviderInvariantName, DefaultProviderInvariantName, StringComparison.OrdinalIgnoreCase))
             {
-                return ExecuteSqlServerBulkInsert(transactionHandle, dataTable, destinationTableName, batchSize, bulkCopyTimeoutSeconds, useTableLock, keepIdentity, columnMappings);
+                return ExecuteSqlServerBulkInsert(transactionHandle, dataTable, destinationTableName, batchSize, bulkCopyTimeoutSeconds, useTableLock, keepIdentity, preloadMode, columnMappings);
             }
 
-            return ExecuteBatchedInsert(transactionHandle, dataTable, destinationTableName, batchSize, bulkCopyTimeoutSeconds, columnMappings);
+            return ExecuteBatchedInsert(transactionHandle, dataTable, destinationTableName, batchSize, bulkCopyTimeoutSeconds, preloadMode, columnMappings);
         }
 
         private static BulkInsertResult ExecuteSqlServerBulkInsert(
@@ -493,6 +616,7 @@ namespace Primo.MIA
             int bulkCopyTimeoutSeconds,
             bool useTableLock,
             bool keepIdentity,
+            DatabaseBulkPreloadMode preloadMode,
             Dictionary<string, string> columnMappings)
         {
             EnsureTransactionHandle(transactionHandle);
@@ -510,6 +634,7 @@ namespace Primo.MIA
 
             using (var bulkCopy = new SqlBulkCopy(sqlConnection, options, sqlTransaction))
             {
+                ExecutePreloadCommand(sqlConnection, sqlTransaction, destinationTableName, preloadMode);
                 bulkCopy.DestinationTableName = destinationTableName;
                 bulkCopy.BatchSize = batchSize > 0 ? batchSize : 1000;
                 bulkCopy.BulkCopyTimeout = bulkCopyTimeoutSeconds > 0 ? bulkCopyTimeoutSeconds : 60;
@@ -520,7 +645,7 @@ namespace Primo.MIA
             return new BulkInsertResult
             {
                 RowsWritten = dataTable.Rows.Count,
-                Mode = "SqlBulkCopy"
+                Mode = BuildBulkInsertModeName("SqlBulkCopy", preloadMode)
             };
         }
 
@@ -531,6 +656,7 @@ namespace Primo.MIA
             string destinationTableName,
             int batchSize,
             int commandTimeoutSeconds,
+            DatabaseBulkPreloadMode preloadMode,
             Dictionary<string, string> columnMappings)
         {
             var mappings = BuildMappings(dataTable, columnMappings);
@@ -540,6 +666,7 @@ namespace Primo.MIA
             using (var transaction = connection.BeginTransaction())
             using (var command = connection.CreateCommand())
             {
+                ExecutePreloadCommand(connection, transaction, destinationTableName, preloadMode);
                 command.Transaction = transaction;
                 command.CommandType = CommandType.Text;
                 command.CommandTimeout = commandTimeoutSeconds > 0 ? commandTimeoutSeconds : 60;
@@ -568,7 +695,7 @@ namespace Primo.MIA
                 return new BulkInsertResult
                 {
                     RowsWritten = rowsWritten,
-                    Mode = "BatchedInsert"
+                    Mode = BuildBulkInsertModeName("BatchedInsert", preloadMode)
                 };
             }
         }
@@ -579,6 +706,7 @@ namespace Primo.MIA
             string destinationTableName,
             int batchSize,
             int commandTimeoutSeconds,
+            DatabaseBulkPreloadMode preloadMode,
             Dictionary<string, string> columnMappings)
         {
             EnsureTransactionHandle(transactionHandle);
@@ -588,6 +716,7 @@ namespace Primo.MIA
 
             using (var command = transactionHandle.Connection.CreateCommand())
             {
+                ExecutePreloadCommand(transactionHandle.Connection, transactionHandle.Transaction, destinationTableName, preloadMode);
                 command.Transaction = transactionHandle.Transaction;
                 command.CommandType = CommandType.Text;
                 command.CommandTimeout = commandTimeoutSeconds > 0 ? commandTimeoutSeconds : 60;
@@ -611,8 +740,24 @@ namespace Primo.MIA
                 return new BulkInsertResult
                 {
                     RowsWritten = rowsWritten,
-                    Mode = "BatchedInsert"
+                    Mode = BuildBulkInsertModeName("BatchedInsert", preloadMode)
                 };
+            }
+        }
+
+        public static string BuildPreloadCommandText(string destinationTableName, DatabaseBulkPreloadMode preloadMode)
+        {
+            if (string.IsNullOrWhiteSpace(destinationTableName))
+                throw new ArgumentException("Имя таблицы-приёмника не может быть пустым.", nameof(destinationTableName));
+
+            switch (preloadMode)
+            {
+                case DatabaseBulkPreloadMode.DeleteAll:
+                    return $"DELETE FROM {destinationTableName}";
+                case DatabaseBulkPreloadMode.Truncate:
+                    return $"TRUNCATE TABLE {destinationTableName}";
+                default:
+                    return null;
             }
         }
 
@@ -770,6 +915,32 @@ namespace Primo.MIA
             {
                 // Не все провайдеры поддерживают Prepare — это допустимо.
             }
+        }
+
+        private static void ExecutePreloadCommand(
+            DbConnection connection,
+            DbTransaction transaction,
+            string destinationTableName,
+            DatabaseBulkPreloadMode preloadMode)
+        {
+            var preloadCommandText = BuildPreloadCommandText(destinationTableName, preloadMode);
+            if (string.IsNullOrWhiteSpace(preloadCommandText))
+                return;
+
+            using (var preloadCommand = connection.CreateCommand())
+            {
+                preloadCommand.Transaction = transaction;
+                preloadCommand.CommandType = CommandType.Text;
+                preloadCommand.CommandText = preloadCommandText;
+                preloadCommand.ExecuteNonQuery();
+            }
+        }
+
+        private static string BuildBulkInsertModeName(string baseMode, DatabaseBulkPreloadMode preloadMode)
+        {
+            return preloadMode == DatabaseBulkPreloadMode.None
+                ? baseMode
+                : baseMode + "+" + preloadMode;
         }
 
         private static void EnsureTransactionHandle(DatabaseTransactionHandle transactionHandle)

@@ -5,6 +5,7 @@ using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 
 namespace Primo.MIA
 {
@@ -124,6 +125,26 @@ namespace Primo.MIA
             set { _propColumnCount = value; InvokePropertyChanged(this, nameof(Prop_ColumnCount)); }
         }
 
+        private string _propColumnNames;
+        [LTools.Common.Model.Serialization.StoringProperty]
+        [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(List<string>))]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_ColumnNames)]
+        public string Prop_ColumnNames
+        {
+            get => _propColumnNames;
+            set { _propColumnNames = value; InvokePropertyChanged(this, nameof(Prop_ColumnNames)); }
+        }
+
+        private string _propHasRows;
+        [LTools.Common.Model.Serialization.StoringProperty]
+        [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(bool))]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_HasRows)]
+        public string Prop_HasRows
+        {
+            get => _propHasRows;
+            set { _propHasRows = value; InvokePropertyChanged(this, nameof(Prop_HasRows)); }
+        }
+
         public DatabaseQueryBack(IWFContainer container) : base(container)
         {
             sdkComponentName = ActivityStrings.Activity_DatabaseQuery;
@@ -142,7 +163,9 @@ namespace Primo.MIA
                 PropertyBuilder.Int("Prop_CommandTimeoutSeconds", "Таймаут выполнения в секундах"),
                 PropertyBuilder.Variable<DataTable>("Prop_ResultTable", "Результат запроса в виде DataTable"),
                 PropertyBuilder.Variable<int>("Prop_RowCount", "Количество строк"),
-                PropertyBuilder.Variable<int>("Prop_ColumnCount", "Количество столбцов")
+                PropertyBuilder.Variable<int>("Prop_ColumnCount", "Количество столбцов"),
+                PropertyBuilder.Variable<List<string>>("Prop_ColumnNames", "Список имён колонок"),
+                PropertyBuilder.Variable<bool>("Prop_HasRows", "Есть ли строки в результате")
             };
             InitClass(container);
         }
@@ -167,10 +190,13 @@ namespace Primo.MIA
                 var table = transactionHandle != null
                     ? DatabaseHelper.ExecuteQuery(transactionHandle, commandText, Prop_CommandType, timeout, parameters)
                     : DatabaseHelper.ExecuteQuery(provider, connectionString, commandText, Prop_CommandType, timeout, parameters);
+                var columnNames = table.Columns.Cast<DataColumn>().Select(column => column.ColumnName).ToList();
 
                 SetVariableValue(Prop_ResultTable, table, sd);
                 SetVariableValue(Prop_RowCount, table.Rows.Count, sd);
                 SetVariableValue(Prop_ColumnCount, table.Columns.Count, sd);
+                SetVariableValue(Prop_ColumnNames, columnNames, sd);
+                SetVariableValue(Prop_HasRows, table.Rows.Count > 0, sd);
 
                 return new ExecutionResult
                 {

@@ -103,6 +103,16 @@ namespace Primo.MIA
             set { _propValue = value; InvokePropertyChanged(this, nameof(Prop_Value)); }
         }
 
+        private string _propDefaultValue;
+        [LTools.Common.Model.Serialization.StoringProperty]
+        [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
+        [System.ComponentModel.Category(ActivityStrings.Category_Optional), System.ComponentModel.DisplayName(ActivityStrings.Field_DefaultValue)]
+        public string Prop_DefaultValue
+        {
+            get => _propDefaultValue;
+            set { _propDefaultValue = value; InvokePropertyChanged(this, nameof(Prop_DefaultValue)); }
+        }
+
         private string _propHasValue;
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(bool))]
@@ -123,6 +133,56 @@ namespace Primo.MIA
             set { _propValueType = value; InvokePropertyChanged(this, nameof(Prop_ValueType)); }
         }
 
+        private string _propUsedDefaultValue;
+        [LTools.Common.Model.Serialization.StoringProperty]
+        [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(bool))]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_UsedDefaultValue)]
+        public string Prop_UsedDefaultValue
+        {
+            get => _propUsedDefaultValue;
+            set { _propUsedDefaultValue = value; InvokePropertyChanged(this, nameof(Prop_UsedDefaultValue)); }
+        }
+
+        private string _propIntValue;
+        [LTools.Common.Model.Serialization.StoringProperty]
+        [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_IntValue)]
+        public string Prop_IntValue
+        {
+            get => _propIntValue;
+            set { _propIntValue = value; InvokePropertyChanged(this, nameof(Prop_IntValue)); }
+        }
+
+        private string _propDecimalValue;
+        [LTools.Common.Model.Serialization.StoringProperty]
+        [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(decimal))]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_DecimalValue)]
+        public string Prop_DecimalValue
+        {
+            get => _propDecimalValue;
+            set { _propDecimalValue = value; InvokePropertyChanged(this, nameof(Prop_DecimalValue)); }
+        }
+
+        private string _propBoolValue;
+        [LTools.Common.Model.Serialization.StoringProperty]
+        [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(bool))]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_BoolValue)]
+        public string Prop_BoolValue
+        {
+            get => _propBoolValue;
+            set { _propBoolValue = value; InvokePropertyChanged(this, nameof(Prop_BoolValue)); }
+        }
+
+        private string _propDateTimeValue;
+        [LTools.Common.Model.Serialization.StoringProperty]
+        [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(DateTime))]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_DateTimeValue)]
+        public string Prop_DateTimeValue
+        {
+            get => _propDateTimeValue;
+            set { _propDateTimeValue = value; InvokePropertyChanged(this, nameof(Prop_DateTimeValue)); }
+        }
+
         public DatabaseScalarBack(IWFContainer container) : base(container)
         {
             sdkComponentName = ActivityStrings.Activity_DatabaseScalar;
@@ -139,9 +199,15 @@ namespace Primo.MIA
                 PropertyBuilder.String("Prop_CommandText", "SQL текст или имя stored procedure"),
                 PropertyBuilder.Script<Dictionary<string, string>>("Prop_Parameters", "Параметры команды"),
                 PropertyBuilder.Int("Prop_CommandTimeoutSeconds", "Таймаут выполнения в секундах"),
+                PropertyBuilder.String("Prop_DefaultValue", "Значение по умолчанию, если scalar вернул null/DBNull"),
                 PropertyBuilder.Variable<string>("Prop_Value", "Скалярный результат в виде строки"),
                 PropertyBuilder.Variable<bool>("Prop_HasValue", "Есть значение (не null/DBNull)"),
-                PropertyBuilder.Variable<string>("Prop_ValueType", "Имя .NET-типа результата")
+                PropertyBuilder.Variable<string>("Prop_ValueType", "Имя .NET-типа результата"),
+                PropertyBuilder.Variable<bool>("Prop_UsedDefaultValue", "Подставлено ли значение по умолчанию"),
+                PropertyBuilder.Variable<int>("Prop_IntValue", "Результат как Int32"),
+                PropertyBuilder.Variable<decimal>("Prop_DecimalValue", "Результат как Decimal"),
+                PropertyBuilder.Variable<bool>("Prop_BoolValue", "Результат как Boolean"),
+                PropertyBuilder.Variable<DateTime>("Prop_DateTimeValue", "Результат как DateTime")
             };
             InitClass(container);
         }
@@ -166,17 +232,37 @@ namespace Primo.MIA
                     ? DatabaseHelper.ExecuteScalar(transactionHandle, commandText, Prop_CommandType, timeout, parameters)
                     : DatabaseHelper.ExecuteScalar(provider, connectionString, commandText, Prop_CommandType, timeout, parameters);
                 var hasValue = rawValue != null && rawValue != DBNull.Value;
-                var valueType = hasValue ? rawValue.GetType().FullName : string.Empty;
-                var value = DatabaseHelper.ConvertScalarToString(rawValue) ?? string.Empty;
+                var defaultValue = GetPropertyValue<string>(Prop_DefaultValue, nameof(Prop_DefaultValue), sd);
+                var usedDefaultValue = !hasValue && !string.IsNullOrWhiteSpace(defaultValue);
+                var effectiveValue = hasValue ? rawValue : (usedDefaultValue ? (object)defaultValue : null);
+                var valueType = effectiveValue != null ? effectiveValue.GetType().FullName : string.Empty;
+                var value = DatabaseHelper.ConvertScalarToString(effectiveValue) ?? string.Empty;
+                var intValue = DatabaseHelper.ConvertScalarToInt32(effectiveValue);
+                var decimalValue = DatabaseHelper.ConvertScalarToDecimal(effectiveValue);
+                var boolValue = DatabaseHelper.ConvertScalarToBoolean(effectiveValue);
+                var dateTimeValue = DatabaseHelper.ConvertScalarToDateTime(effectiveValue);
 
                 SetVariableValue(Prop_Value, value, sd);
                 SetVariableValue(Prop_HasValue, hasValue, sd);
                 SetVariableValue(Prop_ValueType, valueType, sd);
+                SetVariableValue(Prop_UsedDefaultValue, usedDefaultValue, sd);
+                if (intValue.HasValue)
+                    SetVariableValue(Prop_IntValue, intValue.Value, sd);
+                if (decimalValue.HasValue)
+                    SetVariableValue(Prop_DecimalValue, decimalValue.Value, sd);
+                if (boolValue.HasValue)
+                    SetVariableValue(Prop_BoolValue, boolValue.Value, sd);
+                if (dateTimeValue.HasValue)
+                    SetVariableValue(Prop_DateTimeValue, dateTimeValue.Value, sd);
 
                 return new ExecutionResult
                 {
                     IsSuccess = true,
-                    SuccessMessage = hasValue ? $"Получено значение типа {valueType}" : "Скалярный запрос вернул null/DBNull"
+                    SuccessMessage = hasValue
+                        ? $"Получено значение типа {valueType}"
+                        : (usedDefaultValue
+                            ? "Скалярный запрос вернул null/DBNull, подставлено значение по умолчанию"
+                            : "Скалярный запрос вернул null/DBNull")
                 };
             }
             catch (Exception ex)

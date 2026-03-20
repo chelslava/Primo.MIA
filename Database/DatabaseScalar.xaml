@@ -61,6 +61,9 @@
             <TextBlock Text="Таймаут (сек):" Style="{StaticResource FieldLabel}"/>
             <TextBox Text="{Binding Prop_CommandTimeoutSeconds, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
 
+            <TextBlock Text="Значение по умолчанию (если result = null):" Style="{StaticResource FieldLabel}"/>
+            <TextBox Text="{Binding Prop_DefaultValue, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+
             <TextBlock Text="Переменная результата:" Style="{StaticResource FieldLabel}"/>
             <TextBox Text="{Binding Prop_Value, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
         </StackPanel>

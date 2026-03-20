@@ -276,6 +276,7 @@ namespace Primo.MIA.Common
         public const string Field_CommandTimeoutSeconds = "Таймаут команды (сек)";
         public const string Field_ParametersDictionary = "Параметры";
         public const string Field_ResultTable = "Таблица-результат";
+        public const string Field_HasRows = "Есть строки";
         public const string Field_IsAvailable = "Подключение доступно";
         public const string Field_ServerVersion = "Версия сервера";
         public const string Field_ElapsedMs = "Время выполнения (мс)";
@@ -289,6 +290,7 @@ namespace Primo.MIA.Common
         public const string Field_BulkCopyTimeoutSeconds = "Таймаут bulk copy (сек)";
         public const string Field_UseTableLock = "Использовать table lock";
         public const string Field_KeepIdentity = "Сохранять identity";
+        public const string Field_PreloadMode = "Очистка перед загрузкой";
         public const string Field_RowsWritten = "Записано строк";
         public const string Field_MappingCount = "Количество маппингов";
         public const string Field_WriteMode = "Режим записи";
@@ -561,6 +563,11 @@ namespace Primo.MIA.Common
         public const string Field_HtmlOutput = "HTML-код";
         public const string Field_RowCount = "Количество строк";
         public const string Field_ColumnCount = "Количество столбцов";
+        public const string Field_UsedDefaultValue = "Использовано значение по умолчанию";
+        public const string Field_IntValue = "Значение как Int32";
+        public const string Field_DecimalValue = "Значение как Decimal";
+        public const string Field_BoolValue = "Значение как Boolean";
+        public const string Field_DateTimeValue = "Значение как DateTime";
         public const string Error_DataTableRequired = "Исходная таблица данных не указана";
         public const string Error_MaxRowsNegative = "Максимальное количество строк не может быть отрицательным";
         public const string Error_CustomThemeRequiresColors = "При выборе пользовательской темы необходимо указать хотя бы один цвет";

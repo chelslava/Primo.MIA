@@ -67,6 +67,9 @@
 
             <TextBlock Text="Результат (DataTable):" Style="{StaticResource FieldLabel}"/>
             <TextBox Text="{Binding Prop_ResultTable, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+
+            <TextBlock Text="Список колонок (переменная):" Style="{StaticResource FieldLabel}"/>
+            <TextBox Text="{Binding Prop_ColumnNames, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
         </StackPanel>
     </Grid>
 </UserControl>

@@ -218,6 +218,16 @@
     }
 
     /// <summary>
+    /// Предварительная очистка таблицы перед bulk insert.
+    /// </summary>
+    public enum DatabaseBulkPreloadMode
+    {
+        None,
+        DeleteAll,
+        Truncate
+    }
+
+    /// <summary>
     /// Уровень логирования
     /// </summary>
     public enum LogLevel

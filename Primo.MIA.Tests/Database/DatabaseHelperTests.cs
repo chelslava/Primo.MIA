@@ -56,7 +56,8 @@ namespace Primo.MIA.Tests.Database
                 1000,
                 60,
                 false,
-                false);
+                false,
+                DatabaseBulkPreloadMode.None);
 
             result.RowsWritten.Should().Be(0);
             result.Mode.Should().Be("NoColumns");
@@ -84,6 +85,32 @@ namespace Primo.MIA.Tests.Database
 
             action.Should().Throw<ArgumentException>()
                 .WithMessage("*Имя таблицы не может быть пустым*");
+        }
+
+        [Fact(DisplayName = "ConvertScalarToBoolean: понимает 0 и 1")]
+        public void ConvertScalarToBoolean_ParsesZeroAndOne()
+        {
+            DatabaseHelper.ConvertScalarToBoolean("1").Should().BeTrue();
+            DatabaseHelper.ConvertScalarToBoolean("0").Should().BeFalse();
+        }
+
+        [Fact(DisplayName = "ConvertScalarToDateTime: roundtrip ISO дата парсится")]
+        public void ConvertScalarToDateTime_IsoString_Parses()
+        {
+            var value = DatabaseHelper.ConvertScalarToDateTime("2026-03-21T10:15:30.0000000Z");
+            value.Should().HaveValue();
+            value.Value.ToUniversalTime().Should().Be(new DateTime(2026, 3, 21, 10, 15, 30, DateTimeKind.Utc));
+        }
+
+        [Fact(DisplayName = "BuildPreloadCommandText: формирует команду очистки")]
+        public void BuildPreloadCommandText_ReturnsExpectedSql()
+        {
+            DatabaseHelper.BuildPreloadCommandText("dbo.Users", DatabaseBulkPreloadMode.DeleteAll)
+                .Should().Be("DELETE FROM dbo.Users");
+            DatabaseHelper.BuildPreloadCommandText("dbo.Users", DatabaseBulkPreloadMode.Truncate)
+                .Should().Be("TRUNCATE TABLE dbo.Users");
+            DatabaseHelper.BuildPreloadCommandText("dbo.Users", DatabaseBulkPreloadMode.None)
+                .Should().BeNull();
         }
     }
 }

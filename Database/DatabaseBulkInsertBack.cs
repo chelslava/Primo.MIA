@@ -123,6 +123,15 @@ namespace Primo.MIA
             set { _propKeepIdentity = value; InvokePropertyChanged(this, nameof(Prop_KeepIdentity)); }
         }
 
+        private DatabaseBulkPreloadMode _propPreloadMode = DatabaseBulkPreloadMode.None;
+        [LTools.Common.Model.Serialization.StoringProperty]
+        [System.ComponentModel.Category(ActivityStrings.Category_Settings), System.ComponentModel.DisplayName(ActivityStrings.Field_PreloadMode)]
+        public DatabaseBulkPreloadMode Prop_PreloadMode
+        {
+            get => _propPreloadMode;
+            set { _propPreloadMode = value; InvokePropertyChanged(this, nameof(Prop_PreloadMode)); }
+        }
+
         private string _propRowsWritten;
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
@@ -175,6 +184,7 @@ namespace Primo.MIA
                 PropertyBuilder.Int("Prop_BulkCopyTimeoutSeconds", "Таймаут массовой записи в секундах"),
                 PropertyBuilder.BooleanObject("Prop_UseTableLock", "Использовать table lock (актуально для SqlBulkCopy)"),
                 PropertyBuilder.BooleanObject("Prop_KeepIdentity", "Сохранять значения identity (актуально для SqlBulkCopy)"),
+                PropertyBuilder.Enum<DatabaseBulkPreloadMode>("Prop_PreloadMode", "Предварительная очистка таблицы перед загрузкой"),
                 PropertyBuilder.Variable<int>("Prop_RowsWritten", "Количество записанных строк"),
                 PropertyBuilder.Variable<int>("Prop_MappingCount", "Количество использованных маппингов колонок"),
                 PropertyBuilder.Variable<string>("Prop_WriteMode", "Фактически использованный режим записи")
@@ -200,8 +210,8 @@ namespace Primo.MIA
                 var transactionId = DatabaseTransactionResolver.ResolveOptional(explicitTransactionId);
                 var transactionHandle = DatabaseTransactionManager.Get(transactionId);
                 var writeResult = transactionHandle != null
-                    ? DatabaseHelper.ExecuteBulkInsert(transactionHandle, Prop_DataTable, destinationTable, batchSize, timeout, Prop_UseTableLock, Prop_KeepIdentity, columnMappings)
-                    : DatabaseHelper.ExecuteBulkInsert(provider, connectionString, Prop_DataTable, destinationTable, batchSize, timeout, Prop_UseTableLock, Prop_KeepIdentity, columnMappings);
+                    ? DatabaseHelper.ExecuteBulkInsert(transactionHandle, Prop_DataTable, destinationTable, batchSize, timeout, Prop_UseTableLock, Prop_KeepIdentity, Prop_PreloadMode, columnMappings)
+                    : DatabaseHelper.ExecuteBulkInsert(provider, connectionString, Prop_DataTable, destinationTable, batchSize, timeout, Prop_UseTableLock, Prop_KeepIdentity, Prop_PreloadMode, columnMappings);
 
                 var mappingCount = columnMappings != null && columnMappings.Count > 0
                     ? columnMappings.Count
