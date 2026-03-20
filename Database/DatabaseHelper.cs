@@ -276,6 +276,53 @@ namespace Primo.MIA
             };
         }
 
+        public static StoredProcedureExecutionResult ExecuteStoredProcedure(
+            string providerInvariantName,
+            string connectionString,
+            string procedureName,
+            int commandTimeoutSeconds,
+            Dictionary<string, string> inputParameters = null,
+            List<string> outputParameterNames = null,
+            bool includeReturnValue = false)
+        {
+            using (var connection = OpenConnection(providerInvariantName, connectionString))
+            using (var command = CreateStoredProcedureCommand(
+                connection,
+                providerInvariantName,
+                procedureName,
+                commandTimeoutSeconds,
+                inputParameters,
+                outputParameterNames,
+                includeReturnValue))
+            {
+                return ExecuteStoredProcedureCommand(command, providerInvariantName);
+            }
+        }
+
+        public static StoredProcedureExecutionResult ExecuteStoredProcedure(
+            DatabaseTransactionHandle transactionHandle,
+            string procedureName,
+            int commandTimeoutSeconds,
+            Dictionary<string, string> inputParameters = null,
+            List<string> outputParameterNames = null,
+            bool includeReturnValue = false)
+        {
+            EnsureTransactionHandle(transactionHandle);
+
+            using (var command = CreateStoredProcedureCommand(
+                transactionHandle.Connection,
+                transactionHandle.ProviderInvariantName,
+                procedureName,
+                commandTimeoutSeconds,
+                inputParameters,
+                outputParameterNames,
+                includeReturnValue,
+                transactionHandle.Transaction))
+            {
+                return ExecuteStoredProcedureCommand(command, transactionHandle.ProviderInvariantName);
+            }
+        }
+
         public static string ConvertScalarToString(object value)
         {
             if (value == null || value == DBNull.Value)
@@ -1059,6 +1106,22 @@ namespace Primo.MIA
             return string.Join(".", parts.Select(part => QuoteIdentifier(providerInvariantName, part)));
         }
 
+        public static string NormalizeOutputParameterName(string providerInvariantName, string parameterName)
+        {
+            if (string.IsNullOrWhiteSpace(parameterName))
+                throw new ArgumentException("Имя параметра не может быть пустым.", nameof(parameterName));
+
+            var trimmed = parameterName.Trim();
+            if (trimmed.StartsWith("@", StringComparison.Ordinal) ||
+                trimmed.StartsWith(":", StringComparison.Ordinal) ||
+                trimmed.StartsWith("?", StringComparison.Ordinal))
+            {
+                return trimmed;
+            }
+
+            return GetParameterPrefix(providerInvariantName) + trimmed;
+        }
+
         private static List<string> SplitQualifiedIdentifier(string qualifiedIdentifier)
         {
             var parts = new List<string>();
@@ -1136,6 +1199,90 @@ namespace Primo.MIA
                 prefix = "\"";
                 suffix = "\"";
             }
+        }
+
+        private static DbCommand CreateStoredProcedureCommand(
+            DbConnection connection,
+            string providerInvariantName,
+            string procedureName,
+            int commandTimeoutSeconds,
+            Dictionary<string, string> inputParameters,
+            List<string> outputParameterNames,
+            bool includeReturnValue,
+            DbTransaction transaction = null)
+        {
+            if (string.IsNullOrWhiteSpace(procedureName))
+                throw new ArgumentException("Имя stored procedure не может быть пустым.", nameof(procedureName));
+
+            var command = connection.CreateCommand();
+            command.Transaction = transaction;
+            command.CommandText = procedureName;
+            command.CommandType = CommandType.StoredProcedure;
+            command.CommandTimeout = commandTimeoutSeconds > 0 ? commandTimeoutSeconds : 30;
+
+            AddParameters(command, inputParameters);
+            AddOutputParameters(command, providerInvariantName, outputParameterNames, includeReturnValue);
+            return command;
+        }
+
+        private static void AddOutputParameters(
+            DbCommand command,
+            string providerInvariantName,
+            List<string> outputParameterNames,
+            bool includeReturnValue)
+        {
+            if (command == null)
+                throw new ArgumentNullException(nameof(command));
+
+            if (outputParameterNames != null)
+            {
+                foreach (var outputParameterName in outputParameterNames
+                    .Where(name => !string.IsNullOrWhiteSpace(name))
+                    .Distinct(StringComparer.OrdinalIgnoreCase))
+                {
+                    var parameter = command.CreateParameter();
+                    parameter.ParameterName = NormalizeOutputParameterName(providerInvariantName, outputParameterName);
+                    parameter.Direction = ParameterDirection.Output;
+                    parameter.Size = 4000;
+                    command.Parameters.Add(parameter);
+                }
+            }
+
+            if (includeReturnValue)
+            {
+                var returnParameter = command.CreateParameter();
+                returnParameter.ParameterName = NormalizeOutputParameterName(providerInvariantName, "RETURN_VALUE");
+                returnParameter.Direction = ParameterDirection.ReturnValue;
+                command.Parameters.Add(returnParameter);
+            }
+        }
+
+        private static StoredProcedureExecutionResult ExecuteStoredProcedureCommand(
+            DbCommand command,
+            string providerInvariantName)
+        {
+            var affectedRows = command.ExecuteNonQuery();
+            var outputValues = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            string returnValue = null;
+
+            foreach (DbParameter parameter in command.Parameters)
+            {
+                if (parameter.Direction == ParameterDirection.Output || parameter.Direction == ParameterDirection.InputOutput)
+                {
+                    outputValues[parameter.ParameterName] = ConvertScalarToString(parameter.Value);
+                }
+                else if (parameter.Direction == ParameterDirection.ReturnValue)
+                {
+                    returnValue = ConvertScalarToString(parameter.Value);
+                }
+            }
+
+            return new StoredProcedureExecutionResult
+            {
+                AffectedRows = affectedRows,
+                OutputParameters = outputValues,
+                ReturnValue = returnValue
+            };
         }
 
         private static void EnsureTransactionHandle(DatabaseTransactionHandle transactionHandle)
@@ -1241,6 +1388,15 @@ namespace Primo.MIA
         public int AffectedRows { get; set; }
 
         public int BatchCount { get; set; }
+    }
+
+    public class StoredProcedureExecutionResult
+    {
+        public int AffectedRows { get; set; }
+
+        public Dictionary<string, string> OutputParameters { get; set; }
+
+        public string ReturnValue { get; set; }
     }
 
     internal class BulkInsertColumnMapping

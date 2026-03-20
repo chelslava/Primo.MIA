@@ -223,6 +223,7 @@ namespace Primo.MIA.Common
         public const string Activity_DatabaseQuery = "БД: Запрос";
         public const string Activity_DatabaseScalar = "БД: Скалярное значение";
         public const string Activity_DatabaseNonQuery = "БД: Выполнить команду";
+        public const string Activity_DatabaseStoredProcedure = "БД: Stored procedure";
         public const string Activity_DatabaseBulkInsert = "БД: Массовая запись из DataTable";
         public const string Activity_DatabaseTransactionBegin = "БД: Начать транзакцию";
         public const string Activity_DatabaseTransactionCommit = "БД: Подтвердить транзакцию";
@@ -275,6 +276,10 @@ namespace Primo.MIA.Common
         public const string Field_CommandText = "SQL / имя процедуры";
         public const string Field_CommandTimeoutSeconds = "Таймаут команды (сек)";
         public const string Field_ParametersDictionary = "Параметры";
+        public const string Field_OutputParameterNames = "Выходные параметры";
+        public const string Field_OutputParameters = "Выходные значения";
+        public const string Field_IncludeReturnValue = "Получать return value";
+        public const string Field_ReturnValue = "Return value";
         public const string Field_ResultTable = "Таблица-результат";
         public const string Field_HasRows = "Есть строки";
         public const string Field_IsAvailable = "Подключение доступно";

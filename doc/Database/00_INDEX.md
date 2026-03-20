@@ -13,6 +13,7 @@
 | 02 | [БД: Запрос](02_DatabaseQuery.md) | `DatabaseQueryBack` | Выполнить `SELECT` или stored procedure и вернуть `DataTable` |
 | 03 | [БД: Скалярное значение](03_DatabaseScalar.md) | `DatabaseScalarBack` | Получить одно значение: `COUNT(*)`, `MAX(...)`, `SCOPE_IDENTITY()` и т.п. |
 | 04 | [БД: Выполнить команду](04_DatabaseNonQuery.md) | `DatabaseNonQueryBack` | Выполнить `INSERT/UPDATE/DELETE` и получить число затронутых строк |
+| 04a | [БД: Stored procedure](04a_DatabaseStoredProcedure.md) | `DatabaseStoredProcedureBack` | Вызвать stored procedure с output-параметрами и return value |
 | 05 | [БД: Массовая запись из DataTable](05_DatabaseBulkInsert.md) | `DatabaseBulkInsertBack` | Массово записать `DataTable` в любую БД: `SqlBulkCopy` для SQL Server или batched insert для остальных |
 | 06 | [БД: Начать транзакцию](06_DatabaseTransactionBegin.md) | `DatabaseTransactionBeginBack` | Открыть транзакцию и сделать её текущим DB-контекстом |
 | 07 | [БД: Подтвердить транзакцию](07_DatabaseTransactionCommit.md) | `DatabaseTransactionCommitBack` | Зафиксировать текущую или указанную транзакцию |

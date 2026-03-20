@@ -131,6 +131,15 @@ namespace Primo.MIA.Tests.Database
                 .Should().Be("[dbo].[Users]");
         }
 
+        [Fact(DisplayName = "NormalizeOutputParameterName: использует префикс провайдера")]
+        public void NormalizeOutputParameterName_UsesProviderPrefix()
+        {
+            DatabaseHelper.NormalizeOutputParameterName(DatabaseHelper.DefaultProviderInvariantName, "StatusCode")
+                .Should().Be("@StatusCode");
+            DatabaseHelper.NormalizeOutputParameterName("Oracle.ManagedDataAccess.Client", "StatusCode")
+                .Should().Be(":StatusCode");
+        }
+
         [Fact(DisplayName = "SplitSqlBatches: делит SQL по строкам GO")]
         public void SplitSqlBatches_SplitsByGo()
         {
