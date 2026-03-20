@@ -36,5 +36,8 @@ namespace Primo.MIA.Common
         
         /// <summary>Категория "MIA → Текст"</summary>
         public const string Text = Prefix + "Текст";
+
+        /// <summary>Категория "MIA → База данных"</summary>
+        public const string Database = Prefix + "База данных";
     }
 }

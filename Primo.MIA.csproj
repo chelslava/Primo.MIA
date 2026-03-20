@@ -870,6 +870,111 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Database\DatabaseCheckConnection.xaml.cs">
+      <DependentUpon>DatabaseCheckConnection.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Database\DatabaseCheckConnectionBack.cs" />
+    <Compile Include="Database\DatabaseBulkInsert.xaml.cs">
+      <DependentUpon>DatabaseBulkInsert.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Database\DatabaseBulkInsertBack.cs" />
+    <Compile Include="Database\DatabaseHelper.cs" />
+    <Compile Include="Database\DatabaseTransactionBegin.xaml.cs">
+      <DependentUpon>DatabaseTransactionBegin.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Database\DatabaseTransactionBeginBack.cs" />
+    <Compile Include="Database\DatabaseTransactionCommit.xaml.cs">
+      <DependentUpon>DatabaseTransactionCommit.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Database\DatabaseTransactionCommitBack.cs" />
+    <Compile Include="Database\DatabaseTransactionContext.cs" />
+    <Compile Include="Database\DatabaseTransactionHandle.cs" />
+    <Compile Include="Database\DatabaseTransactionManager.cs" />
+    <Compile Include="Database\DatabaseTransactionResolver.cs" />
+    <Compile Include="Database\DatabaseTransactionRollback.xaml.cs">
+      <DependentUpon>DatabaseTransactionRollback.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Database\DatabaseTransactionRollbackBack.cs" />
+    <Compile Include="Database\DatabaseListColumns.xaml.cs">
+      <DependentUpon>DatabaseListColumns.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Database\DatabaseListColumnsBack.cs" />
+    <Compile Include="Database\DatabaseListTables.xaml.cs">
+      <DependentUpon>DatabaseListTables.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Database\DatabaseListTablesBack.cs" />
+    <Compile Include="Database\DatabaseNonQuery.xaml.cs">
+      <DependentUpon>DatabaseNonQuery.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Database\DatabaseNonQueryBack.cs" />
+    <Compile Include="Database\DatabaseGetTableSchema.xaml.cs">
+      <DependentUpon>DatabaseGetTableSchema.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Database\DatabaseGetTableSchemaBack.cs" />
+    <Compile Include="Database\DatabaseQuery.xaml.cs">
+      <DependentUpon>DatabaseQuery.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Database\DatabaseQueryBack.cs" />
+    <Compile Include="Database\DatabaseScalar.xaml.cs">
+      <DependentUpon>DatabaseScalar.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Database\DatabaseScalarBack.cs" />
+    <Compile Include="Database\DatabaseTableExists.xaml.cs">
+      <DependentUpon>DatabaseTableExists.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Database\DatabaseTableExistsBack.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="Database\DatabaseCheckConnection.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Database\DatabaseBulkInsert.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Database\DatabaseTransactionBegin.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Database\DatabaseTransactionCommit.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Database\DatabaseTransactionRollback.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Database\DatabaseListColumns.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Database\DatabaseListTables.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Database\DatabaseQuery.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Database\DatabaseGetTableSchema.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Database\DatabaseScalar.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Database\DatabaseNonQuery.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Database\DatabaseTableExists.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
     <Resource Include="images\config.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>

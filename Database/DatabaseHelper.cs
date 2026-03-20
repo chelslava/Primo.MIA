@@ -1,0 +1,813 @@
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.Common;
+using System.Data.Odbc;
+using System.Data.OleDb;
+using System.Data.SqlClient;
+using System.Globalization;
+using System.Linq;
+
+namespace Primo.MIA
+{
+    /// <summary>
+    /// Вспомогательные методы для ADO.NET активностей.
+    /// Работают через DbProviderFactory и подходят для любых
+    /// зарегистрированных провайдеров с invariant name.
+    /// </summary>
+    public static class DatabaseHelper
+    {
+        public const string DefaultProviderInvariantName = "System.Data.SqlClient";
+
+        public static DbProviderFactory GetFactory(string providerInvariantName)
+        {
+            var provider = string.IsNullOrWhiteSpace(providerInvariantName)
+                ? DefaultProviderInvariantName
+                : providerInvariantName.Trim();
+
+            try
+            {
+                return DbProviderFactories.GetFactory(provider);
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException(
+                    $"Не удалось получить DbProviderFactory для '{provider}'. " +
+                    "Проверьте invariant name и установлен ли ADO.NET провайдер.",
+                    ex);
+            }
+        }
+
+        public static DbConnection OpenConnection(string providerInvariantName, string connectionString)
+        {
+            if (string.IsNullOrWhiteSpace(connectionString))
+                throw new ArgumentException("Строка подключения не может быть пустой.", nameof(connectionString));
+
+            var factory = GetFactory(providerInvariantName);
+            var connection = factory.CreateConnection();
+            if (connection == null)
+                throw new InvalidOperationException("Провайдер не смог создать объект подключения.");
+
+            connection.ConnectionString = connectionString;
+            connection.Open();
+            return connection;
+        }
+
+        public static DbCommand CreateCommand(
+            DbConnection connection,
+            string commandText,
+            DatabaseCommandType commandType,
+            int commandTimeoutSeconds,
+            Dictionary<string, string> parameters = null,
+            DbTransaction transaction = null)
+        {
+            if (connection == null)
+                throw new ArgumentNullException(nameof(connection));
+            if (string.IsNullOrWhiteSpace(commandText))
+                throw new ArgumentException("Текст команды не может быть пустым.", nameof(commandText));
+
+            var command = connection.CreateCommand();
+            command.CommandText = commandText;
+            command.CommandType = commandType == DatabaseCommandType.StoredProcedure
+                ? CommandType.StoredProcedure
+                : CommandType.Text;
+            command.CommandTimeout = commandTimeoutSeconds > 0 ? commandTimeoutSeconds : 30;
+            command.Transaction = transaction;
+
+            AddParameters(command, parameters);
+            return command;
+        }
+
+        public static void AddParameters(DbCommand command, Dictionary<string, string> parameters)
+        {
+            if (command == null)
+                throw new ArgumentNullException(nameof(command));
+            if (parameters == null || parameters.Count == 0)
+                return;
+
+            foreach (var pair in parameters)
+            {
+                var parameter = command.CreateParameter();
+                parameter.ParameterName = NormalizeParameterName(pair.Key);
+                parameter.Value = string.IsNullOrEmpty(pair.Value)
+                    ? (object)DBNull.Value
+                    : pair.Value;
+                command.Parameters.Add(parameter);
+            }
+        }
+
+        public static string NormalizeParameterName(string parameterName)
+        {
+            if (string.IsNullOrWhiteSpace(parameterName))
+                throw new ArgumentException("Имя параметра не может быть пустым.", nameof(parameterName));
+
+            var trimmed = parameterName.Trim();
+            if (trimmed.StartsWith("@", StringComparison.Ordinal) ||
+                trimmed.StartsWith(":", StringComparison.Ordinal) ||
+                trimmed.StartsWith("?", StringComparison.Ordinal))
+            {
+                return trimmed;
+            }
+
+            return "@" + trimmed;
+        }
+
+        public static DataTable ExecuteQuery(
+            string providerInvariantName,
+            string connectionString,
+            string commandText,
+            DatabaseCommandType commandType,
+            int commandTimeoutSeconds,
+            Dictionary<string, string> parameters = null)
+        {
+            using (var connection = OpenConnection(providerInvariantName, connectionString))
+            using (var command = CreateCommand(connection, commandText, commandType, commandTimeoutSeconds, parameters))
+            using (var adapter = GetFactory(providerInvariantName).CreateDataAdapter())
+            {
+                if (adapter == null)
+                    throw new InvalidOperationException("Провайдер не смог создать DataAdapter.");
+
+                adapter.SelectCommand = command;
+                var table = new DataTable();
+                adapter.Fill(table);
+                return table;
+            }
+        }
+
+        public static DataTable ExecuteQuery(
+            DatabaseTransactionHandle transactionHandle,
+            string commandText,
+            DatabaseCommandType commandType,
+            int commandTimeoutSeconds,
+            Dictionary<string, string> parameters = null)
+        {
+            EnsureTransactionHandle(transactionHandle);
+
+            using (var command = CreateCommand(
+                transactionHandle.Connection,
+                commandText,
+                commandType,
+                commandTimeoutSeconds,
+                parameters,
+                transactionHandle.Transaction))
+            using (var adapter = GetFactory(transactionHandle.ProviderInvariantName).CreateDataAdapter())
+            {
+                if (adapter == null)
+                    throw new InvalidOperationException("Провайдер не смог создать DataAdapter.");
+
+                adapter.SelectCommand = command;
+                var table = new DataTable();
+                adapter.Fill(table);
+                return table;
+            }
+        }
+
+        public static object ExecuteScalar(
+            string providerInvariantName,
+            string connectionString,
+            string commandText,
+            DatabaseCommandType commandType,
+            int commandTimeoutSeconds,
+            Dictionary<string, string> parameters = null)
+        {
+            using (var connection = OpenConnection(providerInvariantName, connectionString))
+            using (var command = CreateCommand(connection, commandText, commandType, commandTimeoutSeconds, parameters))
+            {
+                return command.ExecuteScalar();
+            }
+        }
+
+        public static object ExecuteScalar(
+            DatabaseTransactionHandle transactionHandle,
+            string commandText,
+            DatabaseCommandType commandType,
+            int commandTimeoutSeconds,
+            Dictionary<string, string> parameters = null)
+        {
+            EnsureTransactionHandle(transactionHandle);
+
+            using (var command = CreateCommand(
+                transactionHandle.Connection,
+                commandText,
+                commandType,
+                commandTimeoutSeconds,
+                parameters,
+                transactionHandle.Transaction))
+            {
+                return command.ExecuteScalar();
+            }
+        }
+
+        public static int ExecuteNonQuery(
+            string providerInvariantName,
+            string connectionString,
+            string commandText,
+            DatabaseCommandType commandType,
+            int commandTimeoutSeconds,
+            Dictionary<string, string> parameters = null)
+        {
+            using (var connection = OpenConnection(providerInvariantName, connectionString))
+            using (var command = CreateCommand(connection, commandText, commandType, commandTimeoutSeconds, parameters))
+            {
+                return command.ExecuteNonQuery();
+            }
+        }
+
+        public static int ExecuteNonQuery(
+            DatabaseTransactionHandle transactionHandle,
+            string commandText,
+            DatabaseCommandType commandType,
+            int commandTimeoutSeconds,
+            Dictionary<string, string> parameters = null)
+        {
+            EnsureTransactionHandle(transactionHandle);
+
+            using (var command = CreateCommand(
+                transactionHandle.Connection,
+                commandText,
+                commandType,
+                commandTimeoutSeconds,
+                parameters,
+                transactionHandle.Transaction))
+            {
+                return command.ExecuteNonQuery();
+            }
+        }
+
+        public static string ConvertScalarToString(object value)
+        {
+            if (value == null || value == DBNull.Value)
+                return null;
+
+            if (value is DateTime dt)
+                return dt.ToString("O", CultureInfo.InvariantCulture);
+
+            if (value is DateTimeOffset dto)
+                return dto.ToString("O", CultureInfo.InvariantCulture);
+
+            if (value is IFormattable formattable)
+                return formattable.ToString(null, CultureInfo.InvariantCulture);
+
+            return value.ToString();
+        }
+
+        public static DataTable GetSchema(
+            string providerInvariantName,
+            string connectionString,
+            string collectionName)
+        {
+            using (var connection = OpenConnection(providerInvariantName, connectionString))
+            {
+                return connection.GetSchema(collectionName);
+            }
+        }
+
+        public static DataTable GetTablesSchema(
+            string providerInvariantName,
+            string connectionString,
+            string schemaName = null,
+            bool includeViews = false)
+        {
+            var schema = GetSchema(providerInvariantName, connectionString, "Tables");
+            var filtered = schema.Clone();
+
+            foreach (DataRow row in schema.Rows)
+            {
+                var tableSchema = GetSchemaValue(row, "TABLE_SCHEMA");
+                var tableName = GetSchemaValue(row, "TABLE_NAME");
+                var tableType = GetSchemaValue(row, "TABLE_TYPE");
+
+                if (string.IsNullOrWhiteSpace(tableName))
+                    continue;
+                if (!string.IsNullOrWhiteSpace(schemaName) &&
+                    !string.Equals(tableSchema, schemaName, StringComparison.OrdinalIgnoreCase))
+                    continue;
+                if (!includeViews &&
+                    !string.IsNullOrWhiteSpace(tableType) &&
+                    tableType.IndexOf("VIEW", StringComparison.OrdinalIgnoreCase) >= 0)
+                    continue;
+
+                filtered.ImportRow(row);
+            }
+
+            return filtered;
+        }
+
+        public static bool TableExists(
+            string providerInvariantName,
+            string connectionString,
+            string tableName,
+            string schemaName = null,
+            bool includeViews = false)
+        {
+            if (string.IsNullOrWhiteSpace(tableName))
+                throw new ArgumentException("Имя таблицы не может быть пустым.", nameof(tableName));
+
+            var schema = GetTablesSchema(providerInvariantName, connectionString, schemaName, includeViews);
+            return schema.Rows.Cast<DataRow>()
+                .Any(row => string.Equals(GetSchemaValue(row, "TABLE_NAME"), tableName, StringComparison.OrdinalIgnoreCase));
+        }
+
+        public static List<string> GetTableNames(
+            string providerInvariantName,
+            string connectionString,
+            string schemaName = null,
+            bool includeViews = false)
+        {
+            var schema = GetTablesSchema(providerInvariantName, connectionString, schemaName, includeViews);
+            return schema.Rows.Cast<DataRow>()
+                .Select(row =>
+                {
+                    var tableSchema = GetSchemaValue(row, "TABLE_SCHEMA");
+                    var tableName = GetSchemaValue(row, "TABLE_NAME");
+                    return string.IsNullOrWhiteSpace(tableSchema) ? tableName : tableSchema + "." + tableName;
+                })
+                .Where(name => !string.IsNullOrWhiteSpace(name))
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .OrderBy(name => name, StringComparer.OrdinalIgnoreCase)
+                .ToList();
+        }
+
+        public static DataTable GetColumnsSchema(
+            string providerInvariantName,
+            string connectionString,
+            string tableName,
+            string schemaName = null)
+        {
+            if (string.IsNullOrWhiteSpace(tableName))
+                throw new ArgumentException("Имя таблицы не может быть пустым.", nameof(tableName));
+
+            var schema = GetSchema(providerInvariantName, connectionString, "Columns");
+            var filtered = schema.Clone();
+
+            foreach (DataRow row in schema.Rows)
+            {
+                var rowSchema = GetSchemaValue(row, "TABLE_SCHEMA");
+                var rowTable = GetSchemaValue(row, "TABLE_NAME");
+                if (!string.Equals(rowTable, tableName, StringComparison.OrdinalIgnoreCase))
+                    continue;
+                if (!string.IsNullOrWhiteSpace(schemaName) &&
+                    !string.Equals(rowSchema, schemaName, StringComparison.OrdinalIgnoreCase))
+                    continue;
+
+                filtered.ImportRow(row);
+            }
+
+            return filtered;
+        }
+
+        public static List<string> GetColumnNames(
+            string providerInvariantName,
+            string connectionString,
+            string tableName,
+            string schemaName = null)
+        {
+            var schema = GetColumnsSchema(providerInvariantName, connectionString, tableName, schemaName);
+            return schema.Rows.Cast<DataRow>()
+                .Select(row => GetSchemaValue(row, "COLUMN_NAME"))
+                .Where(name => !string.IsNullOrWhiteSpace(name))
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .OrderBy(name => name, StringComparer.OrdinalIgnoreCase)
+                .ToList();
+        }
+
+        /// <summary>
+        /// Универсальная массовая запись DataTable.
+        /// Для SQL Server использует SqlBulkCopy, для остальных провайдеров —
+        /// batched insert через DbProviderFactory и транзакцию.
+        /// </summary>
+        public static BulkInsertResult ExecuteBulkInsert(
+            string providerInvariantName,
+            string connectionString,
+            DataTable dataTable,
+            string destinationTableName,
+            int batchSize,
+            int bulkCopyTimeoutSeconds,
+            bool useTableLock,
+            bool keepIdentity,
+            Dictionary<string, string> columnMappings = null)
+        {
+            var provider = string.IsNullOrWhiteSpace(providerInvariantName)
+                ? DefaultProviderInvariantName
+                : providerInvariantName.Trim();
+
+            if (dataTable == null)
+                throw new ArgumentNullException(nameof(dataTable), "Исходная таблица данных не указана.");
+            if (string.IsNullOrWhiteSpace(destinationTableName))
+                throw new ArgumentException("Имя таблицы-приёмника не может быть пустым.", nameof(destinationTableName));
+
+            if (dataTable.Columns.Count == 0)
+                return new BulkInsertResult { RowsWritten = dataTable.Rows.Count, Mode = "NoColumns" };
+
+            if (string.Equals(provider, DefaultProviderInvariantName, StringComparison.OrdinalIgnoreCase))
+            {
+                return ExecuteSqlServerBulkInsert(
+                    connectionString,
+                    dataTable,
+                    destinationTableName,
+                    batchSize,
+                    bulkCopyTimeoutSeconds,
+                    useTableLock,
+                    keepIdentity,
+                    columnMappings);
+            }
+
+            return ExecuteBatchedInsert(
+                provider,
+                connectionString,
+                dataTable,
+                destinationTableName,
+                batchSize,
+                bulkCopyTimeoutSeconds,
+                columnMappings);
+        }
+
+        private static BulkInsertResult ExecuteSqlServerBulkInsert(
+            string connectionString,
+            DataTable dataTable,
+            string destinationTableName,
+            int batchSize,
+            int bulkCopyTimeoutSeconds,
+            bool useTableLock,
+            bool keepIdentity,
+            Dictionary<string, string> columnMappings)
+        {
+            var options = SqlBulkCopyOptions.CheckConstraints;
+            if (useTableLock)
+                options |= SqlBulkCopyOptions.TableLock;
+            if (keepIdentity)
+                options |= SqlBulkCopyOptions.KeepIdentity;
+
+            using (var connection = new SqlConnection(connectionString))
+            using (var bulkCopy = new SqlBulkCopy(connection, options, null))
+            {
+                connection.Open();
+
+                bulkCopy.DestinationTableName = destinationTableName;
+                bulkCopy.BatchSize = batchSize > 0 ? batchSize : 1000;
+                bulkCopy.BulkCopyTimeout = bulkCopyTimeoutSeconds > 0 ? bulkCopyTimeoutSeconds : 60;
+
+                ApplyBulkCopyMappings(bulkCopy, dataTable, columnMappings);
+                bulkCopy.WriteToServer(dataTable);
+            }
+
+            return new BulkInsertResult
+            {
+                RowsWritten = dataTable.Rows.Count,
+                Mode = "SqlBulkCopy"
+            };
+        }
+
+        public static BulkInsertResult ExecuteBulkInsert(
+            DatabaseTransactionHandle transactionHandle,
+            DataTable dataTable,
+            string destinationTableName,
+            int batchSize,
+            int bulkCopyTimeoutSeconds,
+            bool useTableLock,
+            bool keepIdentity,
+            Dictionary<string, string> columnMappings = null)
+        {
+            EnsureTransactionHandle(transactionHandle);
+
+            if (dataTable == null)
+                throw new ArgumentNullException(nameof(dataTable), "Исходная таблица данных не указана.");
+            if (string.IsNullOrWhiteSpace(destinationTableName))
+                throw new ArgumentException("Имя таблицы-приёмника не может быть пустым.", nameof(destinationTableName));
+            if (dataTable.Columns.Count == 0)
+                return new BulkInsertResult { RowsWritten = dataTable.Rows.Count, Mode = "NoColumns" };
+
+            if (string.Equals(transactionHandle.ProviderInvariantName, DefaultProviderInvariantName, StringComparison.OrdinalIgnoreCase))
+            {
+                return ExecuteSqlServerBulkInsert(transactionHandle, dataTable, destinationTableName, batchSize, bulkCopyTimeoutSeconds, useTableLock, keepIdentity, columnMappings);
+            }
+
+            return ExecuteBatchedInsert(transactionHandle, dataTable, destinationTableName, batchSize, bulkCopyTimeoutSeconds, columnMappings);
+        }
+
+        private static BulkInsertResult ExecuteSqlServerBulkInsert(
+            DatabaseTransactionHandle transactionHandle,
+            DataTable dataTable,
+            string destinationTableName,
+            int batchSize,
+            int bulkCopyTimeoutSeconds,
+            bool useTableLock,
+            bool keepIdentity,
+            Dictionary<string, string> columnMappings)
+        {
+            EnsureTransactionHandle(transactionHandle);
+
+            var sqlConnection = transactionHandle.Connection as SqlConnection;
+            var sqlTransaction = transactionHandle.Transaction as SqlTransaction;
+            if (sqlConnection == null || sqlTransaction == null)
+                throw new InvalidOperationException("Для SqlBulkCopy внутри транзакции требуется SqlConnection/SqlTransaction.");
+
+            var options = SqlBulkCopyOptions.CheckConstraints;
+            if (useTableLock)
+                options |= SqlBulkCopyOptions.TableLock;
+            if (keepIdentity)
+                options |= SqlBulkCopyOptions.KeepIdentity;
+
+            using (var bulkCopy = new SqlBulkCopy(sqlConnection, options, sqlTransaction))
+            {
+                bulkCopy.DestinationTableName = destinationTableName;
+                bulkCopy.BatchSize = batchSize > 0 ? batchSize : 1000;
+                bulkCopy.BulkCopyTimeout = bulkCopyTimeoutSeconds > 0 ? bulkCopyTimeoutSeconds : 60;
+                ApplyBulkCopyMappings(bulkCopy, dataTable, columnMappings);
+                bulkCopy.WriteToServer(dataTable);
+            }
+
+            return new BulkInsertResult
+            {
+                RowsWritten = dataTable.Rows.Count,
+                Mode = "SqlBulkCopy"
+            };
+        }
+
+        private static BulkInsertResult ExecuteBatchedInsert(
+            string providerInvariantName,
+            string connectionString,
+            DataTable dataTable,
+            string destinationTableName,
+            int batchSize,
+            int commandTimeoutSeconds,
+            Dictionary<string, string> columnMappings)
+        {
+            var mappings = BuildMappings(dataTable, columnMappings);
+            var effectiveBatchSize = batchSize > 0 ? batchSize : 1000;
+
+            using (var connection = OpenConnection(providerInvariantName, connectionString))
+            using (var transaction = connection.BeginTransaction())
+            using (var command = connection.CreateCommand())
+            {
+                command.Transaction = transaction;
+                command.CommandType = CommandType.Text;
+                command.CommandTimeout = commandTimeoutSeconds > 0 ? commandTimeoutSeconds : 60;
+                command.CommandText = BuildInsertCommandText(providerInvariantName, destinationTableName, mappings);
+
+                CreateInsertParameters(command, providerInvariantName, mappings);
+                TryPrepareCommand(command);
+
+                var rowsWritten = 0;
+
+                foreach (DataRow row in dataTable.Rows)
+                {
+                    AssignInsertParameterValues(command, row, mappings);
+                    command.ExecuteNonQuery();
+                    rowsWritten++;
+
+                    if (rowsWritten % effectiveBatchSize == 0)
+                    {
+                        // Граница пачки оставлена как явный маркер: при необходимости
+                        // сюда можно добавить логирование/чекпоинты без перестройки API.
+                    }
+                }
+
+                transaction.Commit();
+
+                return new BulkInsertResult
+                {
+                    RowsWritten = rowsWritten,
+                    Mode = "BatchedInsert"
+                };
+            }
+        }
+
+        private static BulkInsertResult ExecuteBatchedInsert(
+            DatabaseTransactionHandle transactionHandle,
+            DataTable dataTable,
+            string destinationTableName,
+            int batchSize,
+            int commandTimeoutSeconds,
+            Dictionary<string, string> columnMappings)
+        {
+            EnsureTransactionHandle(transactionHandle);
+
+            var mappings = BuildMappings(dataTable, columnMappings);
+            var effectiveBatchSize = batchSize > 0 ? batchSize : 1000;
+
+            using (var command = transactionHandle.Connection.CreateCommand())
+            {
+                command.Transaction = transactionHandle.Transaction;
+                command.CommandType = CommandType.Text;
+                command.CommandTimeout = commandTimeoutSeconds > 0 ? commandTimeoutSeconds : 60;
+                command.CommandText = BuildInsertCommandText(transactionHandle.ProviderInvariantName, destinationTableName, mappings);
+
+                CreateInsertParameters(command, transactionHandle.ProviderInvariantName, mappings);
+                TryPrepareCommand(command);
+
+                var rowsWritten = 0;
+                foreach (DataRow row in dataTable.Rows)
+                {
+                    AssignInsertParameterValues(command, row, mappings);
+                    command.ExecuteNonQuery();
+                    rowsWritten++;
+
+                    if (rowsWritten % effectiveBatchSize == 0)
+                    {
+                    }
+                }
+
+                return new BulkInsertResult
+                {
+                    RowsWritten = rowsWritten,
+                    Mode = "BatchedInsert"
+                };
+            }
+        }
+
+        /// <summary>
+        /// Настраивает маппинг колонок для bulk copy.
+        /// Если словарь не указан, колонки маппятся по одинаковым именам.
+        /// </summary>
+        public static void ApplyBulkCopyMappings(
+            SqlBulkCopy bulkCopy,
+            DataTable dataTable,
+            Dictionary<string, string> columnMappings = null)
+        {
+            if (bulkCopy == null)
+                throw new ArgumentNullException(nameof(bulkCopy));
+            if (dataTable == null)
+                throw new ArgumentNullException(nameof(dataTable));
+
+            bulkCopy.ColumnMappings.Clear();
+
+            if (columnMappings != null && columnMappings.Count > 0)
+            {
+                foreach (var pair in columnMappings)
+                {
+                    EnsureColumnExists(dataTable, pair.Key);
+                    bulkCopy.ColumnMappings.Add(pair.Key, pair.Value);
+                }
+
+                return;
+            }
+
+            foreach (DataColumn column in dataTable.Columns)
+            {
+                bulkCopy.ColumnMappings.Add(column.ColumnName, column.ColumnName);
+            }
+        }
+
+        private static void EnsureColumnExists(DataTable dataTable, string columnName)
+        {
+            if (string.IsNullOrWhiteSpace(columnName))
+                throw new ArgumentException("Имя колонки не может быть пустым.", nameof(columnName));
+
+            if (!dataTable.Columns.Contains(columnName))
+                throw new InvalidOperationException($"Колонка '{columnName}' отсутствует в DataTable.");
+        }
+
+        private static List<BulkInsertColumnMapping> BuildMappings(
+            DataTable dataTable,
+            Dictionary<string, string> columnMappings)
+        {
+            if (columnMappings != null && columnMappings.Count > 0)
+            {
+                return columnMappings
+                    .Select(pair =>
+                    {
+                        EnsureColumnExists(dataTable, pair.Key);
+                        return new BulkInsertColumnMapping
+                        {
+                            SourceColumn = pair.Key,
+                            DestinationColumn = pair.Value
+                        };
+                    })
+                    .ToList();
+            }
+
+            return dataTable.Columns
+                .Cast<DataColumn>()
+                .Select(column => new BulkInsertColumnMapping
+                {
+                    SourceColumn = column.ColumnName,
+                    DestinationColumn = column.ColumnName
+                })
+                .ToList();
+        }
+
+        private static string BuildInsertCommandText(
+            string providerInvariantName,
+            string destinationTableName,
+            List<BulkInsertColumnMapping> mappings)
+        {
+            var columnList = string.Join(", ", mappings.Select(m => m.DestinationColumn));
+            var valuesList = string.Join(", ", mappings.Select((m, index) => GetParameterPlaceholder(providerInvariantName, index)));
+            return $"INSERT INTO {destinationTableName} ({columnList}) VALUES ({valuesList})";
+        }
+
+        private static void CreateInsertParameters(
+            DbCommand command,
+            string providerInvariantName,
+            List<BulkInsertColumnMapping> mappings)
+        {
+            command.Parameters.Clear();
+
+            for (int i = 0; i < mappings.Count; i++)
+            {
+                var parameter = command.CreateParameter();
+                parameter.ParameterName = GetParameterName(providerInvariantName, i);
+                command.Parameters.Add(parameter);
+            }
+        }
+
+        private static void AssignInsertParameterValues(
+            DbCommand command,
+            DataRow row,
+            List<BulkInsertColumnMapping> mappings)
+        {
+            for (int i = 0; i < mappings.Count; i++)
+            {
+                var value = row[mappings[i].SourceColumn];
+                command.Parameters[i].Value = value ?? DBNull.Value;
+            }
+        }
+
+        private static string GetParameterPlaceholder(string providerInvariantName, int index)
+        {
+            if (IsPositionalProvider(providerInvariantName))
+                return "?";
+
+            return GetParameterPrefix(providerInvariantName) + "p" + index;
+        }
+
+        private static string GetParameterName(string providerInvariantName, int index)
+        {
+            if (IsPositionalProvider(providerInvariantName))
+                return "p" + index;
+
+            return GetParameterPrefix(providerInvariantName) + "p" + index;
+        }
+
+        private static string GetParameterPrefix(string providerInvariantName)
+        {
+            if (string.IsNullOrWhiteSpace(providerInvariantName))
+                return "@";
+
+            if (providerInvariantName.IndexOf("Oracle", StringComparison.OrdinalIgnoreCase) >= 0)
+                return ":";
+
+            return "@";
+        }
+
+        private static bool IsPositionalProvider(string providerInvariantName)
+        {
+            if (string.IsNullOrWhiteSpace(providerInvariantName))
+                return false;
+
+            return providerInvariantName.IndexOf(typeof(OdbcFactory).Namespace, StringComparison.OrdinalIgnoreCase) >= 0 ||
+                   providerInvariantName.IndexOf(typeof(OleDbFactory).Namespace, StringComparison.OrdinalIgnoreCase) >= 0;
+        }
+
+        private static void TryPrepareCommand(DbCommand command)
+        {
+            try
+            {
+                command.Prepare();
+            }
+            catch
+            {
+                // Не все провайдеры поддерживают Prepare — это допустимо.
+            }
+        }
+
+        private static void EnsureTransactionHandle(DatabaseTransactionHandle transactionHandle)
+        {
+            if (transactionHandle == null)
+                throw new InvalidOperationException("Транзакция БД не найдена.");
+            if (transactionHandle.Connection == null || transactionHandle.Transaction == null)
+                throw new InvalidOperationException("Транзакция БД не инициализирована корректно.");
+        }
+
+        private static string GetSchemaValue(DataRow row, string columnName)
+        {
+            if (row == null || row.Table == null)
+                return null;
+
+            if (row.Table.Columns.Contains(columnName))
+                return row[columnName]?.ToString();
+
+            var matchingColumn = row.Table.Columns
+                .Cast<DataColumn>()
+                .FirstOrDefault(col => string.Equals(col.ColumnName, columnName, StringComparison.OrdinalIgnoreCase));
+
+            return matchingColumn != null ? row[matchingColumn]?.ToString() : null;
+        }
+    }
+
+    /// <summary>Результат массовой записи в БД.</summary>
+    public class BulkInsertResult
+    {
+        public int RowsWritten { get; set; }
+
+        public string Mode { get; set; }
+    }
+
+    internal class BulkInsertColumnMapping
+    {
+        public string SourceColumn { get; set; }
+
+        public string DestinationColumn { get; set; }
+    }
+}

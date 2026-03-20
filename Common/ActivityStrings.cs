@@ -172,6 +172,11 @@ namespace Primo.MIA.Common
         public const string Error_StabilityTimeoutRequired = "Время стабильности должно быть указано";
         public const string Error_TimeoutRequired = "Таймаут должен быть указан";
         public const string Error_ListBRequired = "Список B обязателен для данной операции";
+        public const string Error_ConnectionStringRequired = "Строка подключения обязательна";
+        public const string Error_CommandTextRequired = "SQL команда или имя процедуры обязательны";
+        public const string Error_DestinationTableRequired = "Таблица-приёмник обязательна";
+        public const string Error_TransactionIdRequired = "ID транзакции обязателен";
+        public const string Error_TableNameRequired = "Имя таблицы обязательно";
 
         // ═══════════════════════════════════════════════════════════════════════
         // НАЗВАНИЯ АКТИВНОСТЕЙ
@@ -214,6 +219,18 @@ namespace Primo.MIA.Common
         public const string Activity_Generators = "Генераторы";
         public const string Activity_ExcelCellRecalculate = "Excel: Пересчёт ячеек";
         public const string Activity_WaitForFile = "Ожидание файла";
+        public const string Activity_DatabaseCheckConnection = "БД: Проверить подключение";
+        public const string Activity_DatabaseQuery = "БД: Запрос";
+        public const string Activity_DatabaseScalar = "БД: Скалярное значение";
+        public const string Activity_DatabaseNonQuery = "БД: Выполнить команду";
+        public const string Activity_DatabaseBulkInsert = "БД: Массовая запись из DataTable";
+        public const string Activity_DatabaseTransactionBegin = "БД: Начать транзакцию";
+        public const string Activity_DatabaseTransactionCommit = "БД: Подтвердить транзакцию";
+        public const string Activity_DatabaseTransactionRollback = "БД: Откатить транзакцию";
+        public const string Activity_DatabaseTableExists = "БД: Проверить таблицу";
+        public const string Activity_DatabaseListTables = "БД: Список таблиц";
+        public const string Activity_DatabaseListColumns = "БД: Список колонок";
+        public const string Activity_DatabaseGetTableSchema = "БД: Схема таблицы";
 
         // ═══════════════════════════════════════════════════════════════════════
         // ДОПОЛНИТЕЛЬНЫЕ ПОЛЯ (сохранены все оригинальные константы)
@@ -252,6 +269,38 @@ namespace Primo.MIA.Common
         public const string Field_ResponseHeaders = "Заголовки ответа";
         public const string Field_IsSuccess = "Успешно";
         public const string Field_ResponseTime = "Время ответа (мс)";
+        public const string Field_ConnectionString = "Строка подключения";
+        public const string Field_DbProviderInvariantName = "Provider invariant name";
+        public const string Field_CommandType = "Тип команды";
+        public const string Field_CommandText = "SQL / имя процедуры";
+        public const string Field_CommandTimeoutSeconds = "Таймаут команды (сек)";
+        public const string Field_ParametersDictionary = "Параметры";
+        public const string Field_ResultTable = "Таблица-результат";
+        public const string Field_IsAvailable = "Подключение доступно";
+        public const string Field_ServerVersion = "Версия сервера";
+        public const string Field_ElapsedMs = "Время выполнения (мс)";
+        public const string Field_ErrorText = "Текст ошибки";
+        public const string Field_HasValue = "Есть значение";
+        public const string Field_AffectedRows = "Затронуто строк";
+        public const string Field_HasAffectedRows = "Есть затронутые строки";
+        public const string Field_DestinationTable = "Таблица-приёмник";
+        public const string Field_ColumnMappings = "Маппинг колонок";
+        public const string Field_BatchSize = "Размер пакета";
+        public const string Field_BulkCopyTimeoutSeconds = "Таймаут bulk copy (сек)";
+        public const string Field_UseTableLock = "Использовать table lock";
+        public const string Field_KeepIdentity = "Сохранять identity";
+        public const string Field_RowsWritten = "Записано строк";
+        public const string Field_MappingCount = "Количество маппингов";
+        public const string Field_WriteMode = "Режим записи";
+        public const string Field_TransactionId = "ID транзакции";
+        public const string Field_IsolationLevel = "Уровень изоляции";
+        public const string Field_StartedAtUtc = "Начата (UTC)";
+        public const string Field_TableName = "Имя таблицы";
+        public const string Field_SchemaName = "Имя схемы";
+        public const string Field_IncludeViews = "Учитывать представления";
+        public const string Field_Exists = "Существует";
+        public const string Field_TableNames = "Список таблиц";
+        public const string Field_ColumnNames = "Список колонок";
         public const string Field_TupleKind = "Тип кортежа";
         public const string Field_Item1 = "Item1 (обязателен)";
         public const string Field_Item2 = "Item2";
