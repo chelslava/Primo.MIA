@@ -140,6 +140,25 @@ namespace Primo.MIA.Tests.Database
                 .Should().Be(":StatusCode");
         }
 
+        [Fact(DisplayName = "GetIdentityQuery: выбирает SQL по провайдеру")]
+        public void GetIdentityQuery_ReturnsProviderSpecificSql()
+        {
+            DatabaseHelper.GetIdentityQuery(DatabaseHelper.DefaultProviderInvariantName)
+                .Should().Be("SELECT SCOPE_IDENTITY()");
+            DatabaseHelper.GetIdentityQuery("Npgsql")
+                .Should().Be("SELECT LASTVAL()");
+            DatabaseHelper.GetIdentityQuery("MySql.Data.MySqlClient")
+                .Should().Be("SELECT LAST_INSERT_ID()");
+            DatabaseHelper.GetIdentityQuery("System.Data.SQLite")
+                .Should().Be("SELECT last_insert_rowid()");
+        }
+
+        [Fact(DisplayName = "GetIdentityQuery: неизвестный провайдер -> null")]
+        public void GetIdentityQuery_UnknownProvider_ReturnsNull()
+        {
+            DatabaseHelper.GetIdentityQuery("Any.Provider").Should().BeNull();
+        }
+
         [Fact(DisplayName = "SplitSqlBatches: делит SQL по строкам GO")]
         public void SplitSqlBatches_SplitsByGo()
         {

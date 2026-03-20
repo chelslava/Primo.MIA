@@ -102,6 +102,15 @@ namespace Primo.MIA
             set { _propSplitByGoBatches = value; InvokePropertyChanged(this, nameof(Prop_SplitByGoBatches)); }
         }
 
+        private bool _propReturnIdentity;
+        [LTools.Common.Model.Serialization.StoringProperty]
+        [System.ComponentModel.Category(ActivityStrings.Category_Settings), System.ComponentModel.DisplayName(ActivityStrings.Field_ReturnIdentity)]
+        public bool Prop_ReturnIdentity
+        {
+            get => _propReturnIdentity;
+            set { _propReturnIdentity = value; InvokePropertyChanged(this, nameof(Prop_ReturnIdentity)); }
+        }
+
         private string _propAffectedRows;
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
@@ -132,6 +141,16 @@ namespace Primo.MIA
             set { _propBatchCount = value; InvokePropertyChanged(this, nameof(Prop_BatchCount)); }
         }
 
+        private string _propIdentityValue;
+        [LTools.Common.Model.Serialization.StoringProperty]
+        [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
+        [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_IdentityValue)]
+        public string Prop_IdentityValue
+        {
+            get => _propIdentityValue;
+            set { _propIdentityValue = value; InvokePropertyChanged(this, nameof(Prop_IdentityValue)); }
+        }
+
         public DatabaseNonQueryBack(IWFContainer container) : base(container)
         {
             sdkComponentName = ActivityStrings.Activity_DatabaseNonQuery;
@@ -149,9 +168,11 @@ namespace Primo.MIA
                 PropertyBuilder.Script<Dictionary<string, string>>("Prop_Parameters", "Параметры команды"),
                 PropertyBuilder.Int("Prop_CommandTimeoutSeconds", "Таймаут выполнения в секундах"),
                 PropertyBuilder.BooleanObject("Prop_SplitByGoBatches", "Разбивать SQL-текст по batch-границам GO"),
+                PropertyBuilder.BooleanObject("Prop_ReturnIdentity", "Получить значение last inserted id после выполнения"),
                 PropertyBuilder.Variable<int>("Prop_AffectedRows", "Количество затронутых строк"),
                 PropertyBuilder.Variable<bool>("Prop_HasAffectedRows", "Количество затронутых строк больше нуля"),
-                PropertyBuilder.Variable<int>("Prop_BatchCount", "Количество выполненных batch")
+                PropertyBuilder.Variable<int>("Prop_BatchCount", "Количество выполненных batch"),
+                PropertyBuilder.Variable<string>("Prop_IdentityValue", "Значение last inserted id")
             };
             InitClass(container);
         }
@@ -173,17 +194,20 @@ namespace Primo.MIA
                 var transactionId = DatabaseTransactionResolver.ResolveOptional(explicitTransactionId);
                 var transactionHandle = DatabaseTransactionManager.Get(transactionId);
                 var executionResult = transactionHandle != null
-                    ? DatabaseHelper.ExecuteNonQuery(transactionHandle, commandText, Prop_CommandType, timeout, Prop_SplitByGoBatches, parameters)
-                    : DatabaseHelper.ExecuteNonQuery(provider, connectionString, commandText, Prop_CommandType, timeout, Prop_SplitByGoBatches, parameters);
+                    ? DatabaseHelper.ExecuteNonQuery(transactionHandle, commandText, Prop_CommandType, timeout, Prop_SplitByGoBatches, Prop_ReturnIdentity, parameters)
+                    : DatabaseHelper.ExecuteNonQuery(provider, connectionString, commandText, Prop_CommandType, timeout, Prop_SplitByGoBatches, Prop_ReturnIdentity, parameters);
 
                 SetVariableValue(Prop_AffectedRows, executionResult.AffectedRows, sd);
                 SetVariableValue(Prop_HasAffectedRows, executionResult.AffectedRows > 0, sd);
                 SetVariableValue(Prop_BatchCount, executionResult.BatchCount, sd);
+                SetVariableValue(Prop_IdentityValue, executionResult.IdentityValue ?? string.Empty, sd);
 
                 return new ExecutionResult
                 {
                     IsSuccess = true,
-                    SuccessMessage = $"Команда выполнена. Затронуто строк: {executionResult.AffectedRows}. Batch: {executionResult.BatchCount}"
+                    SuccessMessage = string.IsNullOrWhiteSpace(executionResult.IdentityValue)
+                        ? $"Команда выполнена. Затронуто строк: {executionResult.AffectedRows}. Batch: {executionResult.BatchCount}"
+                        : $"Команда выполнена. Затронуто строк: {executionResult.AffectedRows}. Identity: {executionResult.IdentityValue}"
                 };
             }
             catch (Exception ex)
@@ -200,6 +224,10 @@ namespace Primo.MIA
         {
             var result = new ValidationResult();
             result.ValidateRequired(Prop_CommandText, ActivityStrings.Field_CommandText, ActivityStrings.Error_CommandTextRequired);
+            result.ValidateCondition(
+                Prop_SplitByGoBatches && Prop_ReturnIdentity,
+                ActivityStrings.Field_ReturnIdentity,
+                "Нельзя одновременно включить GO batch и получение last inserted id");
             if (string.IsNullOrWhiteSpace(Prop_TransactionId) && string.IsNullOrWhiteSpace(DatabaseTransactionResolver.ResolveOptional(null)))
                 result.ValidateRequired(Prop_ConnectionString, ActivityStrings.Field_ConnectionString, ActivityStrings.Error_ConnectionStringRequired);
             return result;

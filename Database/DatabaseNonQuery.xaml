@@ -65,8 +65,15 @@
                       IsChecked="{Binding Prop_SplitByGoBatches}"
                       Margin="0,6,0,0"/>
 
+            <CheckBox Content="Получать last inserted id"
+                      IsChecked="{Binding Prop_ReturnIdentity}"
+                      Margin="0,4,0,0"/>
+
             <TextBlock Text="Переменная затронутых строк:" Style="{StaticResource FieldLabel}"/>
             <TextBox Text="{Binding Prop_AffectedRows, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+
+            <TextBlock Text="Переменная identity value:" Style="{StaticResource FieldLabel}"/>
+            <TextBox Text="{Binding Prop_IdentityValue, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
         </StackPanel>
     </Grid>
 </UserControl>

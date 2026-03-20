@@ -221,11 +221,30 @@ namespace Primo.MIA
             DatabaseCommandType commandType,
             int commandTimeoutSeconds,
             bool splitByGoBatches,
+            bool returnIdentity,
             Dictionary<string, string> parameters = null)
         {
             if (splitByGoBatches && commandType == DatabaseCommandType.Text)
             {
                 return ExecuteNonQueryBatches(providerInvariantName, connectionString, commandText, commandTimeoutSeconds, parameters);
+            }
+
+            if (returnIdentity)
+            {
+                using (var connection = OpenConnection(providerInvariantName, connectionString))
+                using (var transaction = connection.BeginTransaction())
+                {
+                    var affectedRows = ExecuteNonQueryInternal(connection, transaction, commandText, commandType, commandTimeoutSeconds, parameters);
+                    var identityValue = ExecuteIdentityQuery(connection, transaction, providerInvariantName);
+                    transaction.Commit();
+
+                    return new NonQueryExecutionResult
+                    {
+                        AffectedRows = affectedRows,
+                        BatchCount = 1,
+                        IdentityValue = ConvertScalarToString(identityValue)
+                    };
+                }
             }
 
             return new NonQueryExecutionResult
@@ -262,11 +281,36 @@ namespace Primo.MIA
             DatabaseCommandType commandType,
             int commandTimeoutSeconds,
             bool splitByGoBatches,
+            bool returnIdentity,
             Dictionary<string, string> parameters = null)
         {
             if (splitByGoBatches && commandType == DatabaseCommandType.Text)
             {
                 return ExecuteNonQueryBatches(transactionHandle, commandText, commandTimeoutSeconds, parameters);
+            }
+
+            if (returnIdentity)
+            {
+                EnsureTransactionHandle(transactionHandle);
+
+                var affectedRows = ExecuteNonQueryInternal(
+                    transactionHandle.Connection,
+                    transactionHandle.Transaction,
+                    commandText,
+                    commandType,
+                    commandTimeoutSeconds,
+                    parameters);
+                var identityValue = ExecuteIdentityQuery(
+                    transactionHandle.Connection,
+                    transactionHandle.Transaction,
+                    transactionHandle.ProviderInvariantName);
+
+                return new NonQueryExecutionResult
+                {
+                    AffectedRows = affectedRows,
+                    BatchCount = 1,
+                    IdentityValue = ConvertScalarToString(identityValue)
+                };
             }
 
             return new NonQueryExecutionResult
@@ -1359,6 +1403,55 @@ namespace Primo.MIA
             };
         }
 
+        private static int ExecuteNonQueryInternal(
+            DbConnection connection,
+            DbTransaction transaction,
+            string commandText,
+            DatabaseCommandType commandType,
+            int commandTimeoutSeconds,
+            Dictionary<string, string> parameters)
+        {
+            using (var command = CreateCommand(connection, commandText, commandType, commandTimeoutSeconds, parameters, transaction))
+            {
+                return command.ExecuteNonQuery();
+            }
+        }
+
+        private static object ExecuteIdentityQuery(
+            DbConnection connection,
+            DbTransaction transaction,
+            string providerInvariantName)
+        {
+            var identityCommandText = GetIdentityQuery(providerInvariantName);
+            if (string.IsNullOrWhiteSpace(identityCommandText))
+                return null;
+
+            using (var command = CreateCommand(connection, identityCommandText, DatabaseCommandType.Text, 30, null, transaction))
+            {
+                return command.ExecuteScalar();
+            }
+        }
+
+        public static string GetIdentityQuery(string providerInvariantName)
+        {
+            if (string.IsNullOrWhiteSpace(providerInvariantName))
+                return "SELECT SCOPE_IDENTITY()";
+
+            if (providerInvariantName.IndexOf("SqlClient", StringComparison.OrdinalIgnoreCase) >= 0)
+                return "SELECT SCOPE_IDENTITY()";
+
+            if (providerInvariantName.IndexOf("Npgsql", StringComparison.OrdinalIgnoreCase) >= 0)
+                return "SELECT LASTVAL()";
+
+            if (providerInvariantName.IndexOf("MySql", StringComparison.OrdinalIgnoreCase) >= 0)
+                return "SELECT LAST_INSERT_ID()";
+
+            if (providerInvariantName.IndexOf("SQLite", StringComparison.OrdinalIgnoreCase) >= 0)
+                return "SELECT last_insert_rowid()";
+
+            return null;
+        }
+
         private static string GetSchemaValue(DataRow row, string columnName)
         {
             if (row == null || row.Table == null)
@@ -1388,6 +1481,8 @@ namespace Primo.MIA
         public int AffectedRows { get; set; }
 
         public int BatchCount { get; set; }
+
+        public string IdentityValue { get; set; }
     }
 
     public class StoredProcedureExecutionResult
