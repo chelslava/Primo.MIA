@@ -907,10 +907,18 @@
       <DependentUpon>DatabaseNonQuery.xaml</DependentUpon>
     </Compile>
     <Compile Include="Database\DatabaseNonQueryBack.cs" />
+    <Compile Include="Database\DatabaseQueryPaged.xaml.cs">
+      <DependentUpon>DatabaseQueryPaged.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Database\DatabaseQueryPagedBack.cs" />
     <Compile Include="Database\DatabaseStoredProcedure.xaml.cs">
       <DependentUpon>DatabaseStoredProcedure.xaml</DependentUpon>
     </Compile>
     <Compile Include="Database\DatabaseStoredProcedureBack.cs" />
+    <Compile Include="Database\DatabaseUpsert.xaml.cs">
+      <DependentUpon>DatabaseUpsert.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Database\DatabaseUpsertBack.cs" />
     <Compile Include="Database\DatabaseGetTableSchema.xaml.cs">
       <DependentUpon>DatabaseGetTableSchema.xaml</DependentUpon>
     </Compile>
@@ -973,7 +981,15 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Database\DatabaseQueryPaged.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Database\DatabaseStoredProcedure.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Database\DatabaseUpsert.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

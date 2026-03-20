@@ -160,6 +160,42 @@ namespace Primo.MIA.Tests.Database
             DatabaseHelper.GetIdentityQuery("Any.Provider").Should().BeNull();
         }
 
+        [Fact(DisplayName = "BuildPagedQuery: SQL Server использует OFFSET FETCH")]
+        public void BuildPagedQuery_SqlServer_UsesOffsetFetch()
+        {
+            var sql = DatabaseHelper.BuildPagedQuery(
+                DatabaseHelper.DefaultProviderInvariantName,
+                "select * from dbo.Users",
+                "Id",
+                2,
+                50);
+
+            sql.Should().Be("SELECT * FROM (select * from dbo.Users) AS src ORDER BY Id OFFSET 50 ROWS FETCH NEXT 50 ROWS ONLY");
+        }
+
+        [Fact(DisplayName = "BuildPagedQuery: PostgreSQL использует LIMIT OFFSET")]
+        public void BuildPagedQuery_PostgreSql_UsesLimitOffset()
+        {
+            var sql = DatabaseHelper.BuildPagedQuery(
+                "Npgsql",
+                "select * from public.users",
+                "id",
+                3,
+                20);
+
+            sql.Should().Be("SELECT * FROM (select * from public.users) AS src ORDER BY id LIMIT 20 OFFSET 40");
+        }
+
+        [Fact(DisplayName = "BuildCountQuery: Oracle использует alias без AS")]
+        public void BuildCountQuery_Oracle_UsesAliasWithoutAs()
+        {
+            var sql = DatabaseHelper.BuildCountQuery(
+                "Oracle.ManagedDataAccess.Client",
+                "select * from dual");
+
+            sql.Should().Be("SELECT COUNT(1) FROM (select * from dual) src");
+        }
+
         [Fact(DisplayName = "NormalizeOutputParameterName: сохраняет существующий префикс")]
         public void NormalizeOutputParameterName_KeepsExistingPrefix()
         {

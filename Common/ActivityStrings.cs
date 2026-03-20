@@ -221,10 +221,12 @@ namespace Primo.MIA.Common
         public const string Activity_WaitForFile = "Ожидание файла";
         public const string Activity_DatabaseCheckConnection = "БД: Проверить подключение";
         public const string Activity_DatabaseQuery = "БД: Запрос";
+        public const string Activity_DatabaseQueryPaged = "БД: Постраничный запрос";
         public const string Activity_DatabaseScalar = "БД: Скалярное значение";
         public const string Activity_DatabaseNonQuery = "БД: Выполнить команду";
         public const string Activity_DatabaseStoredProcedure = "БД: Stored procedure";
         public const string Activity_DatabaseBulkInsert = "БД: Массовая запись из DataTable";
+        public const string Activity_DatabaseUpsert = "БД: Upsert из DataTable";
         public const string Activity_DatabaseTransactionBegin = "БД: Начать транзакцию";
         public const string Activity_DatabaseTransactionCommit = "БД: Подтвердить транзакцию";
         public const string Activity_DatabaseTransactionRollback = "БД: Откатить транзакцию";
@@ -274,6 +276,8 @@ namespace Primo.MIA.Common
         public const string Field_DbProviderInvariantName = "Provider invariant name";
         public const string Field_CommandType = "Тип команды";
         public const string Field_CommandText = "SQL / имя процедуры";
+        public const string Field_OrderByExpression = "Order by";
+        public const string Field_PageNumber = "Номер страницы";
         public const string Field_CommandTimeoutSeconds = "Таймаут команды (сек)";
         public const string Field_ParametersDictionary = "Параметры";
         public const string Field_OutputParameterNames = "Выходные параметры";
@@ -284,6 +288,9 @@ namespace Primo.MIA.Common
         public const string Field_ReturnValue = "Return value";
         public const string Field_ResultTable = "Таблица-результат";
         public const string Field_HasRows = "Есть строки";
+        public const string Field_TotalRows = "Всего строк";
+        public const string Field_HasNextPage = "Есть следующая страница";
+        public const string Field_HasPreviousPage = "Есть предыдущая страница";
         public const string Field_IsAvailable = "Подключение доступно";
         public const string Field_ServerVersion = "Версия сервера";
         public const string Field_ElapsedMs = "Время выполнения (мс)";
@@ -297,6 +304,8 @@ namespace Primo.MIA.Common
         public const string Field_IdentityValue = "Last inserted id";
         public const string Field_DestinationTable = "Таблица-приёмник";
         public const string Field_ColumnMappings = "Маппинг колонок";
+        public const string Field_KeyColumns = "Ключевые колонки";
+        public const string Field_UpdateColumns = "Колонки обновления";
         public const string Field_BatchSize = "Размер пакета";
         public const string Field_BulkCopyTimeoutSeconds = "Таймаут bulk copy (сек)";
         public const string Field_UseTableLock = "Использовать table lock";
@@ -305,6 +314,8 @@ namespace Primo.MIA.Common
         public const string Field_RowsWritten = "Записано строк";
         public const string Field_MappingCount = "Количество маппингов";
         public const string Field_WriteMode = "Режим записи";
+        public const string Field_InsertedCount = "Вставлено строк";
+        public const string Field_UpdatedCount = "Обновлено строк";
         public const string Field_TransactionId = "ID транзакции";
         public const string Field_IsolationLevel = "Уровень изоляции";
         public const string Field_StartedAtUtc = "Начата (UTC)";

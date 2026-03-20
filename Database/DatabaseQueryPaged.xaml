@@ -1,0 +1,62 @@
+<UserControl x:Class="Primo.MIA.DatabaseQueryPaged"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             d:DesignHeight="80"
+             Margin="0,0,0,5">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Primo.MIA;component/Common/Styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid Background="{DynamicResource {x:Static SystemColors.ScrollBarBrushKey}}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <Image Grid.Column="0"
+               Width="32" Height="32" Margin="5"
+               VerticalAlignment="Center"
+               Source="pack://application:,,,/Primo.MIA;component/images/table.png"/>
+
+        <StackPanel Grid.Column="1" Margin="5,0,5,5">
+            <TextBlock Text="БД: Постраничный запрос" Style="{StaticResource ActivityHeader}"/>
+
+            <TextBlock Text="Provider invariant name:" Style="{StaticResource FieldLabel}"/>
+            <TextBox Text="{Binding Prop_ProviderInvariantName, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+
+            <TextBlock Text="Строка подключения:" Style="{StaticResource FieldLabel}"/>
+            <TextBox Text="{Binding Prop_ConnectionString, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+
+            <TextBlock Text="TransactionId (опционально):" Style="{StaticResource FieldLabel}"/>
+            <TextBox Text="{Binding Prop_TransactionId, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+
+            <TextBlock Text="Исходный SQL:" Style="{StaticResource FieldLabel}"/>
+            <TextBox Text="{Binding Prop_CommandText, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+
+            <TextBlock Text="Order by:" Style="{StaticResource FieldLabel}"/>
+            <TextBox Text="{Binding Prop_OrderByExpression, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+
+            <TextBlock Text="Page number:" Style="{StaticResource FieldLabel}"/>
+            <TextBox Text="{Binding Prop_PageNumber, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+
+            <TextBlock Text="Page size:" Style="{StaticResource FieldLabel}"/>
+            <TextBox Text="{Binding Prop_PageSize, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+
+            <TextBlock Text="Параметры (Dictionary&lt;string,string&gt;):" Style="{StaticResource FieldLabel}"/>
+            <TextBox Text="{Binding Prop_Parameters, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+
+            <TextBlock Text="Таймаут (сек):" Style="{StaticResource FieldLabel}"/>
+            <TextBox Text="{Binding Prop_CommandTimeoutSeconds, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+
+            <TextBlock Text="Результат (DataTable):" Style="{StaticResource FieldLabel}"/>
+            <TextBox Text="{Binding Prop_ResultTable, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+        </StackPanel>
+    </Grid>
+</UserControl>

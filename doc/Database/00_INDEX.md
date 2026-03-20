@@ -11,10 +11,12 @@
 |---|---|---|---|
 | 01 | [БД: Проверить подключение](01_DatabaseCheckConnection.md) | `DatabaseCheckConnectionBack` | Проверить доступность БД и получить версию сервера |
 | 02 | [БД: Запрос](02_DatabaseQuery.md) | `DatabaseQueryBack` | Выполнить `SELECT` или stored procedure и вернуть `DataTable` |
+| 02a | [БД: Постраничный запрос](02a_DatabaseQueryPaged.md) | `DatabaseQueryPagedBack` | Выполнить запрос постранично и получить metadata по страницам |
 | 03 | [БД: Скалярное значение](03_DatabaseScalar.md) | `DatabaseScalarBack` | Получить одно значение: `COUNT(*)`, `MAX(...)`, `SCOPE_IDENTITY()` и т.п. |
 | 04 | [БД: Выполнить команду](04_DatabaseNonQuery.md) | `DatabaseNonQueryBack` | Выполнить `INSERT/UPDATE/DELETE` и получить число затронутых строк |
 | 04a | [БД: Stored procedure](04a_DatabaseStoredProcedure.md) | `DatabaseStoredProcedureBack` | Вызвать stored procedure с output-параметрами и return value |
 | 05 | [БД: Массовая запись из DataTable](05_DatabaseBulkInsert.md) | `DatabaseBulkInsertBack` | Массово записать `DataTable` в любую БД: `SqlBulkCopy` для SQL Server или batched insert для остальных |
+| 05a | [БД: Upsert из DataTable](05a_DatabaseUpsert.md) | `DatabaseUpsertBack` | Обновить существующие строки по ключу и вставить отсутствующие |
 | 06 | [БД: Начать транзакцию](06_DatabaseTransactionBegin.md) | `DatabaseTransactionBeginBack` | Открыть транзакцию и сделать её текущим DB-контекстом |
 | 07 | [БД: Подтвердить транзакцию](07_DatabaseTransactionCommit.md) | `DatabaseTransactionCommitBack` | Зафиксировать текущую или указанную транзакцию |
 | 08 | [БД: Откатить транзакцию](08_DatabaseTransactionRollback.md) | `DatabaseTransactionRollbackBack` | Откатить текущую или указанную транзакцию |
@@ -32,4 +34,4 @@
 5. Пустое значение параметра преобразуется в `DBNull.Value`.
 6. Массовая запись автоматически выбирает оптимальный режим: `SqlBulkCopy` для SQL Server и универсальный batched insert для остальных провайдеров.
 7. `Query`, `Scalar`, `NonQuery` и `BulkInsert` могут выполняться внутри открытой транзакции через `transactionId` или ambient-контекст.
-8. `Scalar` умеет отдавать типизированные выходы, `Query` возвращает список колонок, `NonQuery` умеет исполнять SQL-скрипты по `GO` batch и возвращать `last inserted id`, `Stored procedure` поддерживает `Output/InputOutput/ReturnValue`, а `BulkInsert` поддерживает предварительную очистку таблицы и provider-safe quoting имён.
+8. `Scalar` умеет отдавать типизированные выходы, `Query` возвращает список колонок, `NonQuery` умеет исполнять SQL-скрипты по `GO` batch и возвращать `last inserted id`, `Stored procedure` поддерживает `Output/InputOutput/ReturnValue`, `Постраничный запрос` даёт page metadata, а `BulkInsert` и `Upsert` закрывают основные data movement сценарии.

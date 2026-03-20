@@ -163,6 +163,53 @@ namespace Primo.MIA
             }
         }
 
+        public static PagedQueryResult ExecutePagedQuery(
+            string providerInvariantName,
+            string connectionString,
+            string sourceQuery,
+            string orderByExpression,
+            int pageNumber,
+            int pageSize,
+            int commandTimeoutSeconds,
+            Dictionary<string, string> parameters = null)
+        {
+            using (var connection = OpenConnection(providerInvariantName, connectionString))
+            {
+                return ExecutePagedQueryCore(
+                    connection,
+                    null,
+                    providerInvariantName,
+                    sourceQuery,
+                    orderByExpression,
+                    pageNumber,
+                    pageSize,
+                    commandTimeoutSeconds,
+                    parameters);
+            }
+        }
+
+        public static PagedQueryResult ExecutePagedQuery(
+            DatabaseTransactionHandle transactionHandle,
+            string sourceQuery,
+            string orderByExpression,
+            int pageNumber,
+            int pageSize,
+            int commandTimeoutSeconds,
+            Dictionary<string, string> parameters = null)
+        {
+            EnsureTransactionHandle(transactionHandle);
+            return ExecutePagedQueryCore(
+                transactionHandle.Connection,
+                transactionHandle.Transaction,
+                transactionHandle.ProviderInvariantName,
+                sourceQuery,
+                orderByExpression,
+                pageNumber,
+                pageSize,
+                commandTimeoutSeconds,
+                parameters);
+        }
+
         public static object ExecuteScalar(
             string providerInvariantName,
             string connectionString,
@@ -390,6 +437,56 @@ namespace Primo.MIA
                 return formattable.ToString(null, CultureInfo.InvariantCulture);
 
             return value.ToString();
+        }
+
+        public static UpsertResult ExecuteUpsert(
+            string providerInvariantName,
+            string connectionString,
+            DataTable dataTable,
+            string destinationTableName,
+            List<string> keyColumns,
+            List<string> updateColumns = null,
+            Dictionary<string, string> columnMappings = null,
+            int commandTimeoutSeconds = 60)
+        {
+            using (var connection = OpenConnection(providerInvariantName, connectionString))
+            using (var transaction = connection.BeginTransaction())
+            {
+                var result = ExecuteUpsertCore(
+                    connection,
+                    transaction,
+                    providerInvariantName,
+                    dataTable,
+                    destinationTableName,
+                    keyColumns,
+                    updateColumns,
+                    columnMappings,
+                    commandTimeoutSeconds);
+                transaction.Commit();
+                return result;
+            }
+        }
+
+        public static UpsertResult ExecuteUpsert(
+            DatabaseTransactionHandle transactionHandle,
+            DataTable dataTable,
+            string destinationTableName,
+            List<string> keyColumns,
+            List<string> updateColumns = null,
+            Dictionary<string, string> columnMappings = null,
+            int commandTimeoutSeconds = 60)
+        {
+            EnsureTransactionHandle(transactionHandle);
+            return ExecuteUpsertCore(
+                transactionHandle.Connection,
+                transactionHandle.Transaction,
+                transactionHandle.ProviderInvariantName,
+                dataTable,
+                destinationTableName,
+                keyColumns,
+                updateColumns,
+                columnMappings,
+                commandTimeoutSeconds);
         }
 
         public static int? ConvertScalarToInt32(object value)
@@ -1158,6 +1255,47 @@ namespace Primo.MIA
             return string.Join(".", parts.Select(part => QuoteIdentifier(providerInvariantName, part)));
         }
 
+        public static string BuildPagedQuery(
+            string providerInvariantName,
+            string sourceQuery,
+            string orderByExpression,
+            int pageNumber,
+            int pageSize)
+        {
+            if (string.IsNullOrWhiteSpace(sourceQuery))
+                throw new ArgumentException("Исходный SQL-запрос не может быть пустым.", nameof(sourceQuery));
+            if (string.IsNullOrWhiteSpace(orderByExpression))
+                throw new ArgumentException("Order by выражение не может быть пустым.", nameof(orderByExpression));
+
+            var safePageNumber = pageNumber > 0 ? pageNumber : 1;
+            var safePageSize = pageSize > 0 ? pageSize : 100;
+            var offset = (safePageNumber - 1) * safePageSize;
+            var normalizedProvider = string.IsNullOrWhiteSpace(providerInvariantName)
+                ? DefaultProviderInvariantName
+                : providerInvariantName.Trim();
+            var alias = GetDerivedTableAlias(normalizedProvider);
+
+            if (normalizedProvider.IndexOf("SqlClient", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                return $"SELECT * FROM ({sourceQuery}) {alias} ORDER BY {orderByExpression} OFFSET {offset} ROWS FETCH NEXT {safePageSize} ROWS ONLY";
+            }
+
+            if (normalizedProvider.IndexOf("Oracle", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                return $"SELECT * FROM ({sourceQuery}) {alias} ORDER BY {orderByExpression} OFFSET {offset} ROWS FETCH NEXT {safePageSize} ROWS ONLY";
+            }
+
+            return $"SELECT * FROM ({sourceQuery}) {alias} ORDER BY {orderByExpression} LIMIT {safePageSize} OFFSET {offset}";
+        }
+
+        public static string BuildCountQuery(string providerInvariantName, string sourceQuery)
+        {
+            if (string.IsNullOrWhiteSpace(sourceQuery))
+                throw new ArgumentException("Исходный SQL-запрос не может быть пустым.", nameof(sourceQuery));
+
+            return $"SELECT COUNT(1) FROM ({sourceQuery}) {GetDerivedTableAlias(providerInvariantName)}";
+        }
+
         public static string NormalizeOutputParameterName(string providerInvariantName, string parameterName)
         {
             if (string.IsNullOrWhiteSpace(parameterName))
@@ -1250,6 +1388,297 @@ namespace Primo.MIA
             {
                 prefix = "\"";
                 suffix = "\"";
+            }
+        }
+
+        private static string GetDerivedTableAlias(string providerInvariantName)
+        {
+            if (!string.IsNullOrWhiteSpace(providerInvariantName) &&
+                providerInvariantName.IndexOf("Oracle", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                return "src";
+            }
+
+            return "AS src";
+        }
+
+        private static PagedQueryResult ExecutePagedQueryCore(
+            DbConnection connection,
+            DbTransaction transaction,
+            string providerInvariantName,
+            string sourceQuery,
+            string orderByExpression,
+            int pageNumber,
+            int pageSize,
+            int commandTimeoutSeconds,
+            Dictionary<string, string> parameters)
+        {
+            var safePageNumber = pageNumber > 0 ? pageNumber : 1;
+            var safePageSize = pageSize > 0 ? pageSize : 100;
+            var countQuery = BuildCountQuery(providerInvariantName, sourceQuery);
+            var pageQuery = BuildPagedQuery(providerInvariantName, sourceQuery, orderByExpression, safePageNumber, safePageSize);
+
+            int totalRows;
+            using (var countCommand = CreateCommand(connection, countQuery, DatabaseCommandType.Text, commandTimeoutSeconds, parameters, transaction))
+            {
+                totalRows = ConvertScalarToInt32(countCommand.ExecuteScalar()) ?? 0;
+            }
+
+            using (var pageCommand = CreateCommand(connection, pageQuery, DatabaseCommandType.Text, commandTimeoutSeconds, parameters, transaction))
+            using (var adapter = GetFactory(providerInvariantName).CreateDataAdapter())
+            {
+                if (adapter == null)
+                    throw new InvalidOperationException("Провайдер не смог создать DataAdapter.");
+
+                adapter.SelectCommand = pageCommand;
+                var table = new DataTable();
+                adapter.Fill(table);
+
+                var totalPages = safePageSize > 0
+                    ? (int)Math.Ceiling(totalRows / (double)safePageSize)
+                    : 0;
+
+                return new PagedQueryResult
+                {
+                    ResultTable = table,
+                    TotalRows = totalRows,
+                    PageNumber = safePageNumber,
+                    PageSize = safePageSize,
+                    TotalPages = totalPages,
+                    HasNextPage = safePageNumber < totalPages,
+                    HasPreviousPage = safePageNumber > 1
+                };
+            }
+        }
+
+        private static UpsertResult ExecuteUpsertCore(
+            DbConnection connection,
+            DbTransaction transaction,
+            string providerInvariantName,
+            DataTable dataTable,
+            string destinationTableName,
+            List<string> keyColumns,
+            List<string> updateColumns,
+            Dictionary<string, string> columnMappings,
+            int commandTimeoutSeconds)
+        {
+            if (dataTable == null)
+                throw new ArgumentNullException(nameof(dataTable), "Исходная таблица данных не указана.");
+            if (string.IsNullOrWhiteSpace(destinationTableName))
+                throw new ArgumentException("Имя таблицы-приёмника не может быть пустым.", nameof(destinationTableName));
+            if (keyColumns == null || keyColumns.Count == 0)
+                throw new ArgumentException("Список ключевых колонок не может быть пустым.", nameof(keyColumns));
+
+            var allMappings = BuildMappings(dataTable, columnMappings);
+            var keyMappings = ResolveMappings(allMappings, keyColumns);
+            var updateMappings = updateColumns != null && updateColumns.Count > 0
+                ? ResolveMappings(allMappings, updateColumns)
+                : allMappings.Where(m => keyMappings.All(k => !string.Equals(k.SourceColumn, m.SourceColumn, StringComparison.OrdinalIgnoreCase))).ToList();
+
+            using (var updateCommand = CreateUpsertUpdateCommand(connection, transaction, providerInvariantName, destinationTableName, keyMappings, updateMappings, commandTimeoutSeconds))
+            using (var insertCommand = CreateUpsertInsertCommand(connection, transaction, providerInvariantName, destinationTableName, allMappings, commandTimeoutSeconds))
+            using (var existsCommand = updateMappings.Count == 0
+                ? CreateUpsertExistsCommand(connection, transaction, providerInvariantName, destinationTableName, keyMappings, commandTimeoutSeconds)
+                : null)
+            {
+                var insertedCount = 0;
+                var updatedCount = 0;
+
+                foreach (DataRow row in dataTable.Rows)
+                {
+                    var wasUpdated = false;
+
+                    if (updateMappings.Count > 0)
+                    {
+                        AssignUpsertUpdateParameterValues(updateCommand, row, updateMappings, keyMappings);
+                        wasUpdated = updateCommand.ExecuteNonQuery() > 0;
+                    }
+                    else
+                    {
+                        AssignUpsertExistsParameterValues(existsCommand, row, keyMappings);
+                        wasUpdated = (ConvertScalarToInt32(existsCommand.ExecuteScalar()) ?? 0) > 0;
+                    }
+
+                    if (wasUpdated)
+                    {
+                        updatedCount++;
+                        continue;
+                    }
+
+                    AssignInsertParameterValues(insertCommand, row, allMappings);
+                    insertCommand.ExecuteNonQuery();
+                    insertedCount++;
+                }
+
+                return new UpsertResult
+                {
+                    InsertedCount = insertedCount,
+                    UpdatedCount = updatedCount
+                };
+            }
+        }
+
+        private static List<BulkInsertColumnMapping> ResolveMappings(
+            List<BulkInsertColumnMapping> mappings,
+            List<string> names)
+        {
+            return names
+                .Where(name => !string.IsNullOrWhiteSpace(name))
+                .Select(name =>
+                {
+                    var mapping = mappings.FirstOrDefault(m =>
+                        string.Equals(m.SourceColumn, name, StringComparison.OrdinalIgnoreCase) ||
+                        string.Equals(m.DestinationColumn, name, StringComparison.OrdinalIgnoreCase));
+
+                    if (mapping == null)
+                        throw new InvalidOperationException($"Колонка '{name}' не найдена в DataTable или маппинге.");
+
+                    return mapping;
+                })
+                .Distinct(new BulkInsertMappingComparer())
+                .ToList();
+        }
+
+        private static DbCommand CreateUpsertUpdateCommand(
+            DbConnection connection,
+            DbTransaction transaction,
+            string providerInvariantName,
+            string destinationTableName,
+            List<BulkInsertColumnMapping> keyMappings,
+            List<BulkInsertColumnMapping> updateMappings,
+            int commandTimeoutSeconds)
+        {
+            var command = connection.CreateCommand();
+            command.Transaction = transaction;
+            command.CommandType = CommandType.Text;
+            command.CommandTimeout = commandTimeoutSeconds > 0 ? commandTimeoutSeconds : 60;
+            command.CommandText = BuildUpdateCommandText(providerInvariantName, destinationTableName, keyMappings, updateMappings);
+            CreateUpsertUpdateParameters(command, providerInvariantName, updateMappings, keyMappings);
+            TryPrepareCommand(command);
+            return command;
+        }
+
+        private static DbCommand CreateUpsertInsertCommand(
+            DbConnection connection,
+            DbTransaction transaction,
+            string providerInvariantName,
+            string destinationTableName,
+            List<BulkInsertColumnMapping> mappings,
+            int commandTimeoutSeconds)
+        {
+            var command = connection.CreateCommand();
+            command.Transaction = transaction;
+            command.CommandType = CommandType.Text;
+            command.CommandTimeout = commandTimeoutSeconds > 0 ? commandTimeoutSeconds : 60;
+            command.CommandText = BuildInsertCommandText(providerInvariantName, destinationTableName, mappings);
+            CreateInsertParameters(command, providerInvariantName, mappings);
+            TryPrepareCommand(command);
+            return command;
+        }
+
+        private static DbCommand CreateUpsertExistsCommand(
+            DbConnection connection,
+            DbTransaction transaction,
+            string providerInvariantName,
+            string destinationTableName,
+            List<BulkInsertColumnMapping> keyMappings,
+            int commandTimeoutSeconds)
+        {
+            var command = connection.CreateCommand();
+            command.Transaction = transaction;
+            command.CommandType = CommandType.Text;
+            command.CommandTimeout = commandTimeoutSeconds > 0 ? commandTimeoutSeconds : 60;
+            command.CommandText = BuildExistsCommandText(providerInvariantName, destinationTableName, keyMappings);
+            CreateUpsertExistsParameters(command, providerInvariantName, keyMappings);
+            TryPrepareCommand(command);
+            return command;
+        }
+
+        private static string BuildUpdateCommandText(
+            string providerInvariantName,
+            string destinationTableName,
+            List<BulkInsertColumnMapping> keyMappings,
+            List<BulkInsertColumnMapping> updateMappings)
+        {
+            if (updateMappings == null || updateMappings.Count == 0)
+                throw new ArgumentException("Список колонок обновления не может быть пустым.", nameof(updateMappings));
+
+            var safeTableName = QuoteQualifiedIdentifier(providerInvariantName, destinationTableName);
+            var setClause = string.Join(", ", updateMappings.Select((m, index) =>
+                QuoteIdentifier(providerInvariantName, m.DestinationColumn) + " = " + GetParameterPlaceholder(providerInvariantName, index)));
+            var whereClause = string.Join(" AND ", keyMappings.Select((m, index) =>
+                QuoteIdentifier(providerInvariantName, m.DestinationColumn) + " = " + GetParameterPlaceholder(providerInvariantName, updateMappings.Count + index)));
+            return $"UPDATE {safeTableName} SET {setClause} WHERE {whereClause}";
+        }
+
+        private static string BuildExistsCommandText(
+            string providerInvariantName,
+            string destinationTableName,
+            List<BulkInsertColumnMapping> keyMappings)
+        {
+            var safeTableName = QuoteQualifiedIdentifier(providerInvariantName, destinationTableName);
+            var whereClause = string.Join(" AND ", keyMappings.Select((m, index) =>
+                QuoteIdentifier(providerInvariantName, m.DestinationColumn) + " = " + GetParameterPlaceholder(providerInvariantName, index)));
+            return $"SELECT COUNT(1) FROM {safeTableName} WHERE {whereClause}";
+        }
+
+        private static void CreateUpsertUpdateParameters(
+            DbCommand command,
+            string providerInvariantName,
+            List<BulkInsertColumnMapping> updateMappings,
+            List<BulkInsertColumnMapping> keyMappings)
+        {
+            command.Parameters.Clear();
+
+            for (int i = 0; i < updateMappings.Count + keyMappings.Count; i++)
+            {
+                var parameter = command.CreateParameter();
+                parameter.ParameterName = GetParameterName(providerInvariantName, i);
+                command.Parameters.Add(parameter);
+            }
+        }
+
+        private static void CreateUpsertExistsParameters(
+            DbCommand command,
+            string providerInvariantName,
+            List<BulkInsertColumnMapping> keyMappings)
+        {
+            command.Parameters.Clear();
+
+            for (int i = 0; i < keyMappings.Count; i++)
+            {
+                var parameter = command.CreateParameter();
+                parameter.ParameterName = GetParameterName(providerInvariantName, i);
+                command.Parameters.Add(parameter);
+            }
+        }
+
+        private static void AssignUpsertUpdateParameterValues(
+            DbCommand command,
+            DataRow row,
+            List<BulkInsertColumnMapping> updateMappings,
+            List<BulkInsertColumnMapping> keyMappings)
+        {
+            var index = 0;
+            foreach (var updateMapping in updateMappings)
+            {
+                command.Parameters[index++].Value = row[updateMapping.SourceColumn] ?? DBNull.Value;
+            }
+
+            foreach (var keyMapping in keyMappings)
+            {
+                command.Parameters[index++].Value = row[keyMapping.SourceColumn] ?? DBNull.Value;
+            }
+        }
+
+        private static void AssignUpsertExistsParameterValues(
+            DbCommand command,
+            DataRow row,
+            List<BulkInsertColumnMapping> keyMappings)
+        {
+            for (int i = 0; i < keyMappings.Count; i++)
+            {
+                command.Parameters[i].Value = row[keyMappings[i].SourceColumn] ?? DBNull.Value;
             }
         }
 
@@ -1526,10 +1955,58 @@ namespace Primo.MIA
         public string ReturnValue { get; set; }
     }
 
+    public class PagedQueryResult
+    {
+        public DataTable ResultTable { get; set; }
+
+        public int TotalRows { get; set; }
+
+        public int PageNumber { get; set; }
+
+        public int PageSize { get; set; }
+
+        public int TotalPages { get; set; }
+
+        public bool HasNextPage { get; set; }
+
+        public bool HasPreviousPage { get; set; }
+    }
+
+    public class UpsertResult
+    {
+        public int InsertedCount { get; set; }
+
+        public int UpdatedCount { get; set; }
+    }
+
     internal class BulkInsertColumnMapping
     {
         public string SourceColumn { get; set; }
 
         public string DestinationColumn { get; set; }
+    }
+
+    internal class BulkInsertMappingComparer : IEqualityComparer<BulkInsertColumnMapping>
+    {
+        public bool Equals(BulkInsertColumnMapping x, BulkInsertColumnMapping y)
+        {
+            if (ReferenceEquals(x, y))
+                return true;
+            if (x == null || y == null)
+                return false;
+
+            return string.Equals(x.SourceColumn, y.SourceColumn, StringComparison.OrdinalIgnoreCase) &&
+                   string.Equals(x.DestinationColumn, y.DestinationColumn, StringComparison.OrdinalIgnoreCase);
+        }
+
+        public int GetHashCode(BulkInsertColumnMapping obj)
+        {
+            if (obj == null)
+                return 0;
+
+            var source = obj.SourceColumn ?? string.Empty;
+            var destination = obj.DestinationColumn ?? string.Empty;
+            return StringComparer.OrdinalIgnoreCase.GetHashCode(source + "|" + destination);
+        }
     }
 }
