@@ -84,6 +84,16 @@ namespace Primo.MIA
             set { _propOutputParameterNames = value; InvokePropertyChanged(this, nameof(Prop_OutputParameterNames)); }
         }
 
+        private string _propInputOutputParameters;
+        [LTools.Common.Model.Serialization.StoringProperty]
+        [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(Dictionary<string, string>))]
+        [System.ComponentModel.Category(ActivityStrings.Category_Parameters), System.ComponentModel.DisplayName(ActivityStrings.Field_InputOutputParameters)]
+        public string Prop_InputOutputParameters
+        {
+            get => _propInputOutputParameters;
+            set { _propInputOutputParameters = value; InvokePropertyChanged(this, nameof(Prop_InputOutputParameters)); }
+        }
+
         private bool _propIncludeReturnValue = true;
         [LTools.Common.Model.Serialization.StoringProperty]
         [System.ComponentModel.Category(ActivityStrings.Category_Optional), System.ComponentModel.DisplayName(ActivityStrings.Field_IncludeReturnValue)]
@@ -91,6 +101,16 @@ namespace Primo.MIA
         {
             get => _propIncludeReturnValue;
             set { _propIncludeReturnValue = value; InvokePropertyChanged(this, nameof(Prop_IncludeReturnValue)); }
+        }
+
+        private string _propOutputParameterSize = "4000";
+        [LTools.Common.Model.Serialization.StoringProperty]
+        [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
+        [System.ComponentModel.Category(ActivityStrings.Category_Settings), System.ComponentModel.DisplayName(ActivityStrings.Field_OutputParameterSize)]
+        public string Prop_OutputParameterSize
+        {
+            get => _propOutputParameterSize;
+            set { _propOutputParameterSize = value; InvokePropertyChanged(this, nameof(Prop_OutputParameterSize)); }
         }
 
         private string _propCommandTimeoutSeconds = "30";
@@ -147,8 +167,10 @@ namespace Primo.MIA
                 PropertyBuilder.String("Prop_TransactionId", "ID транзакции (опционально)"),
                 PropertyBuilder.String("Prop_ProcedureName", "Имя stored procedure"),
                 PropertyBuilder.Script<Dictionary<string, string>>("Prop_InputParameters", "Входные параметры"),
+                PropertyBuilder.Script<Dictionary<string, string>>("Prop_InputOutputParameters", "InputOutput параметры"),
                 PropertyBuilder.Script<List<string>>("Prop_OutputParameterNames", "Список output-параметров"),
                 PropertyBuilder.BooleanObject("Prop_IncludeReturnValue", "Получать return value"),
+                PropertyBuilder.Int("Prop_OutputParameterSize", "Размер output/inputoutput параметров"),
                 PropertyBuilder.Int("Prop_CommandTimeoutSeconds", "Таймаут выполнения в секундах"),
                 PropertyBuilder.Variable<Dictionary<string, string>>("Prop_OutputParameters", "Словарь выходных параметров"),
                 PropertyBuilder.Variable<string>("Prop_ReturnValue", "Return value stored procedure"),
@@ -166,18 +188,23 @@ namespace Primo.MIA
                 var explicitTransactionId = GetPropertyValue<string>(Prop_TransactionId, nameof(Prop_TransactionId), sd);
                 var procedureName = GetPropertyValue<string>(Prop_ProcedureName, nameof(Prop_ProcedureName), sd);
                 var inputParameters = GetPropertyValue<Dictionary<string, string>>(Prop_InputParameters, nameof(Prop_InputParameters), sd);
+                var inputOutputParameters = GetPropertyValue<Dictionary<string, string>>(Prop_InputOutputParameters, nameof(Prop_InputOutputParameters), sd);
                 var outputParameterNames = GetPropertyValue<List<string>>(Prop_OutputParameterNames, nameof(Prop_OutputParameterNames), sd);
                 var timeoutText = GetPropertyValue<string>(Prop_CommandTimeoutSeconds, nameof(Prop_CommandTimeoutSeconds), sd);
+                var outputParameterSizeText = GetPropertyValue<string>(Prop_OutputParameterSize, nameof(Prop_OutputParameterSize), sd);
 
                 int timeout;
                 if (!int.TryParse(timeoutText, out timeout))
                     timeout = 30;
+                int outputParameterSize;
+                if (!int.TryParse(outputParameterSizeText, out outputParameterSize))
+                    outputParameterSize = 4000;
 
                 var transactionId = DatabaseTransactionResolver.ResolveOptional(explicitTransactionId);
                 var transactionHandle = DatabaseTransactionManager.Get(transactionId);
                 var executionResult = transactionHandle != null
-                    ? DatabaseHelper.ExecuteStoredProcedure(transactionHandle, procedureName, timeout, inputParameters, outputParameterNames, Prop_IncludeReturnValue)
-                    : DatabaseHelper.ExecuteStoredProcedure(provider, connectionString, procedureName, timeout, inputParameters, outputParameterNames, Prop_IncludeReturnValue);
+                    ? DatabaseHelper.ExecuteStoredProcedure(transactionHandle, procedureName, timeout, inputParameters, inputOutputParameters, outputParameterNames, outputParameterSize, Prop_IncludeReturnValue)
+                    : DatabaseHelper.ExecuteStoredProcedure(provider, connectionString, procedureName, timeout, inputParameters, inputOutputParameters, outputParameterNames, outputParameterSize, Prop_IncludeReturnValue);
 
                 SetVariableValue(Prop_OutputParameters, executionResult.OutputParameters ?? new Dictionary<string, string>(), sd);
                 SetVariableValue(Prop_ReturnValue, executionResult.ReturnValue ?? string.Empty, sd);

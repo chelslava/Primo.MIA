@@ -1,6 +1,7 @@
 using FluentAssertions;
 using System;
 using System.Data;
+using System.Collections.Generic;
 using Xunit;
 
 namespace Primo.MIA.Tests.Database
@@ -157,6 +158,15 @@ namespace Primo.MIA.Tests.Database
         public void GetIdentityQuery_UnknownProvider_ReturnsNull()
         {
             DatabaseHelper.GetIdentityQuery("Any.Provider").Should().BeNull();
+        }
+
+        [Fact(DisplayName = "NormalizeOutputParameterName: сохраняет существующий префикс")]
+        public void NormalizeOutputParameterName_KeepsExistingPrefix()
+        {
+            DatabaseHelper.NormalizeOutputParameterName(DatabaseHelper.DefaultProviderInvariantName, "@Status")
+                .Should().Be("@Status");
+            DatabaseHelper.NormalizeOutputParameterName("Oracle.ManagedDataAccess.Client", ":Status")
+                .Should().Be(":Status");
         }
 
         [Fact(DisplayName = "SplitSqlBatches: делит SQL по строкам GO")]

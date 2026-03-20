@@ -326,7 +326,9 @@ namespace Primo.MIA
             string procedureName,
             int commandTimeoutSeconds,
             Dictionary<string, string> inputParameters = null,
+            Dictionary<string, string> inputOutputParameters = null,
             List<string> outputParameterNames = null,
+            int outputParameterSize = 4000,
             bool includeReturnValue = false)
         {
             using (var connection = OpenConnection(providerInvariantName, connectionString))
@@ -336,7 +338,9 @@ namespace Primo.MIA
                 procedureName,
                 commandTimeoutSeconds,
                 inputParameters,
+                inputOutputParameters,
                 outputParameterNames,
+                outputParameterSize,
                 includeReturnValue))
             {
                 return ExecuteStoredProcedureCommand(command, providerInvariantName);
@@ -348,7 +352,9 @@ namespace Primo.MIA
             string procedureName,
             int commandTimeoutSeconds,
             Dictionary<string, string> inputParameters = null,
+            Dictionary<string, string> inputOutputParameters = null,
             List<string> outputParameterNames = null,
+            int outputParameterSize = 4000,
             bool includeReturnValue = false)
         {
             EnsureTransactionHandle(transactionHandle);
@@ -359,7 +365,9 @@ namespace Primo.MIA
                 procedureName,
                 commandTimeoutSeconds,
                 inputParameters,
+                inputOutputParameters,
                 outputParameterNames,
+                outputParameterSize,
                 includeReturnValue,
                 transactionHandle.Transaction))
             {
@@ -1251,7 +1259,9 @@ namespace Primo.MIA
             string procedureName,
             int commandTimeoutSeconds,
             Dictionary<string, string> inputParameters,
+            Dictionary<string, string> inputOutputParameters,
             List<string> outputParameterNames,
+            int outputParameterSize,
             bool includeReturnValue,
             DbTransaction transaction = null)
         {
@@ -1265,18 +1275,40 @@ namespace Primo.MIA
             command.CommandTimeout = commandTimeoutSeconds > 0 ? commandTimeoutSeconds : 30;
 
             AddParameters(command, inputParameters);
-            AddOutputParameters(command, providerInvariantName, outputParameterNames, includeReturnValue);
+            AddOutputParameters(command, providerInvariantName, inputOutputParameters, outputParameterNames, outputParameterSize, includeReturnValue);
             return command;
         }
 
         private static void AddOutputParameters(
             DbCommand command,
             string providerInvariantName,
+            Dictionary<string, string> inputOutputParameters,
             List<string> outputParameterNames,
+            int outputParameterSize,
             bool includeReturnValue)
         {
             if (command == null)
                 throw new ArgumentNullException(nameof(command));
+
+            var parameterSize = outputParameterSize > 0 ? outputParameterSize : 4000;
+
+            if (inputOutputParameters != null)
+            {
+                foreach (var inputOutputParameter in inputOutputParameters)
+                {
+                    if (string.IsNullOrWhiteSpace(inputOutputParameter.Key))
+                        continue;
+
+                    var parameter = command.CreateParameter();
+                    parameter.ParameterName = NormalizeOutputParameterName(providerInvariantName, inputOutputParameter.Key);
+                    parameter.Direction = ParameterDirection.InputOutput;
+                    parameter.Size = parameterSize;
+                    parameter.Value = string.IsNullOrEmpty(inputOutputParameter.Value)
+                        ? (object)DBNull.Value
+                        : inputOutputParameter.Value;
+                    command.Parameters.Add(parameter);
+                }
+            }
 
             if (outputParameterNames != null)
             {
@@ -1287,7 +1319,7 @@ namespace Primo.MIA
                     var parameter = command.CreateParameter();
                     parameter.ParameterName = NormalizeOutputParameterName(providerInvariantName, outputParameterName);
                     parameter.Direction = ParameterDirection.Output;
-                    parameter.Size = 4000;
+                    parameter.Size = parameterSize;
                     command.Parameters.Add(parameter);
                 }
             }

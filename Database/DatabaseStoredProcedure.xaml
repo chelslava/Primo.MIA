@@ -43,12 +43,18 @@
             <TextBlock Text="Input parameters (Dictionary&lt;string,string&gt;):" Style="{StaticResource FieldLabel}"/>
             <TextBox Text="{Binding Prop_InputParameters, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
 
+            <TextBlock Text="InputOutput parameters (Dictionary&lt;string,string&gt;):" Style="{StaticResource FieldLabel}"/>
+            <TextBox Text="{Binding Prop_InputOutputParameters, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+
             <TextBlock Text="Output parameters (List&lt;string&gt;):" Style="{StaticResource FieldLabel}"/>
             <TextBox Text="{Binding Prop_OutputParameterNames, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
 
             <CheckBox Content="Получать return value"
                       IsChecked="{Binding Prop_IncludeReturnValue}"
                       Margin="0,6,0,0"/>
+
+            <TextBlock Text="Размер output/inputoutput параметров:" Style="{StaticResource FieldLabel}"/>
+            <TextBox Text="{Binding Prop_OutputParameterSize, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
 
             <TextBlock Text="Таймаут (сек):" Style="{StaticResource FieldLabel}"/>
             <TextBox Text="{Binding Prop_CommandTimeoutSeconds, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>

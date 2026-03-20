@@ -277,8 +277,10 @@ namespace Primo.MIA.Common
         public const string Field_CommandTimeoutSeconds = "Таймаут команды (сек)";
         public const string Field_ParametersDictionary = "Параметры";
         public const string Field_OutputParameterNames = "Выходные параметры";
+        public const string Field_InputOutputParameters = "InputOutput параметры";
         public const string Field_OutputParameters = "Выходные значения";
         public const string Field_IncludeReturnValue = "Получать return value";
+        public const string Field_OutputParameterSize = "Размер output-параметров";
         public const string Field_ReturnValue = "Return value";
         public const string Field_ResultTable = "Таблица-результат";
         public const string Field_HasRows = "Есть строки";
