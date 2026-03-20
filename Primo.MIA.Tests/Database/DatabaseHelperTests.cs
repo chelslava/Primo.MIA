@@ -61,5 +61,29 @@ namespace Primo.MIA.Tests.Database
             result.RowsWritten.Should().Be(0);
             result.Mode.Should().Be("NoColumns");
         }
+
+        [Fact(DisplayName = "TableExists: пустое имя таблицы -> ошибка валидации")]
+        public void TableExists_EmptyTableName_Throws()
+        {
+            Action action = () => DatabaseHelper.TableExists(
+                DatabaseHelper.DefaultProviderInvariantName,
+                "fake",
+                " ");
+
+            action.Should().Throw<ArgumentException>()
+                .WithMessage("*Имя таблицы не может быть пустым*");
+        }
+
+        [Fact(DisplayName = "GetColumnsSchema: пустое имя таблицы -> ошибка валидации")]
+        public void GetColumnsSchema_EmptyTableName_Throws()
+        {
+            Action action = () => DatabaseHelper.GetColumnsSchema(
+                DatabaseHelper.DefaultProviderInvariantName,
+                "fake",
+                null);
+
+            action.Should().Throw<ArgumentException>()
+                .WithMessage("*Имя таблицы не может быть пустым*");
+        }
     }
 }
