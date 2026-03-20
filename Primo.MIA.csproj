@@ -282,6 +282,10 @@
     <Compile Include="Common\TupleHelper.cs" />
     <Compile Include="Common\ValidationHelper.cs" />
     <Compile Include="Common\Converters\EnumToVisibilityConverter.cs" />
+    <Compile Include="Files\FileCleanup.xaml.cs">
+      <DependentUpon>FileCleanup.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Files\FileCleanupBack.cs" />
     <Compile Include="Files\SearchFiles.xaml.cs">
       <DependentUpon>SearchFiles.xaml</DependentUpon>
     </Compile>
@@ -295,6 +299,10 @@
     </Compile>
     <Compile Include="HttpWeb\HttpBack.cs" />
     <Compile Include="HttpWeb\HttpLogic.cs" />
+    <Compile Include="Text\TextExtractEntities.xaml.cs">
+      <DependentUpon>TextExtractEntities.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Text\TextExtractEntitiesBack.cs" />
     <Compile Include="Text\TextParse.xaml.cs">
       <DependentUpon>TextParse.xaml</DependentUpon>
     </Compile>
@@ -716,6 +724,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Files\FileCleanup.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Files\SearchFiles.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -763,6 +775,10 @@
     <Page Include="List\ListAggregate.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Text\TextExtractEntities.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Text\TextParse.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -919,6 +935,16 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="images\translit.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="images\regex.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="images\delete.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
   </ItemGroup>

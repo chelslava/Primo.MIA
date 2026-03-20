@@ -1,0 +1,171 @@
+<!--
+    TextExtractEntities.xaml
+    Визуальный интерфейс активности «Текст: Извлечь сущности».
+
+    Каждый тип сущности — отдельный чекбокс. Блок «Пользовательский паттерн»
+    виден только если включён чекбокс Custom.
+-->
+<UserControl x:Class="Primo.MIA.TextExtractEntities"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="clr-namespace:Primo.MIA"
+             mc:Ignorable="d"
+             d:DesignHeight="360"
+             Margin="0,0,0,5">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Primo.MIA;component/Common/Styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid Background="{DynamicResource {x:Static SystemColors.ScrollBarBrushKey}}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <Image Grid.Column="0"
+               Width="32" Height="32" Margin="5"
+               VerticalAlignment="Center"
+               Source="pack://application:,,,/Primo.MIA;component/images/regex.png"/>
+
+        <StackPanel Grid.Column="1"
+                    VerticalAlignment="Top"
+                    Margin="5,0,5,8">
+
+            <TextBlock Style="{StaticResource ActivityHeader}">
+                <Run Text="Текст: Извлечь сущности" Foreground="#FF0E0E0E"/>
+            </TextBlock>
+
+            <TextBlock Text="Входной текст:" Style="{StaticResource FieldLabel}"/>
+            <TextBox Text="{Binding Prop_InputText, UpdateSourceTrigger=PropertyChanged}"
+                     Style="{StaticResource FieldBox}"
+                     ToolTip="Текст для поиска сущностей"/>
+
+            <!-- Типы сущностей — чекбоксы в две колонки -->
+            <TextBlock Text="Что извлекать:" Style="{StaticResource FieldLabel}"
+                       Margin="0,6,0,2"/>
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0">
+                    <CheckBox Content="Email"
+                              IsChecked="{Binding Prop_ExtractEmail}"
+                              Margin="0,1,0,1" Foreground="#FF0E0E0E"
+                              ToolTip="Адреса электронной почты"/>
+                    <CheckBox Content="Phone"
+                              IsChecked="{Binding Prop_ExtractPhone}"
+                              Margin="0,1,0,1" Foreground="#FF0E0E0E"
+                              ToolTip="Российские номера телефонов (+7, 8...)"/>
+                    <CheckBox Content="Date"
+                              IsChecked="{Binding Prop_ExtractDate}"
+                              Margin="0,1,0,1" Foreground="#FF0E0E0E"
+                              ToolTip="Даты в форматах dd.mm.yyyy, yyyy-mm-dd, «15 марта 2026»"/>
+                    <CheckBox Content="Money"
+                              IsChecked="{Binding Prop_ExtractMoney}"
+                              Margin="0,1,0,1" Foreground="#FF0E0E0E"
+                              ToolTip="Денежные суммы с валютой (руб., USD, EUR и т.д.)"/>
+                    <CheckBox Content="INN"
+                              IsChecked="{Binding Prop_ExtractINN}"
+                              Margin="0,1,0,1" Foreground="#FF0E0E0E"
+                              ToolTip="ИНН юрлиц (10 цифр) и физлиц (12 цифр)"/>
+                    <CheckBox Content="SNILS"
+                              IsChecked="{Binding Prop_ExtractSNILS}"
+                              Margin="0,1,0,1" Foreground="#FF0E0E0E"
+                              ToolTip="СНИЛС в формате XXX-XXX-XXX XX"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1">
+                    <CheckBox Content="Passport"
+                              IsChecked="{Binding Prop_ExtractPassport}"
+                              Margin="0,1,0,1" Foreground="#FF0E0E0E"
+                              ToolTip="Серия и номер паспорта РФ (4+6 цифр)"/>
+                    <CheckBox Content="CarNumber"
+                              IsChecked="{Binding Prop_ExtractCarNumber}"
+                              Margin="0,1,0,1" Foreground="#FF0E0E0E"
+                              ToolTip="Номера автомобилей РФ (А123ВС77), ГОСТ Р 50577-93"/>
+                    <CheckBox Content="URL"
+                              IsChecked="{Binding Prop_ExtractURL}"
+                              Margin="0,1,0,1" Foreground="#FF0E0E0E"
+                              ToolTip="HTTP/HTTPS/FTP ссылки"/>
+                    <CheckBox Content="IP"
+                              IsChecked="{Binding Prop_ExtractIP}"
+                              Margin="0,1,0,1" Foreground="#FF0E0E0E"
+                              ToolTip="IPv4-адреса"/>
+                    <CheckBox Content="GUID"
+                              IsChecked="{Binding Prop_ExtractGUID}"
+                              Margin="0,1,0,1" Foreground="#FF0E0E0E"
+                              ToolTip="UUID/GUID"/>
+                    <CheckBox Content="Custom (свой паттерн)"
+                              IsChecked="{Binding Prop_ExtractCustom}"
+                              Margin="0,1,0,1" Foreground="#FF0E0E0E"
+                              ToolTip="Включить поиск по пользовательскому Regex"/>
+                </StackPanel>
+            </Grid>
+
+            <!-- Блок Custom — виден только если Prop_ExtractCustom = true -->
+            <StackPanel Visibility="{Binding Prop_ExtractCustom, Converter={StaticResource BoolToVis}}"
+                        Margin="0,4,0,0">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="110"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" Margin="0,0,4,0">
+                        <TextBlock Text="Пользовательский паттерн:" Style="{StaticResource FieldLabel}"/>
+                        <TextBox Text="{Binding Prop_CustomPattern, UpdateSourceTrigger=PropertyChanged}"
+                                 Style="{StaticResource FieldBox}"
+                                 ToolTip="Regex-паттерн. Пример: ТН-\d{6}"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1">
+                        <TextBlock Text="Имя типа:" Style="{StaticResource FieldLabel}"/>
+                        <TextBox Text="{Binding Prop_CustomTypeName, UpdateSourceTrigger=PropertyChanged}"
+                                 Style="{StaticResource FieldBox}"
+                                 ToolTip="Имя в словаре (по умолч. Custom)"/>
+                    </StackPanel>
+                </Grid>
+            </StackPanel>
+
+            <!-- Настройки -->
+            <Grid Margin="0,6,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="80"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" Margin="0,0,4,0">
+                    <TextBlock Text="Настройки:" Style="{StaticResource FieldLabel}"/>
+                    <StackPanel Orientation="Horizontal">
+                        <CheckBox Content="Нормализация"
+                                  IsChecked="{Binding Prop_NormalizeResults}"
+                                  Margin="0,0,10,0"
+                                  ToolTip="Привести найденные значения к стандартному виду"
+                                  Foreground="#FF0E0E0E"/>
+                        <CheckBox Content="Валидация ИНН"
+                                  IsChecked="{Binding Prop_ValidateINN}"
+                                  ToolTip="Проверять контрольные цифры ИНН"
+                                  Foreground="#FF0E0E0E"/>
+                    </StackPanel>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1">
+                    <TextBlock Text="Мин. уверенность:" Style="{StaticResource FieldLabel}"
+                               ToolTip="0–100. 0 = все паттерны, 80 = только надёжные"/>
+                    <TextBox Text="{Binding Prop_MinConfidence, UpdateSourceTrigger=PropertyChanged}"
+                             Style="{StaticResource FieldBox}"/>
+                </StackPanel>
+            </Grid>
+
+        </StackPanel>
+    </Grid>
+</UserControl>

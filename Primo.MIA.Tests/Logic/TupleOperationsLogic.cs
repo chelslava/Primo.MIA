@@ -103,5 +103,52 @@ namespace Primo.MIA.Tests.Logic
 
             return result;
         }
+
+        /// <summary>
+        /// Создаёт новый кортеж с заменённым элементом.
+        /// Кортежи иммутабельны — возвращается новый экземпляр.
+        /// </summary>
+        /// <param name="tuple">Исходный кортеж.</param>
+        /// <param name="index">Индекс элемента для замены (1-7).</param>
+        /// <param name="newValue">Новое значение.</param>
+        /// <returns>Новый кортеж с заменённым элементом.</returns>
+        public object SetTupleItem(object tuple, TupleItemIndex index, object newValue)
+        {
+            if (tuple == null)
+                throw new ArgumentNullException(nameof(tuple));
+
+            var tupleType = tuple.GetType();
+            if (!tupleType.Name.StartsWith("Tuple"))
+                throw new ArgumentException("Объект не является кортежем");
+
+            int itemNumber = (int)index;
+            var items = DestructureTuple(tuple);
+
+            if (itemNumber < 1 || itemNumber > items.Count)
+                throw new ArgumentException($"Кортеж не содержит элемент Item{itemNumber}");
+
+            // Заменяем элемент
+            items[itemNumber - 1] = newValue;
+
+            // Создаём новый кортеж
+            return CreateTuple(items, TupleKind.ClassicTuple);
+        }
+
+        /// <summary>
+        /// Определяет арность (количество элементов) кортежа.
+        /// </summary>
+        /// <param name="tuple">Кортеж.</param>
+        /// <returns>Количество элементов или -1 если не кортеж.</returns>
+        public int GetArity(object tuple)
+        {
+            if (tuple == null)
+                return -1;
+
+            var tupleType = tuple.GetType();
+            if (!tupleType.Name.StartsWith("Tuple"))
+                return -1;
+
+            return tupleType.GetGenericArguments().Length;
+        }
     }
 }

@@ -253,5 +253,188 @@ namespace Primo.MIA.Tests.Tuple
         }
 
         #endregion
+
+        #region SetTupleItem Tests
+
+        [Fact(DisplayName = "SetTupleItem: замена первого элемента")]
+        public void SetTupleItem_Item1_ReturnsNewTupleWithReplacedValue()
+        {
+            // Arrange
+            var tuple = System.Tuple.Create("old", "banana", "cherry");
+
+            // Act
+            var result = _logic.SetTupleItem(tuple, TupleItemIndex.Item1, "apple");
+
+            // Assert
+            result.Should().NotBeNull();
+            var newTuple = result as System.Tuple<object, object, object>;
+            newTuple.Should().NotBeNull();
+            newTuple.Item1.Should().Be("apple");
+            newTuple.Item2.Should().Be("banana");
+            newTuple.Item3.Should().Be("cherry");
+        }
+
+        [Fact(DisplayName = "SetTupleItem: замена второго элемента")]
+        public void SetTupleItem_Item2_ReturnsNewTupleWithReplacedValue()
+        {
+            // Arrange
+            var tuple = System.Tuple.Create("apple", "old", "cherry");
+
+            // Act
+            var result = _logic.SetTupleItem(tuple, TupleItemIndex.Item2, "banana");
+
+            // Assert
+            result.Should().NotBeNull();
+            var newTuple = result as System.Tuple<object, object, object>;
+            newTuple.Should().NotBeNull();
+            newTuple.Item1.Should().Be("apple");
+            newTuple.Item2.Should().Be("banana");
+            newTuple.Item3.Should().Be("cherry");
+        }
+
+        [Fact(DisplayName = "SetTupleItem: замена последнего элемента")]
+        public void SetTupleItem_LastItem_ReturnsNewTupleWithReplacedValue()
+        {
+            // Arrange
+            var tuple = System.Tuple.Create("apple", "banana", "old");
+
+            // Act
+            var result = _logic.SetTupleItem(tuple, TupleItemIndex.Item3, "cherry");
+
+            // Assert
+            result.Should().NotBeNull();
+            var newTuple = result as System.Tuple<object, object, object>;
+            newTuple.Should().NotBeNull();
+            newTuple.Item1.Should().Be("apple");
+            newTuple.Item2.Should().Be("banana");
+            newTuple.Item3.Should().Be("cherry");
+        }
+
+        [Fact(DisplayName = "SetTupleItem: замена с изменением типа значения")]
+        public void SetTupleItem_DifferentType_ReturnsNewTupleWithNewType()
+        {
+            // Arrange
+            var tuple = System.Tuple.Create("string", 42);
+
+            // Act
+            var result = _logic.SetTupleItem(tuple, TupleItemIndex.Item1, 123);
+
+            // Assert
+            result.Should().NotBeNull();
+            var newTuple = result as System.Tuple<object, object>;
+            newTuple.Item1.Should().Be(123);
+            newTuple.Item2.Should().Be(42);
+        }
+
+        [Fact(DisplayName = "SetTupleItem: null кортеж — ошибка")]
+        public void SetTupleItem_NullTuple_ThrowsArgumentNullException()
+        {
+            // Act & Assert
+            Action act = () => _logic.SetTupleItem(null, TupleItemIndex.Item1, "value");
+            act.Should().Throw<ArgumentNullException>();
+        }
+
+        [Fact(DisplayName = "SetTupleItem: индекс вне диапазона — ошибка")]
+        public void SetTupleItem_InvalidIndex_ThrowsArgumentException()
+        {
+            // Arrange
+            var tuple = System.Tuple.Create("apple", "banana");
+
+            // Act & Assert
+            Action act = () => _logic.SetTupleItem(tuple, TupleItemIndex.Item5, "cherry");
+            act.Should().Throw<ArgumentException>();
+        }
+
+        [Fact(DisplayName = "SetTupleItem: не кортеж — ошибка")]
+        public void SetTupleItem_NotATuple_ThrowsArgumentException()
+        {
+            // Arrange
+            var notATuple = "just a string";
+
+            // Act & Assert
+            Action act = () => _logic.SetTupleItem(notATuple, TupleItemIndex.Item1, "value");
+            act.Should().Throw<ArgumentException>();
+        }
+
+        [Fact(DisplayName = "SetTupleItem: оригинальный кортеж не изменяется")]
+        public void SetTupleItem_OriginalTupleUnchanged()
+        {
+            // Arrange
+            var tuple = System.Tuple.Create("original", "value");
+
+            // Act
+            _logic.SetTupleItem(tuple, TupleItemIndex.Item1, "new");
+
+            // Assert — оригинал не изменился
+            tuple.Item1.Should().Be("original");
+        }
+
+        #endregion
+
+        #region GetArity Tests
+
+        [Fact(DisplayName = "GetArity: кортеж из 1 элемента")]
+        public void GetArity_OneElement_Returns1()
+        {
+            // Arrange
+            var tuple = System.Tuple.Create("only");
+
+            // Act
+            var result = _logic.GetArity(tuple);
+
+            // Assert
+            result.Should().Be(1);
+        }
+
+        [Fact(DisplayName = "GetArity: кортеж из 2 элементов")]
+        public void GetArity_TwoElements_Returns2()
+        {
+            // Arrange
+            var tuple = System.Tuple.Create("a", "b");
+
+            // Act
+            var result = _logic.GetArity(tuple);
+
+            // Assert
+            result.Should().Be(2);
+        }
+
+        [Fact(DisplayName = "GetArity: кортеж из 7 элементов")]
+        public void GetArity_SevenElements_Returns7()
+        {
+            // Arrange
+            var tuple = System.Tuple.Create(1, 2, 3, 4, 5, 6, 7);
+
+            // Act
+            var result = _logic.GetArity(tuple);
+
+            // Assert
+            result.Should().Be(7);
+        }
+
+        [Fact(DisplayName = "GetArity: null — возвращает -1")]
+        public void GetArity_Null_ReturnsMinus1()
+        {
+            // Act
+            var result = _logic.GetArity(null);
+
+            // Assert
+            result.Should().Be(-1);
+        }
+
+        [Fact(DisplayName = "GetArity: не кортеж — возвращает -1")]
+        public void GetArity_NotATuple_ReturnsMinus1()
+        {
+            // Arrange
+            var notATuple = "just a string";
+
+            // Act
+            var result = _logic.GetArity(notATuple);
+
+            // Assert
+            result.Should().Be(-1);
+        }
+
+        #endregion
     }
 }

@@ -1,0 +1,195 @@
+<!--
+    FileCleanup.xaml
+    Визуальный интерфейс активности «Файл: Очистка по времени».
+
+    Что удалять — три независимых чекбокса.
+    Маска файлов — поддержка нескольких масок через запятую (*.tmp, *.log).
+    Поля «Старше N дней» / «Раньше даты» показываются по ThresholdMode.
+    DryRun выделен оранжевым — критически важный параметр.
+-->
+<UserControl x:Class="Primo.MIA.FileCleanup"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:system="clr-namespace:System;assembly=mscorlib"
+             xmlns:local="clr-namespace:Primo.MIA"
+             mc:Ignorable="d"
+             d:DesignHeight="380"
+             Margin="0,0,0,5">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Primo.MIA;component/Common/Styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+
+            <ObjectDataProvider x:Key="TimeAttrValues"
+                                MethodName="GetValues"
+                                ObjectType="{x:Type system:Enum}">
+                <ObjectDataProvider.MethodParameters>
+                    <x:Type TypeName="local:FileTimeAttribute"/>
+                </ObjectDataProvider.MethodParameters>
+            </ObjectDataProvider>
+
+            <ObjectDataProvider x:Key="ThresholdModeValues"
+                                MethodName="GetValues"
+                                ObjectType="{x:Type system:Enum}">
+                <ObjectDataProvider.MethodParameters>
+                    <x:Type TypeName="local:CleanupThresholdMode"/>
+                </ObjectDataProvider.MethodParameters>
+            </ObjectDataProvider>
+
+            <!-- Показывает поле при нескольких значениях enum -->
+            <local:MultiEnumToVisibilityConverter x:Key="MultiEnumToVis"/>
+
+            <!-- Показывает блок «Маска файлов» только если выбраны Файлы -->
+            <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid Background="{DynamicResource {x:Static SystemColors.ScrollBarBrushKey}}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <Image Grid.Column="0"
+               Width="32" Height="32" Margin="5"
+               VerticalAlignment="Center"
+               Source="pack://application:,,,/Primo.MIA;component/images/delete.png"/>
+
+        <StackPanel Grid.Column="1"
+                    VerticalAlignment="Top"
+                    Margin="5,0,5,8">
+
+            <!-- Заголовок -->
+            <TextBlock Style="{StaticResource ActivityHeader}">
+                <Run Text="Файл: Очистка по времени" Foreground="#FF0E0E0E"/>
+            </TextBlock>
+
+            <!-- DryRun — первым, выделен -->
+            <CheckBox Content="Пробный запуск (DryRun) — ничего не удалять"
+                      IsChecked="{Binding Prop_DryRun}"
+                      Margin="0,0,0,6"
+                      FontWeight="SemiBold"
+                      Foreground="#FFC55A11"
+                      ToolTip="Только показывает список кандидатов, ничего не трогает. Рекомендуется при первом запуске."/>
+
+            <!-- Папка -->
+            <TextBlock Text="Папка для очистки:" Style="{StaticResource FieldLabel}"/>
+            <TextBox Text="{Binding Prop_FolderPath, UpdateSourceTrigger=PropertyChanged}"
+                     Style="{StaticResource FieldBox}"
+                     ToolTip="Путь к папке для очистки"/>
+
+            <!-- ── ЧТО УДАЛЯТЬ ── три чекбокса -->
+            <TextBlock Text="Что удалять:" Style="{StaticResource FieldLabel}"
+                       Margin="0,6,0,2"/>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <CheckBox Grid.Column="0"
+                          Content="Файлы"
+                          IsChecked="{Binding Prop_DeleteFiles}"
+                          Margin="0,1,0,1" Foreground="#FF0E0E0E"
+                          ToolTip="Удалять файлы по временному критерию и маске"/>
+
+                <CheckBox Grid.Column="1"
+                          Content="Пустые папки"
+                          IsChecked="{Binding Prop_DeleteEmptyFolders}"
+                          Margin="0,1,0,1" Foreground="#FF0E0E0E"
+                          ToolTip="Удалять папки у которых нет содержимого"/>
+
+                <CheckBox Grid.Column="2"
+                          Content="Папки целиком"
+                          IsChecked="{Binding Prop_DeleteFoldersWithContent}"
+                          Margin="0,1,0,1" Foreground="#FFC55A11"
+                          FontWeight="SemiBold"
+                          ToolTip="Удалять папки вместе со всем содержимым. Необратимо — используйте DryRun."/>
+            </Grid>
+
+            <!-- ── МАСКА ФАЙЛОВ — видна только при Prop_DeleteFiles = true -->
+            <StackPanel Visibility="{Binding Prop_DeleteFiles, Converter={StaticResource BoolToVis}}"
+                        Margin="0,4,0,0">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0" Margin="0,0,8,0">
+                        <TextBlock Text="Маска файлов:" Style="{StaticResource FieldLabel}"/>
+                        <TextBox Text="{Binding Prop_FilePattern, UpdateSourceTrigger=PropertyChanged}"
+                                 Style="{StaticResource FieldBox}"
+                                 ToolTip="Одна или несколько масок через запятую:&#xA;  *.tmp&#xA;  *.log, *.tmp&#xA;  report_*.pdf; temp_??.xlsx&#xA;Пусто = все файлы (*)"/>
+                    </StackPanel>
+
+                    <CheckBox Grid.Column="1"
+                              Content="Рекурсивно"
+                              IsChecked="{Binding Prop_Recursive}"
+                              VerticalAlignment="Bottom"
+                              Margin="0,0,0,3"
+                              ToolTip="Обходить вложенные подпапки"
+                              Foreground="#FF0E0E0E"/>
+                </Grid>
+            </StackPanel>
+
+            <!-- ── ВРЕМЕННОЙ КРИТЕРИЙ -->
+            <Grid Margin="0,6,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" Margin="0,0,4,0">
+                    <TextBlock Text="Атрибут времени:" Style="{StaticResource FieldLabel}"/>
+                    <ComboBox ItemsSource="{Binding Source={StaticResource TimeAttrValues}}"
+                              SelectedItem="{Binding Prop_TimeAttribute}"
+                              Style="{StaticResource FieldComboBox}"
+                              ToolTip="CreationTime — дата создания&#xA;LastWriteTime — дата изменения&#xA;LastAccessTime — дата доступа"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1">
+                    <TextBlock Text="Режим порога:" Style="{StaticResource FieldLabel}"/>
+                    <ComboBox ItemsSource="{Binding Source={StaticResource ThresholdModeValues}}"
+                              SelectedItem="{Binding Prop_ThresholdMode}"
+                              Style="{StaticResource FieldComboBox}"
+                              ToolTip="OlderThanDays — старше N дней&#xA;BeforeDate — раньше даты&#xA;Both — оба условия одновременно"/>
+                </StackPanel>
+            </Grid>
+
+            <!-- Старше N дней — для OlderThanDays и Both -->
+            <StackPanel Visibility="{Binding Prop_ThresholdMode,
+                                    Converter={StaticResource MultiEnumToVis},
+                                    ConverterParameter=OlderThanDays|Both}">
+                <TextBlock Text="Старше чем (дней):" Style="{StaticResource FieldLabel}"/>
+                <TextBox Text="{Binding Prop_OlderThanDays, UpdateSourceTrigger=PropertyChanged}"
+                         Style="{StaticResource FieldBox}"
+                         ToolTip="Удалять объекты старше N дней. Порог = сейчас − N дней."/>
+            </StackPanel>
+
+            <!-- Раньше даты — для BeforeDate и Both -->
+            <StackPanel Visibility="{Binding Prop_ThresholdMode,
+                                    Converter={StaticResource MultiEnumToVis},
+                                    ConverterParameter=BeforeDate|Both}">
+                <TextBlock Text="Раньше даты:" Style="{StaticResource FieldLabel}"/>
+                <TextBox Text="{Binding Prop_ThresholdDate, UpdateSourceTrigger=PropertyChanged}"
+                         Style="{StaticResource FieldBox}"
+                         ToolTip="Удалять объекты с датой атрибута раньше указанной"/>
+            </StackPanel>
+
+            <!-- Игнорировать ошибки -->
+            <CheckBox Content="Игнорировать ошибки удаления"
+                      IsChecked="{Binding Prop_IgnoreErrors}"
+                      Margin="0,6,0,2"
+                      ToolTip="Продолжать при ошибке отдельного файла/папки. Ошибки записываются в выходной параметр."
+                      Foreground="#FF0E0E0E"/>
+
+        </StackPanel>
+    </Grid>
+</UserControl>

@@ -807,5 +807,116 @@ namespace Primo.MIA.Common
 
         /// <summary>Количество изменённых символов.</summary>
         public const string Field_ChangedChars = "Изменено символов";
+
+        // ═══════════════════════════════════════════════════════════════════════
+        // TEXT EXTRACT ENTITIES (Извлечь сущности)
+        // ═══════════════════════════════════════════════════════════════════════
+
+        /// <summary>Название активности «Текст: Извлечь сущности».</summary>
+        public const string Activity_TextExtractEntities = "Текст: Извлечь сущности";
+
+        // Fields
+        /// <summary>Типы сущностей для поиска через запятую.</summary>
+        public const string Field_EntityTypes = "Типы сущностей";
+
+        /// <summary>Пользовательский Regex-паттерн для типа Custom.</summary>
+        public const string Field_CustomPattern = "Пользовательский паттерн (Regex)";
+
+        /// <summary>Пользовательский Regex-паттерн для типа Custom.</summary>
+        public const string Field_CustomTypeName = "Имя пользовательского типа";
+
+        /// <summary>Нормализовать найденные значения.</summary>
+        public const string Field_NormalizeResults = "Нормализация";
+
+        /// <summary>Проверять контрольные цифры ИНН.</summary>
+        public const string Field_ValidateINN = "Валидация ИНН";
+
+        /// <summary>Минимальный уровень уверенности паттерна (0–100).</summary>
+        public const string Field_MinConfidence = "Мин. уверенность";
+
+        /// <summary>Словарь найденных сущностей по типу.</summary>
+        public const string Field_EntityResults = "Результаты";
+
+        /// <summary>Плоский список всех найденных значений.</summary>
+        public const string Field_AllFound = "Все найденные";
+
+        /// <summary>Общее количество найденных сущностей.</summary>
+        public const string Field_EntityTotalCount = "Всего найдено";
+
+        /// <summary>Есть хотя бы одно совпадение.</summary>
+        public const string Field_HasMatches = "Есть совпадения";
+
+        /// <summary>Список типов с хотя бы одним совпадением.</summary>
+        public const string Field_FoundTypes = "Найденные типы";
+
+        // ═══════════════════════════════════════════════════════════════════════
+        // FILE CLEANUP (Очистка файлов и папок по времени)
+        // ═══════════════════════════════════════════════════════════════════════
+
+        /// <summary>Название активности «Файл: Очистка по времени».</summary>
+        public const string Activity_FileCleanup = "Файл: Очистка по времени";
+
+        // Fields
+        /// <summary>Путь к папке для очистки.</summary>
+        public const string Field_CleanupFolder = "Папка для очистки";
+
+        /// <summary>Что удалять (CleanupTargetType).</summary>
+        public const string Field_CleanupTargetType = "Что удалять";
+
+        /// <summary>Временной атрибут для сравнения (FileTimeAttribute).</summary>
+        public const string Field_CleanupTimeAttribute = "Атрибут времени";
+
+        /// <summary>Способ задания порога (CleanupThresholdMode).</summary>
+        public const string Field_CleanupThresholdMode = "Режим порога";
+
+        /// <summary>Удалять объекты старше N дней.</summary>
+        public const string Field_CleanupOlderThanDays = "Старше чем (дней)";
+
+        /// <summary>Удалять объекты с датой раньше указанной.</summary>
+        public const string Field_CleanupThresholdDate = "Раньше даты";
+
+        /// <summary>Маска имён файлов (wildcard: *.tmp, *.log).</summary>
+        public const string Field_CleanupFilePattern = "Маска файлов";
+
+        /// <summary>Обходить подпапки рекурсивно.</summary>
+        public const string Field_CleanupRecursive = "Рекурсивно";
+
+        /// <summary>Не удалять файлы меньше N байт.</summary>
+        public const string Field_CleanupMinSize = "Мин. размер (байт)";
+
+        /// <summary>Ограничить количество удалений за один вызов.</summary>
+        public const string Field_CleanupMaxItems = "Макс. объектов";
+
+        /// <summary>Режим DryRun — ничего не удалять, только показать список.</summary>
+        public const string Field_CleanupDryRun = "Пробный запуск (DryRun)";
+
+        /// <summary>Продолжать при ошибке удаления отдельного файла.</summary>
+        public const string Field_CleanupIgnoreErrors = "Игнорировать ошибки";
+
+        /// <summary>Количество удалённых объектов.</summary>
+        public const string Field_CleanupDeletedCount = "Удалено объектов";
+
+        /// <summary>Список путей удалённых объектов.</summary>
+        public const string Field_CleanupDeletedPaths = "Список удалённых";
+
+        /// <summary>Суммарный размер удалённых файлов в байтах.</summary>
+        public const string Field_CleanupFreedBytes = "Освобождено (байт)";
+
+        /// <summary>Список ошибок удаления.</summary>
+        public const string Field_CleanupErrors = "Ошибки удаления";
+
+        // Errors
+        /// <summary>Путь к папке не указан.</summary>
+        public const string Error_CleanupFolderRequired = "Путь к папке обязателен";
+
+        /// <summary>Папка не найдена.</summary>
+        public const string Error_CleanupFolderNotFound = "Папка не найдена";
+
+        /// <summary>Количество дней не указано или некорректно.</summary>
+        public const string Error_CleanupDaysRequired = "Количество дней обязательно и должно быть >= 0";
+
+        /// <summary>Дата порога не указана или некорректна.</summary>
+        public const string Error_CleanupDateRequired = "Дата порога обязательна и должна быть корректной датой";
+
     }
 }

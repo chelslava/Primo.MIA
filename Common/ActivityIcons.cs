@@ -56,5 +56,11 @@ namespace Primo.MIA.Common
         /// <summary>Иконка для активностей работы с текстом (Транслитерация)</summary>
         public const string TextTranslit = BasePath + "translit.png";
 
+        /// <summary>Иконка для активностей работы с текстом (Regex)</summary>
+        public const string Regex = BasePath + "regex.png";
+
+        /// <summary>Иконка для активности Файл: Очистка по времени</summary>
+        public const string Clean = BasePath + "delete.png";
+
     }
 }

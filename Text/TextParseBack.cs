@@ -369,7 +369,7 @@ namespace Primo.MIA
                 string compiledPattern;
                 try
                 {
-                    compiledPattern = CompileMask(mask, this.Prop_MaskSyntax, this.Prop_GreedyMatch);
+                    compiledPattern = CompileMask(mask, this.Prop_MaskSyntax, this.Prop_GreedyMatch, this.Prop_AllMatches);
                 }
                 catch (Exception ex)
                 {
@@ -505,19 +505,28 @@ namespace Primo.MIA
         ///   1. Разбиваем маску на чередующиеся части: литерал, плейсхолдер, литерал...
         ///   2. Каждый литерал экранируется через Regex.Escape
         ///   3. Каждый плейсхолдер {Имя} → (?&lt;Имя&gt;.+?) или (?&lt;Имя&gt;.+) при greedy
+        ///   4. При allMatches=false добавляются якоря ^ и $ для точного совпадения
         /// </summary>
         /// <param name="mask">Исходная маска с плейсхолдерами.</param>
         /// <param name="syntax">Синтаксис плейсхолдеров.</param>
         /// <param name="greedy">true — жадный захват (.+), false — ленивый (.+?).</param>
-        private static string CompileMask(string mask, TemplateSyntax syntax, bool greedy)
+        /// <param name="allMatches">true — поиск всех вхождений (без якорей), false — одно совпадение (с якорями).</param>
+        private static string CompileMask(string mask, TemplateSyntax syntax, bool greedy, bool allMatches = false)
         {
             string placeholderPattern = PlaceholderPatterns[syntax];
             string quantifier         = greedy ? ".+" : ".+?";
             var    sb                 = new StringBuilder();
             int    lastIndex          = 0;
+            bool   hasPlaceholders    = false;
+
+            // Добавляем якорь начала строки только для одиночного совпадения
+            if (!allMatches)
+                sb.Append("^");
 
             foreach (Match m in Regex.Matches(mask, placeholderPattern))
             {
+                hasPlaceholders = true;
+
                 // Экранируем литеральный текст между плейсхолдерами
                 string literal = mask.Substring(lastIndex, m.Index - lastIndex);
                 if (!string.IsNullOrEmpty(literal))
@@ -541,7 +550,11 @@ namespace Primo.MIA
             if (!string.IsNullOrEmpty(tail))
                 sb.Append(Regex.Escape(tail));
 
-            if (sb.Length == 0)
+            // Добавляем якорь конца строки только для одиночного совпадения
+            if (!allMatches)
+                sb.Append("$");
+
+            if (!hasPlaceholders)
                 throw new ArgumentException(
                     "Маска не содержит ни одного плейсхолдера. " +
                     "Добавьте хотя бы один плейсхолдер, например {Значение}");
