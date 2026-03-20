@@ -105,12 +105,30 @@ namespace Primo.MIA.Tests.Database
         [Fact(DisplayName = "BuildPreloadCommandText: формирует команду очистки")]
         public void BuildPreloadCommandText_ReturnsExpectedSql()
         {
-            DatabaseHelper.BuildPreloadCommandText("dbo.Users", DatabaseBulkPreloadMode.DeleteAll)
-                .Should().Be("DELETE FROM dbo.Users");
-            DatabaseHelper.BuildPreloadCommandText("dbo.Users", DatabaseBulkPreloadMode.Truncate)
-                .Should().Be("TRUNCATE TABLE dbo.Users");
-            DatabaseHelper.BuildPreloadCommandText("dbo.Users", DatabaseBulkPreloadMode.None)
+            DatabaseHelper.BuildPreloadCommandText(DatabaseHelper.DefaultProviderInvariantName, "dbo.Users", DatabaseBulkPreloadMode.DeleteAll)
+                .Should().Be("DELETE FROM [dbo].[Users]");
+            DatabaseHelper.BuildPreloadCommandText(DatabaseHelper.DefaultProviderInvariantName, "dbo.Users", DatabaseBulkPreloadMode.Truncate)
+                .Should().Be("TRUNCATE TABLE [dbo].[Users]");
+            DatabaseHelper.BuildPreloadCommandText(DatabaseHelper.DefaultProviderInvariantName, "dbo.Users", DatabaseBulkPreloadMode.None)
                 .Should().BeNull();
+        }
+
+        [Fact(DisplayName = "QuoteQualifiedIdentifier: экранирует составные имена под провайдер")]
+        public void QuoteQualifiedIdentifier_UsesProviderSpecificQuotes()
+        {
+            DatabaseHelper.QuoteQualifiedIdentifier(DatabaseHelper.DefaultProviderInvariantName, "dbo.Order Details")
+                .Should().Be("[dbo].[Order Details]");
+            DatabaseHelper.QuoteQualifiedIdentifier("Npgsql", "public.Order")
+                .Should().Be("\"public\".\"Order\"");
+            DatabaseHelper.QuoteQualifiedIdentifier("MySql.Data.MySqlClient", "sales.Order")
+                .Should().Be("`sales`.`Order`");
+        }
+
+        [Fact(DisplayName = "QuoteQualifiedIdentifier: не переэкранирует уже quoted имя")]
+        public void QuoteQualifiedIdentifier_DoesNotDoubleQuote()
+        {
+            DatabaseHelper.QuoteQualifiedIdentifier(DatabaseHelper.DefaultProviderInvariantName, "[dbo].[Users]")
+                .Should().Be("[dbo].[Users]");
         }
 
         [Fact(DisplayName = "SplitSqlBatches: делит SQL по строкам GO")]

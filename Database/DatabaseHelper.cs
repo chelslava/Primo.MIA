@@ -792,12 +792,25 @@ namespace Primo.MIA
             if (string.IsNullOrWhiteSpace(destinationTableName))
                 throw new ArgumentException("Имя таблицы-приёмника не может быть пустым.", nameof(destinationTableName));
 
+            return BuildPreloadCommandText(DefaultProviderInvariantName, destinationTableName, preloadMode);
+        }
+
+        public static string BuildPreloadCommandText(
+            string providerInvariantName,
+            string destinationTableName,
+            DatabaseBulkPreloadMode preloadMode)
+        {
+            if (string.IsNullOrWhiteSpace(destinationTableName))
+                throw new ArgumentException("Имя таблицы-приёмника не может быть пустым.", nameof(destinationTableName));
+
+            var safeTableName = QuoteQualifiedIdentifier(providerInvariantName, destinationTableName);
+
             switch (preloadMode)
             {
                 case DatabaseBulkPreloadMode.DeleteAll:
-                    return $"DELETE FROM {destinationTableName}";
+                    return $"DELETE FROM {safeTableName}";
                 case DatabaseBulkPreloadMode.Truncate:
-                    return $"TRUNCATE TABLE {destinationTableName}";
+                    return $"TRUNCATE TABLE {safeTableName}";
                 default:
                     return null;
             }
@@ -895,9 +908,10 @@ namespace Primo.MIA
             string destinationTableName,
             List<BulkInsertColumnMapping> mappings)
         {
-            var columnList = string.Join(", ", mappings.Select(m => m.DestinationColumn));
+            var safeTableName = QuoteQualifiedIdentifier(providerInvariantName, destinationTableName);
+            var columnList = string.Join(", ", mappings.Select(m => QuoteIdentifier(providerInvariantName, m.DestinationColumn)));
             var valuesList = string.Join(", ", mappings.Select((m, index) => GetParameterPlaceholder(providerInvariantName, index)));
-            return $"INSERT INTO {destinationTableName} ({columnList}) VALUES ({valuesList})";
+            return $"INSERT INTO {safeTableName} ({columnList}) VALUES ({valuesList})";
         }
 
         private static void CreateInsertParameters(
@@ -981,7 +995,7 @@ namespace Primo.MIA
             string destinationTableName,
             DatabaseBulkPreloadMode preloadMode)
         {
-            var preloadCommandText = BuildPreloadCommandText(destinationTableName, preloadMode);
+            var preloadCommandText = BuildPreloadCommandText(GetProviderInvariantName(connection), destinationTableName, preloadMode);
             if (string.IsNullOrWhiteSpace(preloadCommandText))
                 return;
 
@@ -999,6 +1013,129 @@ namespace Primo.MIA
             return preloadMode == DatabaseBulkPreloadMode.None
                 ? baseMode
                 : baseMode + "+" + preloadMode;
+        }
+
+        private static string GetProviderInvariantName(DbConnection connection)
+        {
+            if (connection is SqlConnection)
+                return DefaultProviderInvariantName;
+
+            return connection != null ? connection.GetType().Namespace : DefaultProviderInvariantName;
+        }
+
+        public static string QuoteIdentifier(string providerInvariantName, string identifier)
+        {
+            if (string.IsNullOrWhiteSpace(identifier))
+                throw new ArgumentException("Идентификатор не может быть пустым.", nameof(identifier));
+
+            var trimmed = identifier.Trim();
+            if (IsAlreadyQuoted(trimmed))
+                return trimmed;
+
+            var commandBuilder = TryCreateCommandBuilder(providerInvariantName);
+            if (commandBuilder != null)
+            {
+                try
+                {
+                    return commandBuilder.QuoteIdentifier(trimmed);
+                }
+                catch
+                {
+                }
+            }
+
+            string prefix;
+            string suffix;
+            GetIdentifierQuotes(providerInvariantName, out prefix, out suffix);
+            return prefix + trimmed.Replace(suffix, suffix + suffix) + suffix;
+        }
+
+        public static string QuoteQualifiedIdentifier(string providerInvariantName, string qualifiedIdentifier)
+        {
+            if (string.IsNullOrWhiteSpace(qualifiedIdentifier))
+                throw new ArgumentException("Идентификатор не может быть пустым.", nameof(qualifiedIdentifier));
+
+            var parts = SplitQualifiedIdentifier(qualifiedIdentifier);
+            return string.Join(".", parts.Select(part => QuoteIdentifier(providerInvariantName, part)));
+        }
+
+        private static List<string> SplitQualifiedIdentifier(string qualifiedIdentifier)
+        {
+            var parts = new List<string>();
+            var current = string.Empty;
+            var squareDepth = 0;
+            var doubleQuoteDepth = 0;
+            var backtickDepth = 0;
+
+            foreach (var ch in qualifiedIdentifier.Trim())
+            {
+                if (ch == '[')
+                    squareDepth++;
+                else if (ch == ']' && squareDepth > 0)
+                    squareDepth--;
+                else if (ch == '"')
+                    doubleQuoteDepth = doubleQuoteDepth == 0 ? 1 : 0;
+                else if (ch == '`')
+                    backtickDepth = backtickDepth == 0 ? 1 : 0;
+
+                if (ch == '.' && squareDepth == 0 && doubleQuoteDepth == 0 && backtickDepth == 0)
+                {
+                    if (!string.IsNullOrWhiteSpace(current))
+                        parts.Add(current.Trim());
+                    current = string.Empty;
+                    continue;
+                }
+
+                current += ch;
+            }
+
+            if (!string.IsNullOrWhiteSpace(current))
+                parts.Add(current.Trim());
+
+            return parts;
+        }
+
+        private static bool IsAlreadyQuoted(string identifier)
+        {
+            return (identifier.StartsWith("[", StringComparison.Ordinal) && identifier.EndsWith("]", StringComparison.Ordinal)) ||
+                   (identifier.StartsWith("\"", StringComparison.Ordinal) && identifier.EndsWith("\"", StringComparison.Ordinal)) ||
+                   (identifier.StartsWith("`", StringComparison.Ordinal) && identifier.EndsWith("`", StringComparison.Ordinal));
+        }
+
+        private static DbCommandBuilder TryCreateCommandBuilder(string providerInvariantName)
+        {
+            try
+            {
+                return GetFactory(providerInvariantName).CreateCommandBuilder();
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        private static void GetIdentifierQuotes(string providerInvariantName, out string prefix, out string suffix)
+        {
+            prefix = "[";
+            suffix = "]";
+
+            if (string.IsNullOrWhiteSpace(providerInvariantName))
+                return;
+
+            if (providerInvariantName.IndexOf("MySql", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                prefix = "`";
+                suffix = "`";
+                return;
+            }
+
+            if (providerInvariantName.IndexOf("Oracle", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                providerInvariantName.IndexOf("Npgsql", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                providerInvariantName.IndexOf("SQLite", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                prefix = "\"";
+                suffix = "\"";
+            }
         }
 
         private static void EnsureTransactionHandle(DatabaseTransactionHandle transactionHandle)
