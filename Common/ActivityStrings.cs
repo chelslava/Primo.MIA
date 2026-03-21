@@ -996,5 +996,44 @@ namespace Primo.MIA.Common
         /// <summary>Дата порога не указана или некорректна.</summary>
         public const string Error_CleanupDateRequired = "Дата порога обязательна и должна быть корректной датой";
 
+        // ═══════════════════════════════════════════════════════════════════════
+        // WEBHOOK (Webhook: Отправить)
+        // ═══════════════════════════════════════════════════════════════════════
+
+        public const string Activity_Webhook = "Webhook: Отправить";
+        public const string Field_WebhookUrl = "URL вебхука";
+        public const string Field_WebhookPayload = "Payload (JSON)";
+        public const string Field_WebhookTemplate = "Шаблон";
+        public const string Field_WebhookTemplateVars = "Переменные шаблона";
+        public const string Field_WebhookContentType = "Content-Type";
+        public const string Field_WebhookExtraHeaders = "Доп. заголовки";
+        public const string Field_WebhookTimeout = "Таймаут (сек)";
+        public const string Field_WebhookRetryCount = "Повторных попыток";
+        public const string Field_WebhookRetryDelayMs = "Пауза между попытками (мс)";
+        public const string Field_WebhookStatusCode = "Код ответа";
+        public const string Field_WebhookResponseBody = "Тело ответа";
+        public const string Field_WebhookIsSuccess = "Успешно (2xx)";
+        public const string Field_WebhookAttemptCount = "Попыток выполнено";
+
+
+        // ═══════════════════════════════════════════════════════════════════════
+        // WEBHOOK LISTEN (Webhook: Получить)
+        // ═══════════════════════════════════════════════════════════════════════
+
+        public const string Activity_WebhookListen = "Webhook: Получить";
+        public const string Field_WebhookListenPrefix = "URL-префикс";
+        public const string Field_WebhookListenTimeout = "Таймаут ожидания (сек)";
+        public const string Field_WebhookListenAllowedMethods = "Разрешённые методы";
+        public const string Field_WebhookListenSecretToken = "Секретный токен";
+        public const string Field_WebhookListenResponseCode = "Код ответа отправителю";
+        public const string Field_WebhookListenResponseBody = "Тело ответа отправителю";
+        public const string Field_WebhookListenReceivedBody = "Тело запроса";
+        public const string Field_WebhookListenReceivedHeaders = "Заголовки запроса";
+        public const string Field_WebhookListenReceivedMethod = "Метод запроса";
+        public const string Field_WebhookListenReceivedUrl = "URL запроса";
+        public const string Field_WebhookListenQueryParams = "Query-параметры";
+        public const string Field_WebhookListenIsTimeout = "Таймаут истёк";
+        public const string Field_WebhookListenIsTokenValid = "Токен валиден";
     }
+
 }

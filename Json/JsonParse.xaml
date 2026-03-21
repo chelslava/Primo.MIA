@@ -1,4 +1,4 @@
-<UserControl x:Class="Primo.MIA.Http"
+<UserControl x:Class="Primo.MIA.JsonParse"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -6,13 +6,13 @@
              xmlns:system="clr-namespace:System;assembly=mscorlib"
              xmlns:local="clr-namespace:Primo.MIA"
              mc:Ignorable="d"
-             d:DesignHeight="80" Margin="0,0,0,5">
+             d:DesignHeight="100" Margin="0,0,0,5">
 
     <UserControl.Resources>
-        <ObjectDataProvider x:Key="MethodValues" MethodName="GetValues"
+        <ObjectDataProvider x:Key="ModeValues" MethodName="GetValues"
                             ObjectType="{x:Type system:Enum}">
             <ObjectDataProvider.MethodParameters>
-                <x:Type TypeName="local:HttpMethodType"/>
+                <x:Type TypeName="local:JsonParseMode"/>
             </ObjectDataProvider.MethodParameters>
         </ObjectDataProvider>
     </UserControl.Resources>
@@ -35,25 +35,32 @@
 
             <!-- Заголовок -->
             <TextBlock FontWeight="Bold" FontSize="12" Foreground="#FF0E0E0E">
-                <Run Text="HTTP Запрос ["/>
-                <Run Text="{Binding Prop_Method, Mode=OneWay}"/>
+                <Run Text="JSON: Парсинг ["/>
+                <Run Text="{Binding Prop_Mode, Mode=OneWay}"/>
                 <Run Text="]"/>
             </TextBlock>
 
-            <!-- URL -->
+            <!-- Режим -->
             <Grid Margin="0,2,0,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <TextBlock Grid.Column="0" Text="URL: " VerticalAlignment="Center" FontSize="11" Foreground="#FF0E0E0E"/>
-                <TextBox Grid.Column="1"
-                         Text="{Binding Prop_Url, UpdateSourceTrigger=PropertyChanged}"
-                         Height="20"
-                         Margin="0,0,6,0"
-                         BorderThickness="0"
-                          />
+                <TextBlock Grid.Column="0" Text="Режим: " VerticalAlignment="Center" FontSize="11" Foreground="#FF0E0E0E"/>
+                <ComboBox Grid.Column="1"
+                          ItemsSource="{Binding Source={StaticResource ModeValues}}"
+                          SelectedItem="{Binding Prop_Mode}"
+                          Height="20"
+                          Margin="0,0,6,0"/>
             </Grid>
+
+            <!-- Опции -->
+            <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
+                <CheckBox Content="Строгий режим"
+                          IsChecked="{Binding Prop_StrictMode}"
+                          FontSize="10"
+                          VerticalAlignment="Center" Foreground="#FF0E0E0E"/>
+            </StackPanel>
 
         </StackPanel>
     </Grid>

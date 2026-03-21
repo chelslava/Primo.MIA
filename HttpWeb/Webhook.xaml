@@ -1,0 +1,145 @@
+<!--
+    Webhook.xaml
+    Визуальный интерфейс активности «Webhook: Отправить».
+
+    Блок «Шаблон» — многострочный TextBox.
+    Блок «Переменные шаблона» виден только если Prop_Template не пустой.
+    Retry-параметры в одной строке.
+    IgnoreSslErrors — предупреждение оранжевым цветом.
+-->
+<UserControl x:Class="Primo.MIA.Webhook"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="clr-namespace:Primo.MIA"
+             mc:Ignorable="d"
+             d:DesignHeight="320"
+             Margin="0,0,0,5">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Primo.MIA;component/Common/Styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid Background="{DynamicResource {x:Static SystemColors.ScrollBarBrushKey}}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Иконка -->
+        <Image Grid.Column="0"
+               Width="32" Height="32" Margin="5"
+               VerticalAlignment="Center"
+               Source="pack://application:,,,/Primo.MIA;component/images/http.png"/>
+
+        <!-- Поля -->
+        <StackPanel Grid.Column="1"
+                    VerticalAlignment="Top"
+                    Margin="5,0,5,8">
+
+            <!-- Заголовок -->
+            <TextBlock Style="{StaticResource ActivityHeader}">
+                <Run Text="Webhook: Отправить" Foreground="#FF0E0E0E"/>
+            </TextBlock>
+
+            <!-- URL -->
+            <TextBlock Text="URL вебхука:" Style="{StaticResource FieldLabel}"/>
+            <TextBox Text="{Binding Prop_Url, UpdateSourceTrigger=PropertyChanged}"
+                     Style="{StaticResource FieldBox}"
+                     ToolTip="URL входящего вебхука. Пример: https://hooks.slack.com/services/..."/>
+
+            <!-- Payload -->
+            <TextBlock Text="Payload (JSON):" Style="{StaticResource FieldLabel}"/>
+            <TextBox Text="{Binding Prop_Payload, UpdateSourceTrigger=PropertyChanged}"
+                     Style="{StaticResource FieldBox}"
+                     AcceptsReturn="True"
+                     MinHeight="44"
+                     TextWrapping="Wrap"
+                     VerticalScrollBarVisibility="Auto"
+                     ToolTip="JSON-строка для отправки. Если задан Шаблон — это поле игнорируется."/>
+
+            <!-- Шаблон -->
+            <TextBlock Text="Шаблон (с {{плейсхолдерами}}):" Style="{StaticResource FieldLabel}"/>
+            <TextBox Text="{Binding Prop_Template, UpdateSourceTrigger=PropertyChanged}"
+                     Style="{StaticResource FieldBox}"
+                     AcceptsReturn="True"
+                     MinHeight="44"
+                     TextWrapping="Wrap"
+                     VerticalScrollBarVisibility="Auto"
+                     ToolTip="Шаблон JSON с плейсхолдерами {{ключ}}. Имеет приоритет над Payload.&#xA;Пример: {&quot;text&quot;: &quot;Заказ №{{OrderId}} на {{Amount}} руб.&quot;}"/>
+
+            <!-- Переменные шаблона -->
+            <TextBlock Text="Переменные шаблона:" Style="{StaticResource FieldLabel}"/>
+            <TextBox Text="{Binding Prop_TemplateVars, UpdateSourceTrigger=PropertyChanged}"
+                     Style="{StaticResource FieldBox}"
+                     ToolTip="Dictionary&lt;string,string&gt;: ключ = имя плейсхолдера без {{ }}, значение = подставляемое значение"/>
+
+            <!-- Content-Type и доп. заголовки в одной строке -->
+            <Grid Margin="0,2,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" Margin="0,0,4,0">
+                    <TextBlock Text="Content-Type:" Style="{StaticResource FieldLabel}"/>
+                    <TextBox Text="{Binding Prop_ContentType, UpdateSourceTrigger=PropertyChanged}"
+                             Style="{StaticResource FieldBox}"
+                             ToolTip="По умолчанию: application/json"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1">
+                    <TextBlock Text="Доп. заголовки:" Style="{StaticResource FieldLabel}"/>
+                    <TextBox Text="{Binding Prop_ExtraHeaders, UpdateSourceTrigger=PropertyChanged}"
+                             Style="{StaticResource FieldBox}"
+                             ToolTip="Dictionary&lt;string,string&gt; с доп. заголовками запроса"/>
+                </StackPanel>
+            </Grid>
+
+            <!-- Таймаут, Retry Count, Retry Delay в одной строке -->
+            <Grid Margin="0,4,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" Margin="0,0,4,0">
+                    <TextBlock Text="Таймаут (сек):" Style="{StaticResource FieldLabel}"/>
+                    <TextBox Text="{Binding Prop_TimeoutSeconds, UpdateSourceTrigger=PropertyChanged}"
+                             Style="{StaticResource FieldBox}"
+                             ToolTip="Таймаут одной попытки. По умолчанию 30 сек."/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" Margin="0,0,4,0">
+                    <TextBlock Text="Повторных попыток:" Style="{StaticResource FieldLabel}"/>
+                    <TextBox Text="{Binding Prop_RetryCount, UpdateSourceTrigger=PropertyChanged}"
+                             Style="{StaticResource FieldBox}"
+                             ToolTip="0 = только одна попытка. Повтор при ошибке сети или ответе 5xx."/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="2">
+                    <TextBlock Text="Пауза (мс):" Style="{StaticResource FieldLabel}"/>
+                    <TextBox Text="{Binding Prop_RetryDelayMs, UpdateSourceTrigger=PropertyChanged}"
+                             Style="{StaticResource FieldBox}"
+                             ToolTip="Пауза между попытками в миллисекундах. По умолчанию 1000."/>
+                </StackPanel>
+            </Grid>
+
+            <!-- Игнорировать SSL — предупреждение -->
+            <CheckBox Content="Игнорировать ошибки SSL"
+                      IsChecked="{Binding Prop_IgnoreSslErrors}"
+                      Margin="0,6,0,2"
+                      Foreground="#FFC55A11"
+                      FontWeight="SemiBold"
+                      ToolTip="Только для тестовых сред! В продакшене создаёт угрозу безопасности."/>
+
+        </StackPanel>
+    </Grid>
+</UserControl>

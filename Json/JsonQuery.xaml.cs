@@ -1,17 +1,21 @@
 // =============================================================================
-// Http.xaml.cs — code-behind для активности «HTTP Запрос».
-// Связывает XAML-представление с моделью HttpBack.
+// JsonQuery.xaml.cs — code-behind для активности «JSON: Запрос».
+// Связывает XAML-представление с моделью JsonQueryBack.
 // =============================================================================
 
 using System.Windows.Controls;
 
 namespace Primo.MIA
 {
-    /// <summary>Code-behind для активности «HTTP Запрос».</summary>
-    public partial class Http : UserControl
+    /// <summary>
+    /// Code-behind для активности «JSON: Запрос».
+    /// </summary>
+    public partial class JsonQuery : UserControl
     {
-        /// <summary>Конструктор по умолчанию — инициализирует компоненты XAML.</summary>
-        public Http()
+        /// <summary>
+        /// Конструктор по умолчанию — инициализирует компоненты XAML.
+        /// </summary>
+        public JsonQuery()
         {
             InitializeComponent();
         }
@@ -20,7 +24,7 @@ namespace Primo.MIA
         /// Конструктор с привязкой DataContext к модели активности.
         /// </summary>
         /// <param name="item">Экземпляр Back-класса активности.</param>
-        public Http(HttpBack item) : this()
+        public JsonQuery(JsonQueryBack item) : this()
         {
             this.DataContext = item;
         }

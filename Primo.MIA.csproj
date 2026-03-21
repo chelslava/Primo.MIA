@@ -299,6 +299,14 @@
     </Compile>
     <Compile Include="HttpWeb\HttpBack.cs" />
     <Compile Include="HttpWeb\HttpLogic.cs" />
+    <Compile Include="HttpWeb\Webhook.xaml.cs">
+      <DependentUpon>Webhook.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="HttpWeb\WebhookBack.cs" />
+    <Compile Include="HttpWeb\WebhookListen.xaml.cs">
+      <DependentUpon>WebhookListen.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="HttpWeb\WebhookListenBack.cs" />
     <Compile Include="Text\TextExtractEntities.xaml.cs">
       <DependentUpon>TextExtractEntities.xaml</DependentUpon>
     </Compile>
@@ -740,6 +748,14 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="HttpWeb\Webhook.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="HttpWeb\WebhookListen.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="List\ListGroup.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -935,6 +951,48 @@
       <DependentUpon>DatabaseTableExists.xaml</DependentUpon>
     </Compile>
     <Compile Include="Database\DatabaseTableExistsBack.cs" />
+    <Compile Include="HttpWeb\HttpActivityBase.cs" />
+    <Compile Include="HttpWeb\HttpHelper.cs" />
+    <Compile Include="HttpWeb\HttpDownload.xaml.cs">
+      <DependentUpon>HttpDownload.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="HttpWeb\HttpDownloadBack.cs" />
+    <Compile Include="HttpWeb\HttpUpload.xaml.cs">
+      <DependentUpon>HttpUpload.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="HttpWeb\HttpUploadBack.cs" />
+    <Compile Include="HttpWeb\HttpRetry.xaml.cs">
+      <DependentUpon>HttpRetry.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="HttpWeb\HttpRetryBack.cs" />
+    <Compile Include="HttpWeb\HttpOAuth2Token.xaml.cs">
+      <DependentUpon>HttpOAuth2Token.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="HttpWeb\HttpOAuth2TokenBack.cs" />
+    <Compile Include="HttpWeb\HttpOAuth2Refresh.xaml.cs">
+      <DependentUpon>HttpOAuth2Refresh.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="HttpWeb\HttpOAuth2RefreshBack.cs" />
+    <Compile Include="HttpWeb\HttpBatch.xaml.cs">
+      <DependentUpon>HttpBatch.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="HttpWeb\HttpBatchBack.cs" />
+    <Compile Include="Json\JsonParse.xaml.cs">
+      <DependentUpon>JsonParse.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Json\JsonParseBack.cs" />
+    <Compile Include="Json\JsonQuery.xaml.cs">
+      <DependentUpon>JsonQuery.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Json\JsonQueryBack.cs" />
+    <Compile Include="Xml\XmlParse.xaml.cs">
+      <DependentUpon>XmlParse.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Xml\XmlParseBack.cs" />
+    <Compile Include="Xml\XmlQuery.xaml.cs">
+      <DependentUpon>XmlQuery.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Xml\XmlQueryBack.cs" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="Database\DatabaseCheckConnection.xaml">
@@ -994,6 +1052,46 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Database\DatabaseTableExists.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="HttpWeb\HttpDownload.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="HttpWeb\HttpUpload.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="HttpWeb\HttpRetry.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="HttpWeb\HttpOAuth2Token.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="HttpWeb\HttpOAuth2Refresh.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="HttpWeb\HttpBatch.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Json\JsonParse.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Json\JsonQuery.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Xml\XmlParse.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Xml\XmlQuery.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -1080,6 +1178,7 @@
   <ItemGroup>
     <Resource Include="images\bd.png" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="packages\Selenium.WebDriver.4.41.0\build\Selenium.WebDriver.targets" Condition="Exists('packages\Selenium.WebDriver.4.41.0\build\Selenium.WebDriver.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

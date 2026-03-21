@@ -1,0 +1,109 @@
+<!--
+    WebhookListen.xaml
+    Визуальный интерфейс активности «Webhook: Получить».
+
+    Ключевые особенности:
+    - URL-префикс — главное поле, большим шрифтом
+    - Подсказка по правам netsh — прямо в ToolTip
+    - Разрешённые методы и токен в одной строке
+    - Код и тело ответа в одной строке
+-->
+<UserControl x:Class="Primo.MIA.WebhookListen"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="clr-namespace:Primo.MIA"
+             mc:Ignorable="d"
+             d:DesignHeight="280"
+             Margin="0,0,0,5">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Primo.MIA;component/Common/Styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid Background="{DynamicResource {x:Static SystemColors.ScrollBarBrushKey}}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Иконка -->
+        <Image Grid.Column="0"
+               Width="32" Height="32" Margin="5"
+               VerticalAlignment="Center"
+               Source="pack://application:,,,/Primo.MIA;component/images/http.png"/>
+
+        <!-- Поля -->
+        <StackPanel Grid.Column="1"
+                    VerticalAlignment="Top"
+                    Margin="5,0,5,8">
+
+            <!-- Заголовок -->
+            <TextBlock Style="{StaticResource ActivityHeader}">
+                <Run Text="Webhook: Получить" Foreground="#FF0E0E0E"/>
+            </TextBlock>
+
+            <!-- URL-префикс -->
+            <TextBlock Text="URL-префикс:" Style="{StaticResource FieldLabel}"/>
+            <TextBox Text="{Binding Prop_Prefix, UpdateSourceTrigger=PropertyChanged}"
+                     Style="{StaticResource FieldBox}"
+                     ToolTip="URL для прослушивания. Обязательно завершать слешем.&#xA;&#xA;Примеры:&#xA;  http://localhost:8080/webhook/    — только локально, прав не нужно&#xA;  http://+:8080/webhook/            — все интерфейсы, нужны права:&#xA;    netsh http add urlacl url=http://+:8080/webhook/ user=DOMAIN\User"/>
+
+            <!-- Таймаут ожидания -->
+            <TextBlock Text="Таймаут ожидания (сек):" Style="{StaticResource FieldLabel}"/>
+            <TextBox Text="{Binding Prop_TimeoutSeconds, UpdateSourceTrigger=PropertyChanged}"
+                     Style="{StaticResource FieldBox}"
+                     ToolTip="Максимальное время ожидания входящего запроса. По умолчанию 120 сек.&#xA;При истечении: IsTimeout = true, активность завершается без ошибки."/>
+
+            <!-- Разрешённые методы и токен в одной строке -->
+            <Grid Margin="0,2,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" Margin="0,0,4,0">
+                    <TextBlock Text="Разрешённые методы:" Style="{StaticResource FieldLabel}"/>
+                    <TextBox Text="{Binding Prop_AllowedMethods, UpdateSourceTrigger=PropertyChanged}"
+                             Style="{StaticResource FieldBox}"
+                             ToolTip="Методы через запятую: POST или POST,PUT&#xA;Пусто = принимать любой метод&#xA;Запросы с другими методами → ответ 405"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1">
+                    <TextBlock Text="Секретный токен:" Style="{StaticResource FieldLabel}"/>
+                    <TextBox Text="{Binding Prop_SecretToken, UpdateSourceTrigger=PropertyChanged}"
+                             Style="{StaticResource FieldBox}"
+                             ToolTip="Проверяется против заголовка X-Webhook-Secret.&#xA;Пусто = проверка не выполняется.&#xA;Результат → IsTokenValid (bool)."/>
+                </StackPanel>
+            </Grid>
+
+            <!-- Код ответа и тело ответа в одной строке -->
+            <Grid Margin="0,2,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="80"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" Margin="0,0,4,0">
+                    <TextBlock Text="Код ответа:" Style="{StaticResource FieldLabel}"/>
+                    <TextBox Text="{Binding Prop_ResponseCode, UpdateSourceTrigger=PropertyChanged}"
+                             Style="{StaticResource FieldBox}"
+                             ToolTip="HTTP-код ответа отправителю. 200 (OK) или 202 (Accepted) для async."/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1">
+                    <TextBlock Text="Тело ответа отправителю:" Style="{StaticResource FieldLabel}"/>
+                    <TextBox Text="{Binding Prop_ResponseBody, UpdateSourceTrigger=PropertyChanged}"
+                             Style="{StaticResource FieldBox}"
+                             ToolTip="Тело ответа. Пример: {&quot;status&quot;:&quot;ok&quot;}&#xA;Пусто = пустой ответ."/>
+                </StackPanel>
+            </Grid>
+
+        </StackPanel>
+    </Grid>
+</UserControl>

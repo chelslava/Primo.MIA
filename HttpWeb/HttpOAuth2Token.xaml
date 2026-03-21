@@ -1,4 +1,4 @@
-<UserControl x:Class="Primo.MIA.Http"
+<UserControl x:Class="Primo.MIA.HttpOAuth2Token"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -6,13 +6,13 @@
              xmlns:system="clr-namespace:System;assembly=mscorlib"
              xmlns:local="clr-namespace:Primo.MIA"
              mc:Ignorable="d"
-             d:DesignHeight="80" Margin="0,0,0,5">
+             d:DesignHeight="100" Margin="0,0,0,5">
 
     <UserControl.Resources>
-        <ObjectDataProvider x:Key="MethodValues" MethodName="GetValues"
+        <ObjectDataProvider x:Key="GrantValues" MethodName="GetValues"
                             ObjectType="{x:Type system:Enum}">
             <ObjectDataProvider.MethodParameters>
-                <x:Type TypeName="local:HttpMethodType"/>
+                <x:Type TypeName="local:OAuth2GrantType"/>
             </ObjectDataProvider.MethodParameters>
         </ObjectDataProvider>
     </UserControl.Resources>
@@ -34,13 +34,13 @@
         <StackPanel Grid.Column="1" VerticalAlignment="Top" Margin="5,0,5,5">
 
             <!-- Заголовок -->
-            <TextBlock FontWeight="Bold" FontSize="12" Foreground="#FF0E0E0E">
-                <Run Text="HTTP Запрос ["/>
-                <Run Text="{Binding Prop_Method, Mode=OneWay}"/>
+            <TextBlock FontWeight="Bold" FontSize="12"  Foreground="#FF0E0E0E">
+                <Run Text="HTTP: OAuth2 токен ["/>
+                <Run Text="{Binding Prop_GrantType, Mode=OneWay}"/>
                 <Run Text="]"/>
             </TextBlock>
 
-            <!-- URL -->
+            <!-- Token URL -->
             <Grid Margin="0,2,0,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
@@ -48,11 +48,25 @@
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.Column="0" Text="URL: " VerticalAlignment="Center" FontSize="11" Foreground="#FF0E0E0E"/>
                 <TextBox Grid.Column="1"
-                         Text="{Binding Prop_Url, UpdateSourceTrigger=PropertyChanged}"
+                         Text="{Binding Prop_TokenUrl, UpdateSourceTrigger=PropertyChanged}"
                          Height="20"
                          Margin="0,0,6,0"
                          BorderThickness="0"
-                          />
+                         />
+            </Grid>
+
+            <!-- Client ID -->
+            <Grid Margin="0,2,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="Client ID: " VerticalAlignment="Center" FontSize="11" Foreground="#FF0E0E0E"/>
+                <TextBox Grid.Column="1"
+                         Text="{Binding Prop_ClientId, UpdateSourceTrigger=PropertyChanged}"
+                         Height="20"
+                         Margin="0,0,6,0"
+                         BorderThickness="0"/>
             </Grid>
 
         </StackPanel>

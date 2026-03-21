@@ -1,4 +1,4 @@
-<UserControl x:Class="Primo.MIA.Http"
+<UserControl x:Class="Primo.MIA.HttpRetry"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -6,13 +6,19 @@
              xmlns:system="clr-namespace:System;assembly=mscorlib"
              xmlns:local="clr-namespace:Primo.MIA"
              mc:Ignorable="d"
-             d:DesignHeight="80" Margin="0,0,0,5">
+             d:DesignHeight="140" Margin="0,0,0,5">
 
     <UserControl.Resources>
         <ObjectDataProvider x:Key="MethodValues" MethodName="GetValues"
                             ObjectType="{x:Type system:Enum}">
             <ObjectDataProvider.MethodParameters>
                 <x:Type TypeName="local:HttpMethodType"/>
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+        <ObjectDataProvider x:Key="StrategyValues" MethodName="GetValues"
+                            ObjectType="{x:Type system:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="local:HttpRetryDelayStrategy"/>
             </ObjectDataProvider.MethodParameters>
         </ObjectDataProvider>
     </UserControl.Resources>
@@ -35,7 +41,7 @@
 
             <!-- Заголовок -->
             <TextBlock FontWeight="Bold" FontSize="12" Foreground="#FF0E0E0E">
-                <Run Text="HTTP Запрос ["/>
+                <Run Text="HTTP: Запрос с повторами ["/>
                 <Run Text="{Binding Prop_Method, Mode=OneWay}"/>
                 <Run Text="]"/>
             </TextBlock>
@@ -53,6 +59,42 @@
                          Margin="0,0,6,0"
                          BorderThickness="0"
                           />
+            </Grid>
+
+            <!-- Retry настройки -->
+            <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
+                <TextBlock Text="Попыток: " FontSize="10" VerticalAlignment="Center" Foreground="#FF0E0E0E"/>
+                <TextBox Text="{Binding Prop_MaxRetries, UpdateSourceTrigger=PropertyChanged}"
+                         Width="30"
+                         Height="16"
+                         FontSize="10"
+                         VerticalAlignment="Center"
+                         BorderThickness="0"
+                          />
+                <TextBlock Text=" Задержка: " FontSize="10" VerticalAlignment="Center" Foreground="#FF0E0E0E"/>
+                <TextBox Text="{Binding Prop_DelayMs, UpdateSourceTrigger=PropertyChanged}"
+                         Width="50"
+                         Height="16"
+                         FontSize="10"
+                         VerticalAlignment="Center"
+                         BorderThickness="0"
+                          />
+                <TextBlock Text="мс" FontSize="10" VerticalAlignment="Center" Foreground="#FF0E0E0E"/>
+            </StackPanel>
+
+            <!-- Стратегия -->
+            <Grid Margin="0,2,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="Стратегия: " VerticalAlignment="Center" FontSize="10" Foreground="#FF0E0E0E"/>
+                <ComboBox Grid.Column="1"
+                          ItemsSource="{Binding Source={StaticResource StrategyValues}}"
+                          SelectedItem="{Binding Prop_DelayStrategy}"
+                          Height="18"
+                          FontSize="10"
+                          Margin="0,0,6,0"/>
             </Grid>
 
         </StackPanel>

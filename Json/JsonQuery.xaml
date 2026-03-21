@@ -1,21 +1,10 @@
-<UserControl x:Class="Primo.MIA.Http"
+<UserControl x:Class="Primo.MIA.JsonQuery"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:system="clr-namespace:System;assembly=mscorlib"
-             xmlns:local="clr-namespace:Primo.MIA"
              mc:Ignorable="d"
-             d:DesignHeight="80" Margin="0,0,0,5">
-
-    <UserControl.Resources>
-        <ObjectDataProvider x:Key="MethodValues" MethodName="GetValues"
-                            ObjectType="{x:Type system:Enum}">
-            <ObjectDataProvider.MethodParameters>
-                <x:Type TypeName="local:HttpMethodType"/>
-            </ObjectDataProvider.MethodParameters>
-        </ObjectDataProvider>
-    </UserControl.Resources>
+             d:DesignHeight="100" Margin="0,0,0,5">
 
     <Grid Background="{DynamicResource {x:Static SystemColors.ScrollBarBrushKey}}">
         <Grid.ColumnDefinitions>
@@ -35,25 +24,31 @@
 
             <!-- Заголовок -->
             <TextBlock FontWeight="Bold" FontSize="12" Foreground="#FF0E0E0E">
-                <Run Text="HTTP Запрос ["/>
-                <Run Text="{Binding Prop_Method, Mode=OneWay}"/>
-                <Run Text="]"/>
+                <Run Text="JSON: Запрос (JSONPath)"/>
             </TextBlock>
 
-            <!-- URL -->
+            <!-- JSONPath -->
             <Grid Margin="0,2,0,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <TextBlock Grid.Column="0" Text="URL: " VerticalAlignment="Center" FontSize="11" Foreground="#FF0E0E0E"/>
+                <TextBlock Grid.Column="0" Text="Путь: " VerticalAlignment="Center" FontSize="11" Foreground="#FF0E0E0E"/>
                 <TextBox Grid.Column="1"
-                         Text="{Binding Prop_Url, UpdateSourceTrigger=PropertyChanged}"
+                         Text="{Binding Prop_JsonPath, UpdateSourceTrigger=PropertyChanged}"
                          Height="20"
                          Margin="0,0,6,0"
                          BorderThickness="0"
                           />
             </Grid>
+
+            <!-- Опции -->
+            <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
+                <CheckBox Content="Только первое совпадение"
+                          IsChecked="{Binding Prop_ReturnFirst}"
+                          FontSize="10"
+                          VerticalAlignment="Center" Foreground="#FF0E0E0E"/>
+            </StackPanel>
 
         </StackPanel>
     </Grid>
