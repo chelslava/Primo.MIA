@@ -758,19 +758,16 @@ namespace Primo.MIA
 
             // Ключ счётчика в RepoDict.IntDict
             string key = (GetPropertyValue<string>(this.Prop_CounterKey, "Prop_CounterKey", sd)
-                          ?? this.Prop_CounterKey
                           ?? "Counter").Trim().Trim('"');
 
             if (string.IsNullOrWhiteSpace(key)) key = "Counter";
 
             // Начальное значение — применяется только при первом обращении к ключу
             string rawStart = (GetPropertyValue<string>(this.Prop_CounterStart, "Prop_CounterStart", sd)
-                               ?? this.Prop_CounterStart
                                ?? "1").Trim().Trim('"');
 
             // Шаг — применяется при каждом вызове
             string rawStep = (GetPropertyValue<string>(this.Prop_CounterStep, "Prop_CounterStep", sd)
-                              ?? this.Prop_CounterStep
                               ?? "1").Trim().Trim('"');
 
             if (!int.TryParse(rawStart, out int start)) start = 1;

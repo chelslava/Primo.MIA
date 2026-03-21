@@ -25,11 +25,11 @@ namespace Primo.MIA
             set { }
         }
 
-        private DataTable _propDataTable;
+        private string _propDataTable;
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(DataTable))]
         [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_DataTable)]
-        public DataTable Prop_DataTable
+        public string Prop_DataTable
         {
             get => _propDataTable;
             set { _propDataTable = value; InvokePropertyChanged(this, nameof(Prop_DataTable)); }
@@ -144,7 +144,7 @@ namespace Primo.MIA
             sdkComponentIcon = ActivityIcons.Table;
             sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
-                PropertyBuilder.Variable<DataTable>("Prop_DataTable", "Исходная таблица данных"),
+                PropertyBuilder.Script<DataTable>("Prop_DataTable", "Исходная таблица данных"),
                 PropertyBuilder.String("Prop_ProviderInvariantName", "ADO.NET provider invariant name"),
                 PropertyBuilder.String("Prop_ConnectionString", "Строка подключения к БД"),
                 PropertyBuilder.String("Prop_TransactionId", "ID транзакции (опционально)"),
@@ -163,7 +163,8 @@ namespace Primo.MIA
         {
             try
             {
-                if (Prop_DataTable == null)
+                var dataTable = (DataTable)GetPropertyValue<object>(Prop_DataTable, nameof(Prop_DataTable), sd);
+                if (dataTable == null)
                     throw new InvalidOperationException(ActivityStrings.Error_DataTableRequired);
 
                 var provider = GetPropertyValue<string>(Prop_ProviderInvariantName, nameof(Prop_ProviderInvariantName), sd);
@@ -178,8 +179,8 @@ namespace Primo.MIA
                 var transactionId = DatabaseTransactionResolver.ResolveOptional(explicitTransactionId);
                 var transactionHandle = DatabaseTransactionManager.Get(transactionId);
                 var result = transactionHandle != null
-                    ? DatabaseHelper.ExecuteUpsert(transactionHandle, Prop_DataTable, destinationTable, keyColumns, updateColumns, columnMappings, timeout)
-                    : DatabaseHelper.ExecuteUpsert(provider, connectionString, Prop_DataTable, destinationTable, keyColumns, updateColumns, columnMappings, timeout);
+                    ? DatabaseHelper.ExecuteUpsert(transactionHandle, dataTable, destinationTable, keyColumns, updateColumns, columnMappings, timeout)
+                    : DatabaseHelper.ExecuteUpsert(provider, connectionString, dataTable, destinationTable, keyColumns, updateColumns, columnMappings, timeout);
 
                 SetVariableValue(Prop_InsertedCount, result.InsertedCount, sd);
                 SetVariableValue(Prop_UpdatedCount, result.UpdatedCount, sd);
@@ -203,6 +204,7 @@ namespace Primo.MIA
         public override ValidationResult Validate()
         {
             var result = new ValidationResult();
+            result.ValidateRequired(Prop_DataTable, ActivityStrings.Field_DataTable, ActivityStrings.Error_DataTableRequired);
             result.ValidateRequired(Prop_DestinationTable, ActivityStrings.Field_DestinationTable, ActivityStrings.Error_DestinationTableRequired);
             result.ValidateRequired(Prop_KeyColumns, ActivityStrings.Field_KeyColumns, "Список ключевых колонок обязателен");
             if (string.IsNullOrWhiteSpace(Prop_TransactionId) && string.IsNullOrWhiteSpace(DatabaseTransactionResolver.ResolveOptional(null)))

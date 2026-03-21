@@ -48,13 +48,13 @@ namespace Primo.MIA
 
         #region Prop_DataTable
 
-        private DataTable _propDataTable;
+        private string _propDataTable;
 
         /// <summary>Исходная таблица данных для конвертации.</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(DataTable))]
         [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_DataTable)]
-        public DataTable Prop_DataTable
+        public string Prop_DataTable
         {
             get => _propDataTable;
             set { _propDataTable = value; InvokePropertyChanged(this, nameof(Prop_DataTable)); }
@@ -140,7 +140,7 @@ namespace Primo.MIA
 
         #region Prop_HeaderColor
 
-        private string _propHeaderColor = "#1565C0";
+        private string _propHeaderColor = "\"#1565C0\"";
 
         /// <summary>Цвет фона заголовка (HEX).</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
@@ -156,7 +156,7 @@ namespace Primo.MIA
 
         #region Prop_RowColor
 
-        private string _propRowColor = "#FFFFFF";
+        private string _propRowColor = "\"#FFFFFF\"";
 
         /// <summary>Цвет фона строк (HEX).</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
@@ -172,7 +172,7 @@ namespace Primo.MIA
 
         #region Prop_AltRowColor
 
-        private string _propAltRowColor = "#E3F2FD";
+        private string _propAltRowColor = "\"#E3F2FD\"";
 
         /// <summary>Цвет фона чётных строк (HEX).</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
@@ -188,7 +188,7 @@ namespace Primo.MIA
 
         #region Prop_BorderColor
 
-        private string _propBorderColor = "#BBDEFB";
+        private string _propBorderColor = "\"#BBDEFB\"";
 
         /// <summary>Цвет границ (HEX).</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
@@ -259,40 +259,40 @@ namespace Primo.MIA
         {
             sdkComponentName = "DataTable в HTML";
             sdkComponentHelp = @"Компонент ""DataTable в HTML"" (DataTableToHtmlBack)
-Активность для конвертации DataTable в красиво оформленную HTML таблицу с гибкими настройками стилизации.
+            Активность для конвертации DataTable в красиво оформленную HTML таблицу с гибкими настройками стилизации.
 
-Основные
-Таблица данных*: [DataTable] Исходная таблица данных для конвертации.
-Режим вывода HTML: [HtmlOutputMode] Формат выходного HTML.
-  - TableOnly: только таблица (теги table/thead/tbody/tr/td)
-  - FullDocument: полный HTML-документ с html/head/style/body
-Нумерация строк: [Boolean] Добавить колонку с порядковыми номерами строк.
-Текст для null: [String] Текст для отображения null-значений в ячейках. По умолчанию пустая строка.
-Макс. строк: [Int32] Ограничение количества выводимых строк. 0 = без ограничений.
+            Основные
+            Таблица данных*: [DataTable] Исходная таблица данных для конвертации.
+            Режим вывода HTML: [HtmlOutputMode] Формат выходного HTML.
+              - TableOnly: только таблица (теги table/thead/tbody/tr/td)
+              - FullDocument: полный HTML-документ с html/head/style/body
+            Нумерация строк: [Boolean] Добавить колонку с порядковыми номерами строк.
+            Текст для null: [String] Текст для отображения null-значений в ячейках. По умолчанию пустая строка.
+            Макс. строк: [Int32] Ограничение количества выводимых строк. 0 = без ограничений.
 
-Стиль
-Тема оформления: [HtmlTableTheme] Предустановленная тема.
-  - Light: светлая тема (белый фон, серые границы)
-  - Dark: тёмная тема (тёмный фон, светлый текст)
-  - Blue: синяя тема (синий заголовок, чередующиеся синие оттенки)
-  - Green: зелёная тема (зелёный заголовок, чередующиеся зелёные оттенки)
-  - Custom: пользовательская тема (цвета задаются вручную)
+            Стиль
+            Тема оформления: [HtmlTableTheme] Предустановленная тема.
+              - Light: светлая тема (белый фон, серые границы)
+              - Dark: тёмная тема (тёмный фон, светлый текст)
+              - Blue: синяя тема (синий заголовок, чередующиеся синие оттенки)
+              - Green: зелёная тема (зелёный заголовок, чередующиеся зелёные оттенки)
+              - Custom: пользовательская тема (цвета задаются вручную)
 
-Цвет заголовка: [String] Цвет фона заголовка в формате HEX (например, #1565C0). Используется при теме Custom.
-Цвет строк: [String] Цвет фона нечётных строк в формате HEX. Используется при теме Custom.
-Цвет чётных строк: [String] Цвет фона чётных строк в формате HEX. Используется при теме Custom.
-Цвет границ: [String] Цвет границ таблицы в формате HEX. Используется при теме Custom.
+            Цвет заголовка: [String] Цвет фона заголовка в формате HEX (например, #1565C0). Используется при теме Custom.
+            Цвет строк: [String] Цвет фона нечётных строк в формате HEX. Используется при теме Custom.
+            Цвет чётных строк: [String] Цвет фона чётных строк в формате HEX. Используется при теме Custom.
+            Цвет границ: [String] Цвет границ таблицы в формате HEX. Используется при теме Custom.
 
-Выходные данные
-HTML-код: [String] Сформированный HTML-код таблицы или документа.
-Количество строк: [Int32] Количество строк в исходной таблице.
-Количество столбцов: [Int32] Количество столбцов в исходной таблице.";
+            Выходные данные
+            HTML-код: [String] Сформированный HTML-код таблицы или документа.
+            Количество строк: [Int32] Количество строк в исходной таблице.
+            Количество столбцов: [Int32] Количество столбцов в исходной таблице.";
 
             sdkComponentIcon = ActivityIcons.Table;
 
             sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
-                PropertyBuilder.Variable<DataTable>("Prop_DataTable", "Исходная таблица данных для конвертации в HTML"),
+                PropertyBuilder.Script<DataTable>("Prop_DataTable", "Исходная таблица данных для конвертации в HTML"),
                 PropertyBuilder.Enum<HtmlOutputMode>("Prop_OutputMode", "Режим вывода: только таблица или полный HTML-документ"),
                 PropertyBuilder.BooleanObject("Prop_ShowRowNumbers", "Добавить колонку с нумерацией строк"),
                 PropertyBuilder.String("Prop_NullDisplay", "Текст для отображения null-значений"),
@@ -322,7 +322,8 @@ HTML-код: [String] Сформированный HTML-код таблицы и
             try
             {
                 // Валидация
-                if (this.Prop_DataTable == null)
+                DataTable table = (DataTable)GetPropertyValue<object>(this.Prop_DataTable, "Prop_DataTable", sd);
+                if (table == null)
                 {
                     return new ExecutionResult
                     {
@@ -332,19 +333,22 @@ HTML-код: [String] Сформированный HTML-код таблицы и
                 }
 
                 // Получаем параметры
-                var table = this.Prop_DataTable;
                 var theme = this.Prop_Theme;
                 var outputMode = this.Prop_OutputMode;
                 var showRowNumbers = this.Prop_ShowRowNumbers;
-                var nullDisplay = this.Prop_NullDisplay ?? "";
+                var nullDisplay = GetPropertyValue<string>(this.Prop_NullDisplay, "Prop_NullDisplay", sd) ?? string.Empty;
                 var maxRows = this.Prop_MaxRows;
+                var headerColor = GetPropertyValue<string>(this.Prop_HeaderColor, "Prop_HeaderColor", sd);
+                var rowColor = GetPropertyValue<string>(this.Prop_RowColor, "Prop_RowColor", sd);
+                var altRowColor = GetPropertyValue<string>(this.Prop_AltRowColor, "Prop_AltRowColor", sd);
+                var borderColor = GetPropertyValue<string>(this.Prop_BorderColor, "Prop_BorderColor", sd);
 
                 // Записываем метаданные
                 this.Prop_RowCount = table.Rows.Count;
                 this.Prop_ColumnCount = table.Columns.Count;
 
                 // Получаем цвета для темы
-                var colors = GetThemeColors(theme);
+                var colors = GetThemeColors(theme, headerColor, rowColor, altRowColor, borderColor);
 
                 // Генерируем HTML
                 string html;
@@ -386,9 +390,9 @@ HTML-код: [String] Сформированный HTML-код таблицы и
             if (this.Prop_DataTable == null)
             {
                 ret.Items.Add(new ValidationResult.ValidationItem
-                {
+               {
                     PropertyName = nameof(Prop_DataTable),
-                    Error = ActivityStrings.Error_DataTableRequired
+                   Error = ActivityStrings.Error_DataTableRequired
                 });
             }
 
@@ -426,7 +430,12 @@ HTML-код: [String] Сформированный HTML-код таблицы и
         /// </summary>
         /// <param name="theme">Тема оформления.</param>
         /// <returns>Кортеж с цветами (header, row, altRow, border).</returns>
-        private (string Header, string Row, string AltRow, string Border, string HeaderText) GetThemeColors(HtmlTableTheme theme)
+        private (string Header, string Row, string AltRow, string Border, string HeaderText) GetThemeColors(
+            HtmlTableTheme theme,
+            string headerColor,
+            string rowColor,
+            string altRowColor,
+            string borderColor)
         {
             switch (theme)
             {
@@ -444,10 +453,10 @@ HTML-код: [String] Сформированный HTML-код таблицы и
 
                 case HtmlTableTheme.Custom:
                     return (
-                        this.Prop_HeaderColor ?? "#1565C0",
-                        this.Prop_RowColor ?? "#FFFFFF",
-                        this.Prop_AltRowColor ?? "#E3F2FD",
-                        this.Prop_BorderColor ?? "#BBDEFB",
+                        headerColor ?? "#1565C0",
+                        rowColor ?? "#FFFFFF",
+                        altRowColor ?? "#E3F2FD",
+                        borderColor ?? "#BBDEFB",
                         "#FFFFFF"
                     );
 

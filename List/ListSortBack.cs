@@ -142,7 +142,7 @@ namespace Primo.MIA
                 var list = GetPropertyValue<List<string>>(this.Prop_List, "Prop_List", sd);
                 if (list == null) throw new ArgumentNullException("Prop_List", "Список не может быть null");
 
-                List<string> result = Sort(list);
+                List<string> result = Sort(list, sd);
 
                 SetVariableValue(this.Prop_Result, result, sd);
                 SetVariableValue(this.Prop_Count, result.Count, sd);
@@ -155,7 +155,7 @@ namespace Primo.MIA
             }
         }
 
-        private List<string> Sort(List<string> list)
+        private List<string> Sort(List<string> list, ScriptingData sd)
         {
             switch (this.Mode)
             {
@@ -188,7 +188,7 @@ namespace Primo.MIA
                     return reversed;
 
                 case ListSortMode.Random:
-                    return ShuffleList(list);
+                    return ShuffleList(list, sd);
 
                 default:
                     throw new InvalidOperationException($"Неизвестный режим: {this.Mode}");
@@ -199,14 +199,15 @@ namespace Primo.MIA
         /// Перемешивание Fisher–Yates — равномерно случайный порядок.
         /// При заданном Prop_RandomSeed результат воспроизводим.
         /// </summary>
-        private List<string> ShuffleList(List<string> list)
+        private List<string> ShuffleList(List<string> list, ScriptingData sd)
         {
             var result = new List<string>(list);
             Random rng;
 
             // Пробуем прочитать зерно из свойства
-            if (!string.IsNullOrWhiteSpace(this.Prop_RandomSeed)
-                && int.TryParse(this.Prop_RandomSeed, out int seed))
+            string randomSeed = GetPropertyValue<string>(this.Prop_RandomSeed, nameof(Prop_RandomSeed), sd);
+            if (!string.IsNullOrWhiteSpace(randomSeed)
+                && int.TryParse(randomSeed, out int seed))
                 rng = new Random(seed);
             else
                 rng = new Random();

@@ -25,11 +25,11 @@ namespace Primo.MIA
             set { }
         }
 
-        private DataTable _propDataTable;
+        private string _propDataTable;
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(DataTable))]
         [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_DataTable)]
-        public DataTable Prop_DataTable
+        public string Prop_DataTable
         {
             get => _propDataTable;
             set { _propDataTable = value; InvokePropertyChanged(this, nameof(Prop_DataTable)); }
@@ -174,7 +174,7 @@ namespace Primo.MIA
             sdkComponentIcon = ActivityIcons.Table;
             sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
-                PropertyBuilder.Variable<DataTable>("Prop_DataTable", "Исходная таблица данных для массовой записи"),
+                PropertyBuilder.Script<DataTable>("Prop_DataTable", "Исходная таблица данных для массовой записи"),
                 PropertyBuilder.String("Prop_ProviderInvariantName", "ADO.NET provider invariant name"),
                 PropertyBuilder.String("Prop_ConnectionString", "Строка подключения к БД"),
                 PropertyBuilder.String("Prop_TransactionId", "ID транзакции (опционально)"),
@@ -196,7 +196,8 @@ namespace Primo.MIA
         {
             try
             {
-                if (Prop_DataTable == null)
+                var dataTable = (DataTable)GetPropertyValue<object>(Prop_DataTable, nameof(Prop_DataTable), sd);
+                if (dataTable == null)
                     throw new InvalidOperationException(ActivityStrings.Error_DataTableRequired);
 
                 var provider = GetPropertyValue<string>(Prop_ProviderInvariantName, nameof(Prop_ProviderInvariantName), sd);
@@ -210,12 +211,12 @@ namespace Primo.MIA
                 var transactionId = DatabaseTransactionResolver.ResolveOptional(explicitTransactionId);
                 var transactionHandle = DatabaseTransactionManager.Get(transactionId);
                 var writeResult = transactionHandle != null
-                    ? DatabaseHelper.ExecuteBulkInsert(transactionHandle, Prop_DataTable, destinationTable, batchSize, timeout, Prop_UseTableLock, Prop_KeepIdentity, Prop_PreloadMode, columnMappings)
-                    : DatabaseHelper.ExecuteBulkInsert(provider, connectionString, Prop_DataTable, destinationTable, batchSize, timeout, Prop_UseTableLock, Prop_KeepIdentity, Prop_PreloadMode, columnMappings);
+                    ? DatabaseHelper.ExecuteBulkInsert(transactionHandle, dataTable, destinationTable, batchSize, timeout, Prop_UseTableLock, Prop_KeepIdentity, Prop_PreloadMode, columnMappings)
+                    : DatabaseHelper.ExecuteBulkInsert(provider, connectionString, dataTable, destinationTable, batchSize, timeout, Prop_UseTableLock, Prop_KeepIdentity, Prop_PreloadMode, columnMappings);
 
                 var mappingCount = columnMappings != null && columnMappings.Count > 0
                     ? columnMappings.Count
-                    : Prop_DataTable.Columns.Count;
+                    : dataTable.Columns.Count;
 
                 SetVariableValue(Prop_RowsWritten, writeResult.RowsWritten, sd);
                 SetVariableValue(Prop_MappingCount, mappingCount, sd);
@@ -240,6 +241,7 @@ namespace Primo.MIA
         public override ValidationResult Validate()
         {
             var result = new ValidationResult();
+            result.ValidateRequired(Prop_DataTable, ActivityStrings.Field_DataTable, ActivityStrings.Error_DataTableRequired);
             if (string.IsNullOrWhiteSpace(Prop_TransactionId) && string.IsNullOrWhiteSpace(DatabaseTransactionResolver.ResolveOptional(null)))
                 result.ValidateRequired(Prop_ConnectionString, ActivityStrings.Field_ConnectionString, ActivityStrings.Error_ConnectionStringRequired);
             result.ValidateRequired(Prop_DestinationTable, ActivityStrings.Field_DestinationTable, ActivityStrings.Error_DestinationTableRequired);

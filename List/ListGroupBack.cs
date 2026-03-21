@@ -146,9 +146,9 @@ namespace Primo.MIA
                 var list = GetPropertyValue<List<string>>(this.Prop_List, "Prop_List", sd);
                 if (list == null) throw new ArgumentNullException("Prop_List", "Список не может быть null");
 
-                int prefixLen = int.TryParse(this.Prop_PrefixLength, out int pl) ? pl : 3;
-                int topN = int.TryParse(this.Prop_TopN, out int tn) ? tn : 10;
-                string regex = this.Prop_RegexPattern ?? string.Empty;
+                int prefixLen = int.TryParse(GetPropertyValue<string>(this.Prop_PrefixLength, "Prop_PrefixLength", sd), out int pl) ? pl : 3;
+                int topN = int.TryParse(GetPropertyValue<string>(this.Prop_TopN, "Prop_TopN", sd), out int tn) ? tn : 10;
+                string regex = GetPropertyValue<string>(this.Prop_RegexPattern, "Prop_RegexPattern", sd) ?? string.Empty;
 
                 // Словарь частот нужен для всех режимов — вычисляем один раз
                 var freqMap = list

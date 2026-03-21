@@ -53,10 +53,11 @@ namespace Primo.MIA
         {
             get
             {
-                if (string.IsNullOrWhiteSpace(this.Prop_Timeout))
+                string timeoutRaw = this.Prop_Timeout?.Trim('"');
+                if (string.IsNullOrWhiteSpace(timeoutRaw))
                     return 100000;
 
-                if (int.TryParse(this.Prop_Timeout, out int timeout))
+                if (int.TryParse(timeoutRaw, out int timeout))
                     return timeout * 1000;
 
                 return 100000;

@@ -99,8 +99,8 @@ namespace Primo.MIA
                     throw new ArgumentException($"Неверный формат начальной ячейки: {startCell}");
 
                 // Получаем смещения
-                int rowOffset = int.TryParse(this.Prop_RowOffset, out int ro) ? ro : 0;
-                int colOffset = int.TryParse(this.Prop_ColumnOffset, out int co) ? co : 0;
+                int rowOffset = int.TryParse(GetPropertyValue<string>(this.Prop_RowOffset, "Prop_RowOffset", sd), out int ro) ? ro : 0;
+                int colOffset = int.TryParse(GetPropertyValue<string>(this.Prop_ColumnOffset, "Prop_ColumnOffset", sd), out int co) ? co : 0;
 
                 // Вычисляем новые координаты
                 int newRow = Math.Max(1, cellInfo.Row + rowOffset); // Минимум 1

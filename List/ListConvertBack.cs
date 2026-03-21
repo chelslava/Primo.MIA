@@ -191,7 +191,7 @@ namespace Primo.MIA
                 var listB = GetPropertyValue<List<string>>(this.Prop_ListB, "Prop_ListB", sd);
                 string sep = GetPropertyValue<string>(this.Prop_Separator, "Prop_Separator", sd) ?? "=";
                 string csv = GetPropertyValue<string>(this.Prop_CsvInput, "Prop_CsvInput", sd) ?? string.Empty;
-                int chunkSize = int.TryParse(this.Prop_ChunkSize, out int cs) ? cs : 10;
+                int chunkSize = int.TryParse(GetPropertyValue<string>(this.Prop_ChunkSize, "Prop_ChunkSize", sd), out int cs) ? cs : 10;
 
                 switch (this.Mode)
                 {

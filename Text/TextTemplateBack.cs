@@ -317,7 +317,9 @@ namespace Primo.MIA
                     if (!File.Exists(templateFile))
                         return Fail($"{ActivityStrings.Error_TemplateFileNotFound}: {templateFile}");
 
-                    Encoding encoding = ParseEncoding(this.Prop_Encoding);
+                    string encodingName = GetPropertyValue<string>(
+                        this.Prop_Encoding, nameof(Prop_Encoding), sd);
+                    Encoding encoding = ParseEncoding(encodingName);
                     template = File.ReadAllText(templateFile, encoding);
                 }
                 else

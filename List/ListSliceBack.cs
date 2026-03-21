@@ -182,11 +182,11 @@ namespace Primo.MIA
                 var list = GetPropertyValue<List<string>>(this.Prop_List, "Prop_List", sd);
                 if (list == null) throw new ArgumentNullException("Prop_List", "Список не может быть null");
 
-                int n = int.TryParse(this.Prop_N, out int nv) ? nv : 10;
-                int page = int.TryParse(this.Prop_Page, out int pv) ? pv : 1;
-                int pageSize = int.TryParse(this.Prop_PageSize, out int psv) ? psv : 10;
-                int fromIndex = int.TryParse(this.Prop_FromIndex, out int fiv) ? fiv : 0;
-                int toIndex = int.TryParse(this.Prop_ToIndex, out int tiv) ? tiv : list.Count - 1;
+                int n = int.TryParse(GetPropertyValue<string>(this.Prop_N, "Prop_N", sd), out int nv) ? nv : 10;
+                int page = int.TryParse(GetPropertyValue<string>(this.Prop_Page, "Prop_Page", sd), out int pv) ? pv : 1;
+                int pageSize = int.TryParse(GetPropertyValue<string>(this.Prop_PageSize, "Prop_PageSize", sd), out int psv) ? psv : 10;
+                int fromIndex = int.TryParse(GetPropertyValue<string>(this.Prop_FromIndex, "Prop_FromIndex", sd), out int fiv) ? fiv : 0;
+                int toIndex = int.TryParse(GetPropertyValue<string>(this.Prop_ToIndex, "Prop_ToIndex", sd), out int tiv) ? tiv : list.Count - 1;
 
                 List<string> result;
                 int totalPages = 0;

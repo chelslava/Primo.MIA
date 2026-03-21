@@ -248,8 +248,8 @@ namespace Primo.MIA
                 string padCharStr = GetPropertyValue<string>(this.Prop_PadChar, "Prop_PadChar", sd) ?? " ";
                 char padChar = padCharStr.Length > 0 ? padCharStr[0] : ' ';
 
-                int padWidth = int.TryParse(this.Prop_PadWidth, out int pw) ? pw : 0;
-                int maxLength = int.TryParse(this.Prop_MaxLength, out int ml) ? ml : int.MaxValue;
+                int padWidth = int.TryParse(GetPropertyValue<string>(this.Prop_PadWidth, "Prop_PadWidth", sd), out int pw) ? pw : 0;
+                int maxLength = int.TryParse(GetPropertyValue<string>(this.Prop_MaxLength, "Prop_MaxLength", sd), out int ml) ? ml : int.MaxValue;
 
                 // Получаем функцию трансформации для выбранного режима
                 Func<string, string> transform = BuildTransform(find, replacement, prefix, suffix, padChar, padWidth, maxLength);
