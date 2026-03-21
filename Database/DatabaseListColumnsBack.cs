@@ -52,7 +52,7 @@ namespace Primo.MIA
         {
             sdkComponentName = ActivityStrings.Activity_DatabaseListColumns;
             sdkComponentHelp = "Возвращает список колонок таблицы по schema metadata.";
-            sdkComponentIcon = ActivityIcons.Table;
+            sdkComponentIcon = ActivityIcons.Base;
             sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
                 PropertyBuilder.String("Prop_ProviderInvariantName", "ADO.NET provider invariant name"),

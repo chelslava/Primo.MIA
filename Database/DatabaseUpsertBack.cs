@@ -141,7 +141,7 @@ namespace Primo.MIA
             sdkComponentHelp =
                 "Выполняет key-based upsert из DataTable.\n" +
                 "Сначала пытается UPDATE по ключевым колонкам, если строка не найдена — выполняет INSERT.";
-            sdkComponentIcon = ActivityIcons.Table;
+            sdkComponentIcon = ActivityIcons.Base;
             sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
                 PropertyBuilder.Script<DataTable>("Prop_DataTable", "Исходная таблица данных"),

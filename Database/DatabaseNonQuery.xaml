@@ -33,7 +33,7 @@
         <Image Grid.Column="0"
                Width="32" Height="32" Margin="5"
                VerticalAlignment="Center"
-               Source="pack://application:,,,/Primo.MIA;component/images/table.png"/>
+               Source="pack://application:,,,/Primo.MIA;component/images/bd.png"/>
 
         <StackPanel Grid.Column="1" Margin="5,0,5,5">
             <TextBlock Text="БД: Выполнить команду" Style="{StaticResource ActivityHeader}"/>

@@ -157,7 +157,7 @@ namespace Primo.MIA
             sdkComponentHelp =
                 "Выполняет INSERT/UPDATE/DELETE или stored procedure без табличного результата.\n" +
                 "Возвращает количество затронутых строк.";
-            sdkComponentIcon = ActivityIcons.Table;
+            sdkComponentIcon = ActivityIcons.Base;
             sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
                 PropertyBuilder.String("Prop_ProviderInvariantName", "ADO.NET provider invariant name"),

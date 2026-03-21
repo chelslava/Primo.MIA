@@ -181,7 +181,7 @@ namespace Primo.MIA
             sdkComponentHelp =
                 "Выполняет постраничное чтение SQL-запроса.\n" +
                 "Использует исходный запрос как подзапрос, считает total rows и возвращает одну страницу результата.";
-            sdkComponentIcon = ActivityIcons.Table;
+            sdkComponentIcon = ActivityIcons.Base;
             sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
                 PropertyBuilder.String("Prop_ProviderInvariantName", "ADO.NET provider invariant name"),

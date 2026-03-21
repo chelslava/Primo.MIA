@@ -151,7 +151,7 @@ namespace Primo.MIA
             sdkComponentHelp =
                 "Выполняет SQL-запрос или stored procedure и возвращает результат в DataTable.\n" +
                 "Параметры передаются через Dictionary<string, string>.";
-            sdkComponentIcon = ActivityIcons.Table;
+            sdkComponentIcon = ActivityIcons.Base;
             sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
                 PropertyBuilder.String("Prop_ProviderInvariantName", "ADO.NET provider invariant name"),

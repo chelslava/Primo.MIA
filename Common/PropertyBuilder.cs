@@ -162,25 +162,5 @@ namespace Primo.MIA.Common
                 IsReadOnly = false
             };
         }
-
-        /// <summary>
-        /// Создает свойство типа OBJECT для DatTable.
-        /// 
-        /// </summary>
-        /// <param name="propName">Имя свойства</param>
-        /// <param name="tooltip">Подсказка</param>
-        /// <returns>Настроенный PropertiesItem</returns>
-        public static WFHelper.PropertiesItem TableObject(string propName, string tooltip)
-        {
-            return new WFHelper.PropertiesItem
-            {
-                PropName = propName,
-                PropertyType = PropertyTypes.SCRIPT,
-                EditorType = ScriptEditorTypes.COLLECTION,
-                DataType = typeof(System.Data.DataTable),
-                ToolTip = tooltip,
-                IsReadOnly = false
-            };
-        }
     }
 }

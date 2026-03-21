@@ -171,7 +171,7 @@ namespace Primo.MIA
                 "  SQL Server (System.Data.SqlClient) -> SqlBulkCopy\n" +
                 "  Остальные провайдеры              -> batched insert через DbProviderFactory\n\n" +
                 "Если ColumnMappings не указаны, колонки маппятся по одинаковым именам.";
-            sdkComponentIcon = ActivityIcons.Table;
+            sdkComponentIcon = ActivityIcons.Base;
             sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
                 PropertyBuilder.Script<DataTable>("Prop_DataTable", "Исходная таблица данных для массовой записи"),

@@ -101,7 +101,7 @@ namespace Primo.MIA
             sdkComponentHelp =
                 "Проверяет доступность БД через ADO.NET provider.\n\n" +
                 "Открывает подключение, читает ServerVersion и сразу закрывает его.";
-            sdkComponentIcon = ActivityIcons.Table;
+            sdkComponentIcon = ActivityIcons.Base;
             sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
                 PropertyBuilder.String("Prop_ProviderInvariantName", "ADO.NET provider invariant name"),

@@ -159,7 +159,7 @@ namespace Primo.MIA
             sdkComponentHelp =
                 "Вызывает stored procedure через ADO.NET.\n" +
                 "Поддерживает input-параметры, output-параметры и получение return value.";
-            sdkComponentIcon = ActivityIcons.Table;
+            sdkComponentIcon = ActivityIcons.Base;
             sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
                 PropertyBuilder.String("Prop_ProviderInvariantName", "ADO.NET provider invariant name"),

@@ -32,7 +32,7 @@ namespace Primo.MIA
         {
             sdkComponentName = ActivityStrings.Activity_DatabaseTransactionRollback;
             sdkComponentHelp = "Откатывает транзакцию по явному transactionId или по текущему ambient-контексту.";
-            sdkComponentIcon = ActivityIcons.Table;
+            sdkComponentIcon = ActivityIcons.Base;
             sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
                 PropertyBuilder.String("Prop_TransactionId", "ID транзакции (необязательно, если есть ambient-контекст)")

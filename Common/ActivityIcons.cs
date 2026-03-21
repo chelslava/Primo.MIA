@@ -62,5 +62,8 @@ namespace Primo.MIA.Common
         /// <summary>Иконка для активности Файл: Очистка по времени</summary>
         public const string Clean = BasePath + "delete.png";
 
+        /// <summary>Иконка для активностей работы с базой данных</summary>
+        public const string Base = BasePath + "bd.png";
+
     }
 }

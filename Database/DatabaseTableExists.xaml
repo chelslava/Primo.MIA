@@ -9,7 +9,7 @@
     <UserControl.Resources><ResourceDictionary><ResourceDictionary.MergedDictionaries><ResourceDictionary Source="/Primo.MIA;component/Common/Styles.xaml"/></ResourceDictionary.MergedDictionaries></ResourceDictionary></UserControl.Resources>
     <Grid Background="{DynamicResource {x:Static SystemColors.ScrollBarBrushKey}}">
         <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-        <Image Grid.Column="0" Width="32" Height="32" Margin="5" VerticalAlignment="Center" Source="pack://application:,,,/Primo.MIA;component/images/table.png"/>
+        <Image Grid.Column="0" Width="32" Height="32" Margin="5" VerticalAlignment="Center" Source="pack://application:,,,/Primo.MIA;component/images/bd.png"/>
         <StackPanel Grid.Column="1" Margin="5,0,5,5">
             <TextBlock Text="БД: Проверить таблицу" Style="{StaticResource ActivityHeader}"/>
             <TextBlock Text="Provider invariant name:" Style="{StaticResource FieldLabel}"/>

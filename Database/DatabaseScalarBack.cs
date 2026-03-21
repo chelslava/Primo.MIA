@@ -189,7 +189,7 @@ namespace Primo.MIA
             sdkComponentHelp =
                 "Выполняет SQL-запрос, возвращающий одно значение.\n" +
                 "Результат сохраняется как строка в invariant-культуре.";
-            sdkComponentIcon = ActivityIcons.Table;
+            sdkComponentIcon = ActivityIcons.Base;
             sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
                 PropertyBuilder.String("Prop_ProviderInvariantName", "ADO.NET provider invariant name"),

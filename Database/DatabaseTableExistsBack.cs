@@ -52,7 +52,7 @@ namespace Primo.MIA
         {
             sdkComponentName = ActivityStrings.Activity_DatabaseTableExists;
             sdkComponentHelp = "Проверяет существование таблицы или view в БД через schema metadata.";
-            sdkComponentIcon = ActivityIcons.Table;
+            sdkComponentIcon = ActivityIcons.Base;
             sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
                 PropertyBuilder.String("Prop_ProviderInvariantName", "ADO.NET provider invariant name"),

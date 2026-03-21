@@ -73,7 +73,7 @@ namespace Primo.MIA
             sdkComponentHelp =
                 "Открывает соединение, начинает транзакцию и сохраняет её в ambient-контекст DB-модуля.\n" +
                 "Следующие DB-активности могут использовать её без явной передачи transactionId.";
-            sdkComponentIcon = ActivityIcons.Table;
+            sdkComponentIcon = ActivityIcons.Base;
             sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
                 PropertyBuilder.String("Prop_ProviderInvariantName", "ADO.NET provider invariant name"),
