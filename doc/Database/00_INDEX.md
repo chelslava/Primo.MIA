@@ -35,3 +35,57 @@
 6. Массовая запись автоматически выбирает оптимальный режим: `SqlBulkCopy` для SQL Server и универсальный batched insert для остальных провайдеров.
 7. `Query`, `Scalar`, `NonQuery` и `BulkInsert` могут выполняться внутри открытой транзакции через `transactionId` или ambient-контекст.
 8. `Scalar` умеет отдавать типизированные выходы, `Query` возвращает список колонок, `NonQuery` умеет исполнять SQL-скрипты по `GO` batch и возвращать `last inserted id`, `Stored procedure` поддерживает `Output/InputOutput/ReturnValue`, `Постраничный запрос` даёт page metadata, а `BulkInsert` и `Upsert` закрывают основные data movement сценарии.
+
+## Примеры строк подключения
+
+Ниже приведены типовые примеры. Конкретные параметры зависят от вашей инфраструктуры, версии драйвера и политики безопасности.
+
+### SQL Server (`System.Data.SqlClient`)
+
+```text
+Server=sql01\SQLEXPRESS;Database=DemoDb;User Id=robot;Password=secret;TrustServerCertificate=True;
+```
+
+Windows-аутентификация:
+
+```text
+Server=sql01;Database=DemoDb;Integrated Security=True;TrustServerCertificate=True;
+```
+
+### PostgreSQL (`Npgsql`)
+
+```text
+Host=pg01;Port=5432;Database=demo_db;Username=robot;Password=secret;
+```
+
+### MySQL (`MySql.Data.MySqlClient`)
+
+```text
+Server=mysql01;Port=3306;Database=demo_db;Uid=robot;Pwd=secret;SslMode=None;
+```
+
+### Oracle (`Oracle.ManagedDataAccess.Client`)
+
+```text
+User Id=robot;Password=secret;Data Source=//oracle01:1521/XEPDB1;
+```
+
+### SQLite (`System.Data.SQLite`)
+
+```text
+Data Source=C:\Data\demo.db;Version=3;
+```
+
+### ODBC (`System.Data.Odbc`)
+
+```text
+Driver={ODBC Driver 18 for SQL Server};Server=sql01;Database=DemoDb;Uid=robot;Pwd=secret;Encrypt=no;
+```
+
+## Как читать таблицы параметров
+
+- `Provider invariant name` — строковый идентификатор ADO.NET-провайдера. Он определяет, какой `DbProviderFactory` будет использован.
+- `Строка подключения` — полная connection string для выбранного провайдера. Примеры приведены выше.
+- `TransactionId` — необязательный идентификатор уже открытой DB-транзакции. Если он передан, активность работает в рамках существующего соединения/транзакции.
+- `Параметры` — как правило `Dictionary<string,string>`, где ключ — имя параметра SQL/stored procedure, а значение — строковое представление значения.
+- `Таймаут команды (сек)` — ограничение по времени на выполнение SQL-команды внутри активности, а не сетевой таймаут всей инфраструктуры.

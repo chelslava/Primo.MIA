@@ -21,24 +21,24 @@
 
 | Параметр | Тип | Описание |
 |---|---|---|
-| `Таблица данных` | `DataTable` | Источник строк для загрузки |
-| `Provider invariant name` | `string` | Например `System.Data.SqlClient`, `Npgsql`, `MySql.Data.MySqlClient`, `Oracle.ManagedDataAccess.Client` |
-| `Строка подключения` | `string` | Connection string выбранной БД |
-| `Таблица-приёмник` | `string` | Например `dbo.UsersImport` |
-| `Маппинг колонок` | `Dictionary<string,string>` | `SourceColumn -> DestinationColumn`, необязательно |
-| `Размер пакета` | `int` | Batch size, по умолчанию `1000` |
-| `Таймаут bulk copy (сек)` | `int` | Таймаут операции записи |
-| `Использовать table lock` | `bool` | Используется только в SQL Server fast path |
-| `Сохранять identity` | `bool` | Используется только в SQL Server fast path |
-| `Очистка перед загрузкой` | `DatabaseBulkPreloadMode` | `None`, `DeleteAll` или `Truncate` перед вставкой |
+| `Таблица данных` | `DataTable` | Источник строк для загрузки. Колонки этой таблицы используются как источник маппинга и параметров вставки. |
+| `Provider invariant name` | `string` | Идентификатор провайдера, например `System.Data.SqlClient`, `Npgsql`, `MySql.Data.MySqlClient`, `Oracle.ManagedDataAccess.Client`. |
+| `Строка подключения` | `string` | Connection string выбранной БД. Примеры для разных провайдеров приведены в [00_INDEX.md](00_INDEX.md). |
+| `Таблица-приёмник` | `string` | Полное имя таблицы назначения, например `dbo.UsersImport` или `public.users_import`. |
+| `Маппинг колонок` | `Dictionary<string,string>` | Необязательное сопоставление `SourceColumn -> DestinationColumn`. Если не задано, активность пытается маппить по одинаковым именам. |
+| `Размер пакета` | `int` | Размер логического пакета записи. Для SQL Server влияет на `SqlBulkCopy.BatchSize`, для универсального режима служит размером порции обработки. |
+| `Таймаут bulk copy (сек)` | `int` | Максимальное время выполнения операции массовой записи. |
+| `Использовать table lock` | `bool` | Актуально только для SQL Server fast path. Может ускорить загрузку, но увеличивает жёсткость блокировок. |
+| `Сохранять identity` | `bool` | Актуально только для SQL Server fast path. Позволяет сохранить уже существующие значения identity из `DataTable`. |
+| `Очистка перед загрузкой` | `DatabaseBulkPreloadMode` | Определяет, нужно ли очищать таблицу перед вставкой: ничего не делать, выполнить `DELETE` или выполнить `TRUNCATE`. |
 
 ## Выходные параметры
 
 | Параметр | Тип | Описание |
 |---|---|---|
-| `Записано строк` | `int` | Сколько строк отправлено в БД |
-| `Количество маппингов` | `int` | Число применённых сопоставлений колонок |
-| `Режим записи` | `string` | Например `SqlBulkCopy` или `BatchedInsert` |
+| `Записано строк` | `int` | Количество строк, фактически переданных на запись в БД. |
+| `Количество маппингов` | `int` | Сколько сопоставлений колонок было использовано для формирования SQL или `SqlBulkCopy`. |
+| `Режим записи` | `string` | Какой путь был реально использован: например `SqlBulkCopy`, `BatchedInsert`, `SqlBulkCopy+Truncate`. |
 
 ## Очистка перед загрузкой
 
