@@ -26,8 +26,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using LTools.Common.Model;
 using LTools.Common.Model.Serialization;
 using LTools.Common.UIElements;
