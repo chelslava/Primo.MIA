@@ -41,6 +41,9 @@
 | 20 | [Элемент: Загрузить файл](20_ElementUploadFile.md) | `ElementUploadFileBack` | Загрузить файл через input |
 | 21 | [Элемент: Выбор из списка](21_ElementSelect.md) | `ElementSelectBack` | Выбрать опцию в select |
 | 22 | [Элемент: Множественный выбор](22_ElementSelectMultiple.md) | `ElementSelectMultipleBack` | Выбрать несколько опций |
+| 30 | [Элемент: Найти](30_ElementFind.md) | `ElementFindBack` | Найти один или несколько элементов по локатору |
+| 31 | [Элемент: Поиск и проверка](31_ElementSearch.md) | `ElementSearchBack` | Универсальная проверка состояния и поиск списков элементов |
+| 32 | [Элемент: Получить CSS стиль](32_ElementGetComputedStyle.md) | `ElementGetComputedStyleBack` | Получить вычисленное значение CSS-свойства |
 
 ### Ожидания и переключения
 
@@ -78,6 +81,9 @@
 - Заполнить форму → [Элемент: Ввод текста](09_ElementInput.md)
 - Проверить наличие элемента → [Элемент: Существует](13_ElementExists.md)
 - Получить текст элемента → [Элемент: Информация](12_ElementGetInfo.md)
+- Найти все строки таблицы → [Элемент: Найти](30_ElementFind.md)
+- Проверить кликабельность кнопки → [Элемент: Поиск и проверка](31_ElementSearch.md)
+- Проверить цвет или размер элемента → [Элемент: Получить CSS стиль](32_ElementGetComputedStyle.md)
 
 ### Ожидания и синхронизация
 - Дождаться элемента → [Браузер: Ожидание](23_BrowserWaitFor.md)
