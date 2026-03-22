@@ -328,6 +328,7 @@
       <DependentUpon>TextTranslit.xaml</DependentUpon>
     </Compile>
     <Compile Include="Text\TextTranslitBack.cs" />
+    <Compile Include="Text\TextTranslitLogic.cs" />
     <Compile Include="Utilities\GeneratorsBack.cs" />
     <Compile Include="Utilities\ExcelCellRecalculateBack.cs" />
     <Compile Include="Dictionary\DictionaryContainsValue.xaml.cs">

@@ -1,11 +1,10 @@
 using System;
 using FluentAssertions;
-using Primo.MIA.Tests.Logic;
+using Primo.MIA;
 using Xunit;
 
-// Используем псевдонимы для избежания конфликта имён с основным проектом
-using Scheme = Primo.MIA.Tests.Logic.TranslitScheme;
-using Direction = Primo.MIA.Tests.Logic.TranslitDirection;
+using Scheme = Primo.MIA.TranslitScheme;
+using Direction = Primo.MIA.TranslitDirection;
 
 namespace Primo.MIA.Tests.Text
 {

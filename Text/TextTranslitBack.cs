@@ -435,51 +435,42 @@ namespace Primo.MIA
         {
             try
             {
+                var logic = new TextTranslitLogic();
                 string inputText = GetPropertyValue<string>(
                     this.Prop_InputText, nameof(Prop_InputText), sd);
 
                 if (inputText == null)
                     return Fail(ActivityStrings.Error_InputStringRequired);
 
-                // ── Определяем направление ─────────────────────────────────
+                var translitResult = logic.Transliterate(
+                    inputText,
+                    this.Prop_Scheme,
+                    this.Prop_Direction,
+                    this.Prop_PreserveCase,
+                    this.Prop_PreserveNonAlpha);
 
-                TranslitDirection direction = this.Prop_Direction;
-                if (direction == TranslitDirection.AutoDetect)
-                    direction = DetectDirection(inputText);
-
-                // Записываем определённое направление
+                TranslitDirection direction = translitResult.DetectedDirection;
                 SetVariableValue(this.Prop_DetectedDirection, direction.ToString(), sd);
-
-                // ── Выполняем транслитерацию ───────────────────────────────
-
-                int    changedChars;
-                string result;
-
-                if (direction == TranslitDirection.LatinToCyrillic)
-                    result = TransliterateLatinToCyrillic(inputText, this.Prop_Scheme,
-                        this.Prop_PreserveCase, this.Prop_PreserveNonAlpha, out changedChars);
-                else
-                    result = TransliterateCyrillicToLatin(inputText, this.Prop_Scheme,
-                        this.Prop_PreserveCase, this.Prop_PreserveNonAlpha, out changedChars);
 
                 // ── Постобработка ──────────────────────────────────────────
 
                 // Замена пробелов (до смены регистра — важен порядок)
                 string replaceSpaces = GetPropertyValue<string>(
                     this.Prop_ReplaceSpaces, nameof(Prop_ReplaceSpaces), sd);
+                string result = translitResult.Text;
                 if (!string.IsNullOrEmpty(replaceSpaces))
-                    result = result.Replace(" ", replaceSpaces);
+                    result = logic.ReplaceSpaces(result, replaceSpaces);
 
                 // Приведение регистра (взаимоисключающие флаги — ToUpper имеет приоритет)
                 if (this.Prop_ToUpperCase)
-                    result = result.ToUpperInvariant();
+                    result = logic.ToUpperCase(result);
                 else if (this.Prop_ToLowerCase)
-                    result = result.ToLowerInvariant();
+                    result = logic.ToLowerCase(result);
 
                 // ── Записываем результаты ──────────────────────────────────
 
                 SetVariableValue(this.Prop_Result,       result,       sd);
-                SetVariableValue(this.Prop_ChangedChars, changedChars, sd);
+                SetVariableValue(this.Prop_ChangedChars, translitResult.ChangedChars, sd);
 
                 string directionMsg = direction == TranslitDirection.CyrillicToLatin
                     ? "Кир → Лат"
@@ -489,7 +480,7 @@ namespace Primo.MIA
                 {
                     IsSuccess      = true,
                     SuccessMessage = $"Транслитерировано ({this.Prop_Scheme}, {directionMsg}): " +
-                                     $"изменено {changedChars} символов"
+                                     $"изменено {translitResult.ChangedChars} символов"
                 };
             }
             catch (Exception ex)
