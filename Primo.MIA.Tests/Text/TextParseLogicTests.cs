@@ -13,11 +13,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using FluentAssertions;
-using Primo.MIA.Tests.Logic;
+using Primo.MIA;
 using Xunit;
 
-// Алиас для избежания конфликта имён с Primo.MIA.TemplateSyntax
-using Syntax = Primo.MIA.Tests.Logic.ParseSyntax;
+using Syntax = Primo.MIA.TemplateSyntax;
 
 namespace Primo.MIA.Tests.Text
 {
@@ -106,9 +105,8 @@ namespace Primo.MIA.Tests.Text
             // Assert
             pattern.Should().Contain(@"\$");
             pattern.Should().Contain(@"\[");
-            // Примечание: Regex.Escape экранирует ] только если есть [, но в составе \[
-            // Поэтому проверяем что вся последовательность [code: ...] экранирована корректно
-            pattern.Should().MatchRegex(@"\[\w+:");  // [ экранирован как \[
+            // Проверяем, что литеральная часть [code: экранирована как regex-текст.
+            pattern.Should().Contain(@"\[code:");
         }
 
         [Fact(DisplayName = "CompileMask: маска без плейсхолдеров — ошибка")]

@@ -22,8 +22,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
 using LTools.Common.Model;
 using LTools.Common.Model.Serialization;
 using LTools.Common.UIElements;
@@ -38,23 +36,6 @@ namespace Primo.MIA
     /// </summary>
     public class TextParseBack : PrimoComponentTO<TextParse>
     {
-        // =====================================================================
-        // Статические словари — паттерны для поиска плейсхолдеров в маске
-        // Переиспользуем TemplateSyntax из Enums.cs (там же где TextTemplate)
-        // =====================================================================
-
-        /// <summary>
-        /// Regex-паттерны для поиска плейсхолдеров внутри самой маски.
-        /// Группа 1: имя ключа (без суффикса формата — в маске форматов нет).
-        /// </summary>
-        private static readonly Dictionary<TemplateSyntax, string> PlaceholderPatterns =
-            new Dictionary<TemplateSyntax, string>
-            {
-                { TemplateSyntax.DoubleBrace, @"\{\{([^}]+)\}\}" },
-                { TemplateSyntax.SingleBrace, @"\{([^{}]+)\}"    },
-                { TemplateSyntax.Percent,     @"%([^%]+)%"       }
-            };
-
         // =====================================================================
         // Свойства
         // =====================================================================
@@ -364,44 +345,24 @@ namespace Primo.MIA
                 if (string.IsNullOrEmpty(mask))
                     return Fail(ActivityStrings.Error_ParseMaskRequired);
 
-                // ── Компилируем маску в regex ──────────────────────────────
+                var parseResult = TextParseLogic.Parse(
+                    inputText,
+                    mask,
+                    this.Prop_MaskSyntax,
+                    this.Prop_CaseSensitive,
+                    this.Prop_GreedyMatch,
+                    this.Prop_MultiLine,
+                    this.Prop_AllMatches);
 
-                string compiledPattern;
-                try
-                {
-                    compiledPattern = CompileMask(mask, this.Prop_MaskSyntax, this.Prop_GreedyMatch, this.Prop_AllMatches);
-                }
-                catch (Exception ex)
-                {
-                    return Fail($"{ActivityStrings.Error_ParseMaskInvalid}: {ex.Message}");
-                }
+                if (!parseResult.IsSuccess)
+                    return Fail(NormalizeError(parseResult.ErrorMessage));
 
-                // Записываем скомпилированный паттерн для диагностики
-                SetVariableValue(this.Prop_CompiledPattern, compiledPattern, sd);
-
-                // ── Настраиваем опции regex ────────────────────────────────
-
-                RegexOptions options = RegexOptions.Compiled;
-                if (!this.Prop_CaseSensitive) options |= RegexOptions.IgnoreCase;
-                // Singleline: "." совпадает в том числе с \n (для многострочного текста)
-                if (this.Prop_MultiLine)      options |= RegexOptions.Singleline;
-
-                Regex regex;
-                try
-                {
-                    regex = new Regex(compiledPattern, options);
-                }
-                catch (Exception ex)
-                {
-                    return Fail($"{ActivityStrings.Error_ParseMaskInvalid}: {ex.Message}");
-                }
-
-                // ── Выполняем поиск ────────────────────────────────────────
+                SetVariableValue(this.Prop_CompiledPattern, parseResult.CompiledPattern, sd);
 
                 if (this.Prop_AllMatches)
-                    return ExecuteAllMatches(sd, regex, inputText);
-                else
-                    return ExecuteFirstMatch(sd, regex, inputText);
+                    return ApplyAllMatchesResult(sd, parseResult);
+
+                return ApplyFirstMatchResult(sd, parseResult);
             }
             catch (Exception ex)
             {
@@ -417,30 +378,27 @@ namespace Primo.MIA
         /// Ищет первое совпадение маски в тексте.
         /// IsMatched = false — штатный результат (не ошибка).
         /// </summary>
-        private ExecutionResult ExecuteFirstMatch(ScriptingData sd, Regex regex, string inputText)
+        private ExecutionResult ApplyFirstMatchResult(ScriptingData sd, TextParseResult parseResult)
         {
-            Match match = regex.Match(inputText);
-
-            if (!match.Success)
+            if (!parseResult.IsMatched)
             {
                 // Маска не совпала — штатный результат, не ошибка
-                SetVariableValue(this.Prop_IsMatched,    false,                              sd);
-                SetVariableValue(this.Prop_MatchCount, 0,                                  sd);
-                SetVariableValue(this.Prop_Result,       new Dictionary<string, string>(),   sd);
+                SetVariableValue(this.Prop_IsMatched, false, sd);
+                SetVariableValue(this.Prop_MatchCount, 0, sd);
+                SetVariableValue(this.Prop_Result, new Dictionary<string, string>(), sd);
 
                 return new ExecutionResult
                 {
-                    IsSuccess      = true,
+                    IsSuccess = true,
                     SuccessMessage = "Маска не совпала со строкой"
                 };
             }
 
-            // Извлекаем именованные группы через LINQ
-            Dictionary<string, string> result = ExtractNamedGroups(regex, match);
+            Dictionary<string, string> result = parseResult.Result;
 
-            SetVariableValue(this.Prop_Result,       result,        sd);
-            SetVariableValue(this.Prop_IsMatched,    true,          sd);
-            SetVariableValue(this.Prop_MatchCount, result.Count,  sd);
+            SetVariableValue(this.Prop_Result, result, sd);
+            SetVariableValue(this.Prop_IsMatched, true, sd);
+            SetVariableValue(this.Prop_MatchCount, result.Count, sd);
 
             // Краткое сообщение с первыми двумя извлечёнными значениями
             string preview = string.Join(", ", result.Take(2)
@@ -450,7 +408,7 @@ namespace Primo.MIA
 
             return new ExecutionResult
             {
-                IsSuccess      = true,
+                IsSuccess = true,
                 SuccessMessage = $"Извлечено {result.Count} значений: {preview}"
             };
         }
@@ -465,131 +423,37 @@ namespace Primo.MIA
         /// Prop_AllResults содержит список всех совпадений.
         /// Prop_MatchedCount — количество вхождений (не ключей).
         /// </summary>
-        private ExecutionResult ExecuteAllMatches(ScriptingData sd, Regex regex, string inputText)
+        private ExecutionResult ApplyAllMatchesResult(ScriptingData sd, TextParseResult parseResult)
         {
-            MatchCollection matches = regex.Matches(inputText);
-
-            // Список всех совпадений через LINQ
-            var allResults = matches
-                .Cast<Match>()
-                .Select(m => ExtractNamedGroups(regex, m))
-                .ToList();
-
-            // Prop_Result — первое совпадение или пустой словарь
-            var firstResult = allResults.Count > 0
-                ? allResults[0]
-                : new Dictionary<string, string>();
-
-            SetVariableValue(this.Prop_AllResults,   allResults,          sd);
-            SetVariableValue(this.Prop_Result,       firstResult,         sd);
-            SetVariableValue(this.Prop_IsMatched,    allResults.Count > 0, sd);
-            SetVariableValue(this.Prop_MatchCount, allResults.Count,    sd);
+            SetVariableValue(this.Prop_AllResults, parseResult.AllResults, sd);
+            SetVariableValue(this.Prop_Result, parseResult.Result, sd);
+            SetVariableValue(this.Prop_IsMatched, parseResult.IsMatched, sd);
+            SetVariableValue(this.Prop_MatchCount, parseResult.Count, sd);
 
             return new ExecutionResult
             {
-                IsSuccess      = true,
-                SuccessMessage = allResults.Count > 0
-                    ? $"Найдено {allResults.Count} вхождений маски"
+                IsSuccess = true,
+                SuccessMessage = parseResult.Count > 0
+                    ? $"Найдено {parseResult.Count} вхождений маски"
                     : "Вхождений маски не найдено"
             };
         }
 
-        // =====================================================================
-        // Вспомогательные методы
-        // =====================================================================
-
-        /// <summary>
-        /// Компилирует читаемую маску в regex-паттерн с именованными группами захвата.
-        ///
-        /// Алгоритм:
-        ///   1. Разбиваем маску на чередующиеся части: литерал, плейсхолдер, литерал...
-        ///   2. Каждый литерал экранируется через Regex.Escape
-        ///   3. Каждый плейсхолдер {Имя} → (?&lt;Имя&gt;.+?) или (?&lt;Имя&gt;.+) при greedy
-        ///   4. При allMatches=false добавляются якоря ^ и $ для точного совпадения
-        /// </summary>
-        /// <param name="mask">Исходная маска с плейсхолдерами.</param>
-        /// <param name="syntax">Синтаксис плейсхолдеров.</param>
-        /// <param name="greedy">true — жадный захват (.+), false — ленивый (.+?).</param>
-        /// <param name="allMatches">true — поиск всех вхождений (без якорей), false — одно совпадение (с якорями).</param>
-        private static string CompileMask(string mask, TemplateSyntax syntax, bool greedy, bool allMatches = false)
-        {
-            string placeholderPattern = PlaceholderPatterns[syntax];
-            string quantifier         = greedy ? ".+" : ".+?";
-            var    sb                 = new StringBuilder();
-            int    lastIndex          = 0;
-            bool   hasPlaceholders    = false;
-
-            // Добавляем якорь начала строки только для одиночного совпадения
-            if (!allMatches)
-                sb.Append("^");
-
-            foreach (Match m in Regex.Matches(mask, placeholderPattern))
-            {
-                hasPlaceholders = true;
-
-                // Экранируем литеральный текст между плейсхолдерами
-                string literal = mask.Substring(lastIndex, m.Index - lastIndex);
-                if (!string.IsNullOrEmpty(literal))
-                    sb.Append(Regex.Escape(literal));
-
-                // Плейсхолдер → именованная группа захвата (?<Имя>.+?)
-                string groupName = m.Groups[1].Value.Trim();
-
-                // Проверяем что имя группы является допустимым идентификатором
-                if (!IsValidGroupName(groupName))
-                    throw new ArgumentException(
-                        $"Недопустимое имя плейсхолдера «{groupName}». " +
-                        "Имя должно начинаться с буквы или _, содержать только буквы, цифры и _");
-
-                sb.Append($"(?<{groupName}>{quantifier})");
-                lastIndex = m.Index + m.Length;
-            }
-
-            // Экранируем хвост маски после последнего плейсхолдера
-            string tail = mask.Substring(lastIndex);
-            if (!string.IsNullOrEmpty(tail))
-                sb.Append(Regex.Escape(tail));
-
-            // Добавляем якорь конца строки только для одиночного совпадения
-            if (!allMatches)
-                sb.Append("$");
-
-            if (!hasPlaceholders)
-                throw new ArgumentException(
-                    "Маска не содержит ни одного плейсхолдера. " +
-                    "Добавьте хотя бы один плейсхолдер, например {Значение}");
-
-            return sb.ToString();
-        }
-
-        /// <summary>
-        /// Извлекает именованные группы из совпадения regex.
-        /// Числовые группы (0, 1, 2...) исключаются — только явные имена.
-        /// Использует LINQ для компактного построения словаря.
-        /// </summary>
-        private static Dictionary<string, string> ExtractNamedGroups(Regex regex, Match match) =>
-            regex.GetGroupNames()
-                // Пропускаем числовые группы захвата (0 = весь матч, 1,2,3 = позиционные)
-                .Where(name => !int.TryParse(name, out _))
-                .ToDictionary(
-                    name  => name,
-                    name  => match.Groups[name].Value
-                );
-
-        /// <summary>
-        /// Проверяет что имя группы является допустимым C#/regex-идентификатором.
-        /// Regex именованные группы: начинается с буквы или _, содержит буквы/цифры/_.
-        /// </summary>
-        private static bool IsValidGroupName(string name)
-        {
-            if (string.IsNullOrEmpty(name)) return false;
-            if (!char.IsLetter(name[0]) && name[0] != '_') return false;
-
-            return name.All(c => char.IsLetterOrDigit(c) || c == '_');
-        }
-
         private static ExecutionResult Fail(string msg) =>
             new ExecutionResult { IsSuccess = false, ErrorMessage = msg };
+
+        private static string NormalizeError(string errorMessage)
+        {
+            if (string.IsNullOrEmpty(errorMessage))
+                return ActivityStrings.Error_ParseMaskInvalid;
+            if (errorMessage.StartsWith("Ошибка компиляции маски: ", StringComparison.Ordinal) ||
+                errorMessage.StartsWith("Ошибка создания regex: ", StringComparison.Ordinal))
+            {
+                return $"{ActivityStrings.Error_ParseMaskInvalid}: {errorMessage.Substring(errorMessage.IndexOf(':') + 2)}";
+            }
+
+            return errorMessage;
+        }
 
         // =====================================================================
         // Валидация

@@ -318,6 +318,7 @@
       <DependentUpon>TextParse.xaml</DependentUpon>
     </Compile>
     <Compile Include="Text\TextParseBack.cs" />
+    <Compile Include="Text\TextParseLogic.cs" />
     <Compile Include="Text\TextTemplate.xaml.cs">
       <DependentUpon>TextTemplate.xaml</DependentUpon>
     </Compile>
