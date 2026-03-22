@@ -397,6 +397,7 @@
       <DependentUpon>ListConvert.xaml</DependentUpon>
     </Compile>
     <Compile Include="List\ListAggregateBack.cs" />
+    <Compile Include="List\ListAggregateLogic.cs" />
     <Compile Include="List\ListConvertBack.cs" />
     <Compile Include="List\ListFilterBack.cs" />
     <Compile Include="List\ListGroupBack.cs" />

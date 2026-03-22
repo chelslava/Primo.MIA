@@ -131,89 +131,18 @@ namespace Primo.MIA
         {
             try
             {
+                var logic = new ListAggregateLogic();
                 var list = GetPropertyValue<List<string>>(this.Prop_List, "Prop_List", sd);
                 if (list == null) throw new ArgumentNullException("Prop_List", "Список не может быть null");
 
                 string sep = GetPropertyValue<string>(this.Prop_Separator, "Prop_Separator", sd) ?? ", ";
+                var result = logic.AggregateDetailed(list, this.Mode, sep);
 
-                // Числа из списка — парсим один раз через LINQ для числовых режимов
-                var numbers = list
-                    .Where(s => !string.IsNullOrWhiteSpace(s))
-                    .Select(s => new { Raw = s, Parsed = StringHelper.TryParseDouble(s) })
-                    .Where(x => x.Parsed.HasValue)
-                    .Select(x => x.Parsed.Value)
-                    .ToList();
+                SetVariableValue(this.Prop_NumericResult, result.NumericResult, sd);
+                SetVariableValue(this.Prop_StringResult, result.StringResult, sd);
+                SetVariableValue(this.Prop_NumericCount, result.NumericCount, sd);
 
-                double numResult = 0;
-                string strResult = string.Empty;
-                int numCount = numbers.Count;
-
-                switch (this.Mode)
-                {
-                    case ListAggregateMode.Count:
-                        numResult = list.Count;
-                        break;
-
-                    case ListAggregateMode.CountDistinct:
-                        numResult = list
-                            .Where(s => !string.IsNullOrWhiteSpace(s))
-                            .Distinct(StringComparer.OrdinalIgnoreCase)
-                            .Count();
-                        break;
-
-                    case ListAggregateMode.CountNonEmpty:
-                        numResult = list.Count(s => !string.IsNullOrWhiteSpace(s));
-                        break;
-
-                    case ListAggregateMode.Sum:
-                        numResult = numbers.Any() ? numbers.Sum() : 0;
-                        break;
-
-                    case ListAggregateMode.Min:
-                        if (!numbers.Any()) throw new InvalidOperationException("Нет числовых элементов для вычисления Min");
-                        numResult = numbers.Min();
-                        break;
-
-                    case ListAggregateMode.Max:
-                        if (!numbers.Any()) throw new InvalidOperationException("Нет числовых элементов для вычисления Max");
-                        numResult = numbers.Max();
-                        break;
-
-                    case ListAggregateMode.Average:
-                        if (!numbers.Any()) throw new InvalidOperationException("Нет числовых элементов для вычисления Average");
-                        numResult = numbers.Average();
-                        break;
-
-                    case ListAggregateMode.ShortestString:
-                        strResult = list
-                            .Where(s => s != null)
-                            .OrderBy(s => s.Length)
-                            .ThenBy(s => s)
-                            .FirstOrDefault() ?? string.Empty;
-                        break;
-
-                    case ListAggregateMode.LongestString:
-                        strResult = list
-                            .Where(s => s != null)
-                            .OrderByDescending(s => s.Length)
-                            .ThenBy(s => s)
-                            .FirstOrDefault() ?? string.Empty;
-                        break;
-
-                    case ListAggregateMode.Join:
-                        strResult = string.Join(sep, list.Where(s => s != null));
-                        numResult = list.Count;
-                        break;
-
-                    default:
-                        throw new InvalidOperationException($"Неизвестный режим: {this.Mode}");
-                }
-
-                SetVariableValue(this.Prop_NumericResult, numResult, sd);
-                SetVariableValue(this.Prop_StringResult, strResult, sd);
-                SetVariableValue(this.Prop_NumericCount, numCount, sd);
-
-                return new ExecutionResult { IsSuccess = true, SuccessMessage = $"{this.Mode} = {(string.IsNullOrEmpty(strResult) ? numResult.ToString() : strResult)}" };
+                return new ExecutionResult { IsSuccess = true, SuccessMessage = $"{this.Mode} = {(string.IsNullOrEmpty(result.StringResult) ? result.NumericResult.ToString() : result.StringResult)}" };
             }
             catch (Exception ex)
             {
