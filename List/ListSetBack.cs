@@ -127,52 +127,42 @@ namespace Primo.MIA
         {
             try
             {
+                var logic = new ListSetLogic();
                 var listA = GetPropertyValue<List<string>>(this.Prop_ListA, "Prop_ListA", sd);
                 var listB = GetPropertyValue<List<string>>(this.Prop_ListB, "Prop_ListB", sd);
 
                 if (listA == null) throw new ArgumentNullException("Prop_ListA", "Список A не может быть null");
 
-                var comparer = ComparisonHelper.GetStringComparer(this.Prop_CaseSensitive);
-
-                List<string> result;
-
                 switch (this.Operation)
                 {
                     case ListSetOperation.Union:
                         if (listB == null) throw new ArgumentNullException("Prop_ListB", "Список B обязателен для Union");
-                        result = listA.Union(listB, comparer).ToList();
                         break;
 
                     case ListSetOperation.Intersect:
                         if (listB == null) throw new ArgumentNullException("Prop_ListB", "Список B обязателен для Intersect");
-                        result = listA.Intersect(listB, comparer).ToList();
                         break;
 
                     case ListSetOperation.Except:
                         if (listB == null) throw new ArgumentNullException("Prop_ListB", "Список B обязателен для Except");
-                        result = listA.Except(listB, comparer).ToList();
                         break;
 
                     case ListSetOperation.ExceptReverse:
                         if (listB == null) throw new ArgumentNullException("Prop_ListB", "Список B обязателен для ExceptReverse");
-                        result = listB.Except(listA, comparer).ToList();
                         break;
 
                     case ListSetOperation.SymmetricDiff:
                         if (listB == null) throw new ArgumentNullException("Prop_ListB", "Список B обязателен для SymmetricDiff");
-                        // (A∪B) ∖ (A∩B)
-                        var union = listA.Union(listB, comparer);
-                        var intersect = new HashSet<string>(listA.Intersect(listB, comparer), comparer);
-                        result = union.Where(x => !intersect.Contains(x)).ToList();
                         break;
 
                     case ListSetOperation.Distinct:
-                        result = listA.Distinct(comparer).ToList();
                         break;
 
                     default:
                         throw new InvalidOperationException($"Неизвестная операция: {this.Operation}");
                 }
+
+                var result = logic.PerformSetOperation(listA, listB, this.Operation, this.Prop_CaseSensitive);
 
                 SetVariableValue(this.Prop_Result, result, sd);
                 SetVariableValue(this.Prop_Count, result.Count, sd);
