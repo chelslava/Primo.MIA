@@ -401,9 +401,11 @@
     <Compile Include="List\ListAggregateBack.cs" />
     <Compile Include="List\ListAggregateLogic.cs" />
     <Compile Include="List\ListConvertBack.cs" />
+    <Compile Include="List\ListConvertLogic.cs" />
     <Compile Include="List\ListFilterBack.cs" />
     <Compile Include="List\ListFilterLogic.cs" />
     <Compile Include="List\ListGroupBack.cs" />
+    <Compile Include="List\ListGroupLogic.cs" />
     <Compile Include="List\ListInspectBack.cs" />
     <Compile Include="List\ListSetBack.cs" />
     <Compile Include="List\ListSetLogic.cs" />

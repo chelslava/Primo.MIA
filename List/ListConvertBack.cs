@@ -27,7 +27,6 @@ using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace Primo.MIA
 {
@@ -187,6 +186,7 @@ namespace Primo.MIA
         {
             try
             {
+                var logic = new ListConvertLogic();
                 var list = GetPropertyValue<List<string>>(this.Prop_List, "Prop_List", sd);
                 var listB = GetPropertyValue<List<string>>(this.Prop_ListB, "Prop_ListB", sd);
                 string sep = GetPropertyValue<string>(this.Prop_Separator, "Prop_Separator", sd) ?? "=";
@@ -198,12 +198,7 @@ namespace Primo.MIA
                     case ListConvertMode.ToDict:
                         {
                             if (list == null) throw new ArgumentNullException("Prop_List");
-                            // Разбиваем каждую строку по первому вхождению разделителя
-                            var dict = list
-                                .Where(s => !string.IsNullOrWhiteSpace(s) && s.Contains(sep))
-                                .Select(s => s.Split(new[] { sep }, 2, StringSplitOptions.None))
-                                .GroupBy(parts => parts[0].Trim())
-                                .ToDictionary(g => g.Key, g => g.Last()[1].Trim());
+                            var dict = (Dictionary<string, string>)logic.Convert(list, this.Mode, separator: sep);
                             SetVariableValue(this.Prop_ResultDict, dict, sd);
                             SetVariableValue(this.Prop_Count, dict.Count, sd);
                             break;
@@ -212,9 +207,7 @@ namespace Primo.MIA
                     case ListConvertMode.ToDictIndexed:
                         {
                             if (list == null) throw new ArgumentNullException("Prop_List");
-                            var dict = list
-                                .Select((item, idx) => new { idx, item = item ?? string.Empty })
-                                .ToDictionary(x => x.idx.ToString(), x => x.item);
+                            var dict = (Dictionary<string, string>)logic.Convert(list, this.Mode);
                             SetVariableValue(this.Prop_ResultDict, dict, sd);
                             SetVariableValue(this.Prop_Count, dict.Count, sd);
                             break;
@@ -223,9 +216,7 @@ namespace Primo.MIA
                     case ListConvertMode.ToCSVRow:
                         {
                             if (list == null) throw new ArgumentNullException("Prop_List");
-                            // Каждый элемент оборачиваем в кавычки, внутренние кавычки экранируем удвоением
-                            string csvRow = string.Join(",",
-                                list.Select(s => "\"" + (s ?? string.Empty).Replace("\"", "\"\"") + "\""));
+                            string csvRow = (string)logic.Convert(list, this.Mode, csvSeparator: ",");
                             SetVariableValue(this.Prop_ResultString, csvRow, sd);
                             SetVariableValue(this.Prop_Count, list.Count, sd);
                             break;
@@ -233,8 +224,7 @@ namespace Primo.MIA
 
                     case ListConvertMode.FromCSVRow:
                         {
-                            // Простой CSV-парсер с поддержкой кавычек
-                            var result = ParseCsvRow(csv);
+                            var result = (List<string>)logic.Convert(new List<string> { csv }, this.Mode, csvSeparator: ",");
                             SetVariableValue(this.Prop_ResultList, result, sd);
                             SetVariableValue(this.Prop_Count, result.Count, sd);
                             break;
@@ -246,10 +236,7 @@ namespace Primo.MIA
                             if (listB == null) throw new ArgumentNullException("Prop_ListB", "Список значений обязателен для ZipToDict");
                             if (list.Count != listB.Count)
                                 throw new ArgumentException($"Списки разной длины: {list.Count} vs {listB.Count}");
-                            var dict = list
-                                .Zip(listB, (k, v) => new { k = k ?? string.Empty, v = v ?? string.Empty })
-                                .GroupBy(x => x.k)
-                                .ToDictionary(g => g.Key, g => g.Last().v);
+                            var dict = (Dictionary<string, string>)logic.Convert(list, this.Mode, secondList: listB);
                             SetVariableValue(this.Prop_ResultDict, dict, sd);
                             SetVariableValue(this.Prop_Count, dict.Count, sd);
                             break;
@@ -258,12 +245,7 @@ namespace Primo.MIA
                     case ListConvertMode.Flatten:
                         {
                             if (list == null) throw new ArgumentNullException("Prop_List");
-                            // Разбиваем каждый элемент по разделителю и собираем в один плоский список
-                            var flat = list
-                                .Where(s => s != null)
-                                .SelectMany(s => s.Split(new[] { sep }, StringSplitOptions.RemoveEmptyEntries))
-                                .Select(s => s.Trim())
-                                .ToList();
+                            var flat = (List<string>)logic.Convert(list, this.Mode, separator: sep);
                             SetVariableValue(this.Prop_ResultList, flat, sd);
                             SetVariableValue(this.Prop_Count, flat.Count, sd);
                             break;
@@ -272,12 +254,7 @@ namespace Primo.MIA
                     case ListConvertMode.Chunk:
                         {
                             if (list == null) throw new ArgumentNullException("Prop_List");
-                            if (chunkSize < 1) throw new ArgumentException("Размер батча должен быть ≥ 1");
-                            // Разбиваем на батчи через Range + Skip/Take
-                            var chunks = Enumerable
-                                .Range(0, (int)Math.Ceiling((double)list.Count / chunkSize))
-                                .Select(i => list.Skip(i * chunkSize).Take(chunkSize).ToList())
-                                .ToList();
+                            var chunks = (List<List<string>>)logic.Convert(list, this.Mode, chunkSize: chunkSize);
                             // Chunk возвращает List<List<string>> — сохраняем кол-во батчей
                             SetVariableValue(this.Prop_Count, chunks.Count, sd);
                             // Дополнительно сохраняем первый батч в ResultList для удобства
@@ -295,54 +272,6 @@ namespace Primo.MIA
             {
                 return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Ошибка конвертации: {ex.Message}" };
             }
-        }
-
-        /// <summary>
-        /// Простой CSV-парсер поддерживающий кавычки и экранирование удвоением.
-        /// "value 1","value ""quoted""",plain → ["value 1", "value \"quoted\"", "plain"]
-        /// </summary>
-        private static List<string> ParseCsvRow(string row)
-        {
-            var result = new List<string>();
-            if (string.IsNullOrEmpty(row)) return result;
-
-            int i = 0;
-            while (i < row.Length)
-            {
-                if (row[i] == '"')
-                {
-                    // Quoted field
-                    var sb = new StringBuilder();
-                    i++; // пропускаем открывающую кавычку
-                    while (i < row.Length)
-                    {
-                        if (row[i] == '"' && i + 1 < row.Length && row[i + 1] == '"')
-                        {
-                            sb.Append('"'); i += 2; // двойная кавычка → одиночная
-                        }
-                        else if (row[i] == '"')
-                        {
-                            i++; break; // закрывающая кавычка
-                        }
-                        else
-                        {
-                            sb.Append(row[i++]);
-                        }
-                    }
-                    result.Add(sb.ToString());
-                    if (i < row.Length && row[i] == ',') i++; // пропускаем запятую
-                }
-                else
-                {
-                    // Unquoted field
-                    int start = i;
-                    while (i < row.Length && row[i] != ',') i++;
-                    result.Add(row.Substring(start, i - start));
-                    if (i < row.Length) i++; // пропускаем запятую
-                }
-            }
-
-            return result;
         }
 
         public override ValidationResult Validate()

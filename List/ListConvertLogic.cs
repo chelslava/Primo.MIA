@@ -1,11 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
-namespace Primo.MIA.Tests.Logic
+namespace Primo.MIA
 {
     /// <summary>
-    /// Бизнес-логика конвертации списков
+    /// Бизнес-логика конвертации списков.
     /// </summary>
     public class ListConvertLogic
     {
@@ -35,23 +36,25 @@ namespace Primo.MIA.Tests.Logic
                 case ListConvertMode.ToDictIndexed:
                     return source
                         .Select((value, index) => new { Key = index.ToString(), Value = value })
-                        .ToDictionary(x => x.Key, x => x.Value ?? string.Empty);
+                        .ToDictionary(item => item.Key, item => item.Value ?? string.Empty);
 
                 case ListConvertMode.ToCSVRow:
-                    return string.Join(csvSeparator, 
-                        source.Select(s => $"\"{s?.Replace("\"", "\"\"")}\""));
+                    return string.Join(csvSeparator,
+                        source.Select(value => $"\"{value?.Replace("\"", "\"\"")}\""));
 
                 case ListConvertMode.FromCSVRow:
                     if (source.Count == 0) return new List<string>();
                     var csvLine = source[0] ?? string.Empty;
-                    return ParseCSV(csvLine, csvSeparator);
+                    return ParseCsv(csvLine, csvSeparator);
 
                 case ListConvertMode.ZipToDict:
                     if (secondList == null)
+                    {
                         throw new ArgumentNullException(nameof(secondList), "Второй список обязателен для ZipToDict");
-                    
+                    }
+
                     var zipDict = new Dictionary<string, string>();
-                    int minLength = Math.Min(source.Count, secondList.Count);
+                    var minLength = Math.Min(source.Count, secondList.Count);
                     for (int i = 0; i < minLength; i++)
                     {
                         zipDict[source[i] ?? $"key{i}"] = secondList[i] ?? string.Empty;
@@ -60,15 +63,15 @@ namespace Primo.MIA.Tests.Logic
 
                 case ListConvertMode.Flatten:
                     return source
-                        .Where(s => s != null)
-                        .SelectMany(s => s.Split(new[] { separator }, StringSplitOptions.RemoveEmptyEntries))
-                        .Select(s => s.Trim())
+                        .Where(value => value != null)
+                        .SelectMany(value => value.Split(new[] { separator }, StringSplitOptions.RemoveEmptyEntries))
+                        .Select(value => value.Trim())
                         .ToList();
 
                 case ListConvertMode.Chunk:
                     if (chunkSize <= 0)
                         throw new ArgumentException("Размер чанка должен быть больше 0");
-                    
+
                     var chunks = new List<List<string>>();
                     for (int i = 0; i < source.Count; i += chunkSize)
                     {
@@ -81,11 +84,11 @@ namespace Primo.MIA.Tests.Logic
             }
         }
 
-        private List<string> ParseCSV(string line, string separator)
+        private List<string> ParseCsv(string line, string separator)
         {
             var result = new List<string>();
-            bool inQuotes = false;
-            var current = new System.Text.StringBuilder();
+            var current = new StringBuilder();
+            var inQuotes = false;
 
             for (int i = 0; i < line.Length; i++)
             {
