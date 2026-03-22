@@ -30,7 +30,6 @@ using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 
 namespace Primo.MIA
 {
@@ -41,6 +40,8 @@ namespace Primo.MIA
     /// </summary>
     public class ListTransformBack : PrimoComponentTO<ListTransform>
     {
+        private readonly ListTransformLogic _logic = new ListTransformLogic();
+
         public override string GroupName { get => ActivityCategories.Lists; protected set { } }
 
         protected override int sdkTimeOut
@@ -251,16 +252,18 @@ namespace Primo.MIA
                 int padWidth = int.TryParse(GetPropertyValue<string>(this.Prop_PadWidth, "Prop_PadWidth", sd), out int pw) ? pw : 0;
                 int maxLength = int.TryParse(GetPropertyValue<string>(this.Prop_MaxLength, "Prop_MaxLength", sd), out int ml) ? ml : int.MaxValue;
 
-                // Получаем функцию трансформации для выбранного режима
-                Func<string, string> transform = BuildTransform(find, replacement, prefix, suffix, padChar, padWidth, maxLength);
-
-                // Применяем трансформацию через LINQ Select и считаем изменения
-                var result = list.Select(item =>
-                {
-                    string original = item ?? string.Empty;
-                    string converted = transform(original);
-                    return converted;
-                }).ToList();
+                var result = _logic.Transform(
+                    list,
+                    this.Mode,
+                    find,
+                    replacement,
+                    prefix,
+                    suffix,
+                    padWidth,
+                    padChar,
+                    maxLength,
+                    this.Prop_CaseSensitive,
+                    preserveNullItems: false);
 
                 // Считаем сколько реально изменилось
                 int changed = list
@@ -276,86 +279,6 @@ namespace Primo.MIA
             catch (Exception ex)
             {
                 return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Ошибка преобразования: {ex.Message}" };
-            }
-        }
-
-        /// <summary>
-        /// Строит функцию трансформации string → string для выбранного режима.
-        /// Все параметры захватываются в замыкание — вычисляются один раз перед LINQ Select.
-        /// </summary>
-        private Func<string, string> BuildTransform(
-            string find, string replacement, string prefix, string suffix,
-            char padChar, int padWidth, int maxLength)
-        {
-            switch (this.Mode)
-            {
-                case ListTransformMode.ToUpper:
-                    return s => (s ?? string.Empty).ToUpper();
-
-                case ListTransformMode.ToLower:
-                    return s => (s ?? string.Empty).ToLower();
-
-                case ListTransformMode.Trim:
-                    return s => (s ?? string.Empty).Trim();
-
-                case ListTransformMode.TrimStart:
-                    return s => (s ?? string.Empty).TrimStart();
-
-                case ListTransformMode.TrimEnd:
-                    return s => (s ?? string.Empty).TrimEnd();
-
-                case ListTransformMode.Replace:
-                    {
-                        StringComparison sc = ComparisonHelper.GetStringComparison(this.Prop_CaseSensitive);
-
-                        // Replace без учёта регистра через regex (string.Replace не поддерживает StringComparison)
-                        if (!this.Prop_CaseSensitive)
-                        {
-                            var rx = new Regex(Regex.Escape(find), RegexOptions.IgnoreCase | RegexOptions.Compiled);
-                            return s => s == null ? string.Empty : rx.Replace(s, replacement);
-                        }
-                        return s => s == null ? string.Empty : s.Replace(find, replacement);
-                    }
-
-                case ListTransformMode.RegexReplace:
-                    {
-                        var opts = this.Prop_CaseSensitive
-                            ? RegexOptions.Compiled
-                            : RegexOptions.Compiled | RegexOptions.IgnoreCase;
-                        var rx = new Regex(find, opts);
-                        return s => s == null ? string.Empty : rx.Replace(s, replacement);
-                    }
-
-                case ListTransformMode.Prefix:
-                    return s => prefix + (s ?? string.Empty);
-
-                case ListTransformMode.Suffix:
-                    return s => (s ?? string.Empty) + suffix;
-
-                case ListTransformMode.Wrap:
-                    return s => prefix + (s ?? string.Empty) + suffix;
-
-                case ListTransformMode.PadLeft:
-                    return s => (s ?? string.Empty).PadLeft(padWidth, padChar);
-
-                case ListTransformMode.PadRight:
-                    return s => (s ?? string.Empty).PadRight(padWidth, padChar);
-
-                case ListTransformMode.Truncate:
-                    return s =>
-                    {
-                        string str = s ?? string.Empty;
-                        return str.Length <= maxLength ? str : str.Substring(0, maxLength);
-                    };
-
-                case ListTransformMode.RemoveNumbers:
-                    return s => s == null ? string.Empty : Regex.Replace(s, @"\d", string.Empty);
-
-                case ListTransformMode.RemoveNonAlpha:
-                    return s => s == null ? string.Empty : Regex.Replace(s, @"[^a-zA-Zа-яА-ЯёЁ0-9 ]", string.Empty);
-
-                default:
-                    throw new InvalidOperationException($"Неизвестный режим: {this.Mode}");
             }
         }
 

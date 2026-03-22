@@ -414,6 +414,7 @@
     <Compile Include="List\ListSortBack.cs" />
     <Compile Include="List\ListSortLogic.cs" />
     <Compile Include="List\ListTransformBack.cs" />
+    <Compile Include="List\ListTransformLogic.cs" />
     <Compile Include="List\ListAggregate.xaml.cs">
       <DependentUpon>ListAggregate.xaml</DependentUpon>
     </Compile>
