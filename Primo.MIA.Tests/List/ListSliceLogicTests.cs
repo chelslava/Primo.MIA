@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using FluentAssertions;
-using Primo.MIA.Tests.Logic;
+using Primo.MIA;
 using Xunit;
 
 namespace Primo.MIA.Tests.List
@@ -156,7 +156,7 @@ namespace Primo.MIA.Tests.List
             var result = _logic.Slice(list, ListSliceMode.Range, fromIndex: 1, toIndex: 4);
 
             // Assert
-            result.Should().Equal("b", "c", "d");
+            result.Should().Equal("b", "c", "d", "e");
         }
 
         [Fact]
@@ -169,7 +169,7 @@ namespace Primo.MIA.Tests.List
             var result = _logic.Slice(list, ListSliceMode.Range, fromIndex: 0, toIndex: 3);
 
             // Assert
-            result.Should().Equal("a", "b", "c");
+            result.Should().Equal("a", "b", "c", "d");
         }
 
         [Fact]

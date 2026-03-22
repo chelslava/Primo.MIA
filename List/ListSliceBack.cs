@@ -179,6 +179,7 @@ namespace Primo.MIA
         {
             try
             {
+                var logic = new ListSliceLogic();
                 var list = GetPropertyValue<List<string>>(this.Prop_List, "Prop_List", sd);
                 if (list == null) throw new ArgumentNullException("Prop_List", "Список не может быть null");
 
@@ -188,60 +189,13 @@ namespace Primo.MIA
                 int fromIndex = int.TryParse(GetPropertyValue<string>(this.Prop_FromIndex, "Prop_FromIndex", sd), out int fiv) ? fiv : 0;
                 int toIndex = int.TryParse(GetPropertyValue<string>(this.Prop_ToIndex, "Prop_ToIndex", sd), out int tiv) ? tiv : list.Count - 1;
 
-                List<string> result;
-                int totalPages = 0;
+                var slice = logic.SliceDetailed(list, this.Mode, n, page, pageSize, fromIndex, toIndex, n);
 
-                switch (this.Mode)
-                {
-                    case ListSliceMode.FirstN:
-                        result = list.Take(n).ToList();
-                        break;
+                SetVariableValue(this.Prop_Result, slice.Result, sd);
+                SetVariableValue(this.Prop_Count, slice.Result.Count, sd);
+                SetVariableValue(this.Prop_TotalPages, slice.TotalPages, sd);
 
-                    case ListSliceMode.LastN:
-                        result = list.Skip(Math.Max(0, list.Count - n)).ToList();
-                        break;
-
-                    case ListSliceMode.SkipFirst:
-                        result = list.Skip(n).ToList();
-                        break;
-
-                    case ListSliceMode.SkipLast:
-                        result = list.Take(Math.Max(0, list.Count - n)).ToList();
-                        break;
-
-                    case ListSliceMode.Page:
-                        if (page < 1) throw new ArgumentException("Номер страницы должен быть ≥ 1");
-                        if (pageSize < 1) throw new ArgumentException("Размер страницы должен быть ≥ 1");
-                        totalPages = (int)Math.Ceiling((double)list.Count / pageSize);
-                        result = list.Skip((page - 1) * pageSize).Take(pageSize).ToList();
-                        break;
-
-                    case ListSliceMode.Range:
-                        fromIndex = Math.Max(0, fromIndex);
-                        toIndex = Math.Min(list.Count - 1, toIndex);
-                        if (fromIndex > toIndex) { result = new List<string>(); break; }
-                        result = list.Skip(fromIndex).Take(toIndex - fromIndex + 1).ToList();
-                        break;
-
-                    case ListSliceMode.EveryNth:
-                        if (n < 1) throw new ArgumentException("Шаг должен быть ≥ 1");
-                        // Select с индексом, фильтруем по i % n == 0
-                        result = list
-                            .Select((item, idx) => new { item, idx })
-                            .Where(x => x.idx % n == 0)
-                            .Select(x => x.item)
-                            .ToList();
-                        break;
-
-                    default:
-                        throw new InvalidOperationException($"Неизвестный режим: {this.Mode}");
-                }
-
-                SetVariableValue(this.Prop_Result, result, sd);
-                SetVariableValue(this.Prop_Count, result.Count, sd);
-                SetVariableValue(this.Prop_TotalPages, totalPages, sd);
-
-                return new ExecutionResult { IsSuccess = true, SuccessMessage = $"Срез: {result.Count} из {list.Count} элементов" };
+                return new ExecutionResult { IsSuccess = true, SuccessMessage = $"Срез: {slice.Result.Count} из {list.Count} элементов" };
             }
             catch (Exception ex)
             {

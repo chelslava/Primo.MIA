@@ -404,6 +404,7 @@
     <Compile Include="List\ListSetBack.cs" />
     <Compile Include="List\ListSetLogic.cs" />
     <Compile Include="List\ListSliceBack.cs" />
+    <Compile Include="List\ListSliceLogic.cs" />
     <Compile Include="List\ListSortBack.cs" />
     <Compile Include="List\ListTransformBack.cs" />
     <Compile Include="List\ListAggregate.xaml.cs">
