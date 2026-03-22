@@ -154,6 +154,7 @@ namespace Primo.MIA
         {
             try
             {
+                var logic = new DictionaryKeyValueLogic();
                 var dict = GetPropertyValue<Dictionary<string, string>>(this.Prop_Dictionary, "Prop_Dictionary", sd);
                 string key = GetPropertyValue<string>(this.Prop_Key, "Prop_Key", sd);
                 string defVal = GetPropertyValue<string>(this.Prop_DefaultValue, "Prop_DefaultValue", sd);
@@ -163,22 +164,12 @@ namespace Primo.MIA
                 if (string.IsNullOrEmpty(key))
                     throw new ArgumentException("Ключ не может быть пустым");
 
-                bool found = dict.TryGetValue(key, out string value);
+                var result = logic.GetValue(dict, key, defVal, this.Prop_ThrowIfNotFound);
 
-                if (!found)
-                {
-                    if (this.Prop_ThrowIfNotFound)
-                        throw new KeyNotFoundException(
-                            $"Ключ '{key}' не найден в словаре. " +
-                            $"Доступные ключи: {string.Join(", ", dict.Keys.OrderBy(k => k))}");
+                SetVariableValue(this.Prop_Value, result.Value, sd);
+                SetVariableValue(this.Prop_Found, result.Found, sd);
 
-                    value = defVal ?? string.Empty;
-                }
-
-                SetVariableValue(this.Prop_Value, value, sd);
-                SetVariableValue(this.Prop_Found, found, sd);
-
-                return new ExecutionResult { IsSuccess = true, SuccessMessage = $"Ключ '{key}': {(found ? "найден" : "не найден, возвращено значение по умолчанию")}" };
+                return new ExecutionResult { IsSuccess = true, SuccessMessage = $"Ключ '{key}': {(result.Found ? "найден" : "не найден, возвращено значение по умолчанию")}" };
             }
             catch (Exception ex)
             {

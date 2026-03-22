@@ -140,6 +140,7 @@ namespace Primo.MIA
         {
             try
             {
+                var logic = new DictionaryKeyValueLogic();
                 var dict = GetPropertyValue<Dictionary<string, string>>(this.Prop_Dictionary, "Prop_Dictionary", sd);
                 string key = GetPropertyValue<string>(this.Prop_Key, "Prop_Key", sd);
                 string value = GetPropertyValue<string>(this.Prop_Value, "Prop_Value", sd);
@@ -151,17 +152,12 @@ namespace Primo.MIA
                 if (value == null)
                     throw new ArgumentNullException("Prop_Value", "Значение не может быть null");
 
-                // Фиксируем: был ли ключ до установки
-                bool isUpdate = dict.ContainsKey(key);
+                var result = logic.SetValue(dict, key, value);
 
-                // Создаём копию и устанавливаем значение — оригинал не трогаем
-                var result = dict.ToDictionary(p => p.Key, p => p.Value);
-                result[key] = value;
+                SetVariableValue(this.Prop_ResultDictionary, result.Dictionary, sd);
+                SetVariableValue(this.Prop_IsUpdate, result.IsUpdate, sd);
 
-                SetVariableValue(this.Prop_ResultDictionary, result, sd);
-                SetVariableValue(this.Prop_IsUpdate, isUpdate, sd);
-
-                string action = isUpdate ? "обновлён" : "добавлен";
+                string action = result.IsUpdate ? "обновлён" : "добавлен";
                 return new ExecutionResult { IsSuccess = true, SuccessMessage = $"Ключ '{key}' {action}" };
             }
             catch (Exception ex)

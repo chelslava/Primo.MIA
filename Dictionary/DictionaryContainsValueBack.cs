@@ -113,25 +113,19 @@ namespace Primo.MIA
         {
             try
             {
+                var logic = new DictionaryKeyValueLogic();
                 var dict = GetPropertyValue<Dictionary<string, string>>(this.Prop_Dictionary, "Prop_Dictionary", sd);
                 string searchVal = GetPropertyValue<string>(this.Prop_SearchValue, "Prop_SearchValue", sd);
 
                 if (dict == null) throw new ArgumentNullException("Prop_Dictionary", "Словарь не может быть null");
                 if (searchVal == null) throw new ArgumentNullException("Prop_SearchValue", "Искомое значение не может быть null");
 
-                StringComparison comparison = ComparisonHelper.GetStringComparison(this.Prop_CaseSensitive);
+                var result = logic.ContainsValue(dict, searchVal, this.Prop_CaseSensitive);
 
-                // Через LINQ Where собираем все ключи с совпавшим значением
-                List<string> foundKeys = dict
-                    .Where(p => string.Equals(p.Value, searchVal, comparison))
-                    .Select(p => p.Key)
-                    .OrderBy(k => k)
-                    .ToList();
+                SetVariableValue(this.Prop_Result, result.Found, sd);
+                SetVariableValue(this.Prop_FoundKeys, result.Keys, sd);
 
-                SetVariableValue(this.Prop_Result, foundKeys.Any(), sd);
-                SetVariableValue(this.Prop_FoundKeys, foundKeys, sd);
-
-                return new ExecutionResult { IsSuccess = true, SuccessMessage = $"Значение '{searchVal}': найдено у {foundKeys.Count} ключей" };
+                return new ExecutionResult { IsSuccess = true, SuccessMessage = $"Значение '{searchVal}': найдено у {result.Count} ключей" };
             }
             catch (Exception ex)
             {

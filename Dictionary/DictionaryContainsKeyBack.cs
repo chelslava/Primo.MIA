@@ -81,16 +81,17 @@ namespace Primo.MIA
         {
             try
             {
+                var logic = new DictionaryKeyValueLogic();
                 var dict = GetPropertyValue<Dictionary<string, string>>(this.Prop_Dictionary, "Prop_Dictionary", sd);
                 string key = GetPropertyValue<string>(this.Prop_Key, "Prop_Key", sd);
 
                 if (dict == null) throw new ArgumentNullException("Prop_Dictionary", "Словарь не может быть null");
                 if (string.IsNullOrEmpty(key)) throw new ArgumentException("Ключ не может быть пустым");
 
-                bool result = dict.ContainsKey(key);
-                SetVariableValue(this.Prop_Result, result, sd);
+                var result = logic.ContainsKey(dict, key);
+                SetVariableValue(this.Prop_Result, result.Found, sd);
 
-                return new ExecutionResult { IsSuccess = true, SuccessMessage = $"Ключ '{key}': {(result ? "найден" : "не найден")}" };
+                return new ExecutionResult { IsSuccess = true, SuccessMessage = $"Ключ '{key}': {(result.Found ? "найден" : "не найден")}" };
             }
             catch (Exception ex)
             {
