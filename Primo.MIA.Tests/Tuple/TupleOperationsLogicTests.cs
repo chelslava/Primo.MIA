@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using FluentAssertions;
 using Primo.MIA;
-using Primo.MIA.Tests.Logic;
 using Xunit;
 
 namespace Primo.MIA.Tests.Tuple

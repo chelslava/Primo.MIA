@@ -414,7 +414,6 @@
     <Compile Include="List\ListSortBack.cs" />
     <Compile Include="List\ListSortLogic.cs" />
     <Compile Include="List\ListTransformBack.cs" />
-    <Compile Include="List\ListTransformLogic.cs" />
     <Compile Include="List\ListAggregate.xaml.cs">
       <DependentUpon>ListAggregate.xaml</DependentUpon>
     </Compile>
@@ -474,6 +473,7 @@
     <Compile Include="Tuple\TupleCreateBack.cs" />
     <Compile Include="Tuple\TupleDestructureBack.cs" />
     <Compile Include="Tuple\TupleGetBack.cs" />
+    <Compile Include="Tuple\TupleOperationsLogic.cs" />
     <Compile Include="Tuple\TupleInspectBack.cs" />
     <Compile Include="Tuple\TupleSortBack.cs" />
     <Compile Include="Tuple\TupleUnzipBack.cs" />
