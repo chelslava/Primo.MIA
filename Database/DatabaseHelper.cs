@@ -1898,9 +1898,6 @@ namespace Primo.MIA
             if (string.IsNullOrWhiteSpace(providerInvariantName))
                 return "SELECT SCOPE_IDENTITY()";
 
-            if (providerInvariantName.IndexOf("SqlClient", StringComparison.OrdinalIgnoreCase) >= 0)
-                return "SELECT SCOPE_IDENTITY()";
-
             if (providerInvariantName.IndexOf("Npgsql", StringComparison.OrdinalIgnoreCase) >= 0)
                 return "SELECT LASTVAL()";
 
@@ -1909,6 +1906,9 @@ namespace Primo.MIA
 
             if (providerInvariantName.IndexOf("SQLite", StringComparison.OrdinalIgnoreCase) >= 0)
                 return "SELECT last_insert_rowid()";
+
+            if (providerInvariantName.IndexOf("SqlClient", StringComparison.OrdinalIgnoreCase) >= 0)
+                return "SELECT SCOPE_IDENTITY()";
 
             return null;
         }

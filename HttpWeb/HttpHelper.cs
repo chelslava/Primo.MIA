@@ -317,6 +317,9 @@ namespace Primo.MIA
                 (!json.StartsWith("[") || !json.EndsWith("]")))
                 return false;
 
+            if (HasTrailingComma(json))
+                return false;
+
             try
             {
                 JsonConvert.DeserializeObject(json);
@@ -326,6 +329,54 @@ namespace Primo.MIA
             {
                 return false;
             }
+        }
+
+        private static bool HasTrailingComma(string json)
+        {
+            bool inString = false;
+            bool isEscaped = false;
+
+            for (int i = 0; i < json.Length; i++)
+            {
+                char current = json[i];
+
+                if (inString)
+                {
+                    if (isEscaped)
+                    {
+                        isEscaped = false;
+                    }
+                    else if (current == '\\')
+                    {
+                        isEscaped = true;
+                    }
+                    else if (current == '"')
+                    {
+                        inString = false;
+                    }
+
+                    continue;
+                }
+
+                if (current == '"')
+                {
+                    inString = true;
+                    continue;
+                }
+
+                if (current != ',')
+                    continue;
+
+                for (int j = i + 1; j < json.Length; j++)
+                {
+                    if (char.IsWhiteSpace(json[j]))
+                        continue;
+
+                    return json[j] == '}' || json[j] == ']';
+                }
+            }
+
+            return false;
         }
 
         /// <summary>

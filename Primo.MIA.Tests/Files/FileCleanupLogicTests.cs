@@ -14,11 +14,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using FluentAssertions;
-using Primo.MIA.Tests.Logic;
 using Xunit;
 
-using TimeAttr = Primo.MIA.Tests.Logic.FileTimeAttribute;
-using ThresholdMode = Primo.MIA.Tests.Logic.CleanupThresholdMode;
+using TimeAttr = Primo.MIA.FileTimeAttribute;
+using ThresholdMode = Primo.MIA.CleanupThresholdMode;
 
 namespace Primo.MIA.Tests.Files
 {
@@ -52,7 +51,7 @@ namespace Primo.MIA.Tests.Files
         public void ParseFilePatterns_EmptyString_ReturnsStar()
         {
             // Act
-            var result = FileCleanupLogic.ParseFilePatterns("");
+            var result = Primo.MIA.FileCleanupLogic.ParseFilePatterns("");
 
             // Assert
             result.Should().Equal("*");
@@ -62,7 +61,7 @@ namespace Primo.MIA.Tests.Files
         public void ParseFilePatterns_Null_ReturnsStar()
         {
             // Act
-            var result = FileCleanupLogic.ParseFilePatterns(null);
+            var result = Primo.MIA.FileCleanupLogic.ParseFilePatterns(null);
 
             // Assert
             result.Should().Equal("*");
@@ -72,7 +71,7 @@ namespace Primo.MIA.Tests.Files
         public void ParseFilePatterns_SinglePattern_ReturnsList()
         {
             // Act
-            var result = FileCleanupLogic.ParseFilePatterns("*.tmp");
+            var result = Primo.MIA.FileCleanupLogic.ParseFilePatterns("*.tmp");
 
             // Assert
             result.Should().Equal("*.tmp");
@@ -82,7 +81,7 @@ namespace Primo.MIA.Tests.Files
         public void ParseFilePatterns_CommaSeparated_ReturnsList()
         {
             // Act
-            var result = FileCleanupLogic.ParseFilePatterns("*.tmp, *.log, *.bak");
+            var result = Primo.MIA.FileCleanupLogic.ParseFilePatterns("*.tmp, *.log, *.bak");
 
             // Assert
             result.Should().Equal("*.tmp", "*.log", "*.bak");
@@ -92,7 +91,7 @@ namespace Primo.MIA.Tests.Files
         public void ParseFilePatterns_SemicolonSeparated_ReturnsList()
         {
             // Act
-            var result = FileCleanupLogic.ParseFilePatterns("*.tmp;*.log;*.bak");
+            var result = Primo.MIA.FileCleanupLogic.ParseFilePatterns("*.tmp;*.log;*.bak");
 
             // Assert
             result.Should().Equal("*.tmp", "*.log", "*.bak");
@@ -102,7 +101,7 @@ namespace Primo.MIA.Tests.Files
         public void ParseFilePatterns_Duplicates_Removed()
         {
             // Act
-            var result = FileCleanupLogic.ParseFilePatterns("*.tmp, *.log, *.tmp");
+            var result = Primo.MIA.FileCleanupLogic.ParseFilePatterns("*.tmp, *.log, *.tmp");
 
             // Assert
             result.Should().Equal("*.tmp", "*.log");
@@ -124,7 +123,7 @@ namespace Primo.MIA.Tests.Files
         public void FormatBytes_VariousSizes_ReturnsCorrectFormat(long bytes, string expected)
         {
             // Act
-            string result = FileCleanupLogic.FormatBytes(bytes);
+            string result = Primo.MIA.FileCleanupLogic.FormatBytes(bytes);
 
             // Assert
             result.Should().Be(expected);
@@ -145,7 +144,7 @@ namespace Primo.MIA.Tests.Files
             fi.LastWriteTime = DateTime.Now.AddDays(-10);
 
             // Act
-            bool result = FileCleanupLogic.MeetsTimeThreshold(
+            bool result = Primo.MIA.FileCleanupLogic.MeetsTimeThreshold(
                 fi, TimeAttr.LastWriteTime, DateTime.Now.AddDays(-5), null);
 
             // Assert
@@ -162,7 +161,7 @@ namespace Primo.MIA.Tests.Files
             fi.LastWriteTime = DateTime.Now.AddDays(-2);
 
             // Act
-            bool result = FileCleanupLogic.MeetsTimeThreshold(
+            bool result = Primo.MIA.FileCleanupLogic.MeetsTimeThreshold(
                 fi, TimeAttr.LastWriteTime, DateTime.Now.AddDays(-5), null);
 
             // Assert
@@ -179,7 +178,7 @@ namespace Primo.MIA.Tests.Files
             fi.LastWriteTime = DateTime.Now.AddDays(-10);
 
             // Act — файл старше 5 дней И раньше конкретной даты
-            bool result = FileCleanupLogic.MeetsTimeThreshold(
+            bool result = Primo.MIA.FileCleanupLogic.MeetsTimeThreshold(
                 fi, TimeAttr.LastWriteTime,
                 DateTime.Now.AddDays(-5),
                 DateTime.Now.AddDays(-3));
@@ -198,7 +197,7 @@ namespace Primo.MIA.Tests.Files
             fi.LastWriteTime = DateTime.Now.AddDays(-10);
 
             // Act — файл старше 5 дней, но НЕ раньше даты (дата = 15 дней назад)
-            bool result = FileCleanupLogic.MeetsTimeThreshold(
+            bool result = Primo.MIA.FileCleanupLogic.MeetsTimeThreshold(
                 fi, TimeAttr.LastWriteTime,
                 DateTime.Now.AddDays(-5),
                 DateTime.Now.AddDays(-15));
@@ -221,11 +220,11 @@ namespace Primo.MIA.Tests.Files
             var threshold = DateTime.Now.AddDays(-7);
 
             // Act & Assert
-            FileCleanupLogic.MeetsTimeThreshold(fi, TimeAttr.CreationTime, threshold, null)
+            Primo.MIA.FileCleanupLogic.MeetsTimeThreshold(fi, TimeAttr.CreationTime, threshold, null)
                 .Should().BeTrue("CreationTime старее порога");
-            FileCleanupLogic.MeetsTimeThreshold(fi, TimeAttr.LastWriteTime, threshold, null)
+            Primo.MIA.FileCleanupLogic.MeetsTimeThreshold(fi, TimeAttr.LastWriteTime, threshold, null)
                 .Should().BeFalse("LastWriteTime новее порога");
-            FileCleanupLogic.MeetsTimeThreshold(fi, TimeAttr.LastAccessTime, threshold, null)
+            Primo.MIA.FileCleanupLogic.MeetsTimeThreshold(fi, TimeAttr.LastAccessTime, threshold, null)
                 .Should().BeTrue("LastAccessTime старее порога");
         }
 
@@ -242,7 +241,7 @@ namespace Primo.MIA.Tests.Files
             var di = new DirectoryInfo(emptyFolder);
 
             // Act
-            long size = FileCleanupLogic.GetDirectorySize(di);
+            long size = Primo.MIA.FileCleanupLogic.GetDirectorySize(di);
 
             // Assert
             size.Should().Be(0);
@@ -259,7 +258,7 @@ namespace Primo.MIA.Tests.Files
             var di = new DirectoryInfo(folder);
 
             // Act
-            long size = FileCleanupLogic.GetDirectorySize(di);
+            long size = Primo.MIA.FileCleanupLogic.GetDirectorySize(di);
 
             // Assert
             size.Should().Be(300);
@@ -278,7 +277,7 @@ namespace Primo.MIA.Tests.Files
             var di = new DirectoryInfo(folder);
 
             // Act
-            long size = FileCleanupLogic.GetDirectorySize(di);
+            long size = Primo.MIA.FileCleanupLogic.GetDirectorySize(di);
 
             // Assert
             size.Should().Be(300);
@@ -298,7 +297,7 @@ namespace Primo.MIA.Tests.Files
             fi.LastWriteTime = DateTime.Now.AddDays(-100);
 
             // Act
-            var result = FileCleanupLogic.Cleanup(
+            var result = Primo.MIA.FileCleanupLogic.Cleanup(
                 _testFolder,
                 deleteFiles: true,
                 olderThanDays: 30,
@@ -321,7 +320,7 @@ namespace Primo.MIA.Tests.Files
             fi.LastWriteTime = DateTime.Now.AddDays(-100);
 
             // Act
-            var result = FileCleanupLogic.Cleanup(
+            var result = Primo.MIA.FileCleanupLogic.Cleanup(
                 _testFolder,
                 deleteFiles: true,
                 olderThanDays: 30,
@@ -341,7 +340,7 @@ namespace Primo.MIA.Tests.Files
         public void Cleanup_EmptyPath_ReturnsError()
         {
             // Act
-            var result = FileCleanupLogic.Cleanup("");
+            var result = Primo.MIA.FileCleanupLogic.Cleanup("");
 
             // Assert
             result.IsSuccess.Should().BeFalse();
@@ -352,7 +351,7 @@ namespace Primo.MIA.Tests.Files
         public void Cleanup_NonExistentFolder_ReturnsError()
         {
             // Act
-            var result = FileCleanupLogic.Cleanup(@"C:\NonExistentFolder_12345");
+            var result = Primo.MIA.FileCleanupLogic.Cleanup(@"C:\NonExistentFolder_12345");
 
             // Assert
             result.IsSuccess.Should().BeFalse();
@@ -363,7 +362,7 @@ namespace Primo.MIA.Tests.Files
         public void Cleanup_NoTargetSelected_ReturnsError()
         {
             // Act
-            var result = FileCleanupLogic.Cleanup(
+            var result = Primo.MIA.FileCleanupLogic.Cleanup(
                 _testFolder,
                 deleteFiles: false,
                 deleteEmptyFolders: false,
@@ -378,7 +377,7 @@ namespace Primo.MIA.Tests.Files
         public void Cleanup_NegativeDays_ReturnsError()
         {
             // Act
-            var result = FileCleanupLogic.Cleanup(
+            var result = Primo.MIA.FileCleanupLogic.Cleanup(
                 _testFolder,
                 thresholdMode: ThresholdMode.OlderThanDays,
                 olderThanDays: -5);
@@ -404,7 +403,7 @@ namespace Primo.MIA.Tests.Files
             new FileInfo(txtFile).LastWriteTime = DateTime.Now.AddDays(-100);
 
             // Act
-            var result = FileCleanupLogic.Cleanup(
+            var result = Primo.MIA.FileCleanupLogic.Cleanup(
                 _testFolder,
                 deleteFiles: true,
                 filePattern: "*.log",
@@ -429,7 +428,7 @@ namespace Primo.MIA.Tests.Files
             new FileInfo(largeFile).LastWriteTime = DateTime.Now.AddDays(-100);
 
             // Act
-            var result = FileCleanupLogic.Cleanup(
+            var result = Primo.MIA.FileCleanupLogic.Cleanup(
                 _testFolder,
                 deleteFiles: true,
                 minSizeBytes: 100,
@@ -454,7 +453,7 @@ namespace Primo.MIA.Tests.Files
             }
 
             // Act
-            var result = FileCleanupLogic.Cleanup(
+            var result = Primo.MIA.FileCleanupLogic.Cleanup(
                 _testFolder,
                 deleteFiles: true,
                 maxItems: 2,
@@ -481,7 +480,7 @@ namespace Primo.MIA.Tests.Files
             new FileInfo(file2).LastWriteTime = DateTime.Now.AddDays(-100);
 
             // Act
-            var result = FileCleanupLogic.Cleanup(
+            var result = Primo.MIA.FileCleanupLogic.Cleanup(
                 _testFolder,
                 deleteFiles: true,
                 olderThanDays: 30,

@@ -21,9 +21,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
 using LTools.Common.Model;
 using LTools.Common.Model.Serialization;
 using LTools.Common.UIElements;
@@ -38,25 +36,6 @@ namespace Primo.MIA
     /// </summary>
     public class TextTemplateBack : PrimoComponentTO<TextTemplate>
     {
-        // =====================================================================
-        // Статические словари — паттерны regex для каждого синтаксиса
-        // =====================================================================
-
-        /// <summary>
-        /// Regex-паттерны для каждого синтаксиса плейсхолдеров.
-        /// Группа 1: имя ключа (может содержать суффикс формата через ':').
-        /// </summary>
-        private static readonly Dictionary<TemplateSyntax, string> SyntaxPatterns =
-            new Dictionary<TemplateSyntax, string>
-            {
-                // {{ключ}} или {{ключ:формат}}
-                { TemplateSyntax.DoubleBrace, @"\{\{([^}]+)\}\}" },
-                // {ключ} или {ключ:формат}
-                { TemplateSyntax.SingleBrace, @"\{([^{}]+)\}"   },
-                // %ключ% или %ключ:формат%
-                { TemplateSyntax.Percent,     @"%([^%]+)%"      }
-            };
-
         // =====================================================================
         // Свойства
         // =====================================================================
@@ -319,7 +298,7 @@ namespace Primo.MIA
 
                     string encodingName = GetPropertyValue<string>(
                         this.Prop_Encoding, nameof(Prop_Encoding), sd);
-                    Encoding encoding = ParseEncoding(encodingName);
+                    Encoding encoding = TextTemplateLogic.ParseEncoding(encodingName);
                     template = File.ReadAllText(templateFile, encoding);
                 }
                 else
@@ -334,81 +313,27 @@ namespace Primo.MIA
 
                 // ── Выполняем подстановку ──────────────────────────────────
 
-                var  missingKeys  = new List<string>();
-                int  replacements = 0;
+                var renderResult = TextTemplateLogic.Render(
+                    template,
+                    variables,
+                    this.Prop_Syntax,
+                    this.Prop_MissingKeyBehavior,
+                    this.Prop_CaseSensitive);
 
-                // Получаем regex-паттерн для выбранного синтаксиса
-                string pattern = SyntaxPatterns[this.Prop_Syntax];
-
-                // StringComparison для поиска ключей с учётом Prop_CaseSensitive
-                StringComparison comparison = this.Prop_CaseSensitive
-                    ? StringComparison.Ordinal
-                    : StringComparison.OrdinalIgnoreCase;
-
-                // Один проход по шаблону через Regex.Replace с MatchEvaluator
-                // Используем замыкание на локальные переменные вместо ref/out
-                string result = Regex.Replace(template, pattern, match =>
-                {
-                    // Полное содержимое плейсхолдера: "ключ" или "ключ:формат"
-                    string fullKey = match.Groups[1].Value.Trim();
-
-                    // Разделяем ключ и суффикс формата
-                    string key        = fullKey;
-                    string formatSpec = null;
-
-                    int colonIndex = fullKey.IndexOf(':');
-                    if (colonIndex > 0)
-                    {
-                        key        = fullKey.Substring(0, colonIndex).Trim();
-                        formatSpec = fullKey.Substring(colonIndex + 1).Trim();
-                    }
-
-                    // Ищем ключ в словаре с учётом регистра
-                    string value = variables
-                        .Where(kv => string.Compare(kv.Key, key, comparison) == 0)
-                        .Select(kv => kv.Value)
-                        .FirstOrDefault();
-
-                    if (value != null)
-                    {
-                        replacements++;
-
-                        // Применяем форматирование если задан суффикс
-                        if (!string.IsNullOrEmpty(formatSpec))
-                            value = ApplyFormat(value, formatSpec);
-
-                        return value;
-                    }
-
-                    // Ключ не найден — применяем стратегию MissingKeyBehavior
-                    missingKeys.Add(key);
-
-                    return this.Prop_MissingKeyBehavior == MissingKeyBehavior.ReplaceWithEmpty
-                        ? string.Empty
-                        : match.Value; // LeaveAsIs — возвращаем плейсхолдер как есть
-                });
-
-                // ── Проверяем строгий режим ────────────────────────────────
-
-                if (this.Prop_MissingKeyBehavior == MissingKeyBehavior.ThrowError
-                    && missingKeys.Count > 0)
-                {
-                    string keyList = string.Join(", ", missingKeys.Distinct());
-                    return Fail(
-                        $"{ActivityStrings.Error_TemplateMissingKeys}: {keyList}");
-                }
+                if (!renderResult.IsSuccess)
+                    return Fail(renderResult.ErrorMessage);
 
                 // ── Записываем выходные параметры ──────────────────────────
 
-                SetVariableValue(this.Prop_Result,         result,       sd);
-                SetVariableValue(this.Prop_ReplacedCount,  replacements, sd);
-                SetVariableValue(this.Prop_MissingKeys,    missingKeys,  sd);
+                SetVariableValue(this.Prop_Result,         renderResult.Result,        sd);
+                SetVariableValue(this.Prop_ReplacedCount,  renderResult.ReplacedCount, sd);
+                SetVariableValue(this.Prop_MissingKeys,    renderResult.MissingKeys,   sd);
 
                 // ── Формируем сообщение ────────────────────────────────────
 
-                string successMsg = missingKeys.Count == 0
-                    ? $"Выполнено {replacements} замен"
-                    : $"Выполнено {replacements} замен, незаполненных ключей: {missingKeys.Count}";
+                string successMsg = renderResult.MissingKeys.Count == 0
+                    ? $"Выполнено {renderResult.ReplacedCount} замен"
+                    : $"Выполнено {renderResult.ReplacedCount} замен, незаполненных ключей: {renderResult.MissingKeys.Count}";
 
                 return new ExecutionResult
                 {
@@ -425,50 +350,6 @@ namespace Primo.MIA
         // =====================================================================
         // Вспомогательные методы
         // =====================================================================
-
-        /// <summary>
-        /// Применяет .NET-формат к строковому значению плейсхолдера.
-        /// Пытается распарсить как DateTime, затем как double.
-        /// Если не удалось — возвращает исходное значение без изменений.
-        /// </summary>
-        /// <param name="value">Строковое значение из словаря.</param>
-        /// <param name="format">.NET-формат (например "N2", "dd.MM.yyyy", "P1").</param>
-        private static string ApplyFormat(string value, string format)
-        {
-            // Пробуем DateTime
-            if (DateTime.TryParse(value, out DateTime dateValue))
-                return dateValue.ToString(format);
-
-            // Пробуем double (InvariantCulture для парсинга, CurrentCulture для вывода)
-            if (double.TryParse(value,
-                System.Globalization.NumberStyles.Any,
-                System.Globalization.CultureInfo.InvariantCulture,
-                out double numValue))
-                return numValue.ToString(format);
-
-            // Не удалось — возвращаем как есть
-            return value;
-        }
-
-        /// <summary>
-        /// Разбирает строку кодировки в объект Encoding.
-        /// Поддерживает UTF-8, UTF-16, Windows-1251, CP866 и другие IANA-имена.
-        /// При ошибке возвращает UTF-8.
-        /// </summary>
-        private static Encoding ParseEncoding(string encodingName)
-        {
-            if (string.IsNullOrWhiteSpace(encodingName))
-                return Encoding.UTF8;
-
-            try
-            {
-                return Encoding.GetEncoding(encodingName);
-            }
-            catch
-            {
-                return Encoding.UTF8;
-            }
-        }
 
         private static ExecutionResult Fail(string msg) =>
             new ExecutionResult { IsSuccess = false, ErrorMessage = msg };

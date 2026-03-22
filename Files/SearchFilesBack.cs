@@ -5,8 +5,6 @@ using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text.RegularExpressions;
 using static LTools.Common.Helpers.WFHelper.PropertiesItem;
 
 namespace Primo.MIA
@@ -326,105 +324,12 @@ FilesAndFolders - Искать и файлы, и папки одновремен
         /// </summary>
         private List<string> SearchItems(SearchParameters parameters)
         {
-            var results = new List<string>();
-
-            // Определение опции поиска (рекурсивно или нет)
-            SearchOption searchOption = parameters.SearchInSubfolders
-                ? SearchOption.AllDirectories
-                : SearchOption.TopDirectoryOnly;
-
-            // Поиск файлов
-            if (parameters.SearchType == SearchType.FilesOnly ||
-                parameters.SearchType == SearchType.FilesAndFolders)
-            {
-                var files = SearchFiles(parameters.DirectoryPath, parameters.Pattern,
-                    parameters.FilterType, searchOption);
-                results.AddRange(files);
-            }
-
-            // Поиск папок
-            if (parameters.SearchType == SearchType.FoldersOnly ||
-                parameters.SearchType == SearchType.FilesAndFolders)
-            {
-                var folders = SearchFolders(parameters.DirectoryPath, parameters.Pattern,
-                    parameters.FilterType, searchOption);
-                results.AddRange(folders);
-            }
-
-            // Сортировка результатов по имени
-            return results.OrderBy(x => x).ToList();
-        }
-
-        /// <summary>
-        /// Поиск файлов
-        /// </summary>
-        private List<string> SearchFiles(string directoryPath, string pattern,
-            SearchFilterType filterType, SearchOption searchOption)
-        {
-            var dirInfo = new DirectoryInfo(directoryPath);
-
-            if (filterType == SearchFilterType.Wildcard)
-            {
-                // Wildcard поиск - используем встроенный метод
-                return dirInfo.GetFiles(pattern, searchOption)
-                    .Select(f => f.FullName)
-                    .ToList();
-            }
-            else
-            {
-                // Regex поиск
-                Regex regex;
-                try
-                {
-                    regex = new Regex(pattern, RegexOptions.IgnoreCase | RegexOptions.Compiled);
-                }
-                catch (ArgumentException ex)
-                {
-                    throw new ArgumentException($"Некорректный regex паттерн: {pattern}. Ошибка: {ex.Message}");
-                }
-
-                // Получаем все файлы и фильтруем по regex
-                return dirInfo.GetFiles("*", searchOption)
-                    .Where(f => regex.IsMatch(f.Name))
-                    .Select(f => f.FullName)
-                    .ToList();
-            }
-        }
-
-        /// <summary>
-        /// Поиск папок
-        /// </summary>
-        private List<string> SearchFolders(string directoryPath, string pattern,
-            SearchFilterType filterType, SearchOption searchOption)
-        {
-            var dirInfo = new DirectoryInfo(directoryPath);
-
-            if (filterType == SearchFilterType.Wildcard)
-            {
-                // Wildcard поиск - используем встроенный метод
-                return dirInfo.GetDirectories(pattern, searchOption)
-                    .Select(d => d.FullName + "\\")
-                    .ToList();
-            }
-            else
-            {
-                // Regex поиск
-                Regex regex;
-                try
-                {
-                    regex = new Regex(pattern, RegexOptions.IgnoreCase | RegexOptions.Compiled);
-                }
-                catch (ArgumentException ex)
-                {
-                    throw new ArgumentException($"Некорректный regex паттерн: {pattern}. Ошибка: {ex.Message}");
-                }
-
-                // Получаем все папки и фильтруем по regex
-                return dirInfo.GetDirectories("*", searchOption)
-                    .Where(d => regex.IsMatch(d.Name))
-                    .Select(d => d.FullName + "\\")
-                    .ToList();
-            }
+            return new SearchFilesLogic().SearchFiles(
+                parameters.DirectoryPath,
+                parameters.Pattern,
+                parameters.FilterType,
+                parameters.SearchType,
+                parameters.SearchInSubfolders);
         }
 
         #endregion

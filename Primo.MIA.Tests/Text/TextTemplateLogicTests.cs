@@ -12,12 +12,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using FluentAssertions;
-using Primo.MIA.Tests.Logic;
+using Primo.MIA;
 using Xunit;
 
-// Алиасы для избежания конфликта имён
-using Syntax = Primo.MIA.Tests.Logic.TemplateSyntax;
-using MissingBehavior = Primo.MIA.Tests.Logic.MissingKeyBehavior;
+using Syntax = Primo.MIA.TemplateSyntax;
+using MissingBehavior = Primo.MIA.MissingKeyBehavior;
 
 namespace Primo.MIA.Tests.Text
 {

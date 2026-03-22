@@ -27,10 +27,19 @@ Primo.MIA.Tests/
 
 ## Запуск тестов
 
-### Из командной строки
+Для этого репозитория основной и надежный способ запуска тестов — через Visual Studio build tools (`MSBuild.exe` + `vstest.console.exe`). Обычный `dotnet test` может ломаться на WPF/XAML-сборке основного проекта.
+
+### Рекомендуемый запуск из PowerShell
 
 ```bash
-dotnet test
+powershell -ExecutionPolicy Bypass -File .\scripts\run-tests-vs.ps1
+```
+
+### Ручной запуск через Visual Studio tools
+
+```powershell
+"C:\Program Files\Microsoft Visual Studio\18\Enterprise\MSBuild\Current\Bin\MSBuild.exe" Primo.MIA.Tests\Primo.MIA.Tests.csproj /t:Build /p:Configuration=Debug /m
+"C:\Program Files\Microsoft Visual Studio\18\Enterprise\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe" Primo.MIA.Tests\bin\Debug\net462\Primo.MIA.Tests.dll
 ```
 
 ### Из Visual Studio
@@ -41,7 +50,7 @@ dotnet test
 ### Запуск конкретного теста
 
 ```bash
-dotnet test --filter "FullyQualifiedName~ListFilterLogicTests"
+powershell -ExecutionPolicy Bypass -File .\scripts\run-tests-vs.ps1 -TestFilter "FullyQualifiedName~TextTemplateLogicTests"
 ```
 
 ## Покрытие кода
@@ -196,7 +205,7 @@ public void TestName()
 
 ## Добавление новых тестов
 
-1. Создайте класс логики в `Logic/` (если нужно)
+1. Сначала проверьте, можно ли вынести чистую логику в production-класс и тестировать его напрямую
 2. Создайте тестовый класс в соответствующей папке
 3. Наследуйтесь от базового класса (если есть)
 4. Используйте FluentAssertions для утверждений

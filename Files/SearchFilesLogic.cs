@@ -3,18 +3,15 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Primo.MIA;
 
-namespace Primo.MIA.Tests.Logic
+namespace Primo.MIA
 {
     /// <summary>
-    /// Бизнес-логика поиска файлов
+    /// Чистая логика поиска файлов и папок без зависимости от SDK.
+    /// Используется как production-кодом, так и unit-тестами.
     /// </summary>
     public class SearchFilesLogic
     {
-        /// <summary>
-        /// Поиск файлов в директории
-        /// </summary>
         public List<string> SearchFiles(
             string directoryPath,
             string pattern,
@@ -34,26 +31,19 @@ namespace Primo.MIA.Tests.Logic
             var results = new List<string>();
             var searchOption = searchInSubfolders ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
 
-            // Поиск файлов
             if (searchType == SearchType.FilesOnly || searchType == SearchType.FilesAndFolders)
             {
-                var files = FindFiles(directoryPath, pattern, filterType, searchOption);
-                results.AddRange(files);
+                results.AddRange(FindFiles(directoryPath, pattern, filterType, searchOption));
             }
 
-            // Поиск папок
             if (searchType == SearchType.FoldersOnly || searchType == SearchType.FilesAndFolders)
             {
-                var folders = FindFolders(directoryPath, pattern, filterType, searchOption);
-                results.AddRange(folders);
+                results.AddRange(FindFolders(directoryPath, pattern, filterType, searchOption));
             }
 
             return results.OrderBy(x => x).ToList();
         }
 
-        /// <summary>
-        /// Поиск файлов
-        /// </summary>
         private List<string> FindFiles(string directoryPath, string pattern, SearchFilterType filterType, SearchOption searchOption)
         {
             var dirInfo = new DirectoryInfo(directoryPath);
@@ -64,19 +54,14 @@ namespace Primo.MIA.Tests.Logic
                     .Select(f => f.FullName)
                     .ToList();
             }
-            else // Regex
-            {
-                var regex = new Regex(pattern, RegexOptions.IgnoreCase | RegexOptions.Compiled);
-                return dirInfo.GetFiles("*", searchOption)
-                    .Where(f => regex.IsMatch(f.Name))
-                    .Select(f => f.FullName)
-                    .ToList();
-            }
+
+            var regex = CreateRegex(pattern);
+            return dirInfo.GetFiles("*", searchOption)
+                .Where(f => regex.IsMatch(f.Name))
+                .Select(f => f.FullName)
+                .ToList();
         }
 
-        /// <summary>
-        /// Поиск папок
-        /// </summary>
         private List<string> FindFolders(string directoryPath, string pattern, SearchFilterType filterType, SearchOption searchOption)
         {
             var dirInfo = new DirectoryInfo(directoryPath);
@@ -87,13 +72,23 @@ namespace Primo.MIA.Tests.Logic
                     .Select(d => d.FullName + "\\")
                     .ToList();
             }
-            else // Regex
+
+            var regex = CreateRegex(pattern);
+            return dirInfo.GetDirectories("*", searchOption)
+                .Where(d => regex.IsMatch(d.Name))
+                .Select(d => d.FullName + "\\")
+                .ToList();
+        }
+
+        private static Regex CreateRegex(string pattern)
+        {
+            try
             {
-                var regex = new Regex(pattern, RegexOptions.IgnoreCase | RegexOptions.Compiled);
-                return dirInfo.GetDirectories("*", searchOption)
-                    .Where(d => regex.IsMatch(d.Name))
-                    .Select(d => d.FullName + "\\")
-                    .ToList();
+                return new Regex(pattern, RegexOptions.IgnoreCase | RegexOptions.Compiled);
+            }
+            catch (ArgumentException ex)
+            {
+                throw new ArgumentException($"Некорректный regex паттерн: {pattern}. Ошибка: {ex.Message}");
             }
         }
     }

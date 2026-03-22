@@ -460,8 +460,6 @@ namespace Primo.MIA
         {
             try
             {
-                // ── Читаем и проверяем входные параметры ───────────────────
-
                 string folderPath = GetPropertyValue<string>(
                     this.Prop_FolderPath, nameof(Prop_FolderPath), sd);
 
@@ -470,20 +468,17 @@ namespace Primo.MIA
 
                 if (!Directory.Exists(folderPath))
                     return Fail($"{ActivityStrings.Error_CleanupFolderNotFound}: {folderPath}");
-
-                // ── Вычисляем пороговую дату ───────────────────────────────
-
-                DateTime? thresholdDays = null;
+                
                 DateTime? thresholdDate = null;
+                int olderThanDays = 0;
 
                 if (this.Prop_ThresholdMode == CleanupThresholdMode.OlderThanDays
                  || this.Prop_ThresholdMode == CleanupThresholdMode.Both)
                 {
                     object daysObj = GetPropertyValue(
                         this.Prop_OlderThanDays, nameof(Prop_OlderThanDays), sd);
-                    if (!int.TryParse(daysObj?.ToString(), out int days) || days < 0)
+                    if (!int.TryParse(daysObj?.ToString(), out olderThanDays) || olderThanDays < 0)
                         return Fail(ActivityStrings.Error_CleanupDaysRequired);
-                    thresholdDays = DateTime.Now.AddDays(-days);
                 }
 
                 if (this.Prop_ThresholdMode == CleanupThresholdMode.BeforeDate
@@ -496,8 +491,6 @@ namespace Primo.MIA
                     thresholdDate = date;
                 }
 
-                // ── Парсим параметры фильтрации ────────────────────────────
-
                 object minSizeObj = GetPropertyValue(
                     this.Prop_MinSizeBytes, nameof(Prop_MinSizeBytes), sd);
                 long.TryParse(minSizeObj?.ToString(), out long minSizeBytes);
@@ -509,78 +502,40 @@ namespace Primo.MIA
                 string filePattern = GetPropertyValue<string>(
                     this.Prop_FilePattern, nameof(Prop_FilePattern), sd);
 
-                // Разбираем несколько масок через запятую или точку с запятой
-                // Пусто или * → ["*"] (все файлы)
-                List<string> patterns = ParseFilePatterns(filePattern);
+                var result = FileCleanupLogic.Cleanup(
+                    folderPath,
+                    deleteFiles: this.Prop_DeleteFiles,
+                    deleteEmptyFolders: this.Prop_DeleteEmptyFolders,
+                    deleteFoldersWithContent: this.Prop_DeleteFoldersWithContent,
+                    timeAttribute: this.Prop_TimeAttribute,
+                    thresholdMode: this.Prop_ThresholdMode,
+                    olderThanDays: olderThanDays,
+                    thresholdDate: thresholdDate,
+                    filePattern: filePattern,
+                    recursive: this.Prop_Recursive,
+                    minSizeBytes: minSizeBytes,
+                    maxItems: maxItems,
+                    dryRun: this.Prop_DryRun,
+                    ignoreErrors: this.Prop_IgnoreErrors);
 
-                // ── Собираем кандидатов на удаление ───────────────────────
+                if (!result.IsSuccess)
+                    return Fail(result.ErrorMessage);
 
-                var deletedPaths = new List<string>();
-                var errors       = new List<string>();
-                long freedBytes  = 0;
-
-                SearchOption searchOption = this.Prop_Recursive
-                    ? SearchOption.AllDirectories
-                    : SearchOption.TopDirectoryOnly;
-
-                // Получаем функцию для чтения нужного атрибута времени
-                Func<FileSystemInfo, DateTime> getTime =
-                    TimeGetters[this.Prop_TimeAttribute];
-
-                // Хотя бы один вид объектов должен быть выбран
-                if (!this.Prop_DeleteFiles
-                    && !this.Prop_DeleteEmptyFolders
-                    && !this.Prop_DeleteFoldersWithContent)
-                    return Fail("Выберите хотя бы один тип объектов для удаления: " +
-                                "файлы, пустые папки или папки целиком.");
-
-                // Удаляем файлы если выбрано
-                if (this.Prop_DeleteFiles)
-                {
-                    ProcessFiles(folderPath, patterns, searchOption,
-                        getTime, thresholdDays, thresholdDate,
-                        minSizeBytes, maxItems,
-                        this.Prop_DryRun, this.Prop_IgnoreErrors,
-                        deletedPaths, errors, ref freedBytes);
-                }
-
-                // Удаляем пустые папки если выбрано
-                // (делаем после файлов — чтобы папки успели освободиться)
-                if (this.Prop_DeleteEmptyFolders && !this.Prop_DryRun)
-                {
-                    ProcessEmptyFolders(folderPath, getTime,
-                        thresholdDays, thresholdDate,
-                        this.Prop_IgnoreErrors, deletedPaths, errors);
-                }
-
-                // Удаляем папки целиком если выбрано
-                if (this.Prop_DeleteFoldersWithContent)
-                {
-                    ProcessFolders(folderPath, getTime,
-                        thresholdDays, thresholdDate,
-                        maxItems, this.Prop_DryRun, this.Prop_IgnoreErrors,
-                        deletedPaths, errors, ref freedBytes);
-                }
-
-                // ── Записываем выходные параметры ─────────────────────────
-
-                SetVariableValue(this.Prop_DeletedCount, deletedPaths.Count, sd);
-                SetVariableValue(this.Prop_DeletedPaths, deletedPaths,       sd);
-                SetVariableValue(this.Prop_FreedBytes,   freedBytes,         sd);
-                SetVariableValue(this.Prop_Errors,       errors,             sd);
-
-                // ── Формируем сообщение ────────────────────────────────────
+                SetVariableValue(this.Prop_DeletedCount, result.DeletedCount, sd);
+                SetVariableValue(this.Prop_DeletedPaths, result.DeletedPaths, sd);
+                SetVariableValue(this.Prop_FreedBytes, result.FreedBytes, sd);
+                SetVariableValue(this.Prop_Errors, result.Errors, sd);
 
                 string dryRunPrefix = this.Prop_DryRun ? "[DryRun] " : string.Empty;
-                string freedStr     = FormatBytes(freedBytes);
-                string errStr       = errors.Count > 0
-                    ? $", ошибок: {errors.Count}"
+                string freedStr = FileCleanupLogic.FormatBytes(result.FreedBytes);
+                string errStr = result.Errors.Count > 0
+                    ? $", ошибок: {result.Errors.Count}"
                     : string.Empty;
 
                 return new ExecutionResult
                 {
                     IsSuccess      = true,
-                    SuccessMessage = $"{dryRunPrefix}Удалено: {deletedPaths.Count} объектов, " +
+                    SuccessMessage = $"{dryRunPrefix}Удалено: {result.DeletedCount} объектов, " +
                                      $"освобождено: {freedStr}{errStr}"
                 };
             }

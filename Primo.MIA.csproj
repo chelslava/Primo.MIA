@@ -286,14 +286,17 @@
       <DependentUpon>FileCleanup.xaml</DependentUpon>
     </Compile>
     <Compile Include="Files\FileCleanupBack.cs" />
+    <Compile Include="Files\FileCleanupLogic.cs" />
     <Compile Include="Files\SearchFiles.xaml.cs">
       <DependentUpon>SearchFiles.xaml</DependentUpon>
     </Compile>
     <Compile Include="Files\SearchFilesBack.cs" />
+    <Compile Include="Files\SearchFilesLogic.cs" />
     <Compile Include="Files\WaitForFile.xaml.cs">
       <DependentUpon>WaitForFile.xaml</DependentUpon>
     </Compile>
     <Compile Include="Files\WaitForFileBack.cs" />
+    <Compile Include="Files\WaitForFileLogic.cs" />
     <Compile Include="HttpWeb\Http.xaml.cs">
       <DependentUpon>Http.xaml</DependentUpon>
     </Compile>
@@ -319,6 +322,7 @@
       <DependentUpon>TextTemplate.xaml</DependentUpon>
     </Compile>
     <Compile Include="Text\TextTemplateBack.cs" />
+    <Compile Include="Text\TextTemplateLogic.cs" />
     <Compile Include="Text\TextTranslit.xaml.cs">
       <DependentUpon>TextTranslit.xaml</DependentUpon>
     </Compile>

@@ -299,20 +299,46 @@ Regex - Использование регулярных выражений. На
         {
             try
             {
-                // Получение и валидация входных параметров
                 var parameters = GetAndValidateParameters(sd);
+                var result = new WaitForFileLogic().WaitForFile(
+                    parameters.DirectoryPath,
+                    parameters.FilePattern,
+                    parameters.FilterType,
+                    parameters.Mode,
+                    parameters.TimeoutMs,
+                    parameters.CheckInterval,
+                    parameters.WaitForStability,
+                    parameters.StabilityTimeout);
 
-                // Начало отсчета времени
-                var startTime = DateTime.UtcNow;
+                SetVariableValue(this.Prop_FileFound, result.FileFound, sd);
+                SetVariableValue(this.Prop_FilePath, result.FilePath ?? string.Empty, sd);
+                SetVariableValue(this.Prop_FileName, result.FileName ?? string.Empty, sd);
+                SetVariableValue(this.Prop_FileSize, result.FileSize, sd);
+                SetVariableValue(this.Prop_WaitTime, result.WaitTimeMs, sd);
 
-                // Поиск файла в зависимости от режима
-                FileInfo foundFile = FindFile(parameters);
+                if (result.FileFound)
+                {
+                    return new ExecutionResult
+                    {
+                        IsSuccess = true,
+                        SuccessMessage = $"Файл обнаружен: {result.FileName}"
+                    };
+                }
 
-                // Расчет фактического времени ожидания
-                long actualWaitTime = (long)(DateTime.UtcNow - startTime).TotalMilliseconds;
+                if (parameters.ThrowOnTimeout)
+                {
+                    throw new TimeoutException(
+                        $"Таймаут ожидания файла истек. " +
+                        $"Директория: {parameters.DirectoryPath}, " +
+                        $"Маска: {parameters.FilePattern}, " +
+                        $"Таймаут: {parameters.TimeoutMs / 1000} сек.");
+                }
 
-                // Установка выходных параметров и возврат результата
-                return ProcessResult(foundFile, actualWaitTime, parameters, sd);
+                return new ExecutionResult
+                {
+                    IsSuccess = true,
+                    SuccessMessage = $"Таймаут ожидания файла истек после {parameters.TimeoutMs / 1000} секунд"
+                };
             }
             catch (Exception ex)
             {
