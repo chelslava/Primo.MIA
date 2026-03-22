@@ -20,7 +20,6 @@ using LTools.SDK;
 using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Primo.MIA
 {
@@ -139,10 +138,12 @@ namespace Primo.MIA
         {
             try
             {
+                var logic = new ListSortLogic();
                 var list = GetPropertyValue<List<string>>(this.Prop_List, "Prop_List", sd);
                 if (list == null) throw new ArgumentNullException("Prop_List", "Список не может быть null");
 
-                List<string> result = Sort(list, sd);
+                int? randomSeed = TryGetRandomSeed(sd);
+                List<string> result = logic.Sort(list, this.Mode, randomSeed);
 
                 SetVariableValue(this.Prop_Result, result, sd);
                 SetVariableValue(this.Prop_Count, result.Count, sd);
@@ -155,73 +156,14 @@ namespace Primo.MIA
             }
         }
 
-        private List<string> Sort(List<string> list, ScriptingData sd)
+        private int? TryGetRandomSeed(ScriptingData sd)
         {
-            switch (this.Mode)
-            {
-                case ListSortMode.Alphabetical:
-                    return list.OrderBy(x => x, StringComparer.Ordinal).ToList();
-
-                case ListSortMode.AlphabeticalDesc:
-                    return list.OrderByDescending(x => x, StringComparer.Ordinal).ToList();
-
-                case ListSortMode.CaseInsensitive:
-                    return list.OrderBy(x => x, StringComparer.OrdinalIgnoreCase).ToList();
-
-                case ListSortMode.CaseInsensitiveDesc:
-                    return list.OrderByDescending(x => x, StringComparer.OrdinalIgnoreCase).ToList();
-
-                case ListSortMode.ByLength:
-                    // При одинаковой длине — вторичная сортировка по алфавиту для стабильности
-                    return list.OrderBy(x => x?.Length ?? 0).ThenBy(x => x).ToList();
-
-                case ListSortMode.ByLengthDesc:
-                    return list.OrderByDescending(x => x?.Length ?? 0).ThenBy(x => x).ToList();
-
-                case ListSortMode.Natural:
-                    return list.OrderBy(x => x, NaturalComparer.Instance).ToList();
-
-                case ListSortMode.Reverse:
-                    // Копируем и переворачиваем — без пересортировки
-                    var reversed = new List<string>(list);
-                    reversed.Reverse();
-                    return reversed;
-
-                case ListSortMode.Random:
-                    return ShuffleList(list, sd);
-
-                default:
-                    throw new InvalidOperationException($"Неизвестный режим: {this.Mode}");
-            }
-        }
-
-        /// <summary>
-        /// Перемешивание Fisher–Yates — равномерно случайный порядок.
-        /// При заданном Prop_RandomSeed результат воспроизводим.
-        /// </summary>
-        private List<string> ShuffleList(List<string> list, ScriptingData sd)
-        {
-            var result = new List<string>(list);
-            Random rng;
-
-            // Пробуем прочитать зерно из свойства
             string randomSeed = GetPropertyValue<string>(this.Prop_RandomSeed, nameof(Prop_RandomSeed), sd);
             if (!string.IsNullOrWhiteSpace(randomSeed)
                 && int.TryParse(randomSeed, out int seed))
-                rng = new Random(seed);
-            else
-                rng = new Random();
+                return seed;
 
-            // Fisher–Yates shuffle
-            for (int i = result.Count - 1; i > 0; i--)
-            {
-                int j = rng.Next(i + 1);
-                string tmp = result[i];
-                result[i] = result[j];
-                result[j] = tmp;
-            }
-
-            return result;
+            return null;
         }
 
         public override ValidationResult Validate()
