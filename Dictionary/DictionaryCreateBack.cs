@@ -196,27 +196,33 @@ namespace Primo.MIA
         {
             try
             {
+                var logic = new DictionaryCreateLogic();
                 var dict = GetPropertyValue<Dictionary<string, string>>(this.Prop_Dictionary, "Prop_Dictionary", sd);
                 var keysList = GetPropertyValue<List<string>>(this.Prop_KeysList, "Prop_KeysList", sd);
                 var valuesList = GetPropertyValue<List<string>>(this.Prop_ValuesList, "Prop_ValuesList", sd);
+                DictionaryCreateResult result;
 
                 switch (this.Mode)
                 {
                     case DictionaryCreateMode.CreateEmpty:
-                        ExecuteCreateEmpty(sd);
+                        result = logic.CreateEmpty();
                         break;
                     case DictionaryCreateMode.FromLists:
-                        ExecuteFromLists(sd, keysList, valuesList);
+                        result = logic.FromLists(keysList, valuesList);
                         break;
                     case DictionaryCreateMode.Clone:
-                        ExecuteClone(sd, dict);
+                        result = logic.Clone(dict);
                         break;
                     case DictionaryCreateMode.Invert:
-                        ExecuteInvert(sd, dict);
+                        result = logic.Invert(dict, this.Prop_ThrowOnDuplicates);
                         break;
                     default:
                         throw new InvalidOperationException($"Неизвестный режим: {this.Mode}");
                 }
+
+                SetVariableValue(this.Prop_ResultDictionary, result.Dictionary, sd);
+                SetVariableValue(this.Prop_Count, result.Count, sd);
+                SetVariableValue(this.Prop_DuplicatesCount, result.DuplicatesSkipped, sd);
 
                 return new ExecutionResult { IsSuccess = true, SuccessMessage = $"Режим '{this.Mode}' выполнен" };
             }
@@ -224,101 +230,6 @@ namespace Primo.MIA
             {
                 return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Ошибка создания словаря: {ex.Message}" };
             }
-        }
-
-        // =========================================================================
-        // РЕАЛИЗАЦИЯ РЕЖИМОВ
-        // =========================================================================
-
-        /// <summary>CreateEmpty — новый пустой словарь</summary>
-        private void ExecuteCreateEmpty(ScriptingData sd)
-        {
-            var result = new Dictionary<string, string>();
-            SetVariableValue(this.Prop_ResultDictionary, result, sd);
-            SetVariableValue(this.Prop_Count, 0, sd);
-        }
-
-        /// <summary>
-        /// FromLists — создать словарь из двух List&lt;string&gt; одинаковой длины.
-        /// LINQ Zip объединяет два списка попарно по индексу.
-        /// При дублирующихся ключах побеждает последнее значение.
-        /// </summary>
-        private void ExecuteFromLists(ScriptingData sd, List<string> keysList, List<string> valuesList)
-        {
-            if (keysList == null)
-                throw new ArgumentNullException("Prop_KeysList", "Список ключей не может быть null");
-            if (valuesList == null)
-                throw new ArgumentNullException("Prop_ValuesList", "Список значений не может быть null");
-            if (keysList.Count != valuesList.Count)
-                throw new ArgumentException(
-                    $"Длина списка ключей ({keysList.Count}) " +
-                    $"не совпадает с длиной списка значений ({valuesList.Count})");
-
-            // Zip попарно объединяет списки, GroupBy обрабатывает дубли ключей
-            var result = keysList
-                .Zip(valuesList, (k, v) => new { Key = k, Value = v })
-                .GroupBy(pair => pair.Key)
-                .ToDictionary(
-                    group => group.Key,
-                    group => group.Last().Value   // при дубле побеждает последний
-                );
-
-            SetVariableValue(this.Prop_ResultDictionary, result, sd);
-            SetVariableValue(this.Prop_Count, result.Count, sd);
-        }
-
-        /// <summary>
-        /// Clone — создать полную независимую копию словаря.
-        /// ToDictionary создаёт новый экземпляр — изменения в копии
-        /// не затронут оригинал.
-        /// </summary>
-        private void ExecuteClone(ScriptingData sd, Dictionary<string, string> dict)
-        {
-            if (dict == null)
-                throw new ArgumentNullException("Prop_Dictionary", "Словарь не может быть null для режима Clone");
-
-            var result = dict.ToDictionary(p => p.Key, p => p.Value);
-            SetVariableValue(this.Prop_ResultDictionary, result, sd);
-            SetVariableValue(this.Prop_Count, result.Count, sd);
-        }
-
-        /// <summary>
-        /// Invert — инвертировать словарь: значения → ключи, ключи → значения.
-        /// При дублирующихся значениях (будущих ключах):
-        ///   ThrowOnDuplicates=true  → исключение со списком дублей
-        ///   ThrowOnDuplicates=false → сохраняем первое вхождение через GroupBy + First
-        /// </summary>
-        private void ExecuteInvert(ScriptingData sd, Dictionary<string, string> dict)
-        {
-            if (dict == null)
-                throw new ArgumentNullException("Prop_Dictionary", "Словарь не может быть null для режима Invert");
-
-            // Ищем значения которые встречаются более одного раза
-            var duplicates = dict.Values
-                .GroupBy(v => v)
-                .Where(g => g.Count() > 1)
-                .Select(g => g.Key)
-                .ToList();
-
-            if (duplicates.Any() && this.Prop_ThrowOnDuplicates)
-                throw new InvalidOperationException(
-                    $"Инверсия невозможна — дублирующиеся значения: {string.Join(", ", duplicates)}. " +
-                    "Отключите 'Ошибка при дублях' чтобы сохранить первое вхождение.");
-
-            // GroupBy по значению, берём первый ключ при дублях
-            var result = dict
-                .GroupBy(p => p.Value)
-                .ToDictionary(
-                    group => group.Key,
-                    group => group.First().Key
-                );
-
-            // Количество пропущенных = исходное кол-во - результирующее
-            int skipped = dict.Count - result.Count;
-
-            SetVariableValue(this.Prop_ResultDictionary, result, sd);
-            SetVariableValue(this.Prop_Count, result.Count, sd);
-            SetVariableValue(this.Prop_DuplicatesCount, skipped, sd);
         }
 
         // =========================================================================
