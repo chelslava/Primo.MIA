@@ -332,6 +332,7 @@
     <Compile Include="Utilities\GeneratorsBack.cs" />
     <Compile Include="Utilities\ExcelCellLogic.cs" />
     <Compile Include="Utilities\ExcelCellRecalculateBack.cs" />
+    <Compile Include="Utilities\DataTableToHtmlLogic.cs" />
     <Compile Include="Dictionary\DictionaryContainsValue.xaml.cs">
       <DependentUpon>DictionaryContainsValue.xaml</DependentUpon>
     </Compile>
@@ -365,6 +366,7 @@
     <Compile Include="Dictionary\DictionaryCreate.xaml.cs">
       <DependentUpon>DictionaryCreate.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dictionary\DictionaryCreateLogic.cs" />
     <Compile Include="Dictionary\DictionaryOperationsSmallBack.cs" />
     <Compile Include="Dictionary\DictionaryOperationsSmall.xaml.cs">
       <DependentUpon>DictionaryOperationsSmall.xaml</DependentUpon>

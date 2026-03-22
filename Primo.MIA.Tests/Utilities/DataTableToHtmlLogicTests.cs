@@ -13,11 +13,11 @@
 using System;
 using System.Data;
 using FluentAssertions;
-using Primo.MIA.Tests.Logic;
+using Primo.MIA;
 using Xunit;
 
-using Theme = Primo.MIA.Tests.Logic.HtmlTableTheme;
-using OutputMode = Primo.MIA.Tests.Logic.HtmlOutputMode;
+using Theme = Primo.MIA.HtmlTableTheme;
+using OutputMode = Primo.MIA.HtmlOutputMode;
 
 namespace Primo.MIA.Tests.Utilities
 {

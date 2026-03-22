@@ -343,26 +343,30 @@ namespace Primo.MIA
                 var altRowColor = GetPropertyValue<string>(this.Prop_AltRowColor, "Prop_AltRowColor", sd);
                 var borderColor = GetPropertyValue<string>(this.Prop_BorderColor, "Prop_BorderColor", sd);
 
-                // Записываем метаданные
-                this.Prop_RowCount = table.Rows.Count;
-                this.Prop_ColumnCount = table.Columns.Count;
+                var result = DataTableToHtmlLogic.Convert(
+                    table,
+                    theme,
+                    outputMode,
+                    showRowNumbers,
+                    nullDisplay,
+                    maxRows,
+                    headerColor,
+                    rowColor,
+                    altRowColor,
+                    borderColor);
 
-                // Получаем цвета для темы
-                var colors = GetThemeColors(theme, headerColor, rowColor, altRowColor, borderColor);
-
-                // Генерируем HTML
-                string html;
-                if (outputMode == HtmlOutputMode.FullDocument)
+                if (!result.IsSuccess)
                 {
-                    html = GenerateFullDocument(table, colors, showRowNumbers, nullDisplay, maxRows);
-                }
-                else
-                {
-                    html = GenerateTableOnly(table, colors, showRowNumbers, nullDisplay, maxRows);
+                    return new ExecutionResult
+                    {
+                        IsSuccess = false,
+                        ErrorMessage = result.ErrorMessage
+                    };
                 }
 
-                // Записываем результат
-                this.Prop_HtmlOutput = html;
+                this.Prop_RowCount = result.RowCount;
+                this.Prop_ColumnCount = result.ColumnCount;
+                this.Prop_HtmlOutput = result.Html;
 
                 return new ExecutionResult
                 {
@@ -425,205 +429,5 @@ namespace Primo.MIA
             return ret;
         }
 
-        /// <summary>
-        /// Возвращает цвета для указанной темы.
-        /// </summary>
-        /// <param name="theme">Тема оформления.</param>
-        /// <returns>Кортеж с цветами (header, row, altRow, border).</returns>
-        private (string Header, string Row, string AltRow, string Border, string HeaderText) GetThemeColors(
-            HtmlTableTheme theme,
-            string headerColor,
-            string rowColor,
-            string altRowColor,
-            string borderColor)
-        {
-            switch (theme)
-            {
-                case HtmlTableTheme.Light:
-                    return ("#F5F5F5", "#FFFFFF", "#F9F9F9", "#DDDDDD", "#333333");
-
-                case HtmlTableTheme.Dark:
-                    return ("#2D2D2D", "#1E1E1E", "#2A2A2A", "#404040", "#FFFFFF");
-
-                case HtmlTableTheme.Blue:
-                    return ("#1565C0", "#FFFFFF", "#E3F2FD", "#BBDEFB", "#FFFFFF");
-
-                case HtmlTableTheme.Green:
-                    return ("#2E7D32", "#FFFFFF", "#E8F5E9", "#C8E6C9", "#FFFFFF");
-
-                case HtmlTableTheme.Custom:
-                    return (
-                        headerColor ?? "#1565C0",
-                        rowColor ?? "#FFFFFF",
-                        altRowColor ?? "#E3F2FD",
-                        borderColor ?? "#BBDEFB",
-                        "#FFFFFF"
-                    );
-
-                default:
-                    return ("#1565C0", "#FFFFFF", "#E3F2FD", "#BBDEFB", "#FFFFFF");
-            }
-        }
-
-        /// <summary>
-        /// Генерирует только HTML-таблицу (без обёртки документа).
-        /// </summary>
-        private string GenerateTableOnly(DataTable table, (string Header, string Row, string AltRow, string Border, string HeaderText) colors, bool showRowNumbers, string nullDisplay, int maxRows)
-        {
-            var sb = new StringBuilder();
-
-            // Начало таблицы
-            sb.AppendLine($"<table style=\"border-collapse: collapse; width: 100%; font-family: Arial, sans-serif; border: 1px solid {colors.Border};\">");
-
-            // Заголовок
-            sb.AppendLine($"<thead>");
-            sb.AppendLine($"<tr style=\"background-color: {colors.Header}; color: {colors.HeaderText};\">");
-
-            if (showRowNumbers)
-            {
-                sb.AppendLine($"<th style=\"padding: 10px; border: 1px solid {colors.Border}; text-align: center; font-weight: bold;\">№</th>");
-            }
-
-            foreach (DataColumn column in table.Columns)
-            {
-                sb.AppendLine($"<th style=\"padding: 10px; border: 1px solid {colors.Border}; text-align: left; font-weight: bold;\">{EscapeHtml(column.ColumnName)}</th>");
-            }
-
-            sb.AppendLine($"</tr>");
-            sb.AppendLine($"</thead>");
-
-            // Тело таблицы
-            sb.AppendLine($"<tbody>");
-
-            int rowCount = maxRows > 0 ? Math.Min(maxRows, table.Rows.Count) : table.Rows.Count;
-
-            for (int i = 0; i < rowCount; i++)
-            {
-                var row = table.Rows[i];
-                var bgColor = i % 2 == 0 ? colors.Row : colors.AltRow;
-
-                sb.AppendLine($"<tr style=\"background-color: {bgColor};\">");
-
-                if (showRowNumbers)
-                {
-                    sb.AppendLine($"<td style=\"padding: 8px; border: 1px solid {colors.Border}; text-align: center;\">{i + 1}</td>");
-                }
-
-                foreach (DataColumn column in table.Columns)
-                {
-                    var value = row[column] == null || row[column] == DBNull.Value
-                        ? nullDisplay
-                        : row[column].ToString();
-
-                    sb.AppendLine($"<td style=\"padding: 8px; border: 1px solid {colors.Border};\">{EscapeHtml(value)}</td>");
-                }
-
-                sb.AppendLine($"</tr>");
-            }
-
-            sb.AppendLine($"</tbody>");
-            sb.AppendLine($"</table>");
-
-            return sb.ToString();
-        }
-
-        /// <summary>
-        /// Генерирует полный HTML-документ с таблицей.
-        /// </summary>
-        private string GenerateFullDocument(DataTable table, (string Header, string Row, string AltRow, string Border, string HeaderText) colors, bool showRowNumbers, string nullDisplay, int maxRows)
-        {
-            var sb = new StringBuilder();
-
-            sb.AppendLine("<!DOCTYPE html>");
-            sb.AppendLine("<html lang=\"ru\">");
-            sb.AppendLine("<head>");
-            sb.AppendLine("<meta charset=\"UTF-8\">");
-            sb.AppendLine("<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">");
-            sb.AppendLine("<title>DataTable Export</title>");
-            sb.AppendLine("<style>");
-
-            // Стили
-            sb.AppendLine("body { font-family: Arial, sans-serif; margin: 20px; background-color: #FAFAFA; }");
-            sb.AppendLine("table { border-collapse: collapse; width: 100%; background-color: #FFFFFF; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }");
-            sb.AppendLine($"th {{ background-color: {colors.Header}; color: {colors.HeaderText}; padding: 12px; text-align: left; border: 1px solid {colors.Border}; }}");
-            sb.AppendLine($"td {{ padding: 10px; border: 1px solid {colors.Border}; }}");
-            sb.AppendLine($"tbody tr:nth-child(odd) {{ background-color: {colors.Row}; }}");
-            sb.AppendLine($"tbody tr:nth-child(even) {{ background-color: {colors.AltRow}; }}");
-            sb.AppendLine("tbody tr:hover { background-color: #F5F5F5; }");
-
-            sb.AppendLine("</style>");
-            sb.AppendLine("</head>");
-            sb.AppendLine("<body>");
-
-            // Таблица
-            sb.AppendLine("<table>");
-
-            // Заголовок
-            sb.AppendLine("<thead>");
-            sb.AppendLine("<tr>");
-
-            if (showRowNumbers)
-            {
-                sb.AppendLine($"<th style=\"text-align: center;\">№</th>");
-            }
-
-            foreach (DataColumn column in table.Columns)
-            {
-                sb.AppendLine($"<th>{EscapeHtml(column.ColumnName)}</th>");
-            }
-
-            sb.AppendLine("</tr>");
-            sb.AppendLine("</thead>");
-
-            // Тело таблицы
-            sb.AppendLine("<tbody>");
-
-            int rowCount = maxRows > 0 ? Math.Min(maxRows, table.Rows.Count) : table.Rows.Count;
-
-            for (int i = 0; i < rowCount; i++)
-            {
-                var row = table.Rows[i];
-
-                sb.AppendLine("<tr>");
-
-                if (showRowNumbers)
-                {
-                    sb.AppendLine($"<td style=\"text-align: center;\">{i + 1}</td>");
-                }
-
-                foreach (DataColumn column in table.Columns)
-                {
-                    var value = row[column] == null || row[column] == DBNull.Value
-                        ? nullDisplay
-                        : row[column].ToString();
-
-                    sb.AppendLine($"<td>{EscapeHtml(value)}</td>");
-                }
-
-                sb.AppendLine("</tr>");
-            }
-
-            sb.AppendLine("</tbody>");
-            sb.AppendLine("</table>");
-
-            sb.AppendLine("</body>");
-            sb.AppendLine("</html>");
-
-            return sb.ToString();
-        }
-
-        /// <summary>
-        /// Экранирует специальные символы HTML.
-        /// </summary>
-        /// <param name="text">Исходный текст.</param>
-        /// <returns>Экранированный текст.</returns>
-        private string EscapeHtml(string text)
-        {
-            if (string.IsNullOrEmpty(text))
-                return "";
-
-            // Используем SecurityElement.Escape для экранирования XML/HTML символов
-            return System.Security.SecurityElement.Escape(text);
-        }
     }
 }
