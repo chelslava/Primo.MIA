@@ -409,6 +409,7 @@
     <Compile Include="Utilities\LogMessageBack.cs" />
     <Compile Include="Utilities\DataTableToHtmlBack.cs" />
     <Compile Include="Utilities\ReadTomlConfigBack.cs" />
+    <Compile Include="Utilities\ReadTomlConfigLogic.cs" />
     <Compile Include="Utilities\ReadTomlConfig.xaml.cs">
       <DependentUpon>ReadTomlConfig.xaml</DependentUpon>
     </Compile>

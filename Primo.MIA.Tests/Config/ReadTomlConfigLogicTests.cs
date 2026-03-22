@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using FluentAssertions;
 using Primo.MIA;
-using Primo.MIA.Tests.Logic;
 using Xunit;
 
 namespace Primo.MIA.Tests.Config
