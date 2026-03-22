@@ -357,23 +357,116 @@ ReadProfile         — мёрж [default] + [production/staging/...]
         {
             try
             {
+                var logic = new ReadTomlConfigLogic();
                 var parameters = GetAndValidateParameters(sd);
-                TomlTable rootTable = ParseTomlFile(parameters.FilePath, parameters.Encoding);
 
                 switch (parameters.ReadMode)
                 {
                     case TomlReadMode.SingleValue:
-                        ExecuteSingleValueMode(sd, rootTable, parameters);
+                    {
+                        var (found, value) = logic.ReadSingleValue(
+                            parameters.FilePath,
+                            parameters.KeyPath,
+                            parameters.DefaultValue,
+                            parameters.Encoding);
+
+                        if (!found && parameters.ThrowIfKeyNotFound)
+                            throw new KeyNotFoundException($"Ключ '{parameters.KeyPath}' не найден в TOML-файле");
+
+                        SetVariableValue(this.Prop_StringValue, value, sd);
+                        SetVariableValue(this.Prop_KeyExists, found, sd);
+                        SetVariableValue(this.Prop_KeysCount, found ? 1 : 0, sd);
                         break;
+                    }
                     case TomlReadMode.SectionToDictionary:
-                        ExecuteSectionToDictionaryMode(sd, rootTable, parameters);
+                    {
+                        var dict = logic.ReadSectionToDictionary(
+                            parameters.FilePath,
+                            parameters.SectionName,
+                            parameters.Encoding);
+
+                        if (dict.Count == 0 && parameters.ThrowIfKeyNotFound)
+                            throw new KeyNotFoundException($"Секция '{parameters.SectionName}' не найдена в TOML-файле");
+
+                        SetVariableValue(this.Prop_Dictionary, dict, sd);
+                        SetVariableValue(this.Prop_KeysCount, dict.Count, sd);
                         break;
+                    }
                     case TomlReadMode.FullFileToDictionary:
-                        ExecuteFullFileToDictionaryMode(sd, rootTable);
+                    {
+                        var dict = logic.ReadFullFileToDictionary(parameters.FilePath, parameters.Encoding);
+                        SetVariableValue(this.Prop_Dictionary, dict, sd);
+                        SetVariableValue(this.Prop_KeysCount, dict.Count, sd);
                         break;
+                    }
                     case TomlReadMode.ReadProfile:
-                        ExecuteReadProfileMode(sd, rootTable, parameters);
+                    {
+                        try
+                        {
+                            var (merged, fromProfile, fromDefault, availableProfiles) = logic.ReadProfile(
+                                parameters.FilePath,
+                                parameters.ProfileName,
+                                parameters.DefaultProfileName,
+                                parameters.MergeStrategy,
+                                parameters.IncludeNestedSections,
+                                parameters.Encoding);
+
+                            SetVariableValue(this.Prop_AvailableProfiles, availableProfiles, sd);
+                            SetVariableValue(this.Prop_KeyExists, true, sd);
+                            SetVariableValue(this.Prop_Dictionary, merged, sd);
+                            SetVariableValue(this.Prop_KeysCount, merged.Count, sd);
+                            SetVariableValue(this.Prop_ProfileKeysCount, fromProfile, sd);
+                            SetVariableValue(this.Prop_DefaultKeysCount, fromDefault, sd);
+                        }
+                        catch (KeyNotFoundException) when (!parameters.ThrowIfKeyNotFound)
+                        {
+                            var fallback = new Dictionary<string, string>();
+                            int fromDefault = 0;
+                            List<string> availableProfiles;
+
+                            try
+                            {
+                                var fullFile = logic.ReadFullFileToDictionary(parameters.FilePath, parameters.Encoding);
+                                availableProfiles = fullFile.Keys
+                                    .Select(key => key.Split('.')[0])
+                                    .Distinct()
+                                    .Where(key => !string.IsNullOrWhiteSpace(key))
+                                    .OrderBy(key => key)
+                                    .ToList();
+                            }
+                            catch
+                            {
+                                availableProfiles = new List<string>();
+                            }
+
+                            if (parameters.MergeStrategy != ProfileMergeStrategy.ProfileOnly)
+                            {
+                                try
+                                {
+                                    var (defaultOnly, _, defaultCount, _) = logic.ReadProfile(
+                                        parameters.FilePath,
+                                        parameters.DefaultProfileName,
+                                        parameters.DefaultProfileName,
+                                        ProfileMergeStrategy.ProfileOnly,
+                                        parameters.IncludeNestedSections,
+                                        parameters.Encoding);
+                                    fallback = defaultOnly;
+                                    fromDefault = defaultCount;
+                                }
+                                catch (KeyNotFoundException)
+                                {
+                                }
+                            }
+
+                            SetVariableValue(this.Prop_AvailableProfiles, availableProfiles, sd);
+                            SetVariableValue(this.Prop_KeyExists, false, sd);
+                            SetVariableValue(this.Prop_Dictionary, fallback, sd);
+                            SetVariableValue(this.Prop_KeysCount, fallback.Count, sd);
+                            SetVariableValue(this.Prop_ProfileKeysCount, 0, sd);
+                            SetVariableValue(this.Prop_DefaultKeysCount, fromDefault, sd);
+                        }
                         break;
+                    }
                     default:
                         throw new InvalidOperationException($"Неизвестный режим чтения: {parameters.ReadMode}");
                 }
