@@ -1,6 +1,6 @@
 using System;
 using FluentAssertions;
-using Primo.MIA.Tests.Logic;
+using Primo.MIA;
 using Xunit;
 
 namespace Primo.MIA.Tests.Excel

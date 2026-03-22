@@ -4,7 +4,6 @@ using LTools.SDK;
 using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
 
 namespace Primo.MIA
 {
@@ -89,25 +88,16 @@ namespace Primo.MIA
         {
             try
             {
+                var logic = new ExcelCellLogic();
                 string startCell = GetPropertyValue<string>(this.Prop_StartCell, "Prop_StartCell", sd);
                 if (string.IsNullOrWhiteSpace(startCell))
                     throw new ArgumentNullException("Prop_StartCell", "Начальная ячейка обязательна");
-
-                // Парсим начальную ячейку
-                var cellInfo = ParseExcelCell(startCell);
-                if (!cellInfo.IsValid)
-                    throw new ArgumentException($"Неверный формат начальной ячейки: {startCell}");
 
                 // Получаем смещения
                 int rowOffset = int.TryParse(GetPropertyValue<string>(this.Prop_RowOffset, "Prop_RowOffset", sd), out int ro) ? ro : 0;
                 int colOffset = int.TryParse(GetPropertyValue<string>(this.Prop_ColumnOffset, "Prop_ColumnOffset", sd), out int co) ? co : 0;
 
-                // Вычисляем новые координаты
-                int newRow = Math.Max(1, cellInfo.Row + rowOffset); // Минимум 1
-                int newCol = Math.Max(1, cellInfo.Column + colOffset); // Минимум 1
-
-                // Формируем новое имя ячейки
-                string targetCell = ConvertToExcelColumn(newCol) + newRow.ToString();
+                string targetCell = logic.RecalculateCell(startCell, rowOffset, colOffset);
 
                 // Устанавливаем результат
                 SetVariableValue(this.Prop_TargetCell, targetCell, sd);
@@ -127,68 +117,6 @@ namespace Primo.MIA
                 };
             }
         }
-
-        #region Вспомогательные методы
-
-        private struct CellCoordinates
-        {
-            public bool IsValid;
-            public int Row;
-            public int Column;
-
-            public CellCoordinates(bool valid, int row, int col)
-            {
-                IsValid = valid;
-                Row = row;
-                Column = col;
-            }
-        }
-
-        private CellCoordinates ParseExcelCell(string cellName)
-        {
-            if (string.IsNullOrWhiteSpace(cellName)) return new CellCoordinates(false, 0, 0);
-
-            // Регулярное выражение для парсинга A1, B2, Z10, AA5 и т.д.
-            var match = Regex.Match(cellName.Trim(), @"^([A-Z]+)(\d+)$", RegexOptions.IgnoreCase);
-            if (!match.Success) return new CellCoordinates(false, 0, 0);
-
-            string colPart = match.Groups[1].Value.ToUpper();
-            string rowPart = match.Groups[2].Value;
-
-            int row;
-            if (!int.TryParse(rowPart, out row) || row < 1) return new CellCoordinates(false, 0, 0);
-
-            int column = ConvertFromExcelColumn(colPart);
-
-            return new CellCoordinates(true, row, column);
-        }
-
-        private int ConvertFromExcelColumn(string columnName)
-        {
-            int result = 0;
-            foreach (char c in columnName)
-            {
-                result *= 26;
-                result += c - 'A' + 1;
-            }
-            return result;
-        }
-
-        private string ConvertToExcelColumn(int columnNumber)
-        {
-            if (columnNumber <= 0) return string.Empty;
-
-            string result = string.Empty;
-            while (columnNumber > 0)
-            {
-                columnNumber--; // Сдвигаем на 1, потому что A=1, а не A=0
-                result = (char)('A' + (columnNumber % 26)) + result;
-                columnNumber /= 26;
-            }
-            return result;
-        }
-
-        #endregion
 
         public override ValidationResult Validate()
         {
