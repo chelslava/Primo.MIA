@@ -369,6 +369,7 @@
     <Compile Include="Dictionary\DictionaryCreateLogic.cs" />
     <Compile Include="Dictionary\DictionaryKeyValueLogic.cs" />
     <Compile Include="Dictionary\DictionaryOperationsSmallBack.cs" />
+    <Compile Include="Dictionary\DictionaryOperationsLogic.cs" />
     <Compile Include="Dictionary\DictionaryOperationsSmall.xaml.cs">
       <DependentUpon>DictionaryOperationsSmall.xaml</DependentUpon>
     </Compile>

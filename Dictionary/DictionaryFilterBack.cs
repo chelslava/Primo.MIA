@@ -193,6 +193,7 @@ namespace Primo.MIA
         {
             try
             {
+                var logic = new DictionaryOperationsLogic();
                 var dict = GetPropertyValue<Dictionary<string, string>>(this.Prop_Dictionary, "Prop_Dictionary", sd);
                 string query = GetPropertyValue<string>(this.Prop_Query, "Prop_Query", sd);
 
@@ -202,13 +203,7 @@ namespace Primo.MIA
                 if (query == null)
                     throw new ArgumentNullException("Prop_Query", "Строка поиска не может быть null");
 
-                // Строим предикат "как проверять одну строку" из выбранного метода
-                Func<string, bool> matchFunc = BuildMatchFunction(query);
-
-                // Применяем предикат к нужному полю пары согласно Target
-                var result = dict
-                    .Where(p => ApplyTarget(p, matchFunc))
-                    .ToDictionary(p => p.Key, p => p.Value);
+                var result = logic.Filter(dict, query, this.Prop_Target, this.Prop_Method, this.Prop_CaseSensitive);
 
                 int filteredOut = dict.Count - result.Count;
 
@@ -230,151 +225,6 @@ namespace Primo.MIA
                     IsSuccess = false,
                     ErrorMessage = $"Ошибка фильтрации: {ex.Message}"
                 };
-            }
-        }
-
-        // =========================================================================
-        // ПОСТРОЕНИЕ ПРЕДИКАТА МЕТОДА ПОИСКА
-        // =========================================================================
-
-        /// <summary>
-        /// Фабрика предикатов: по выбранному Prop_Method возвращает функцию
-        /// bool(string) которая проверяет соответствует ли переданная строка условию.
-        /// Все варианты учитывают флаг Prop_CaseSensitive.
-        /// </summary>
-        private Func<string, bool> BuildMatchFunction(string query)
-        {
-            switch (this.Prop_Method)
-            {
-                case DictionaryFilterMethod.Contains:
-                    return BuildContainsFunc(query);
-
-                case DictionaryFilterMethod.Exact:
-                    return BuildExactFunc(query);
-
-                case DictionaryFilterMethod.Regex:
-                    return BuildRegexFunc(query);
-
-                case DictionaryFilterMethod.Wildcard:
-                    return BuildWildcardFunc(query);
-
-                default:
-                    throw new InvalidOperationException($"Неизвестный метод поиска: {this.Prop_Method}");
-            }
-        }
-
-        /// <summary>
-        /// Contains — строка содержит подстроку query.
-        /// Использует IndexOf с нужным StringComparison для учёта регистра.
-        /// </summary>
-        private Func<string, bool> BuildContainsFunc(string query)
-        {
-            StringComparison cmp = ComparisonHelper.GetStringComparison(this.Prop_CaseSensitive);
-
-            // Null-безопасно: если проверяемая строка null — не проходит фильтр
-            return s => s != null && s.IndexOf(query, cmp) >= 0;
-        }
-
-        /// <summary>
-        /// Exact — строка полностью равна query.
-        /// Использует StringComparer для учёта регистра.
-        /// </summary>
-        private Func<string, bool> BuildExactFunc(string query)
-        {
-            StringComparison cmp = ComparisonHelper.GetStringComparison(this.Prop_CaseSensitive);
-
-            return s => s != null && string.Equals(s, query, cmp);
-        }
-
-        /// <summary>
-        /// Regex — строка соответствует регулярному выражению.
-        /// Паттерн компилируется один раз через RegexOptions.Compiled.
-        /// Проверяет полное совпадение (^ ... $) чтобы поведение было предсказуемым.
-        /// Для частичного поиска пользователь может убрать якоря из своего паттерна.
-        /// </summary>
-        private Func<string, bool> BuildRegexFunc(string query)
-        {
-            if (string.IsNullOrEmpty(query))
-                throw new ArgumentException(
-                    "Regex-паттерн не может быть пустым", "Prop_Query");
-
-            var options = RegexOptions.Compiled;
-            if (!this.Prop_CaseSensitive)
-                options |= RegexOptions.IgnoreCase;
-
-            Regex regex;
-            try
-            {
-                regex = new Regex(query, options);
-            }
-            catch (ArgumentException ex)
-            {
-                throw new ArgumentException(
-                    $"Некорректный regex-паттерн '{query}': {ex.Message}", "Prop_Query", ex);
-            }
-
-            return s => s != null && regex.IsMatch(s);
-        }
-
-        /// <summary>
-        /// Wildcard — строка соответствует wildcard-паттерну.
-        /// Символы паттерна:
-        ///   * — любое количество любых символов (включая пустую строку)
-        ///   ? — ровно один любой символ
-        /// Реализация: wildcard транслируется в regex через Select + Regex.Escape.
-        /// Добавляются якоря ^ и $ — сопоставление всегда полное.
-        /// </summary>
-        private Func<string, bool> BuildWildcardFunc(string query)
-        {
-            if (string.IsNullOrEmpty(query))
-                throw new ArgumentException(
-                    "Wildcard-паттерн не может быть пустым", "Prop_Query");
-
-            // Транслируем каждый символ wildcard в эквивалент regex:
-            //   * → .*   (любое кол-во любых символов)
-            //   ? → .    (ровно один любой символ)
-            //   всё остальное → Regex.Escape (спецсимволы экранируются)
-            string regexPattern = "^"
-                + string.Concat(
-                    query.Select(c =>
-                        c == '*' ? ".*"
-                      : c == '?' ? "."
-                      : Regex.Escape(c.ToString())))
-                + "$";
-
-            var options = RegexOptions.Compiled;
-            if (!this.Prop_CaseSensitive)
-                options |= RegexOptions.IgnoreCase;
-
-            var regex = new Regex(regexPattern, options);
-            return s => s != null && regex.IsMatch(s);
-        }
-
-        // =========================================================================
-        // ПРИМЕНЕНИЕ ЦЕЛИ ПОИСКА (Target)
-        // =========================================================================
-
-        /// <summary>
-        /// Применяет предикат matchFunc к нужному полю пары согласно Prop_Target:
-        ///   Keys         — проверяет только ключ
-        ///   Values       — проверяет только значение
-        ///   KeysAndValues — проверяет ключ ИЛИ значение (достаточно одного совпадения)
-        /// </summary>
-        private bool ApplyTarget(KeyValuePair<string, string> pair, Func<string, bool> matchFunc)
-        {
-            switch (this.Prop_Target)
-            {
-                case DictionaryFilterTarget.Keys:
-                    return matchFunc(pair.Key);
-
-                case DictionaryFilterTarget.Values:
-                    return matchFunc(pair.Value);
-
-                case DictionaryFilterTarget.KeysAndValues:
-                    return matchFunc(pair.Key) || matchFunc(pair.Value);
-
-                default:
-                    throw new InvalidOperationException($"Неизвестная цель поиска: {this.Prop_Target}");
             }
         }
 

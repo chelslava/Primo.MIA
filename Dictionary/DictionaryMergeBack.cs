@@ -171,6 +171,7 @@ namespace Primo.MIA
         {
             try
             {
+                var logic = new DictionaryOperationsLogic();
                 var first = GetPropertyValue<Dictionary<string, string>>(this.Prop_FirstDictionary, "Prop_FirstDictionary", sd);
                 var second = GetPropertyValue<Dictionary<string, string>>(this.Prop_SecondDictionary, "Prop_SecondDictionary", sd);
 
@@ -188,25 +189,7 @@ namespace Primo.MIA
                         $"Конфликт при слиянии — дублирующиеся ключи: {string.Join(", ", conflictKeys)}. " +
                         "Смените стратегию на KeepFirst или KeepSecond.");
 
-                Dictionary<string, string> result;
-
-                if (this.Strategy == DictionaryMergeStrategy.KeepFirst)
-                {
-                    // Начинаем с копии первого, из второго добавляем только отсутствующие
-                    result = first.ToDictionary(p => p.Key, p => p.Value);
-                    second
-                        .Where(p => !result.ContainsKey(p.Key))
-                        .ToList()
-                        .ForEach(p => result[p.Key] = p.Value);
-                }
-                else // KeepSecond — второй перекрывает первый
-                {
-                    // Начинаем с копии первого, второй накладываем поверх (все ключи)
-                    result = first.ToDictionary(p => p.Key, p => p.Value);
-                    second
-                        .ToList()
-                        .ForEach(p => result[p.Key] = p.Value);
-                }
+                var result = logic.Merge(first, second, this.Strategy);
 
                 SetVariableValue(this.Prop_ResultDictionary, result, sd);
                 SetVariableValue(this.Prop_Count, result.Count, sd);
