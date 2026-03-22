@@ -2,18 +2,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Primo.MIA.Common;
 
-namespace Primo.MIA.Tests.Logic
+namespace Primo.MIA
 {
     /// <summary>
-    /// Бизнес-логика фильтрации списков, извлеченная для тестирования.
-    /// Не зависит от инфраструктуры Primo RPA.
+    /// Бизнес-логика фильтрации списков.
     /// </summary>
     public class ListFilterLogic
     {
-        /// <summary>
-        /// Фильтрует список строк по заданному условию
-        /// </summary>
         public FilterResult Filter(
             List<string> source,
             string pattern,
@@ -42,70 +39,70 @@ namespace Primo.MIA.Tests.Logic
             int minLength,
             int maxLength)
         {
-            StringComparison sc = caseSensitive
-                ? StringComparison.Ordinal
-                : StringComparison.OrdinalIgnoreCase;
+            var comparison = ComparisonHelper.GetStringComparison(caseSensitive);
 
             switch (mode)
             {
                 case ListFilterMode.Contains:
-                    return s => s != null && s.IndexOf(pattern, sc) >= 0;
+                    return value => value != null && value.IndexOf(pattern, comparison) >= 0;
 
                 case ListFilterMode.NotContains:
-                    return s => s == null || s.IndexOf(pattern, sc) < 0;
+                    return value => value == null || value.IndexOf(pattern, comparison) < 0;
 
                 case ListFilterMode.StartsWith:
-                    return s => s != null && s.StartsWith(pattern, sc);
+                    return value => value != null && value.StartsWith(pattern, comparison);
 
                 case ListFilterMode.EndsWith:
-                    return s => s != null && s.EndsWith(pattern, sc);
+                    return value => value != null && value.EndsWith(pattern, comparison);
 
                 case ListFilterMode.ExactMatch:
-                    return s => string.Equals(s, pattern, sc);
+                    return value => string.Equals(value, pattern, comparison);
 
                 case ListFilterMode.Regex:
                 {
-                    var opts = caseSensitive
+                    var options = caseSensitive
                         ? RegexOptions.Compiled
                         : RegexOptions.Compiled | RegexOptions.IgnoreCase;
-                    var rx = new Regex(pattern, opts, TimeSpan.FromSeconds(1));
-                    return s => s != null && rx.IsMatch(s);
+                    var regex = new Regex(pattern, options, TimeSpan.FromSeconds(1));
+                    return value => value != null && regex.IsMatch(value);
                 }
 
                 case ListFilterMode.NotRegex:
                 {
-                    var opts = caseSensitive
+                    var options = caseSensitive
                         ? RegexOptions.Compiled
                         : RegexOptions.Compiled | RegexOptions.IgnoreCase;
-                    var rx = new Regex(pattern, opts, TimeSpan.FromSeconds(1));
-                    return s => s == null || !rx.IsMatch(s);
+                    var regex = new Regex(pattern, options, TimeSpan.FromSeconds(1));
+                    return value => value == null || !regex.IsMatch(value);
                 }
 
                 case ListFilterMode.NotEmpty:
-                    return s => !string.IsNullOrWhiteSpace(s);
+                    return value => !string.IsNullOrWhiteSpace(value);
 
                 case ListFilterMode.EmptyOnly:
-                    return s => string.IsNullOrWhiteSpace(s);
+                    return value => string.IsNullOrWhiteSpace(value);
 
                 case ListFilterMode.LengthRange:
-                    return s => s != null && s.Length >= minLength && s.Length <= maxLength;
+                    return value => value != null && value.Length >= minLength && value.Length <= maxLength;
 
                 case ListFilterMode.NumericOnly:
-                    return s => !string.IsNullOrWhiteSpace(s)
-                             && double.TryParse(s,
-                                    System.Globalization.NumberStyles.Any,
-                                    System.Globalization.CultureInfo.InvariantCulture,
-                                    out _);
+                    return value => !string.IsNullOrWhiteSpace(value)
+                        && double.TryParse(
+                            value,
+                            System.Globalization.NumberStyles.Any,
+                            System.Globalization.CultureInfo.InvariantCulture,
+                            out _);
 
                 default:
                     throw new InvalidOperationException($"Неизвестный режим: {mode}");
             }
         }
+    }
 
-        public class FilterResult
-        {
-            public List<string> Matched { get; set; }
-            public List<string> Rejected { get; set; }
-        }
+    public class FilterResult
+    {
+        public List<string> Matched { get; set; }
+
+        public List<string> Rejected { get; set; }
     }
 }

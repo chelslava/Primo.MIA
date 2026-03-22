@@ -210,100 +210,34 @@ namespace Primo.MIA
         {
             try
             {
+                var logic = new ListFilterLogic();
                 var list = GetPropertyValue<List<string>>(this.Prop_List, "Prop_List", sd);
                 string pat = GetPropertyValue<string>(this.Prop_Pattern, "Prop_Pattern", sd);
 
                 if (list == null) throw new ArgumentNullException("Prop_List", "Список не может быть null");
+                int minLength = 0;
+                int maxLength = int.MaxValue;
 
-                // Строим предикат для выбранного режима
-                Func<string, bool> predicate = BuildPredicate(pat ?? string.Empty, sd);
+                if (this.Mode == ListFilterMode.LengthRange)
+                {
+                    string minStr = GetPropertyValue<string>(this.Prop_MinLength, "Prop_MinLength", sd) ?? "0";
+                    string maxStr = GetPropertyValue<string>(this.Prop_MaxLength, "Prop_MaxLength", sd) ?? int.MaxValue.ToString();
+                    minLength = int.TryParse(minStr, out int minValue) ? minValue : 0;
+                    maxLength = int.TryParse(maxStr, out int maxValue) ? maxValue : int.MaxValue;
+                }
 
-                // Разбиваем на две части через LINQ ToLookup
-                var lookup = list.ToLookup(predicate);
-                var matched = lookup[true].ToList();
-                var rejected = lookup[false].ToList();
+                var result = logic.Filter(list, pat ?? string.Empty, this.Mode, this.Prop_CaseSensitive, minLength, maxLength);
 
-                SetVariableValue(this.Prop_Matched, matched, sd);
-                SetVariableValue(this.Prop_Rejected, rejected, sd);
-                SetVariableValue(this.Prop_MatchedCount, matched.Count, sd);
-                SetVariableValue(this.Prop_RejectedCount, rejected.Count, sd);
+                SetVariableValue(this.Prop_Matched, result.Matched, sd);
+                SetVariableValue(this.Prop_Rejected, result.Rejected, sd);
+                SetVariableValue(this.Prop_MatchedCount, result.Matched.Count, sd);
+                SetVariableValue(this.Prop_RejectedCount, result.Rejected.Count, sd);
 
-                return new ExecutionResult { IsSuccess = true, SuccessMessage = $"Прошло: {matched.Count}, отсеяно: {rejected.Count}" };
+                return new ExecutionResult { IsSuccess = true, SuccessMessage = $"Прошло: {result.Matched.Count}, отсеяно: {result.Rejected.Count}" };
             }
             catch (Exception ex)
             {
                 return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Ошибка фильтрации: {ex.Message}" };
-            }
-        }
-
-        /// <summary>
-        /// Строит Func&lt;string,bool&gt; для выбранного режима и паттерна.
-        /// Все строковые сравнения учитывают Prop_CaseSensitive.
-        /// </summary>
-        private Func<string, bool> BuildPredicate(string pattern, ScriptingData sd)
-        {
-            StringComparison sc = ComparisonHelper.GetStringComparison(this.Prop_CaseSensitive);
-
-            switch (this.Mode)
-            {
-                case ListFilterMode.Contains:
-                    return s => s != null && s.IndexOf(pattern, sc) >= 0;
-
-                case ListFilterMode.NotContains:
-                    return s => s == null || s.IndexOf(pattern, sc) < 0;
-
-                case ListFilterMode.StartsWith:
-                    return s => s != null && s.StartsWith(pattern, sc);
-
-                case ListFilterMode.EndsWith:
-                    return s => s != null && s.EndsWith(pattern, sc);
-
-                case ListFilterMode.ExactMatch:
-                    return s => string.Equals(s, pattern, sc);
-
-                case ListFilterMode.Regex:
-                    {
-                        var opts = this.Prop_CaseSensitive
-                            ? RegexOptions.Compiled
-                            : RegexOptions.Compiled | RegexOptions.IgnoreCase;
-                        var rx = new Regex(pattern, opts);
-                        return s => s != null && rx.IsMatch(s);
-                    }
-
-                case ListFilterMode.NotRegex:
-                    {
-                        var opts = this.Prop_CaseSensitive
-                            ? RegexOptions.Compiled
-                            : RegexOptions.Compiled | RegexOptions.IgnoreCase;
-                        var rx = new Regex(pattern, opts);
-                        return s => s == null || !rx.IsMatch(s);
-                    }
-
-                case ListFilterMode.NotEmpty:
-                    return s => !string.IsNullOrWhiteSpace(s);
-
-                case ListFilterMode.EmptyOnly:
-                    return s => string.IsNullOrWhiteSpace(s);
-
-                case ListFilterMode.LengthRange:
-                    {
-                        // Читаем min/max через GetPropertyValue для разрешения скриптовых выражений
-                        string minStr = GetPropertyValue<string>(this.Prop_MinLength, "Prop_MinLength", sd) ?? "0";
-                        string maxStr = GetPropertyValue<string>(this.Prop_MaxLength, "Prop_MaxLength", sd) ?? int.MaxValue.ToString();
-                        int min = int.TryParse(minStr, out int mn) ? mn : 0;
-                        int max = int.TryParse(maxStr, out int mx) ? mx : int.MaxValue;
-                        return s => s != null && s.Length >= min && s.Length <= max;
-                    }
-
-                case ListFilterMode.NumericOnly:
-                    return s => !string.IsNullOrWhiteSpace(s)
-                             && double.TryParse(s,
-                                    System.Globalization.NumberStyles.Any,
-                                    System.Globalization.CultureInfo.InvariantCulture,
-                                    out _);
-
-                default:
-                    throw new InvalidOperationException($"Неизвестный режим: {this.Mode}");
             }
         }
 
