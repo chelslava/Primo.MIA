@@ -5,7 +5,6 @@ using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 
 namespace Primo.MIA
 {
@@ -143,6 +142,7 @@ namespace Primo.MIA
         {
             try
             {
+                var logic = new ListGroupLogic();
                 var list = GetPropertyValue<List<string>>(this.Prop_List, "Prop_List", sd);
                 if (list == null) throw new ArgumentNullException("Prop_List", "Список не может быть null");
 
@@ -156,65 +156,7 @@ namespace Primo.MIA
                     .GroupBy(s => s, StringComparer.OrdinalIgnoreCase)
                     .ToDictionary(g => g.Key, g => g.Count(), StringComparer.OrdinalIgnoreCase);
 
-                Dictionary<string, List<string>> grouped;
-
-                switch (this.Mode)
-                {
-                    case ListGroupMode.ByFirstChar:
-                        grouped = list
-                            .GroupBy(s => string.IsNullOrEmpty(s) ? "(пусто)" : s[0].ToString().ToUpper())
-                            .OrderBy(g => g.Key)
-                            .ToDictionary(g => g.Key, g => g.ToList());
-                        break;
-
-                    case ListGroupMode.ByLength:
-                        grouped = list
-                            .GroupBy(s => (s?.Length ?? 0).ToString())
-                            .OrderBy(g => int.Parse(g.Key))
-                            .ToDictionary(g => g.Key, g => g.ToList());
-                        break;
-
-                    case ListGroupMode.ByPrefix:
-                        if (prefixLen < 1) throw new ArgumentException("Длина префикса должна быть ≥ 1");
-                        grouped = list
-                            .GroupBy(s => s == null || s.Length < prefixLen
-                                ? (s ?? "(пусто)")
-                                : s.Substring(0, prefixLen))
-                            .OrderBy(g => g.Key)
-                            .ToDictionary(g => g.Key, g => g.ToList());
-                        break;
-
-                    case ListGroupMode.ByRegexGroup:
-                        {
-                            if (string.IsNullOrWhiteSpace(regex))
-                                throw new ArgumentException("Regex паттерн обязателен для режима ByRegexGroup");
-                            var rx = new Regex(regex, RegexOptions.Compiled | RegexOptions.IgnoreCase);
-                            grouped = list
-                                .GroupBy(s =>
-                                {
-                                    if (s == null) return "(null)";
-                                    var m = rx.Match(s);
-                                    return m.Success && m.Groups.Count > 1 ? m.Groups[1].Value : "(нет совпадения)";
-                                })
-                                .OrderBy(g => g.Key)
-                                .ToDictionary(g => g.Key, g => g.ToList());
-                            break;
-                        }
-
-                    case ListGroupMode.TopFrequent:
-                        // Топ-N по частоте → группируем как одну группу для каждого элемента
-                        grouped = freqMap
-                            .OrderByDescending(kv => kv.Value)
-                            .Take(topN)
-                            .ToDictionary(
-                                kv => $"{kv.Key} ({kv.Value}×)",
-                                kv => list.Where(s => string.Equals(s, kv.Key, StringComparison.OrdinalIgnoreCase)).ToList()
-                            );
-                        break;
-
-                    default:
-                        throw new InvalidOperationException($"Неизвестный режим: {this.Mode}");
-                }
+                var grouped = logic.Group(list, this.Mode, prefixLen, regex, topN);
 
                 SetVariableValue(this.Prop_GroupedResult, grouped, sd);
                 SetVariableValue(this.Prop_GroupCount, grouped.Count, sd);
