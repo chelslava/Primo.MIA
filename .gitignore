@@ -358,12 +358,11 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 
-# VS Code files for those who use both VS Code and Visual Studio
-.vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
+# IDE and tool directories
+.vscode/
+.kiro/
+.dotnet/
+.agents/
 
 # JetBrains Rider
 .idea/
