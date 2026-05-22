@@ -3,21 +3,24 @@
 	<metadata>
 		<id>Primo.MIA</id>
 		<version>1.0.0</version>
-		<authors>Your Team</authors>
-		<description>Централизованное хранилище для глобальных переменных и конфигураций MIA</description>
-		<projectUrl>https://gitlab.com/chelslava/Primo.MIA</projectUrl>
+		<authors>Chelslava</authors>
+		<description>Библиотека расширенных активностей для платформы Primo RPA (~90 активностей: Browser, Database, HTTP, Collections, Files, Calendar, Text, и другие)</description>
+		<projectUrl>https://github.com/chelslava/Primo.MIA</projectUrl>
 		<license type="expression">MIT</license>
 		<requireLicenseAcceptance>false</requireLicenseAcceptance>
 		<readme>README.md</readme>
 		<dependencies>
 			<group targetFramework=".NETFramework4.6.1">
 				<dependency id="Hjson" version="3.0.0" />
+				<dependency id="Newtonsoft.Json" version="13.0.4" />
+				<dependency id="Selenium.WebDriver" version="4.41.0" />
+				<dependency id="Selenium.Support" version="4.41.0" />
+				<dependency id="Tomlyn" version="0.16.2" />
 			</group>
 		</dependencies>
 	</metadata>
 	<files>
-		<file src="bin\    <file src="README.md" target="" />
-  </files>imo.MIA.dll" target="lib\net461" />
+		<file src="bin\**\*.dll" target="lib\net461" />
 		<file src="README.md" target="" />
 	</files>
 </package>

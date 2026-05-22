@@ -1,0 +1,81 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  validate:
+    name: Validate Project Structure
+    runs-on: windows-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+      name: Checkout code
+      
+    - name: Setup NuGet
+      uses: nuget/setup-nuget@v2
+      with:
+        nuget-version: '6.x'
+        
+    - name: Restore NuGet Packages
+      run: nuget restore Primo.MIA.slnx
+      
+    - name: Check Project Files Exist
+      run: |
+        if (Test-Path "Primo.MIA.csproj") { Write-Host "✅ Primo.MIA.csproj found" } else { Write-Host "❌ Primo.MIA.csproj NOT found"; exit 1 }
+        if (Test-Path "Primo.MIA.nuspec") { Write-Host "✅ Primo.MIA.nuspec found" } else { Write-Host "❌ Primo.MIA.nuspec NOT found"; exit 1 }
+        if (Test-Path "Primo.MIA.Tests\Primo.MIA.Tests.csproj") { Write-Host "✅ Tests project found" } else { Write-Host "❌ Tests project NOT found"; exit 1 }
+        
+    - name: Validate .gitignore
+      run: |
+        $content = Get-Content ".gitignore" -Raw
+        if ($content -match "\.vscode/") { Write-Host "✅ .vscode in .gitignore" } else { Write-Host "⚠️ .vscode NOT in .gitignore" }
+        if ($content -match "\.kiro/") { Write-Host "✅ .kiro in .gitignore" } else { Write-Host "⚠️ .kiro NOT in .gitignore" }
+        if ($content -match "\.dotnet/") { Write-Host "✅ .dotnet in .gitignore" } else { Write-Host "⚠️ .dotnet NOT in .gitignore" }
+
+  note-about-primo-sdk:
+    name: ℹ️ Primo SDK Note
+    runs-on: ubuntu-latest
+    needs: validate
+    
+    steps:
+    - name: Information Message
+      run: |
+        echo "================================================"
+        echo " ℹ️  ПРИМЕЧАНИЕ О СБОРКЕ И ТЕСТАХ"
+        echo "================================================"
+        echo ""
+        echo "Полная сборка и запуск тестов НЕВОЗМОЖНЫ в "
+        echo "GitHub Actions, потому что проект зависит от:"
+        echo ""
+        echo "   LTools.Common.dll"
+        echo "   LTools.SDK.dll"
+        echo "   LTools.Scripting.dll"
+        echo "   ... и другие DLL от Primo Studio"
+        echo ""
+        echo "Эти DLL устанавливаются вместе с Primo Studio по пути:"
+        echo "   C:\Program Files\Primo\Primo Studio Community x64\"
+        echo ""
+        echo "Они НЕДОСТУПНЫ через NuGet или в открытом доступе."
+        echo ""
+        echo "================================================"
+        echo " ДЛЯ ПОЛНОЙ СБОРКИ И ТЕСТОВ:"
+        echo "================================================"
+        echo ""
+        echo "1. Используйте локальную машину с установленным:"
+        echo "   - Visual Studio 2022"
+        echo "   - Primo Studio Community"
+        echo ""
+        echo "2. Или настройте self-hosted runner с:"
+        echo "   - Windows OS"
+        echo "   - Visual Studio Build Tools"
+        echo "   - Primo Studio"
+        echo ""
+        echo "3. Команды для локальной сборки:"
+        echo "   msbuild Primo.MIA.csproj /p:Configuration=Release"
+        echo "   msbuild Primo.MIA.Tests\Primo.MIA.Tests.csproj /p:Configuration=Debug"
+        echo ""
+        echo "================================================"

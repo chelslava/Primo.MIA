@@ -1,0 +1,182 @@
+name: Release - Generate NuGet Package
+
+on:
+  release:
+    types: [ published ]
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      configuration:
+        description: 'Build Configuration'
+        required: true
+        default: 'Release'
+        type: choice
+        options:
+          - Debug
+          - Release
+
+jobs:
+  validate-release:
+    name: Validate Release Configuration
+    runs-on: windows-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+      name: Checkout code
+      
+    - name: Setup NuGet
+      uses: nuget/setup-nuget@v2
+      with:
+        nuget-version: '6.x'
+        
+    - name: Restore NuGet Packages
+      run: nuget restore Primo.MIA.slnx
+      
+    - name: Validate Release Files
+      run: |
+        $errors = @()
+        
+        if (-not (Test-Path "Primo.MIA.csproj")) {
+          $errors += "❌ Primo.MIA.csproj NOT found"
+        } else {
+          Write-Host "✅ Primo.MIA.csproj found"
+          $csproj = Get-Content "Primo.MIA.csproj" -Raw
+          if ($csproj -match '<GeneratePackageOnBuild>true</GeneratePackageOnBuild>') {
+            Write-Host "✅ GeneratePackageOnBuild is enabled"
+          } else {
+            Write-Host "⚠️ GeneratePackageOnBuild may not be enabled"
+          }
+        }
+        
+        if (-not (Test-Path "Primo.MIA.nuspec")) {
+          $errors += "❌ Primo.MIA.nuspec NOT found"
+        } else {
+          Write-Host "✅ Primo.MIA.nuspec found"
+          $nuspec = Get-Content "Primo.MIA.nuspec" -Raw
+          if ($nuspec -match '<id>Primo\.MIA</id>') { Write-Host "✅ Package ID: Primo.MIA" }
+          if ($nuspec -match '<version>([^<]+)</version>') { Write-Host "✅ Version: $($matches[1])" }
+        }
+        
+        if (-not (Test-Path "README.md")) {
+          $errors += "❌ README.md NOT found"
+        } else {
+          Write-Host "✅ README.md found"
+        }
+        
+        if ($errors.Count -gt 0) {
+          foreach ($err in $errors) { Write-Host $err }
+          exit 1
+        }
+        
+        Write-Host ""
+        Write-Host "================================================"
+        Write-Host " ✅ Валидация пройдена успешно!"
+        Write-Host "================================================"
+
+  release-instructions:
+    name: ℹ️ Release Instructions
+    runs-on: ubuntu-latest
+    needs: validate-release
+    
+    steps:
+    - name: How to Build and Publish NuGet Package
+      run: |
+        echo "================================================"
+        echo " 📦 КАК СОЗДАТЬ И ОПУБЛИКОВАТЬ NUGET ПАКЕТ"
+        echo "================================================"
+        echo ""
+        echo "⚠️  ВАЖНО: Полная сборка НЕВОЗМОЖНА в GitHub Actions"
+        echo "    потому что требуется Primo Studio SDK (LTools.*.dll)"
+        echo "    Эти DLL НЕДОСТУПНЫ через NuGet."
+        echo ""
+        echo "================================================"
+        echo " 🔧 ШАГ 1: Подготовка локальной машины"
+        echo "================================================"
+        echo ""
+        echo "Требуется установленное ПО:"
+        echo "   1. Visual Studio 2022 с компонентами:"
+        echo "      - Разработка классических приложений .NET"
+        echo "      - .NET Framework 4.6.1 SDK"
+        echo ""
+        echo "   2. Primo Studio Community:"
+        echo "      - Устанавливается по умолчанию в:"
+        echo "        C:\Program Files\Primo\Primo Studio Community x64\"
+        echo ""
+        echo "   3. NuGet CLI (опционально, если нужна ручная упаковка)"
+        echo ""
+        echo "================================================"
+        echo " 🔨 ШАГ 2: Сборка проекта"
+        echo "================================================"
+        echo ""
+        echo "Откройте Developer Command Prompt для VS 2022 и выполните:"
+        echo ""
+        echo "   cd C:\Path\To\Primo.MIA"
+        echo ""
+        echo "   # Восстановить NuGet пакеты"
+        echo "   nuget restore Primo.MIA.slnx"
+        echo ""
+        echo "   # Собрать в Release конфигурации"
+        echo "   msbuild Primo.MIA.csproj /p:Configuration=Release"
+        echo ""
+        echo "   # NuGet пакет будет создан в:"
+        echo "   bin\Release\Primo.MIA.{version}.nupkg"
+        echo ""
+        echo "================================================"
+        echo " 📋 ШАГ 3: Проверка тестов (опционально)"
+        echo "================================================"
+        echo ""
+        echo "   msbuild Primo.MIA.Tests\Primo.MIA.Tests.csproj /p:Configuration=Debug"
+        echo ""
+        echo "   # Запустить тесты через vstest.console"
+        echo "   vstest.console.exe Primo.MIA.Tests\bin\Debug\net462\Primo.MIA.Tests.dll"
+        echo ""
+        echo "================================================"
+        echo " 🚀 ШАГ 4: Публикация на NuGet.org"
+        echo "================================================"
+        echo ""
+        echo "   # Получите API Key на nuget.org"
+        echo "   # Профиль → API Keys → Create"
+        echo ""
+        echo "   # Опубликуйте пакет"
+        echo "   nuget push bin\Release\Primo.MIA.{version}.nupkg "
+        echo "     -Source https://api.nuget.org/v3/index.json "
+        echo "     -ApiKey YOUR_NUGET_API_KEY"
+        echo ""
+        echo "================================================"
+        echo " 🏷️ ШАГ 5: Создание Release на GitHub"
+        echo "================================================"
+        echo ""
+        echo "   1. Создайте тег с версией:"
+        echo "      git tag v1.0.0"
+        echo "      git push origin v1.0.0"
+        echo ""
+        echo "   2. На GitHub → Releases → Draft a new release"
+        echo "      - Tag version: v1.0.0"
+        echo "      - Target: develop или main"
+        echo "      - Title: Primo.MIA v1.0.0"
+        echo "      - Описание: список изменений"
+        echo ""
+        echo "   3. Прикрепите .nupkg файл к релизу"
+        echo "      (Drag & drop в секцию Attach binaries)"
+        echo ""
+        echo "   4. Нажмите Publish release"
+        echo ""
+        echo "================================================"
+        echo " 📝 ВЕРСИОНИРОВАНИЕ (SemVer)"
+        echo "================================================"
+        echo ""
+        echo "   MAJOR.MINOR.PATCH"
+        echo ""
+        echo "   MAJOR - Несовместимые изменения API"
+        echo "   MINOR - Новая функциональность (обратно совместимо)"
+        echo "   PATCH - Исправления багов (обратно совместимо)"
+        echo ""
+        echo "   Примеры:"
+        echo "   v1.0.0  - Первый стабильный релиз"
+        echo "   v1.0.1  - Исправление бага"
+        echo "   v1.1.0  - Новая активность"
+        echo "   v2.0.0  - Ломающие изменения API"
+        echo ""
+        echo "================================================"

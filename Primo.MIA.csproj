@@ -18,8 +18,8 @@
     <Version>1.0.0</Version>
     <Authors>Your Team</Authors>
     <Description>Централизованное хранилище для глобальных переменных и конфигураций MIA</Description>
-    <PackageProjectUrl>https://gitlab.com/chelslava/Primo.MIA</PackageProjectUrl>
-    <RepositoryUrl>https://gitlab.com/chelslava/Primo.MIA</RepositoryUrl>
+     <PackageProjectUrl>https://github.com/chelslava/Primo.MIA</PackageProjectUrl>
+     <RepositoryUrl>https://github.com/chelslava/Primo.MIA</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <NuGetPackageImportStamp>
