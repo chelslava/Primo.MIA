@@ -1,4 +1,4 @@
-// =============================================================================
+﻿// =============================================================================
 // ElementGetInfoBack.cs — активность «Получить информацию об элементе».
 //
 // Объединяет три режима получения информации:
@@ -324,8 +324,7 @@ namespace Primo.MIA
         {
             string propertyName = GetPropertyValue<string>(this.Prop_PropertyName, "Prop_PropertyName", sd);
 
-            if (string.IsNullOrWhiteSpace(propertyName))
-                throw new ArgumentException("Имя свойства не может быть пустым");
+            Guard.NotNullOrWhiteSpace(propertyName, nameof(propertyName));
 
             string value = GetPropertyValue(element, propertyName);
 
@@ -346,8 +345,7 @@ namespace Primo.MIA
         {
             string cssProperty = GetPropertyValue<string>(this.Prop_PropertyName, "Prop_PropertyName", sd);
 
-            if (string.IsNullOrWhiteSpace(cssProperty))
-                throw new ArgumentException("CSS свойство не может быть пустым");
+            Guard.NotNullOrWhiteSpace(cssProperty, nameof(cssProperty));
 
             string value = SeleniumHelper.GetComputedStyle(driver, element, cssProperty);
 

@@ -1,4 +1,4 @@
-// =============================================================================
+﻿// =============================================================================
 // ElementFindUnifiedBack.cs — объединённая активность «Найти элемент(ы)».
 //
 // Объединяет два режима поиска в одной активности:
@@ -247,8 +247,7 @@ namespace Primo.MIA
                     GetPropertyValue<string>(this.Prop_SessionId, nameof(Prop_SessionId), sd));
                 string locatorValue = GetPropertyValue<string>(this.Prop_LocatorValue, nameof(Prop_LocatorValue), sd);
 
-                if (string.IsNullOrWhiteSpace(locatorValue))
-                    throw new ArgumentException("Значение локатора не может быть пустым");
+                Guard.NotNullOrWhiteSpace(locatorValue, nameof(locatorValue));
 
                 // Получение WebDriver по ID сессии
                 var driver = SeleniumHelper.GetDriver(sessionId);

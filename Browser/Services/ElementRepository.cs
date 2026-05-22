@@ -1,4 +1,4 @@
-// =============================================================================
+﻿// =============================================================================
 // ElementRepository.cs — реализация IElementRepository
 //
 // Хранилище для WebElement экземпляров с использованием WeakReference
@@ -14,6 +14,7 @@
 using OpenQA.Selenium;
 using System;
 using System.Collections.Generic;
+using Primo.MIA.Common;
 
 namespace Primo.MIA
 {
@@ -35,11 +36,8 @@ namespace Primo.MIA
         /// </summary>
         public void StoreElement(string elementId, IWebElement element)
         {
-            if (string.IsNullOrWhiteSpace(elementId))
-                throw new ArgumentException("Element ID не может быть пустым", nameof(elementId));
-
-            if (element == null)
-                throw new ArgumentNullException(nameof(element));
+            Guard.NotNullOrWhiteSpace(elementId, nameof(elementId));
+            Guard.NotNull(element, nameof(element));
 
             lock (_lock)
             {

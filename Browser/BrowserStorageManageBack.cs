@@ -1,4 +1,4 @@
-// =============================================================================
+﻿// =============================================================================
 // BrowserStorageManageBack.cs — активность «Управление Web Storage».
 //
 // Управляет localStorage и sessionStorage браузера.
@@ -200,11 +200,10 @@ namespace Primo.MIA
 
                 switch (Prop_Operation)
                 {
-                    case StorageOperation.GetItem:
+                case StorageOperation.GetItem:
                         {
                             string key = GetPropertyValue<string>(Prop_Key, "Prop_Key", sd);
-                            if (string.IsNullOrWhiteSpace(key))
-                                throw new ArgumentException("Ключ не может быть пустым для операции GetItem");
+                            Guard.NotNullOrWhiteSpace(key, nameof(key));
 
                             string value = SeleniumHelper.GetStorageItem(driver, Prop_StorageType, key);
                             SetVariableValue(Prop_OutValue, value ?? string.Empty, sd);
@@ -212,24 +211,22 @@ namespace Primo.MIA
                         }
                         break;
 
-                    case StorageOperation.SetItem:
+                case StorageOperation.SetItem:
                         {
                             string key = GetPropertyValue<string>(Prop_Key, "Prop_Key", sd);
                             string value = GetPropertyValue<string>(Prop_Value, "Prop_Value", sd);
 
-                            if (string.IsNullOrWhiteSpace(key))
-                                throw new ArgumentException("Ключ не может быть пустым для операции SetItem");
+                            Guard.NotNullOrWhiteSpace(key, nameof(key));
 
                             SeleniumHelper.SetStorageItem(driver, Prop_StorageType, key, value ?? string.Empty);
                             resultMsg = $"[Web Storage] Установлено значение для ключа '{key}'";
                         }
                         break;
 
-                    case StorageOperation.RemoveItem:
+                case StorageOperation.RemoveItem:
                         {
                             string key = GetPropertyValue<string>(Prop_Key, "Prop_Key", sd);
-                            if (string.IsNullOrWhiteSpace(key))
-                                throw new ArgumentException("Ключ не может быть пустым для операции RemoveItem");
+                            Guard.NotNullOrWhiteSpace(key, nameof(key));
 
                             SeleniumHelper.RemoveStorageItem(driver, Prop_StorageType, key);
                             resultMsg = $"[Web Storage] Удалён ключ '{key}'";

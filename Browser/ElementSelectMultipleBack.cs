@@ -1,4 +1,4 @@
-// =============================================================================
+﻿// =============================================================================
 // ElementSelectMultipleBack.cs — активность «Работа с multiple select».
 //
 // Управляет множественным выбором в select[multiple] элементах.
@@ -284,7 +284,7 @@ namespace Primo.MIA
                     case MultiSelectOperation.SelectByText:
                         {
                             string value = GetPropertyValue<string>(Prop_Value, "Prop_Value", sd);
-                            ValidateNotEmpty(value, "Prop_Value");
+                            Guard.NotNullOrWhiteSpace(value, nameof(value));
 
                             select.SelectByText(value);
                             resultMsg = $"[Multiple Select] Выбрано по тексту: {value}";
@@ -295,7 +295,7 @@ namespace Primo.MIA
                     case MultiSelectOperation.SelectByValue:
                         {
                             string value = GetPropertyValue<string>(Prop_Value, "Prop_Value", sd);
-                            ValidateNotEmpty(value, "Prop_Value");
+                            Guard.NotNullOrWhiteSpace(value, nameof(value));
 
                             select.SelectByValue(value);
                             resultMsg = $"[Multiple Select] Выбрано по value: {value}";
@@ -317,7 +317,7 @@ namespace Primo.MIA
                     case MultiSelectOperation.DeselectByText:
                         {
                             string value = GetPropertyValue<string>(Prop_Value, "Prop_Value", sd);
-                            ValidateNotEmpty(value, "Prop_Value");
+                            Guard.NotNullOrWhiteSpace(value, nameof(value));
 
                             select.DeselectByText(value);
                             resultMsg = $"[Multiple Select] Снят выбор по тексту: {value}";
@@ -328,7 +328,7 @@ namespace Primo.MIA
                     case MultiSelectOperation.DeselectByValue:
                         {
                             string value = GetPropertyValue<string>(Prop_Value, "Prop_Value", sd);
-                            ValidateNotEmpty(value, "Prop_Value");
+                            Guard.NotNullOrWhiteSpace(value, nameof(value));
 
                             select.DeselectByValue(value);
                             resultMsg = $"[Multiple Select] Снят выбор по value: {value}";

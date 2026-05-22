@@ -1,3 +1,4 @@
+﻿using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -41,8 +42,7 @@ namespace Primo.MIA
 
         public static DbConnection OpenConnection(string providerInvariantName, string connectionString)
         {
-            if (string.IsNullOrWhiteSpace(connectionString))
-                throw new ArgumentException("Строка подключения не может быть пустой.", nameof(connectionString));
+            Guard.NotNullOrWhiteSpace(connectionString, nameof(connectionString));
 
             var factory = GetFactory(providerInvariantName);
             var connection = factory.CreateConnection();
@@ -64,8 +64,7 @@ namespace Primo.MIA
         {
             if (connection == null)
                 throw new ArgumentNullException(nameof(connection));
-            if (string.IsNullOrWhiteSpace(commandText))
-                throw new ArgumentException("Текст команды не может быть пустым.", nameof(commandText));
+            Guard.NotNullOrWhiteSpace(commandText, nameof(commandText));
 
             var command = connection.CreateCommand();
             command.CommandText = commandText;
@@ -99,8 +98,7 @@ namespace Primo.MIA
 
         public static string NormalizeParameterName(string parameterName)
         {
-            if (string.IsNullOrWhiteSpace(parameterName))
-                throw new ArgumentException("Имя параметра не может быть пустым.", nameof(parameterName));
+            Guard.NotNullOrWhiteSpace(parameterName, nameof(parameterName));
 
             var trimmed = parameterName.Trim();
             if (trimmed.StartsWith("@", StringComparison.Ordinal) ||

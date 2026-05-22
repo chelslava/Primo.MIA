@@ -1,0 +1,194 @@
+<!--
+    JsonDataTable.xaml
+    Визуальный интерфейс активности «JSON: DataTable конвертер».
+
+    Блок DataTable виден только при DataTableToJson.
+    Блок JSON виден только при JsonToDataTable.
+    Формат JSON виден только при DataTableToJson.
+    Определять типы колонок видно только при JsonToDataTable.
+    NULL как — только при DataTableToJson.
+-->
+<UserControl x:Class="Primo.MIA.JsonDataTable"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:system="clr-namespace:System;assembly=mscorlib"
+             xmlns:local="clr-namespace:Primo.MIA"
+             mc:Ignorable="d"
+             d:DesignHeight="300"
+             Margin="0,0,0,5">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Primo.MIA;component/Common/Styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+
+            <ObjectDataProvider x:Key="DirectionValues"
+                                MethodName="GetValues"
+                                ObjectType="{x:Type system:Enum}">
+                <ObjectDataProvider.MethodParameters>
+                    <x:Type TypeName="local:JsonConvertDirection"/>
+                </ObjectDataProvider.MethodParameters>
+            </ObjectDataProvider>
+
+            <ObjectDataProvider x:Key="FormatValues"
+                                MethodName="GetValues"
+                                ObjectType="{x:Type system:Enum}">
+                <ObjectDataProvider.MethodParameters>
+                    <x:Type TypeName="local:JsonTableFormat"/>
+                </ObjectDataProvider.MethodParameters>
+            </ObjectDataProvider>
+
+            <ObjectDataProvider x:Key="NullModeValues"
+                                MethodName="GetValues"
+                                ObjectType="{x:Type system:Enum}">
+                <ObjectDataProvider.MethodParameters>
+                    <x:Type TypeName="local:JsonNullMode"/>
+                </ObjectDataProvider.MethodParameters>
+            </ObjectDataProvider>
+
+            <!--
+                Конвертер: блок DataTable виден если Direction = DataTableToJson (=0)
+                           блок JSON виден если Direction = JsonToDataTable (=1)
+            -->
+            <local:EnumToVisibilityConverter x:Key="EnumToVis"/>
+
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid Background="{DynamicResource {x:Static SystemColors.ScrollBarBrushKey}}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Иконка -->
+        <Image Grid.Column="0"
+               Width="32" Height="32" Margin="5"
+               VerticalAlignment="Center"
+               Source="pack://application:,,,/Primo.MIA;component/images/json.png"/>
+
+        <!-- Поля -->
+        <StackPanel Grid.Column="1"
+                    VerticalAlignment="Top"
+                    Margin="5,0,5,8">
+
+            <!-- Заголовок с направлением -->
+            <TextBlock Style="{StaticResource ActivityHeader}">
+                <Run Text="JSON: " Foreground="#FF0E0E0E"/>
+                <Run Text="{Binding Prop_Direction, Mode=OneWay}" Foreground="#FF1565C0"/>
+            </TextBlock>
+
+            <!-- Направление -->
+            <TextBlock Text="Направление:" Style="{StaticResource FieldLabel}"/>
+            <ComboBox ItemsSource="{Binding Source={StaticResource DirectionValues}}"
+                      SelectedItem="{Binding Prop_Direction}"
+                      Style="{StaticResource FieldComboBox}"
+                      ToolTip="DataTableToJson — таблица в JSON&#xA;JsonToDataTable — JSON в таблицу"/>
+
+            <!-- DataTable — виден только при DataTableToJson -->
+            <StackPanel Visibility="{Binding Prop_Direction,
+                        Converter={StaticResource EnumToVis},
+                        ConverterParameter=DataTableToJson}">
+                <TextBlock Text="DataTable (входная):" Style="{StaticResource FieldLabel}"/>
+                <TextBox Text="{Binding Prop_DataTable, UpdateSourceTrigger=PropertyChanged}"
+                         Style="{StaticResource FieldBox}"
+                         ToolTip="Переменная DataTable для конвертации в JSON"/>
+            </StackPanel>
+
+            <!-- JSON — виден только при JsonToDataTable -->
+            <StackPanel Visibility="{Binding Prop_Direction,
+                        Converter={StaticResource EnumToVis},
+                        ConverterParameter=JsonToDataTable}">
+                <TextBlock Text="JSON (входной):" Style="{StaticResource FieldLabel}"/>
+                <TextBox Text="{Binding Prop_Json, UpdateSourceTrigger=PropertyChanged}"
+                         Style="{StaticResource FieldBox}"
+                         AcceptsReturn="True"
+                         MinHeight="44"
+                         TextWrapping="Wrap"
+                         VerticalScrollBarVisibility="Auto"
+                         ToolTip="JSON-строка или переменная скрипта содержащая JSON"/>
+            </StackPanel>
+
+            <!-- Колонки и формат дат в одной строке -->
+            <Grid Margin="0,2,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="110"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" Margin="0,0,4,0">
+                    <TextBlock Text="Колонки (пусто = все):" Style="{StaticResource FieldLabel}"/>
+                    <TextBox Text="{Binding Prop_Columns, UpdateSourceTrigger=PropertyChanged}"
+                             Style="{StaticResource FieldBox}"
+                             ToolTip="Имена колонок через запятую. Пример: Id,Name,Amount&#xA;Пусто = все колонки"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1">
+                    <TextBlock Text="Формат дат:" Style="{StaticResource FieldLabel}"/>
+                    <TextBox Text="{Binding Prop_DateFormat, UpdateSourceTrigger=PropertyChanged}"
+                             Style="{StaticResource FieldBox}"
+                             ToolTip="Формат DateTime-колонок. Примеры:&#xA;  yyyy-MM-dd&#xA;  dd.MM.yyyy&#xA;  yyyy-MM-ddTHH:mm:ss"/>
+                </StackPanel>
+            </Grid>
+
+            <!-- Формат JSON + NULL Mode — только при DataTableToJson -->
+            <StackPanel Visibility="{Binding Prop_Direction,
+                        Converter={StaticResource EnumToVis},
+                        ConverterParameter=DataTableToJson}">
+                <Grid Margin="0,2,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0" Margin="0,0,4,0">
+                        <TextBlock Text="Формат JSON:" Style="{StaticResource FieldLabel}"/>
+                        <ComboBox ItemsSource="{Binding Source={StaticResource FormatValues}}"
+                                  SelectedItem="{Binding Prop_Format}"
+                                  Style="{StaticResource FieldComboBox}"
+                                  ToolTip="ArrayOfObjects — [{...},{...}]&#xA;ArrayOfArrays  — [[...],[...]]&#xA;WithHeaders    — {columns:[...],rows:[[...]]}"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="1">
+                        <TextBlock Text="NULL как:" Style="{StaticResource FieldLabel}"/>
+                        <ComboBox ItemsSource="{Binding Source={StaticResource NullModeValues}}"
+                                  SelectedItem="{Binding Prop_NullMode}"
+                                  Style="{StaticResource FieldComboBox}"
+                                  ToolTip="JsonNull — null&#xA;EmptyString — &quot;&quot;&#xA;Zero — &quot;0&quot;&#xA;Skip — пропустить поле"/>
+                    </StackPanel>
+                </Grid>
+            </StackPanel>
+
+            <!-- Чекбоксы -->
+            <Grid Margin="0,6,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <CheckBox Grid.Column="0"
+                          Content="Форматировать (отступы)"
+                          IsChecked="{Binding Prop_Indent}"
+                          VerticalAlignment="Center"
+                          Foreground="#FF0E0E0E"
+                          ToolTip="Форматировать JSON с отступами (human-readable). Увеличивает размер."/>
+
+                <!-- Определять типы — только при JsonToDataTable -->
+                <StackPanel Grid.Column="1"
+                            Visibility="{Binding Prop_Direction,
+                            Converter={StaticResource EnumToVis},
+                            ConverterParameter=JsonToDataTable}">
+                    <CheckBox Content="Определять типы колонок"
+                              IsChecked="{Binding Prop_TypeInference}"
+                              VerticalAlignment="Center"
+                              Foreground="#FF0E0E0E"
+                              ToolTip="Автоматически определять типы: int, double, bool, DateTime.&#xA;Выключить если нужны все колонки как string."/>
+                </StackPanel>
+            </Grid>
+
+        </StackPanel>
+    </Grid>
+</UserControl>

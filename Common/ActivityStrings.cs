@@ -1034,6 +1034,23 @@ namespace Primo.MIA.Common
         public const string Field_WebhookListenQueryParams = "Query-параметры";
         public const string Field_WebhookListenIsTimeout = "Таймаут истёк";
         public const string Field_WebhookListenIsTokenValid = "Токен валиден";
+
+        // ═══════════════════════════════════════════════════════════════════════
+        // JSON: DATATABLE КОНВЕРТЕР
+        // ═══════════════════════════════════════════════════════════════════════
+
+        public const string Activity_JsonDataTable = "JSON: DataTable конвертер";
+        public const string Field_JsonDirection = "Направление";
+        public const string Field_JsonInputTable = "DataTable (входная)";
+        public const string Field_JsonInputJson = "JSON (входной)";
+        public const string Field_JsonFormat = "Формат JSON";
+        public const string Field_JsonColumns = "Колонки (пусто = все)";
+        public const string Field_JsonDateFormat = "Формат дат";
+        public const string Field_JsonIndent = "Форматировать (отступы)";
+        public const string Field_JsonNullMode = "NULL как";
+        public const string Field_JsonTypeInference = "Определять типы колонок";
+        public const string Field_JsonResultJson = "Результат (JSON)";
+        public const string Field_JsonResultTable = "Результат (DataTable)";
     }
 
 }

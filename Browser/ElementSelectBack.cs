@@ -1,4 +1,4 @@
-// =============================================================================
+﻿// =============================================================================
 // ElementSelectBack.cs — активность «Выбрать из списка».
 //
 // Выбирает опцию из выпадающего списка (select).
@@ -200,7 +200,7 @@ namespace Primo.MIA
 
                 Logger.LogInfo(sdkComponentName, "Начинается выбор из списка для сессии: {0}", sessionId);
 
-                ValidateNotEmpty(selectValue, nameof(selectValue));
+                Guard.NotNullOrWhiteSpace(selectValue, nameof(selectValue));
 
                 var driver = GetDriverFromContext(sessionId);
 

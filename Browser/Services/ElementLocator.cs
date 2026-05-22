@@ -1,4 +1,4 @@
-// =============================================================================
+﻿// =============================================================================
 // ElementLocator.cs — реализация IElementLocator
 //
 // Предоставляет методы для поиска элементов на странице с различными
@@ -15,6 +15,7 @@ using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 using System;
 using System.Collections.Generic;
+using Primo.MIA.Common;
 
 namespace Primo.MIA
 {
@@ -45,11 +46,8 @@ namespace Primo.MIA
             int timeoutSeconds,
             ElementWaitMode waitMode)
         {
-            if (driver == null)
-                throw new ArgumentNullException(nameof(driver));
-
-            if (string.IsNullOrWhiteSpace(locatorValue))
-                throw new ArgumentException("Значение локатора не может быть пустым", nameof(locatorValue));
+            Guard.NotNull(driver, nameof(driver));
+            Guard.NotNullOrWhiteSpace(locatorValue, nameof(locatorValue));
 
             switch (waitMode)
             {
@@ -110,11 +108,8 @@ namespace Primo.MIA
             LocatorType locatorType,
             string locatorValue)
         {
-            if (driver == null)
-                throw new ArgumentNullException(nameof(driver));
-
-            if (string.IsNullOrWhiteSpace(locatorValue))
-                throw new ArgumentException("Значение локатора не может быть пустым", nameof(locatorValue));
+            Guard.NotNull(driver, nameof(driver));
+            Guard.NotNullOrWhiteSpace(locatorValue, nameof(locatorValue));
 
             var by = CreateLocator(locatorType, locatorValue);
             return driver.FindElements(by);
@@ -161,11 +156,8 @@ namespace Primo.MIA
             string locatorValue,
             int timeoutSeconds)
         {
-            if (driver == null)
-                throw new ArgumentNullException(nameof(driver));
-
-            if (string.IsNullOrWhiteSpace(locatorValue))
-                throw new ArgumentException("Значение локатора не может быть пустым", nameof(locatorValue));
+            Guard.NotNull(driver, nameof(driver));
+            Guard.NotNullOrWhiteSpace(locatorValue, nameof(locatorValue));
 
             var by = CreateLocator(locatorType, locatorValue);
             var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(timeoutSeconds));
@@ -195,11 +187,8 @@ namespace Primo.MIA
             string locatorValue,
             int timeoutSeconds)
         {
-            if (driver == null)
-                throw new ArgumentNullException(nameof(driver));
-
-            if (string.IsNullOrWhiteSpace(locatorValue))
-                throw new ArgumentException("Значение локатора не может быть пустым", nameof(locatorValue));
+            Guard.NotNull(driver, nameof(driver));
+            Guard.NotNullOrWhiteSpace(locatorValue, nameof(locatorValue));
 
             var by = CreateLocator(locatorType, locatorValue);
             var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(timeoutSeconds));

@@ -166,8 +166,7 @@ namespace Primo.MIA
                         break;
 
                     case AlertAction.SendKeys:
-                        if (string.IsNullOrEmpty(inputText))
-                            throw new ArgumentException("Текст для ввода не может быть пустым при действии SendKeys");
+                        Guard.NotNullOrEmpty(inputText, nameof(inputText));
                         alert.SendKeys(inputText);
                         alert.Accept();
                         actionMessage = $"Введён текст: {inputText}";

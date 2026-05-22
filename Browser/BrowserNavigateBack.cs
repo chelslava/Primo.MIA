@@ -130,7 +130,7 @@ namespace Primo.MIA
                 {
                     case NavigateMode.ToUrl:
                         string url = GetPropertyValue<string>(Prop_Url, "Prop_Url", sd);
-                        ValidateNotEmpty(url, nameof(Prop_Url));
+                        Guard.NotNullOrWhiteSpace(url, nameof(url));
                         ValidateUrl(url);
 
                         driver.Navigate().GoToUrl(url);

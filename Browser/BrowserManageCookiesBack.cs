@@ -169,9 +169,8 @@ namespace Primo.MIA
                 // Выполнение операции
                 switch (Prop_Operation)
                 {
-                    case CookieOperation.Get:
-                        if (string.IsNullOrWhiteSpace(cookieName))
-                            throw new ArgumentException("Имя cookie не может быть пустым");
+                case CookieOperation.Get:
+                        Guard.NotNullOrWhiteSpace(cookieName, nameof(cookieName));
 
                         var cookie = cookieManager.GetCookieNamed(cookieName);
                         result = cookie?.Value ?? string.Empty;
@@ -185,18 +184,16 @@ namespace Primo.MIA
                         actionMessage = $"Получено {allCookies.Count} cookies";
                         break;
 
-                    case CookieOperation.Set:
-                        if (string.IsNullOrWhiteSpace(cookieName))
-                            throw new ArgumentException("Имя cookie не может быть пустым");
+                case CookieOperation.Set:
+                        Guard.NotNullOrWhiteSpace(cookieName, nameof(cookieName));
 
                         var newCookie = new Cookie(cookieName, cookieValue);
                         cookieManager.AddCookie(newCookie);
                         actionMessage = $"Установлен cookie '{cookieName}'";
                         break;
 
-                    case CookieOperation.Delete:
-                        if (string.IsNullOrWhiteSpace(cookieName))
-                            throw new ArgumentException("Имя cookie не может быть пустым");
+                case CookieOperation.Delete:
+                        Guard.NotNullOrWhiteSpace(cookieName, nameof(cookieName));
 
                         cookieManager.DeleteCookieNamed(cookieName);
                         actionMessage = $"Удалён cookie '{cookieName}'";

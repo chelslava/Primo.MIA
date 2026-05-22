@@ -1,9 +1,10 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using LTools.SDK;
 using LTools.Common.UIElements;
 using OpenQA.Selenium;
 using Primo.MIA.Common;
+using Primo.MIA.Models;
 using System.Windows.Controls;
 
 namespace Primo.MIA
@@ -208,8 +209,7 @@ namespace Primo.MIA
         /// </summary>
         protected void ValidateNotEmpty(string value, string parameterName)
         {
-            if (string.IsNullOrWhiteSpace(value))
-                throw new ArgumentException($"Параметр '{parameterName}' не может быть пустым", parameterName);
+            Guard.NotNullOrWhiteSpace(value, parameterName);
         }
 
         /// <summary>
@@ -217,8 +217,15 @@ namespace Primo.MIA
         /// </summary>
         protected void ValidatePositive(int value, string parameterName)
         {
-            if (value <= 0)
-                throw new ArgumentException($"Параметр '{parameterName}' должен быть положительным", parameterName);
+            Guard.Positive(value, parameterName);
+        }
+
+        /// <summary>
+        /// Валидирует что значение не отрицательное.
+        /// </summary>
+        protected void ValidateNotNegative(int value, string parameterName)
+        {
+            Guard.NotNegative(value, parameterName);
         }
 
         /// <summary>
@@ -226,14 +233,29 @@ namespace Primo.MIA
         /// </summary>
         protected void ValidateUrl(string url)
         {
-            if (string.IsNullOrWhiteSpace(url))
-                throw new ArgumentException("URL не может быть пустым");
+            Guard.NotNullOrWhiteSpace(url, "url");
 
             if (!Uri.TryCreate(url, UriKind.Absolute, out Uri uri))
                 throw new ArgumentException($"Некорректный URL: {url}");
 
             if (uri.Scheme != Uri.UriSchemeHttp && uri.Scheme != Uri.UriSchemeHttps)
                 throw new ArgumentException("Поддерживаются только HTTP и HTTPS протоколы");
+        }
+
+        /// <summary>
+        /// Валидирует что объект не null.
+        /// </summary>
+        protected void ValidateNotNull(object value, string parameterName)
+        {
+            Guard.NotNull(value, parameterName);
+        }
+
+        /// <summary>
+        /// Валидирует что коллекция не пустая.
+        /// </summary>
+        protected void ValidateNotEmpty<T>(ICollection<T> collection, string parameterName)
+        {
+            Guard.NotEmpty(collection, parameterName);
         }
 
         #endregion
@@ -375,9 +397,9 @@ namespace Primo.MIA
             ElementLocatorType locatorType,
             string locatorValue,
             int timeout,
-            Primo.MIA.Models.RetryConfiguration retryConfig = null)
+            RetryConfiguration retryConfig = null)
         {
-            retryConfig = retryConfig ?? Primo.MIA.Models.RetryConfiguration.Default;
+            retryConfig = retryConfig ?? RetryConfiguration.Default;
 
             int attempt = 0;
             Exception lastException = null;
@@ -423,7 +445,7 @@ namespace Primo.MIA
         /// <summary>
         /// Проверяет, является ли исключение подходящим для retry.
         /// </summary>
-        private bool IsRetryableException(Exception ex, Primo.MIA.Models.RetryConfiguration config)
+        private bool IsRetryableException(Exception ex, RetryConfiguration config)
         {
             Type exType = ex.GetType();
             foreach (Type retryableType in config.RetryableExceptions)
@@ -553,7 +575,9 @@ namespace Primo.MIA
             // Сначала пробуем найти в текущем контексте
             IWebElement element = TryFindElement(driver, locatorType, locatorValue, timeout);
             if (element != null)
+            {
                 return element;
+            }
 
             LogInfo("Элемент не найден в текущем контексте, ищем в iframe");
 
@@ -693,7 +717,7 @@ namespace Primo.MIA
             IWebDriver driver,
             ElementLocatorType locatorType,
             string locatorValue,
-            Primo.MIA.Models.ElementPosition position,
+            ElementPosition position,
             int index = 0)
         {
             ValidateNotEmpty(locatorValue, nameof(locatorValue));
@@ -701,23 +725,27 @@ namespace Primo.MIA
             var elements = FindElements(driver, locatorType, locatorValue);
 
             if (elements.Count == 0)
+            {
                 throw new NoSuchElementException($"Элементы [{locatorType}={locatorValue}] не найдены");
+            }
 
             switch (position)
             {
-                case Primo.MIA.Models.ElementPosition.First:
+                case ElementPosition.First:
                     LogInfo($"Возвращаем первый элемент из {elements.Count}");
                     return elements[0];
 
-                case Primo.MIA.Models.ElementPosition.Last:
+                case ElementPosition.Last:
                     LogInfo($"Возвращаем последний элемент из {elements.Count}");
                     return elements[elements.Count - 1];
 
-                case Primo.MIA.Models.ElementPosition.Nth:
+                case ElementPosition.Nth:
                     if (index < 0 || index >= elements.Count)
+                    {
                         throw new ArgumentOutOfRangeException(
                             nameof(index),
                             $"Индекс {index} вне диапазона (доступно элементов: {elements.Count})");
+                    }
 
                     LogInfo($"Возвращаем элемент #{index} из {elements.Count}");
                     return elements[index];
@@ -736,11 +764,11 @@ namespace Primo.MIA
         /// <summary>
         /// Получает информацию о всех открытых окнах.
         /// </summary>
-        /// <param name="driver">WebDriver</param>
+        ///<param name="driver">WebDriver</param>
         /// <returns>Список информации об окнах</returns>
-        protected List<Primo.MIA.Models.WindowInfo> GetAllWindows(IWebDriver driver)
+        protected List<WindowInfo> GetAllWindows(IWebDriver driver)
         {
-            var windows = new List<Primo.MIA.Models.WindowInfo>();
+            var windows = new List<WindowInfo>();
             string currentHandle = driver.CurrentWindowHandle;
 
             foreach (string handle in driver.WindowHandles)
@@ -749,12 +777,12 @@ namespace Primo.MIA
                 {
                     driver.SwitchTo().Window(handle);
 
-                    windows.Add(new Primo.MIA.Models.WindowInfo
+                    windows.Add(new WindowInfo
                     {
                         Handle = handle,
                         Title = driver.Title,
                         Url = driver.Url,
-                        OpenedAt = DateTime.Now, // Примерное время
+                        OpenedAt = DateTime.Now,
                         IsActive = handle == currentHandle
                     });
                 }
@@ -764,7 +792,6 @@ namespace Primo.MIA
                 }
             }
 
-            // Возвращаемся к исходному окну
             driver.SwitchTo().Window(currentHandle);
 
             LogInfo($"Найдено {windows.Count} окон");
@@ -905,7 +932,7 @@ namespace Primo.MIA
         {
             try
             {
-                var cookieCollection = new Primo.MIA.Models.CookieCollection
+                var cookieCollection = new CookieCollection
                 {
                     SourceUrl = driver.Url,
                     ExportedAt = DateTime.Now
@@ -913,7 +940,7 @@ namespace Primo.MIA
 
                 foreach (var cookie in driver.Manage().Cookies.AllCookies)
                 {
-                    cookieCollection.Cookies.Add(new Primo.MIA.Models.CookieData
+                    cookieCollection.Cookies.Add(new CookieData
                     {
                         Name = cookie.Name,
                         Value = cookie.Value,
@@ -949,10 +976,12 @@ namespace Primo.MIA
 
             try
             {
-                var cookieCollection = Newtonsoft.Json.JsonConvert.DeserializeObject<Primo.MIA.Models.CookieCollection>(json);
+                var cookieCollection = Newtonsoft.Json.JsonConvert.DeserializeObject<CookieCollection>(json);
 
                 if (cookieCollection == null || cookieCollection.Cookies == null)
+                {
                     throw new ArgumentException("Некорректный формат JSON cookies");
+                }
 
                 int importedCount = 0;
 

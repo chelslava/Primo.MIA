@@ -53,9 +53,15 @@ namespace Primo.MIA
             bool caseSensitive,
             bool preserveNullItems)
         {
-            Func<string, string> normalize = preserveNullItems
-                ? s => s
-                : s => s ?? string.Empty;
+            Func<string, string> normalize;
+            if (preserveNullItems)
+            {
+                normalize = s => s;
+            }
+            else
+            {
+                normalize = s => s ?? string.Empty;
+            }
 
             switch (mode)
             {

@@ -1,4 +1,4 @@
-// =============================================================================
+﻿// =============================================================================
 // SessionManager.cs — реализация ISessionManager
 //
 // Управляет сессиями браузера, обеспечивая регистрацию, получение и удаление
@@ -37,11 +37,8 @@ namespace Primo.MIA
         /// </summary>
         public void RegisterSession(string sessionId, IWebDriver driver)
         {
-            if (string.IsNullOrWhiteSpace(sessionId))
-                throw new ArgumentException("Session ID не может быть пустым", nameof(sessionId));
-
-            if (driver == null)
-                throw new ArgumentNullException(nameof(driver));
+            Guard.NotNullOrWhiteSpace(sessionId, nameof(sessionId));
+            Guard.NotNull(driver, nameof(driver));
 
             lock (_lock)
             {

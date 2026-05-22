@@ -1,4 +1,4 @@
-// =============================================================================
+﻿// =============================================================================
 // BrowserTabManageBack.cs — активность «Управление вкладками браузера».
 //
 // Открывает, закрывает и переключается между вкладками браузера.
@@ -214,11 +214,10 @@ namespace Primo.MIA
                         resultMsg = "[Управление вкладками] Текущая вкладка закрыта";
                         break;
 
-                    case TabOperation.CloseTabByHandle:
+                case TabOperation.CloseTabByHandle:
                         {
                             string handle = GetPropertyValue<string>(Prop_TabHandle, "Prop_TabHandle", sd);
-                            if (string.IsNullOrWhiteSpace(handle))
-                                throw new ArgumentException("Handle вкладки не может быть пустым");
+                            Guard.NotNullOrWhiteSpace(handle, nameof(handle));
 
                             SeleniumHelper.CloseTabByHandle(driver, handle);
                             resultMsg = $"[Управление вкладками] Вкладка закрыта: {handle}";

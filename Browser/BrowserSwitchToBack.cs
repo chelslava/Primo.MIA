@@ -154,9 +154,8 @@ namespace Primo.MIA
                 // Переключение в зависимости от типа
                 switch (Prop_SwitchType)
                 {
-                    case SwitchToType.Frame:
-                        if (string.IsNullOrWhiteSpace(target))
-                            throw new ArgumentException("Цель переключения не может быть пустой для Frame");
+                case SwitchToType.Frame:
+                        Guard.NotNullOrWhiteSpace(target, nameof(target));
 
                         // Попытка переключиться по индексу или локатору
                         if (int.TryParse(target, out int frameIndex))
@@ -171,9 +170,8 @@ namespace Primo.MIA
                         }
                         break;
 
-                    case SwitchToType.Window:
-                        if (string.IsNullOrWhiteSpace(target))
-                            throw new ArgumentException("Handle окна не может быть пустым");
+                case SwitchToType.Window:
+                        Guard.NotNullOrWhiteSpace(target, nameof(target));
 
                         driver.SwitchTo().Window(target);
                         actionMessage = $"Переключено в окно {target}";

@@ -1991,4 +1991,65 @@
         Count
     }
 
+    // =========================================================================
+    // JSON: DataTable конвертер
+    // =========================================================================
+
+    /// <summary>
+    /// Направление конвертации — DataTable в JSON или JSON в DataTable.
+    /// </summary>
+    public enum JsonConvertDirection
+    {
+        /// <summary>DataTable → JSON-строка.</summary>
+        DataTableToJson,
+
+        /// <summary>JSON-строка → DataTable.</summary>
+        JsonToDataTable
+    }
+
+    /// <summary>
+    /// Формат JSON при конвертации DataTable → JSON.
+    /// </summary>
+    public enum JsonTableFormat
+    {
+        /// <summary>
+        /// Массив объектов — каждая строка как объект с именованными полями.
+        /// [{"Id":1,"Name":"Иван"},{"Id":2,"Name":"Пётр"}]
+        /// Наиболее читаемый формат, совместим с большинством API.
+        /// </summary>
+        ArrayOfObjects,
+
+        /// <summary>
+        /// Массив массивов — каждая строка как массив значений без имён.
+        /// [[1,"Иван"],[2,"Пётр"]]
+        /// Компактный формат, используется в Chart.js, Google Charts и т.п.
+        /// </summary>
+        ArrayOfArrays,
+
+        /// <summary>
+        /// Объект с ключами "columns" и "rows".
+        /// {"columns":["Id","Name"],"rows":[[1,"Иван"],[2,"Пётр"]]}
+        /// Удобен для десериализации без потери информации о структуре.
+        /// </summary>
+        WithHeaders
+    }
+
+    /// <summary>
+    /// Как представлять NULL-значения в JSON.
+    /// </summary>
+    public enum JsonNullMode
+    {
+        /// <summary>NULL → null (JSON null). Стандартное поведение.</summary>
+        JsonNull,
+
+        /// <summary>NULL → "" (пустая строка). Удобно для систем не поддерживающих null.</summary>
+        EmptyString,
+
+        /// <summary>NULL → "0" (ноль как строка). Для числовых полей.</summary>
+        Zero,
+
+        /// <summary>Строки с NULL-значением пропускаются при сериализации.</summary>
+        Skip
+    }
+
 }

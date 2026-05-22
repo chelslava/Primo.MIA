@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -273,14 +273,15 @@
     <Compile Include="Common\ActivityIcons.cs" />
     <Compile Include="Common\ActivityStrings.cs" />
     <Compile Include="Common\ComparisonHelper.cs" />
-    <Compile Include="Enums.cs" />
+    <Compile Include="Common\Guard.cs" />
+<Compile Include="Enums.cs" />
     <Compile Include="Common\FileHelper.cs" />
-    <Compile Include="Common\NaturalComparer.cs" />
-    <Compile Include="Common\PropertyBuilder.cs" />
-    <Compile Include="Common\SeleniumHelper.cs" />
-    <Compile Include="Common\StringHelper.cs" />
-    <Compile Include="Common\TupleHelper.cs" />
-    <Compile Include="Common\ValidationHelper.cs" />
+<Compile Include="Common\NaturalComparer.cs" />
+<Compile Include="Common\PropertyBuilder.cs" />
+<Compile Include="Common\SeleniumHelper.cs" />
+<Compile Include="Common\StringHelper.cs" />
+<Compile Include="Common\TupleHelper.cs" />
+<Compile Include="Common\ValidationHelper.cs" />
     <Compile Include="Common\Converters\EnumToVisibilityConverter.cs" />
     <Compile Include="Files\FileCleanup.xaml.cs">
       <DependentUpon>FileCleanup.xaml</DependentUpon>
@@ -310,6 +311,7 @@
       <DependentUpon>WebhookListen.xaml</DependentUpon>
     </Compile>
     <Compile Include="HttpWeb\WebhookListenBack.cs" />
+    <Compile Include="List\ListTransformLogic.cs" />
     <Compile Include="Text\TextExtractEntities.xaml.cs">
       <DependentUpon>TextExtractEntities.xaml</DependentUpon>
     </Compile>
@@ -417,6 +419,10 @@
     <Compile Include="List\ListAggregate.xaml.cs">
       <DependentUpon>ListAggregate.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Utilities\JsonDataTable.xaml.cs">
+      <DependentUpon>JsonDataTable.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Utilities\JsonDataTableBack.cs" />
     <Compile Include="Utilities\LogMessageBack.cs" />
     <Compile Include="Utilities\DataTableToHtmlBack.cs" />
     <Compile Include="Utilities\ReadTomlConfigBack.cs" />
@@ -825,6 +831,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Text\TextTranslit.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Utilities\JsonDataTable.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

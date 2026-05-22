@@ -136,7 +136,7 @@ namespace Primo.MIA
                 string sessionId = GetPropertyValue<string>(Prop_SessionId, nameof(Prop_SessionId), sd);
                 string script = GetPropertyValue<string>(Prop_Script, nameof(Prop_Script), sd);
 
-                ValidateNotEmpty(script, nameof(Prop_Script));
+                Guard.NotNullOrWhiteSpace(script, nameof(script));
 
                 // Получение драйвера через базовый класс
                 IWebDriver driver = GetDriverFromContext(sessionId);

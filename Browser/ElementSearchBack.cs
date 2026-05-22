@@ -1,4 +1,4 @@
-// =============================================================================
+﻿// =============================================================================
 // ElementSearchBack.cs — универсальная активность «Поиск и проверка элементов».
 //
 // Объединяет функциональность поиска, проверки существования, видимости,
@@ -469,8 +469,7 @@ namespace Primo.MIA
         /// </summary>
         private ExecutionResult ExecuteFindAllMode(IWebDriver driver, string locatorValue, int waitTimeout, ScriptingData sd)
         {
-            if (string.IsNullOrWhiteSpace(locatorValue))
-                throw new ArgumentException("Для режима FindAll необходимо указать локатор");
+            Guard.NotNullOrWhiteSpace(locatorValue, nameof(locatorValue));
 
             var elementLocator = new ElementLocator();
             var locatorType = ConvertLocatorType(Prop_LocatorType);
@@ -501,8 +500,7 @@ namespace Primo.MIA
         /// </summary>
         private ExecutionResult ExecuteCountMode(IWebDriver driver, string locatorValue, int waitTimeout, ScriptingData sd)
         {
-            if (string.IsNullOrWhiteSpace(locatorValue))
-                throw new ArgumentException("Для режима Count необходимо указать локатор");
+            Guard.NotNullOrWhiteSpace(locatorValue, nameof(locatorValue));
 
             var elementLocator = new ElementLocator();
             var locatorType = ConvertLocatorType(Prop_LocatorType);

@@ -1,4 +1,4 @@
-// =============================================================================
+﻿// =============================================================================
 // ElementGetComputedStyleBack.cs — активность «Получить вычисленные CSS стили».
 //
 // Получает вычисленные CSS свойства элемента через window.getComputedStyle().
@@ -187,8 +187,7 @@ namespace Primo.MIA
                 string locatorValue = GetPropertyValue<string>(Prop_LocatorValue, nameof(Prop_LocatorValue), sd);
                 string cssProperty = GetPropertyValue<string>(Prop_CssProperty, nameof(Prop_CssProperty), sd);
 
-                if (string.IsNullOrWhiteSpace(cssProperty))
-                    throw new ArgumentException("CSS свойство не может быть пустым");
+                Guard.NotNullOrWhiteSpace(cssProperty, nameof(cssProperty));
 
                 IWebDriver driver = GetDriverFromContext(sessionId);
 
