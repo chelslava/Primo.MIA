@@ -230,12 +230,10 @@ namespace Primo.MIA
             {
                 // ── Чтение входных параметров ──────────────────────────────
                 string xmlString = GetPropertyValue<string>(this.Prop_XmlString, nameof(Prop_XmlString), sd);
-                if (string.IsNullOrWhiteSpace(xmlString))
-                    throw new ArgumentException("XML-строка не может быть пустой");
+                Guard.NotNullOrWhiteSpace(xmlString, nameof(Prop_XmlString));
 
                 string xpath = GetPropertyValue<string>(this.Prop_XPath, nameof(Prop_XPath), sd);
-                if (string.IsNullOrWhiteSpace(xpath))
-                    throw new ArgumentException("XPath не может быть пустым");
+                Guard.NotNullOrWhiteSpace(xpath, nameof(Prop_XPath));
 
                 string nsPrefix = GetPropertyValue<string>(this.Prop_NamespacePrefix, nameof(Prop_NamespacePrefix), sd);
                 string nsUri = GetPropertyValue<string>(this.Prop_NamespaceUri, nameof(Prop_NamespaceUri), sd);
@@ -256,6 +254,22 @@ namespace Primo.MIA
                 {
                     IsSuccess = true,
                     SuccessMessage = resultMsg
+                };
+            }
+            catch (System.Xml.XmlException ex)
+            {
+                return new ExecutionResult
+                {
+                    IsSuccess = false,
+                    ErrorMessage = $"Ошибка XML: {ex.Message}"
+                };
+            }
+            catch (ArgumentException ex)
+            {
+                return new ExecutionResult
+                {
+                    IsSuccess = false,
+                    ErrorMessage = $"Неверный аргумент: {ex.Message}"
                 };
             }
             catch (Exception ex)

@@ -48,7 +48,7 @@ namespace Primo.MIA
         public string Prop_SessionId
         {
             get => _propSessionId;
-            set { _propSessionId = value; InvokePropertyChanged(this, "Prop_SessionId"); }
+            set { _propSessionId = value; InvokePropertyChanged(this, nameof(Prop_SessionId)); }
         }
 
         private StorageType _propStorageType;
@@ -59,7 +59,7 @@ namespace Primo.MIA
         public StorageType Prop_StorageType
         {
             get => _propStorageType;
-            set { _propStorageType = value; InvokePropertyChanged(this, "Prop_StorageType"); }
+            set { _propStorageType = value; InvokePropertyChanged(this, nameof(Prop_StorageType)); }
         }
 
         private StorageOperation _propOperation;
@@ -70,7 +70,7 @@ namespace Primo.MIA
         public StorageOperation Prop_Operation
         {
             get => _propOperation;
-            set { _propOperation = value; InvokePropertyChanged(this, "Prop_Operation"); }
+            set { _propOperation = value; InvokePropertyChanged(this, nameof(Prop_Operation)); }
         }
 
         private string _propKey;
@@ -82,7 +82,7 @@ namespace Primo.MIA
         public string Prop_Key
         {
             get => _propKey;
-            set { _propKey = value; InvokePropertyChanged(this, "Prop_Key"); }
+            set { _propKey = value; InvokePropertyChanged(this, nameof(Prop_Key)); }
         }
 
         private string _propValue;
@@ -94,7 +94,7 @@ namespace Primo.MIA
         public string Prop_Value
         {
             get => _propValue;
-            set { _propValue = value; InvokePropertyChanged(this, "Prop_Value"); }
+            set { _propValue = value; InvokePropertyChanged(this, nameof(Prop_Value)); }
         }
 
         // ── Выходные параметры ─────────────────────────────────────────
@@ -108,7 +108,7 @@ namespace Primo.MIA
         public string Prop_OutValue
         {
             get => _propOutValue;
-            set { _propOutValue = value; InvokePropertyChanged(this, "Prop_OutValue"); }
+            set { _propOutValue = value; InvokePropertyChanged(this, nameof(Prop_OutValue)); }
         }
 
         private string _propOutKeys;
@@ -120,7 +120,7 @@ namespace Primo.MIA
         public string Prop_OutKeys
         {
             get => _propOutKeys;
-            set { _propOutKeys = value; InvokePropertyChanged(this, "Prop_OutKeys"); }
+            set { _propOutKeys = value; InvokePropertyChanged(this, nameof(Prop_OutKeys)); }
         }
 
         private string _propOutLength;
@@ -132,7 +132,7 @@ namespace Primo.MIA
         public string Prop_OutLength
         {
             get => _propOutLength;
-            set { _propOutLength = value; InvokePropertyChanged(this, "Prop_OutLength"); }
+            set { _propOutLength = value; InvokePropertyChanged(this, nameof(Prop_OutLength)); }
         }
 
         // ── Конструктор ────────────────────────────────────────────────
@@ -202,7 +202,7 @@ namespace Primo.MIA
                 {
                 case StorageOperation.GetItem:
                         {
-                            string key = GetPropertyValue<string>(Prop_Key, "Prop_Key", sd);
+                            string key = GetPropertyValue<string>(Prop_Key, nameof(Prop_Key), sd);
                             Guard.NotNullOrWhiteSpace(key, nameof(key));
 
                             string value = SeleniumHelper.GetStorageItem(driver, Prop_StorageType, key);
@@ -213,8 +213,8 @@ namespace Primo.MIA
 
                 case StorageOperation.SetItem:
                         {
-                            string key = GetPropertyValue<string>(Prop_Key, "Prop_Key", sd);
-                            string value = GetPropertyValue<string>(Prop_Value, "Prop_Value", sd);
+                            string key = GetPropertyValue<string>(Prop_Key, nameof(Prop_Key), sd);
+                            string value = GetPropertyValue<string>(Prop_Value, nameof(Prop_Value), sd);
 
                             Guard.NotNullOrWhiteSpace(key, nameof(key));
 
@@ -225,7 +225,7 @@ namespace Primo.MIA
 
                 case StorageOperation.RemoveItem:
                         {
-                            string key = GetPropertyValue<string>(Prop_Key, "Prop_Key", sd);
+                            string key = GetPropertyValue<string>(Prop_Key, nameof(Prop_Key), sd);
                             Guard.NotNullOrWhiteSpace(key, nameof(key));
 
                             SeleniumHelper.RemoveStorageItem(driver, Prop_StorageType, key);
@@ -260,6 +260,14 @@ namespace Primo.MIA
                 }
 
                 return CreateSuccessResult(resultMsg);
+            }
+            catch (OpenQA.Selenium.WebDriverException ex)
+            {
+                return CreateErrorResult($"Ошибка WebDriver: {ex.Message}");
+            }
+            catch (InvalidOperationException ex)
+            {
+                return CreateErrorResult($"Недопустимая операция: {ex.Message}");
             }
             catch (Exception ex)
             {

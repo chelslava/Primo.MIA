@@ -219,8 +219,8 @@ namespace Primo.MIA
             {
                 // ── Чтение входных параметров ──────────────────────────────
                 DataTable requestsTable = GetPropertyValue<DataTable>(this.Prop_RequestsTable, nameof(Prop_RequestsTable), sd);
-                if (requestsTable == null || requestsTable.Rows.Count == 0)
-                    throw new ArgumentException("Таблица запросов пуста или не задана");
+                Guard.NotNull(requestsTable, nameof(Prop_RequestsTable));
+                Guard.That(requestsTable.Rows.Count > 0, "Таблица запросов не может быть пустой", nameof(Prop_RequestsTable));
 
                 string maxParallelStr = GetPropertyValue<string>(this.Prop_MaxParallel, nameof(Prop_MaxParallel), sd);
                 int maxParallel = 5;
@@ -362,6 +362,22 @@ namespace Primo.MIA
                     IsSuccess = errorCount == 0,
                     SuccessMessage = $"[HTTP: Пакетные запросы] Выполнено: {successCount} успешно, {errorCount} ошибок{statusMsg}",
                     ErrorMessage = errorCount > 0 ? $"Ошибок: {errorCount}" : null
+                };
+            }
+            catch (System.Net.Http.HttpRequestException ex)
+            {
+                return new ExecutionResult
+                {
+                    IsSuccess = false,
+                    ErrorMessage = $"Ошибка HTTP: {ex.Message}"
+                };
+            }
+            catch (TimeoutException ex)
+            {
+                return new ExecutionResult
+                {
+                    IsSuccess = false,
+                    ErrorMessage = $"Превышено время ожидания: {ex.Message}"
                 };
             }
             catch (Exception ex)

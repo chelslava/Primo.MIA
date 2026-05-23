@@ -301,12 +301,10 @@ namespace Primo.MIA
             {
                 // ── Чтение входных параметров ──────────────────────────────
                 string url = GetPropertyValue<string>(this.Prop_Url, nameof(Prop_Url), sd);
-                if (string.IsNullOrWhiteSpace(url))
-                    throw new ArgumentException("URL не может быть пустым");
+                Guard.NotNullOrWhiteSpace(url, nameof(Prop_Url));
 
                 string savePath = GetPropertyValue<string>(this.Prop_SavePath, nameof(Prop_SavePath), sd);
-                if (string.IsNullOrWhiteSpace(savePath))
-                    throw new ArgumentException("Путь сохранения не может быть пустым");
+                Guard.NotNullOrWhiteSpace(savePath, nameof(Prop_SavePath));
 
                 string headersJson = GetPropertyValue<string>(this.Prop_Headers, nameof(Prop_Headers), sd) ?? "{}";
 
@@ -366,6 +364,30 @@ namespace Primo.MIA
                         SuccessMessage = $"[HTTP: Скачать файл] Скачано: {url} → {finalPath} ({FormatFileSize(fileSize)})"
                     };
                 }
+            }
+            catch (System.Net.Http.HttpRequestException ex)
+            {
+                return new ExecutionResult
+                {
+                    IsSuccess = false,
+                    ErrorMessage = $"Ошибка HTTP: {ex.Message}"
+                };
+            }
+            catch (System.IO.IOException ex)
+            {
+                return new ExecutionResult
+                {
+                    IsSuccess = false,
+                    ErrorMessage = $"Ошибка ввода-вывода: {ex.Message}"
+                };
+            }
+            catch (TimeoutException ex)
+            {
+                return new ExecutionResult
+                {
+                    IsSuccess = false,
+                    ErrorMessage = $"Превышено время ожидания: {ex.Message}"
+                };
             }
             catch (Exception ex)
             {

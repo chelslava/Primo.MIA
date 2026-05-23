@@ -333,6 +333,14 @@ namespace Primo.MIA
                 else
                     return ExecuteToDataTable(sd, dateFormat, selectedCols);
             }
+            catch (Newtonsoft.Json.JsonException ex)
+            {
+                return Fail($"Ошибка JSON: {ex.Message}");
+            }
+            catch (ArgumentException ex)
+            {
+                return Fail($"Неверный аргумент: {ex.Message}");
+            }
             catch (Exception ex)
             {
                 return Fail($"Ошибка конвертации: {ex.Message}");

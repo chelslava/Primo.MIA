@@ -1,4 +1,4 @@
-// =============================================================================
+﻿// =============================================================================
 // HttpBack.cs — активность «HTTP Запрос».
 //
 // Выполняет HTTP-запросы к внешним API с поддержкой различных методов,
@@ -78,7 +78,7 @@ namespace Primo.MIA
         public string Prop_Url
         {
             get => _propUrl;
-            set { _propUrl = value; InvokePropertyChanged(this, "Prop_Url"); }
+            set { _propUrl = value; InvokePropertyChanged(this, nameof(Prop_Url)); }
         }
 
         private HttpMethodType _propMethod;
@@ -92,7 +92,7 @@ namespace Primo.MIA
         public HttpMethodType Prop_Method
         {
             get => _propMethod;
-            set { _propMethod = value; InvokePropertyChanged(this, "Prop_Method"); }
+            set { _propMethod = value; InvokePropertyChanged(this, nameof(Prop_Method)); }
         }
 
         private string _propHeaders;
@@ -108,7 +108,7 @@ namespace Primo.MIA
         public string Prop_Headers
         {
             get => _propHeaders;
-            set { _propHeaders = value; InvokePropertyChanged(this, "Prop_Headers"); }
+            set { _propHeaders = value; InvokePropertyChanged(this, nameof(Prop_Headers)); }
         }
 
         private string _propBody;
@@ -124,7 +124,7 @@ namespace Primo.MIA
         public string Prop_Body
         {
             get => _propBody;
-            set { _propBody = value; InvokePropertyChanged(this, "Prop_Body"); }
+            set { _propBody = value; InvokePropertyChanged(this, nameof(Prop_Body)); }
         }
 
         private string _propTimeout;
@@ -139,7 +139,7 @@ namespace Primo.MIA
         public string Prop_Timeout
         {
             get => _propTimeout;
-            set { _propTimeout = value; InvokePropertyChanged(this, "Prop_Timeout"); }
+            set { _propTimeout = value; InvokePropertyChanged(this, nameof(Prop_Timeout)); }
         }
 
         // ── Входные параметры: Сертификаты и SSL ───────────────────────
@@ -155,7 +155,7 @@ namespace Primo.MIA
         public bool Prop_UseCertificate
         {
             get => _propUseCertificate;
-            set { _propUseCertificate = value; InvokePropertyChanged(this, "Prop_UseCertificate"); }
+            set { _propUseCertificate = value; InvokePropertyChanged(this, nameof(Prop_UseCertificate)); }
         }
 
         private string _propCertPath;
@@ -171,7 +171,7 @@ namespace Primo.MIA
         public string Prop_CertPath
         {
             get => _propCertPath;
-            set { _propCertPath = value; InvokePropertyChanged(this, "Prop_CertPath"); }
+            set { _propCertPath = value; InvokePropertyChanged(this, nameof(Prop_CertPath)); }
         }
 
         private string _propCertPassword;
@@ -186,7 +186,7 @@ namespace Primo.MIA
         public string Prop_CertPassword
         {
             get => _propCertPassword;
-            set { _propCertPassword = value; InvokePropertyChanged(this, "Prop_CertPassword"); }
+            set { _propCertPassword = value; InvokePropertyChanged(this, nameof(Prop_CertPassword)); }
         }
 
         private bool _propIgnoreSslErrors;
@@ -201,7 +201,7 @@ namespace Primo.MIA
         public bool Prop_IgnoreSslErrors
         {
             get => _propIgnoreSslErrors;
-            set { _propIgnoreSslErrors = value; InvokePropertyChanged(this, "Prop_IgnoreSslErrors"); }
+            set { _propIgnoreSslErrors = value; InvokePropertyChanged(this, nameof(Prop_IgnoreSslErrors)); }
         }
 
         // ── Выходные параметры ─────────────────────────────────────────
@@ -218,7 +218,7 @@ namespace Primo.MIA
         public string Prop_StatusCode
         {
             get => _propStatusCode;
-            set { _propStatusCode = value; InvokePropertyChanged(this, "Prop_StatusCode"); }
+            set { _propStatusCode = value; InvokePropertyChanged(this, nameof(Prop_StatusCode)); }
         }
 
         private string _propResponseContent;
@@ -233,7 +233,7 @@ namespace Primo.MIA
         public string Prop_ResponseContent
         {
             get => _propResponseContent;
-            set { _propResponseContent = value; InvokePropertyChanged(this, "Prop_ResponseContent"); }
+            set { _propResponseContent = value; InvokePropertyChanged(this, nameof(Prop_ResponseContent)); }
         }
 
         private string _propResponseHeaders;
@@ -248,7 +248,7 @@ namespace Primo.MIA
         public string Prop_ResponseHeaders
         {
             get => _propResponseHeaders;
-            set { _propResponseHeaders = value; InvokePropertyChanged(this, "Prop_ResponseHeaders"); }
+            set { _propResponseHeaders = value; InvokePropertyChanged(this, nameof(Prop_ResponseHeaders)); }
         }
 
         // ── Конструктор ────────────────────────────────────────────────
@@ -325,8 +325,7 @@ namespace Primo.MIA
             {
                 // ── Чтение входных параметров ──────────────────────────
                 string url = GetPropertyValue<string>(this.Prop_Url, "Prop_Url", sd);
-                if (string.IsNullOrWhiteSpace(url))
-                    throw new ArgumentException("URL не может быть пустым");
+                Guard.NotNullOrWhiteSpace(url, nameof(Prop_Url));
 
                 string headersJson = GetPropertyValue<string>(this.Prop_Headers, "Prop_Headers", sd) ?? "{}";
                 string body = GetPropertyValue<string>(this.Prop_Body, "Prop_Body", sd) ?? string.Empty;
@@ -368,6 +367,22 @@ namespace Primo.MIA
                     };
                 }
             }
+            catch (System.Net.Http.HttpRequestException ex)
+            {
+                return new ExecutionResult
+                {
+                    IsSuccess = false,
+                    ErrorMessage = $"Ошибка HTTP: {ex.Message}"
+                };
+            }
+            catch (TimeoutException ex)
+            {
+                return new ExecutionResult
+                {
+                    IsSuccess = false,
+                    ErrorMessage = $"Превышено время ожидания: {ex.Message}"
+                };
+            }
             catch (Exception ex)
             {
                 return new ExecutionResult
@@ -395,8 +410,7 @@ namespace Primo.MIA
                 string certPath = GetPropertyValue<string>(this.Prop_CertPath, "Prop_CertPath", sd);
                 string certPassword = GetPropertyValue<string>(this.Prop_CertPassword, "Prop_CertPassword", sd) ?? string.Empty;
 
-                if (string.IsNullOrWhiteSpace(certPath))
-                    throw new ArgumentException("Путь к сертификату не указан");
+                Guard.NotNullOrWhiteSpace(certPath, nameof(Prop_CertPath));
 
                 if (!System.IO.File.Exists(certPath))
                     throw new System.IO.FileNotFoundException($"Файл сертификата не найден: {certPath}");

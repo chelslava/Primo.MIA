@@ -50,7 +50,7 @@ namespace Primo.MIA
         public string Prop_SessionId
         {
             get => _propSessionId;
-            set { _propSessionId = value; InvokePropertyChanged(this, "Prop_SessionId"); }
+            set { _propSessionId = value; InvokePropertyChanged(this, nameof(Prop_SessionId)); }
         }
 
         private AlertAction _propAction;
@@ -61,7 +61,7 @@ namespace Primo.MIA
         public AlertAction Prop_Action
         {
             get => _propAction;
-            set { _propAction = value; InvokePropertyChanged(this, "Prop_Action"); }
+            set { _propAction = value; InvokePropertyChanged(this, nameof(Prop_Action)); }
         }
 
         private string _propInputText;
@@ -73,7 +73,7 @@ namespace Primo.MIA
         public string Prop_InputText
         {
             get => _propInputText;
-            set { _propInputText = value; InvokePropertyChanged(this, "Prop_InputText"); }
+            set { _propInputText = value; InvokePropertyChanged(this, nameof(Prop_InputText)); }
         }
 
         // ── Выходные параметры ─────────────────────────────────────────
@@ -87,7 +87,7 @@ namespace Primo.MIA
         public string Prop_AlertText
         {
             get => _propAlertText;
-            set { _propAlertText = value; InvokePropertyChanged(this, "Prop_AlertText"); }
+            set { _propAlertText = value; InvokePropertyChanged(this, nameof(Prop_AlertText)); }
         }
 
         // ── Конструктор ────────────────────────────────────────────────
@@ -185,6 +185,14 @@ namespace Primo.MIA
             catch (NoAlertPresentException)
             {
                 return CreateErrorResult("Алерт не найден");
+            }
+            catch (OpenQA.Selenium.WebDriverException ex)
+            {
+                return CreateErrorResult(ex, "Обработка алерта");
+            }
+            catch (InvalidOperationException ex)
+            {
+                return CreateErrorResult(ex, "Обработка алерта");
             }
             catch (Exception ex)
             {

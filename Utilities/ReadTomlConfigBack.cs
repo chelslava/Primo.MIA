@@ -73,7 +73,7 @@ namespace Primo.MIA
         public string Prop_FilePath
         {
             get => _propFilePath;
-            set { _propFilePath = value; InvokePropertyChanged(this, "Prop_FilePath"); }
+            set { _propFilePath = value; InvokePropertyChanged(this, nameof(Prop_FilePath)); }
         }
 
         private TomlReadMode _readMode = TomlReadMode.SingleValue;
@@ -83,7 +83,7 @@ namespace Primo.MIA
         public TomlReadMode ReadMode
         {
             get => _readMode;
-            set { _readMode = value; InvokePropertyChanged(this, "ReadMode"); }
+            set { _readMode = value; InvokePropertyChanged(this, nameof(ReadMode)); }
         }
 
         private string _propKeyPath;
@@ -94,7 +94,7 @@ namespace Primo.MIA
         public string Prop_KeyPath
         {
             get => _propKeyPath;
-            set { _propKeyPath = value; InvokePropertyChanged(this, "Prop_KeyPath"); }
+            set { _propKeyPath = value; InvokePropertyChanged(this, nameof(Prop_KeyPath)); }
         }
 
         private string _propSectionName;
@@ -105,7 +105,7 @@ namespace Primo.MIA
         public string Prop_SectionName
         {
             get => _propSectionName;
-            set { _propSectionName = value; InvokePropertyChanged(this, "Prop_SectionName"); }
+            set { _propSectionName = value; InvokePropertyChanged(this, nameof(Prop_SectionName)); }
         }
 
         private string _propDefaultValue;
@@ -116,7 +116,7 @@ namespace Primo.MIA
         public string Prop_DefaultValue
         {
             get => _propDefaultValue;
-            set { _propDefaultValue = value; InvokePropertyChanged(this, "Prop_DefaultValue"); }
+            set { _propDefaultValue = value; InvokePropertyChanged(this, nameof(Prop_DefaultValue)); }
         }
 
         private bool _throwIfKeyNotFound = false;
@@ -126,7 +126,7 @@ namespace Primo.MIA
         public bool Prop_ThrowIfKeyNotFound
         {
             get => _throwIfKeyNotFound;
-            set { _throwIfKeyNotFound = value; InvokePropertyChanged(this, "Prop_ThrowIfKeyNotFound"); }
+            set { _throwIfKeyNotFound = value; InvokePropertyChanged(this, nameof(Prop_ThrowIfKeyNotFound)); }
         }
 
         private string _propEncoding;
@@ -137,7 +137,7 @@ namespace Primo.MIA
         public string Prop_Encoding
         {
             get => _propEncoding;
-            set { _propEncoding = value; InvokePropertyChanged(this, "Prop_Encoding"); }
+            set { _propEncoding = value; InvokePropertyChanged(this, nameof(Prop_Encoding)); }
         }
 
         // =========================================================================
@@ -155,7 +155,7 @@ namespace Primo.MIA
         public string Prop_ProfileName
         {
             get => _propProfileName;
-            set { _propProfileName = value; InvokePropertyChanged(this, "Prop_ProfileName"); }
+            set { _propProfileName = value; InvokePropertyChanged(this, nameof(Prop_ProfileName)); }
         }
 
         private string _propDefaultProfileName;
@@ -169,7 +169,7 @@ namespace Primo.MIA
         public string Prop_DefaultProfileName
         {
             get => _propDefaultProfileName;
-            set { _propDefaultProfileName = value; InvokePropertyChanged(this, "Prop_DefaultProfileName"); }
+            set { _propDefaultProfileName = value; InvokePropertyChanged(this, nameof(Prop_DefaultProfileName)); }
         }
 
         private ProfileMergeStrategy _mergeStrategy = ProfileMergeStrategy.DefaultThenProfile;
@@ -179,7 +179,7 @@ namespace Primo.MIA
         public ProfileMergeStrategy MergeStrategy
         {
             get => _mergeStrategy;
-            set { _mergeStrategy = value; InvokePropertyChanged(this, "MergeStrategy"); }
+            set { _mergeStrategy = value; InvokePropertyChanged(this, nameof(MergeStrategy)); }
         }
 
         private bool _includeNestedSections = true;
@@ -192,7 +192,7 @@ namespace Primo.MIA
         public bool Prop_IncludeNestedSections
         {
             get => _includeNestedSections;
-            set { _includeNestedSections = value; InvokePropertyChanged(this, "Prop_IncludeNestedSections"); }
+            set { _includeNestedSections = value; InvokePropertyChanged(this, nameof(Prop_IncludeNestedSections)); }
         }
 
         // =========================================================================
@@ -207,7 +207,7 @@ namespace Primo.MIA
         public string Prop_StringValue
         {
             get => _propStringValue;
-            set { _propStringValue = value; InvokePropertyChanged(this, "Prop_StringValue"); }
+            set { _propStringValue = value; InvokePropertyChanged(this, nameof(Prop_StringValue)); }
         }
 
         private string _propDictionary;
@@ -218,7 +218,7 @@ namespace Primo.MIA
         public string Prop_Dictionary
         {
             get => _propDictionary;
-            set { _propDictionary = value; InvokePropertyChanged(this, "Prop_Dictionary"); }
+            set { _propDictionary = value; InvokePropertyChanged(this, nameof(Prop_Dictionary)); }
         }
 
         private string _propKeyExists;
@@ -229,7 +229,7 @@ namespace Primo.MIA
         public string Prop_KeyExists
         {
             get => _propKeyExists;
-            set { _propKeyExists = value; InvokePropertyChanged(this, "Prop_KeyExists"); }
+            set { _propKeyExists = value; InvokePropertyChanged(this, nameof(Prop_KeyExists)); }
         }
 
         private string _propKeysCount;
@@ -240,7 +240,7 @@ namespace Primo.MIA
         public string Prop_KeysCount
         {
             get => _propKeysCount;
-            set { _propKeysCount = value; InvokePropertyChanged(this, "Prop_KeysCount"); }
+            set { _propKeysCount = value; InvokePropertyChanged(this, nameof(Prop_KeysCount)); }
         }
 
         private string _propAvailableProfiles;
@@ -251,7 +251,7 @@ namespace Primo.MIA
         public string Prop_AvailableProfiles
         {
             get => _propAvailableProfiles;
-            set { _propAvailableProfiles = value; InvokePropertyChanged(this, "Prop_AvailableProfiles"); }
+            set { _propAvailableProfiles = value; InvokePropertyChanged(this, nameof(Prop_AvailableProfiles)); }
         }
 
         private string _propProfileKeysCount;
@@ -262,7 +262,7 @@ namespace Primo.MIA
         public string Prop_ProfileKeysCount
         {
             get => _propProfileKeysCount;
-            set { _propProfileKeysCount = value; InvokePropertyChanged(this, "Prop_ProfileKeysCount"); }
+            set { _propProfileKeysCount = value; InvokePropertyChanged(this, nameof(Prop_ProfileKeysCount)); }
         }
 
         private string _propDefaultKeysCount;
@@ -273,7 +273,7 @@ namespace Primo.MIA
         public string Prop_DefaultKeysCount
         {
             get => _propDefaultKeysCount;
-            set { _propDefaultKeysCount = value; InvokePropertyChanged(this, "Prop_DefaultKeysCount"); }
+            set { _propDefaultKeysCount = value; InvokePropertyChanged(this, nameof(Prop_DefaultKeysCount)); }
         }
 
         // =========================================================================
@@ -475,6 +475,22 @@ ReadProfile         — мёрж [default] + [production/staging/...]
                 {
                     IsSuccess = true,
                     SuccessMessage = $"TOML успешно прочитан в режиме: {parameters.ReadMode}"
+                };
+            }
+            catch (System.IO.IOException ex)
+            {
+                return new ExecutionResult
+                {
+                    IsSuccess = false,
+                    ErrorMessage = $"Ошибка ввода-вывода: {ex.Message}"
+                };
+            }
+            catch (ArgumentException ex)
+            {
+                return new ExecutionResult
+                {
+                    IsSuccess = false,
+                    ErrorMessage = $"Неверный аргумент: {ex.Message}"
                 };
             }
             catch (Exception ex)

@@ -341,6 +341,14 @@ namespace Primo.MIA
                     SuccessMessage = successMsg
                 };
             }
+            catch (ArgumentException ex)
+            {
+                return Fail($"Неверный аргумент: {ex.Message}");
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Fail($"Недопустимая операция: {ex.Message}");
+            }
             catch (Exception ex)
             {
                 return Fail($"Ошибка шаблонизатора: {ex.Message}");

@@ -50,7 +50,7 @@ namespace Primo.MIA
         public string Prop_Message
         {
             get { return this.prop_Message; }
-            set { this.prop_Message = value; this.InvokePropertyChanged(this, "Prop_Message"); }
+            set { this.prop_Message = value; this.InvokePropertyChanged(this, nameof(Prop_Message)); }
         }
 
         private LogLevel _logLevel = LogLevel.Info;
@@ -62,7 +62,7 @@ namespace Primo.MIA
         public LogLevel Level
         {
             get => this._logLevel;
-            set { this._logLevel = value; this.InvokePropertyChanged(this, "Level"); }
+            set { this._logLevel = value; this.InvokePropertyChanged(this, nameof(Level)); }
         }
 
         private LogOutputMode _outputMode = LogOutputMode.FileAndConsole;
@@ -74,7 +74,7 @@ namespace Primo.MIA
         public LogOutputMode OutputMode
         {
             get => this._outputMode;
-            set { this._outputMode = value; this.InvokePropertyChanged(this, "OutputMode"); }
+            set { this._outputMode = value; this.InvokePropertyChanged(this, nameof(OutputMode)); }
         }
 
         private string prop_LogDirectory;
@@ -87,7 +87,7 @@ namespace Primo.MIA
         public string Prop_LogDirectory
         {
             get { return this.prop_LogDirectory; }
-            set { this.prop_LogDirectory = value; this.InvokePropertyChanged(this, "Prop_LogDirectory"); }
+            set { this.prop_LogDirectory = value; this.InvokePropertyChanged(this, nameof(Prop_LogDirectory)); }
         }
 
         private LogFileNameTemplate _fileNameTemplate = LogFileNameTemplate.WithDate;
@@ -99,7 +99,7 @@ namespace Primo.MIA
         public LogFileNameTemplate FileNameTemplate
         {
             get => this._fileNameTemplate;
-            set { this._fileNameTemplate = value; this.InvokePropertyChanged(this, "FileNameTemplate"); }
+            set { this._fileNameTemplate = value; this.InvokePropertyChanged(this, nameof(FileNameTemplate)); }
         }
 
         private string prop_BaseFileName;
@@ -112,7 +112,7 @@ namespace Primo.MIA
         public string Prop_BaseFileName
         {
             get { return this.prop_BaseFileName; }
-            set { this.prop_BaseFileName = value; this.InvokePropertyChanged(this, "Prop_BaseFileName"); }
+            set { this.prop_BaseFileName = value; this.InvokePropertyChanged(this, nameof(Prop_BaseFileName)); }
         }
 
         private string prop_FileExtension;
@@ -125,7 +125,7 @@ namespace Primo.MIA
         public string Prop_FileExtension
         {
             get { return this.prop_FileExtension; }
-            set { this.prop_FileExtension = value; this.InvokePropertyChanged(this, "Prop_FileExtension"); }
+            set { this.prop_FileExtension = value; this.InvokePropertyChanged(this, nameof(Prop_FileExtension)); }
         }
 
         private string prop_CustomFileNamePattern;
@@ -138,7 +138,7 @@ namespace Primo.MIA
         public string Prop_CustomFileNamePattern
         {
             get { return this.prop_CustomFileNamePattern; }
-            set { this.prop_CustomFileNamePattern = value; this.InvokePropertyChanged(this, "Prop_CustomFileNamePattern"); }
+            set { this.prop_CustomFileNamePattern = value; this.InvokePropertyChanged(this, nameof(Prop_CustomFileNamePattern)); }
         }
 
         private LogRotationStrategy _rotationStrategy = LogRotationStrategy.Daily;
@@ -150,7 +150,7 @@ namespace Primo.MIA
         public LogRotationStrategy RotationStrategy
         {
             get => this._rotationStrategy;
-            set { this._rotationStrategy = value; this.InvokePropertyChanged(this, "RotationStrategy"); }
+            set { this._rotationStrategy = value; this.InvokePropertyChanged(this, nameof(RotationStrategy)); }
         }
 
         private string prop_MaxFileSizeMB;
@@ -163,7 +163,7 @@ namespace Primo.MIA
         public string Prop_MaxFileSizeMB
         {
             get { return this.prop_MaxFileSizeMB; }
-            set { this.prop_MaxFileSizeMB = value; this.InvokePropertyChanged(this, "Prop_MaxFileSizeMB"); }
+            set { this.prop_MaxFileSizeMB = value; this.InvokePropertyChanged(this, nameof(Prop_MaxFileSizeMB)); }
         }
 
         private bool _includeTimestamp = true;
@@ -175,7 +175,7 @@ namespace Primo.MIA
         public bool Prop_IncludeTimestamp
         {
             get { return this._includeTimestamp; }
-            set { this._includeTimestamp = value; this.InvokePropertyChanged(this, "Prop_IncludeTimestamp"); }
+            set { this._includeTimestamp = value; this.InvokePropertyChanged(this, nameof(Prop_IncludeTimestamp)); }
         }
 
         private bool _includeLevel = true;
@@ -187,7 +187,7 @@ namespace Primo.MIA
         public bool Prop_IncludeLevel
         {
             get { return this._includeLevel; }
-            set { this._includeLevel = value; this.InvokePropertyChanged(this, "Prop_IncludeLevel"); }
+            set { this._includeLevel = value; this.InvokePropertyChanged(this, nameof(Prop_IncludeLevel)); }
         }
 
         private string prop_TimestampFormat;
@@ -200,7 +200,7 @@ namespace Primo.MIA
         public string Prop_TimestampFormat
         {
             get { return this.prop_TimestampFormat; }
-            set { this.prop_TimestampFormat = value; this.InvokePropertyChanged(this, "Prop_TimestampFormat"); }
+            set { this.prop_TimestampFormat = value; this.InvokePropertyChanged(this, nameof(Prop_TimestampFormat)); }
         }
 
         private bool _appendNewLine = true;
@@ -212,7 +212,7 @@ namespace Primo.MIA
         public bool Prop_AppendNewLine
         {
             get { return this._appendNewLine; }
-            set { this._appendNewLine = value; this.InvokePropertyChanged(this, "Prop_AppendNewLine"); }
+            set { this._appendNewLine = value; this.InvokePropertyChanged(this, nameof(Prop_AppendNewLine)); }
         }
 
         // ============== OUTPUT PROPERTIES ==============
@@ -230,7 +230,7 @@ namespace Primo.MIA
             set
             {
                 prop_ActualLogFile = value;
-                this.InvokePropertyChanged(this, "Prop_ActualLogFile");
+                this.InvokePropertyChanged(this, nameof(Prop_ActualLogFile));
             }
         }
 
@@ -247,7 +247,7 @@ namespace Primo.MIA
             set
             {
                 prop_FormattedMessage = value;
-                this.InvokePropertyChanged(this, "Prop_FormattedMessage");
+                this.InvokePropertyChanged(this, nameof(Prop_FormattedMessage));
             }
         }
 
@@ -359,6 +359,14 @@ Custom – пользовательский паттерн (по умолчан�
                 SetVariableValue(this.Prop_FormattedMessage, formattedMessage, sd);
 
                 return new ExecutionResult { IsSuccess = true, SuccessMessage = $"Сообщение залогировано: {parameters.Level}" };
+            }
+            catch (ArgumentException ex)
+            {
+                return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Неверный аргумент: {ex.Message}" };
+            }
+            catch (InvalidOperationException ex)
+            {
+                return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Недопустимая операция: {ex.Message}" };
             }
             catch (Exception ex)
             {

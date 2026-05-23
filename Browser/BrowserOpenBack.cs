@@ -320,6 +320,22 @@ namespace Primo.MIA
                     SuccessMessage = $"[Открыть браузер] {this.Prop_BrowserType} → сессия {sessionId}"
                 };
             }
+            catch (OpenQA.Selenium.WebDriverException ex)
+            {
+                return new ExecutionResult
+                {
+                    IsSuccess = false,
+                    ErrorMessage = $"Ошибка WebDriver: {ex.Message}"
+                };
+            }
+            catch (InvalidOperationException ex)
+            {
+                return new ExecutionResult
+                {
+                    IsSuccess = false,
+                    ErrorMessage = $"Недопустимая операция: {ex.Message}"
+                };
+            }
             catch (Exception ex)
             {
                 return new ExecutionResult

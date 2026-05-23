@@ -539,6 +539,14 @@ namespace Primo.MIA
                                      $"освобождено: {freedStr}{errStr}"
                 };
             }
+            catch (System.IO.IOException ex)
+            {
+                return Fail($"Ошибка ввода-вывода: {ex.Message}");
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Fail($"Нет доступа: {ex.Message}");
+            }
             catch (Exception ex)
             {
                 return Fail($"Ошибка очистки: {ex.Message}");

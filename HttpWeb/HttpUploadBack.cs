@@ -297,12 +297,10 @@ namespace Primo.MIA
             {
                 // ── Чтение входных параметров ──────────────────────────────
                 string url = GetPropertyValue<string>(this.Prop_Url, nameof(Prop_Url), sd);
-                if (string.IsNullOrWhiteSpace(url))
-                    throw new ArgumentException("URL не может быть пустым");
+                Guard.NotNullOrWhiteSpace(url, nameof(Prop_Url));
 
                 string filePath = GetPropertyValue<string>(this.Prop_FilePath, nameof(Prop_FilePath), sd);
-                if (string.IsNullOrWhiteSpace(filePath))
-                    throw new ArgumentException("Путь к файлу не может быть пустым");
+                Guard.NotNullOrWhiteSpace(filePath, nameof(Prop_FilePath));
 
                 if (!File.Exists(filePath))
                     throw new FileNotFoundException($"Файл не найден: {filePath}");
@@ -368,6 +366,30 @@ namespace Primo.MIA
                         }
                     }
                 }
+            }
+            catch (System.Net.Http.HttpRequestException ex)
+            {
+                return new ExecutionResult
+                {
+                    IsSuccess = false,
+                    ErrorMessage = $"Ошибка HTTP: {ex.Message}"
+                };
+            }
+            catch (System.IO.IOException ex)
+            {
+                return new ExecutionResult
+                {
+                    IsSuccess = false,
+                    ErrorMessage = $"Ошибка ввода-вывода: {ex.Message}"
+                };
+            }
+            catch (TimeoutException ex)
+            {
+                return new ExecutionResult
+                {
+                    IsSuccess = false,
+                    ErrorMessage = $"Превышено время ожидания: {ex.Message}"
+                };
             }
             catch (Exception ex)
             {

@@ -42,7 +42,7 @@ namespace Primo.MIA
         {
             get
             {
-                string timeoutStr = GetPropertyValue<string>(this.Prop_Timeout, "Prop_Timeout", null) ?? "30";
+                string timeoutStr = GetPropertyValue<string>(this.Prop_Timeout, nameof(Prop_Timeout), null) ?? "30";
                 if (int.TryParse(timeoutStr, out int timeout))
                     return timeout * 1000;
                 return 30000;
@@ -61,7 +61,7 @@ namespace Primo.MIA
         public string Prop_SessionId
         {
             get => _propSessionId;
-            set { _propSessionId = value; InvokePropertyChanged(this, "Prop_SessionId"); }
+            set { _propSessionId = value; InvokePropertyChanged(this, nameof(Prop_SessionId)); }
         }
 
         private WaitConditionType _propCondition;
@@ -72,7 +72,7 @@ namespace Primo.MIA
         public WaitConditionType Prop_Condition
         {
             get => _propCondition;
-            set { _propCondition = value; InvokePropertyChanged(this, "Prop_Condition"); }
+            set { _propCondition = value; InvokePropertyChanged(this, nameof(Prop_Condition)); }
         }
 
         private ElementLocatorType _propLocatorType;
@@ -83,7 +83,7 @@ namespace Primo.MIA
         public ElementLocatorType Prop_LocatorType
         {
             get => _propLocatorType;
-            set { _propLocatorType = value; InvokePropertyChanged(this, "Prop_LocatorType"); }
+            set { _propLocatorType = value; InvokePropertyChanged(this, nameof(Prop_LocatorType)); }
         }
 
         private string _propLocatorValue;
@@ -95,7 +95,7 @@ namespace Primo.MIA
         public string Prop_LocatorValue
         {
             get => _propLocatorValue;
-            set { _propLocatorValue = value; InvokePropertyChanged(this, "Prop_LocatorValue"); }
+            set { _propLocatorValue = value; InvokePropertyChanged(this, nameof(Prop_LocatorValue)); }
         }
 
         private string _propText;
@@ -107,7 +107,7 @@ namespace Primo.MIA
         public string Prop_Text
         {
             get => _propText;
-            set { _propText = value; InvokePropertyChanged(this, "Prop_Text"); }
+            set { _propText = value; InvokePropertyChanged(this, nameof(Prop_Text)); }
         }
 
         private string _propTimeout;
@@ -119,7 +119,7 @@ namespace Primo.MIA
         public string Prop_Timeout
         {
             get => _propTimeout;
-            set { _propTimeout = value; InvokePropertyChanged(this, "Prop_Timeout"); }
+            set { _propTimeout = value; InvokePropertyChanged(this, nameof(Prop_Timeout)); }
         }
 
         // ── Выходные параметры ─────────────────────────────────────────
@@ -133,7 +133,7 @@ namespace Primo.MIA
         public string Prop_ConditionMet
         {
             get => _propConditionMet;
-            set { _propConditionMet = value; InvokePropertyChanged(this, "Prop_ConditionMet"); }
+            set { _propConditionMet = value; InvokePropertyChanged(this, nameof(Prop_ConditionMet)); }
         }
 
         private string _propWaitTime;
@@ -145,7 +145,7 @@ namespace Primo.MIA
         public string Prop_WaitTime
         {
             get => _propWaitTime;
-            set { _propWaitTime = value; InvokePropertyChanged(this, "Prop_WaitTime"); }
+            set { _propWaitTime = value; InvokePropertyChanged(this, nameof(Prop_WaitTime)); }
         }
 
         // ── Конструктор ────────────────────────────────────────────────
@@ -237,6 +237,14 @@ namespace Primo.MIA
 
                 return CreateSuccessResult($"[Ожидание условия] {Prop_Condition} → {conditionMet} ({waitTime}мс)");
             }
+            catch (OpenQA.Selenium.WebDriverException ex)
+            {
+                return CreateErrorResult(ex, "Ожидание условия");
+            }
+            catch (InvalidOperationException ex)
+            {
+                return CreateErrorResult(ex, "Ожидание условия");
+            }
             catch (Exception ex)
             {
                 return CreateErrorResult(ex, "Ожидание условия");
@@ -292,7 +300,7 @@ namespace Primo.MIA
 
         private bool WaitForElementExists(IWebDriver driver, WebDriverWait wait)
         {
-            string locatorValue = GetPropertyValue<string>(Prop_LocatorValue, "Prop_LocatorValue", null);
+            string locatorValue = GetPropertyValue<string>(Prop_LocatorValue, nameof(Prop_LocatorValue), null);
             var locator = SeleniumHelper.CreateLocator(Prop_LocatorType, locatorValue);
             wait.Until(drv => drv.FindElement(locator));
             return true;
@@ -300,7 +308,7 @@ namespace Primo.MIA
 
         private bool WaitForElementVisible(IWebDriver driver, WebDriverWait wait)
         {
-            string locatorValue = GetPropertyValue<string>(Prop_LocatorValue, "Prop_LocatorValue", null);
+            string locatorValue = GetPropertyValue<string>(Prop_LocatorValue, nameof(Prop_LocatorValue), null);
             var locator = SeleniumHelper.CreateLocator(Prop_LocatorType, locatorValue);
             wait.Until(drv =>
             {
@@ -316,7 +324,7 @@ namespace Primo.MIA
 
         private bool WaitForElementClickable(IWebDriver driver, WebDriverWait wait)
         {
-            string locatorValue = GetPropertyValue<string>(Prop_LocatorValue, "Prop_LocatorValue", null);
+            string locatorValue = GetPropertyValue<string>(Prop_LocatorValue, nameof(Prop_LocatorValue), null);
             var locator = SeleniumHelper.CreateLocator(Prop_LocatorType, locatorValue);
             wait.Until(drv =>
             {
@@ -332,7 +340,7 @@ namespace Primo.MIA
 
         private bool WaitForElementInvisible(IWebDriver driver, WebDriverWait wait)
         {
-            string locatorValue = GetPropertyValue<string>(Prop_LocatorValue, "Prop_LocatorValue", null);
+            string locatorValue = GetPropertyValue<string>(Prop_LocatorValue, nameof(Prop_LocatorValue), null);
             var locator = SeleniumHelper.CreateLocator(Prop_LocatorType, locatorValue);
             wait.Until(drv =>
             {
@@ -351,8 +359,8 @@ namespace Primo.MIA
 
         private bool WaitForTextPresent(IWebDriver driver, WebDriverWait wait, ScriptingData sd)
         {
-            string locatorValue = GetPropertyValue<string>(Prop_LocatorValue, "Prop_LocatorValue", sd);
-            string text = GetPropertyValue<string>(Prop_Text, "Prop_Text", sd);
+            string locatorValue = GetPropertyValue<string>(Prop_LocatorValue, nameof(Prop_LocatorValue), sd);
+            string text = GetPropertyValue<string>(Prop_Text, nameof(Prop_Text), sd);
             var locator = SeleniumHelper.CreateLocator(Prop_LocatorType, locatorValue);
 
             wait.Until(drv =>
@@ -369,14 +377,14 @@ namespace Primo.MIA
 
         private bool WaitForTitleContains(IWebDriver driver, WebDriverWait wait, ScriptingData sd)
         {
-            string text = GetPropertyValue<string>(Prop_Text, "Prop_Text", sd);
+            string text = GetPropertyValue<string>(Prop_Text, nameof(Prop_Text), sd);
             wait.Until(drv => drv.Title.Contains(text));
             return true;
         }
 
         private bool WaitForUrlContains(IWebDriver driver, WebDriverWait wait, ScriptingData sd)
         {
-            string text = GetPropertyValue<string>(Prop_Text, "Prop_Text", sd);
+            string text = GetPropertyValue<string>(Prop_Text, nameof(Prop_Text), sd);
             wait.Until(drv => drv.Url.Contains(text));
             return true;
         }

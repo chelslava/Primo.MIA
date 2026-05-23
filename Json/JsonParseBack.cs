@@ -306,6 +306,22 @@ namespace Primo.MIA
                     SuccessMessage = $"[JSON: Парсинг] JSON {successMessage}"
                 };
             }
+            catch (Newtonsoft.Json.JsonException ex)
+            {
+                return new ExecutionResult
+                {
+                    IsSuccess = false,
+                    ErrorMessage = $"Ошибка JSON: {ex.Message}"
+                };
+            }
+            catch (ArgumentException ex)
+            {
+                return new ExecutionResult
+                {
+                    IsSuccess = false,
+                    ErrorMessage = $"Неверный аргумент: {ex.Message}"
+                };
+            }
             catch (Exception ex)
             {
                 return new ExecutionResult

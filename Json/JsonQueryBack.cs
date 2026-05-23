@@ -228,12 +228,10 @@ namespace Primo.MIA
             {
                 // ── Чтение входных параметров ──────────────────────────────
                 string json = GetPropertyValue<string>(this.Prop_Json, nameof(Prop_Json), sd);
-                if (string.IsNullOrWhiteSpace(json))
-                    throw new ArgumentException("JSON-строка не может быть пустой");
+                Guard.NotNullOrWhiteSpace(json, nameof(Prop_Json));
 
                 string jsonPath = GetPropertyValue<string>(this.Prop_JsonPath, nameof(Prop_JsonPath), sd);
-                if (string.IsNullOrWhiteSpace(jsonPath))
-                    throw new ArgumentException("JSONPath не может быть пустым");
+                Guard.NotNullOrWhiteSpace(jsonPath, nameof(Prop_JsonPath));
 
                 // ── Валидация JSON ────────────────────────────────────────
                 if (!HttpHelper.IsValidJson(json))
@@ -285,6 +283,14 @@ namespace Primo.MIA
                 {
                     IsSuccess = false,
                     ErrorMessage = $"Ошибка JSON [JSON: Запрос]: {jex.Message}"
+                };
+            }
+            catch (ArgumentException ex)
+            {
+                return new ExecutionResult
+                {
+                    IsSuccess = false,
+                    ErrorMessage = $"Неверный аргумент: {ex.Message}"
                 };
             }
             catch (Exception ex)

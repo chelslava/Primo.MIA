@@ -756,6 +756,11 @@ namespace Primo.MIA
                                 RegexOptions.Compiled | RegexOptions.IgnoreCase)
                         });
                     }
+                    catch (ArgumentException ex)
+                    {
+                        return Fail(
+                            $"Некорректный пользовательский паттерн: {ex.Message}");
+                    }
                     catch (Exception ex)
                     {
                         return Fail(
@@ -828,6 +833,14 @@ namespace Primo.MIA
                     IsSuccess      = true,
                     SuccessMessage = $"Найдено {totalCount}: {summary}"
                 };
+            }
+            catch (ArgumentException ex)
+            {
+                return Fail($"Неверный аргумент: {ex.Message}");
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Fail($"Недопустимая операция: {ex.Message}");
             }
             catch (Exception ex)
             {

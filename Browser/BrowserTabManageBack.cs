@@ -48,7 +48,7 @@ namespace Primo.MIA
         public string Prop_SessionId
         {
             get => _propSessionId;
-            set { _propSessionId = value; InvokePropertyChanged(this, "Prop_SessionId"); }
+            set { _propSessionId = value; InvokePropertyChanged(this, nameof(Prop_SessionId)); }
         }
 
         private TabOperation _propOperation;
@@ -59,7 +59,7 @@ namespace Primo.MIA
         public TabOperation Prop_Operation
         {
             get => _propOperation;
-            set { _propOperation = value; InvokePropertyChanged(this, "Prop_Operation"); }
+            set { _propOperation = value; InvokePropertyChanged(this, nameof(Prop_Operation)); }
         }
 
         private string _propTabIndex;
@@ -71,7 +71,7 @@ namespace Primo.MIA
         public string Prop_TabIndex
         {
             get => _propTabIndex;
-            set { _propTabIndex = value; InvokePropertyChanged(this, "Prop_TabIndex"); }
+            set { _propTabIndex = value; InvokePropertyChanged(this, nameof(Prop_TabIndex)); }
         }
 
         private string _propTabHandle;
@@ -83,7 +83,7 @@ namespace Primo.MIA
         public string Prop_TabHandle
         {
             get => _propTabHandle;
-            set { _propTabHandle = value; InvokePropertyChanged(this, "Prop_TabHandle"); }
+            set { _propTabHandle = value; InvokePropertyChanged(this, nameof(Prop_TabHandle)); }
         }
 
         private string _propUrl;
@@ -95,7 +95,7 @@ namespace Primo.MIA
         public string Prop_Url
         {
             get => _propUrl;
-            set { _propUrl = value; InvokePropertyChanged(this, "Prop_Url"); }
+            set { _propUrl = value; InvokePropertyChanged(this, nameof(Prop_Url)); }
         }
 
         // ── Выходные параметры ─────────────────────────────────────────
@@ -109,7 +109,7 @@ namespace Primo.MIA
         public string Prop_OutHandles
         {
             get => _propOutHandles;
-            set { _propOutHandles = value; InvokePropertyChanged(this, "Prop_OutHandles"); }
+            set { _propOutHandles = value; InvokePropertyChanged(this, nameof(Prop_OutHandles)); }
         }
 
         private string _propOutCurrentHandle;
@@ -121,7 +121,7 @@ namespace Primo.MIA
         public string Prop_OutCurrentHandle
         {
             get => _propOutCurrentHandle;
-            set { _propOutCurrentHandle = value; InvokePropertyChanged(this, "Prop_OutCurrentHandle"); }
+            set { _propOutCurrentHandle = value; InvokePropertyChanged(this, nameof(Prop_OutCurrentHandle)); }
         }
 
         private string _propOutTabCount;
@@ -133,7 +133,7 @@ namespace Primo.MIA
         public string Prop_OutTabCount
         {
             get => _propOutTabCount;
-            set { _propOutTabCount = value; InvokePropertyChanged(this, "Prop_OutTabCount"); }
+            set { _propOutTabCount = value; InvokePropertyChanged(this, nameof(Prop_OutTabCount)); }
         }
 
         // ── Конструктор ────────────────────────────────────────────────
@@ -201,7 +201,7 @@ namespace Primo.MIA
                 {
                     case TabOperation.OpenNewTab:
                         {
-                            string url = GetPropertyValue<string>(Prop_Url, "Prop_Url", sd) ?? "";
+                            string url = GetPropertyValue<string>(Prop_Url, nameof(Prop_Url), sd) ?? "";
                             SeleniumHelper.OpenNewTab(driver, url);
                             resultMsg = string.IsNullOrWhiteSpace(url)
                                 ? "[Управление вкладками] Новая вкладка открыта"
@@ -216,7 +216,7 @@ namespace Primo.MIA
 
                 case TabOperation.CloseTabByHandle:
                         {
-                            string handle = GetPropertyValue<string>(Prop_TabHandle, "Prop_TabHandle", sd);
+                            string handle = GetPropertyValue<string>(Prop_TabHandle, nameof(Prop_TabHandle), sd);
                             Guard.NotNullOrWhiteSpace(handle, nameof(handle));
 
                             SeleniumHelper.CloseTabByHandle(driver, handle);
@@ -243,7 +243,7 @@ namespace Primo.MIA
 
                     case TabOperation.SwitchToTab:
                         {
-                            string indexStr = GetPropertyValue<string>(Prop_TabIndex, "Prop_TabIndex", sd) ?? "0";
+                            string indexStr = GetPropertyValue<string>(Prop_TabIndex, nameof(Prop_TabIndex), sd) ?? "0";
                             int index = int.TryParse(indexStr, out int idx) ? idx : 0;
 
                             SeleniumHelper.SwitchToTabByIndex(driver, index);
@@ -256,6 +256,14 @@ namespace Primo.MIA
                 }
 
                 return CreateSuccessResult(resultMsg);
+            }
+            catch (OpenQA.Selenium.WebDriverException ex)
+            {
+                return CreateErrorResult($"Ошибка WebDriver: {ex.Message}");
+            }
+            catch (InvalidOperationException ex)
+            {
+                return CreateErrorResult($"Недопустимая операция: {ex.Message}");
             }
             catch (Exception ex)
             {

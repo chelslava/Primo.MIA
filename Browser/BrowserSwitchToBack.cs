@@ -52,7 +52,7 @@ namespace Primo.MIA
         public string Prop_SessionId
         {
             get => _propSessionId;
-            set { _propSessionId = value; InvokePropertyChanged(this, "Prop_SessionId"); }
+            set { _propSessionId = value; InvokePropertyChanged(this, nameof(Prop_SessionId)); }
         }
 
         private SwitchToType _propSwitchType;
@@ -63,7 +63,7 @@ namespace Primo.MIA
         public SwitchToType Prop_SwitchType
         {
             get => _propSwitchType;
-            set { _propSwitchType = value; InvokePropertyChanged(this, "Prop_SwitchType"); }
+            set { _propSwitchType = value; InvokePropertyChanged(this, nameof(Prop_SwitchType)); }
         }
 
         private string _propTarget;
@@ -75,7 +75,7 @@ namespace Primo.MIA
         public string Prop_Target
         {
             get => _propTarget;
-            set { _propTarget = value; InvokePropertyChanged(this, "Prop_Target"); }
+            set { _propTarget = value; InvokePropertyChanged(this, nameof(Prop_Target)); }
         }
 
         // ── Выходные параметры ─────────────────────────────────────────
@@ -89,7 +89,7 @@ namespace Primo.MIA
         public string Prop_WindowHandles
         {
             get => _propWindowHandles;
-            set { _propWindowHandles = value; InvokePropertyChanged(this, "Prop_WindowHandles"); }
+            set { _propWindowHandles = value; InvokePropertyChanged(this, nameof(Prop_WindowHandles)); }
         }
 
         // ── Конструктор ────────────────────────────────────────────────
@@ -202,6 +202,14 @@ namespace Primo.MIA
                 }
 
                 return CreateSuccessResult($"[Переключить контекст] {actionMessage}");
+            }
+            catch (OpenQA.Selenium.WebDriverException ex)
+            {
+                return CreateErrorResult(ex, "Переключить контекст");
+            }
+            catch (InvalidOperationException ex)
+            {
+                return CreateErrorResult(ex, "Переключить контекст");
             }
             catch (Exception ex)
             {

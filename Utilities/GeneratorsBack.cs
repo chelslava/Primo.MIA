@@ -73,7 +73,7 @@ namespace Primo.MIA
         public GeneratorType Type
         {
             get => _type;
-            set { _type = value; InvokePropertyChanged(this, "Type"); }
+            set { _type = value; InvokePropertyChanged(this, nameof(Type)); }
         }
 
         // =========================================================================
@@ -93,7 +93,7 @@ namespace Primo.MIA
         public GuidFormat Prop_GuidFormat
         {
             get => _propGuidFormat;
-            set { _propGuidFormat = value; InvokePropertyChanged(this, "Prop_GuidFormat"); }
+            set { _propGuidFormat = value; InvokePropertyChanged(this, nameof(Prop_GuidFormat)); }
         }
 
         // =========================================================================
@@ -112,7 +112,7 @@ namespace Primo.MIA
         public string Prop_Directory
         {
             get => _propDirectory;
-            set { _propDirectory = value; InvokePropertyChanged(this, "Prop_Directory"); }
+            set { _propDirectory = value; InvokePropertyChanged(this, nameof(Prop_Directory)); }
         }
 
         private string _propBaseName;
@@ -128,7 +128,7 @@ namespace Primo.MIA
         public string Prop_BaseName
         {
             get => _propBaseName;
-            set { _propBaseName = value; InvokePropertyChanged(this, "Prop_BaseName"); }
+            set { _propBaseName = value; InvokePropertyChanged(this, nameof(Prop_BaseName)); }
         }
 
         private string _propExtension;
@@ -142,7 +142,7 @@ namespace Primo.MIA
         public string Prop_Extension
         {
             get => _propExtension;
-            set { _propExtension = value; InvokePropertyChanged(this, "Prop_Extension"); }
+            set { _propExtension = value; InvokePropertyChanged(this, nameof(Prop_Extension)); }
         }
 
         // =========================================================================
@@ -161,7 +161,7 @@ namespace Primo.MIA
         public string Prop_MinValue
         {
             get => _propMinValue;
-            set { _propMinValue = value; InvokePropertyChanged(this, "Prop_MinValue"); }
+            set { _propMinValue = value; InvokePropertyChanged(this, nameof(Prop_MinValue)); }
         }
 
         private string _propMaxValue;
@@ -176,7 +176,7 @@ namespace Primo.MIA
         public string Prop_MaxValue
         {
             get => _propMaxValue;
-            set { _propMaxValue = value; InvokePropertyChanged(this, "Prop_MaxValue"); }
+            set { _propMaxValue = value; InvokePropertyChanged(this, nameof(Prop_MaxValue)); }
         }
 
         // =========================================================================
@@ -200,7 +200,7 @@ namespace Primo.MIA
         public TimestampFormat Prop_TimestampFormat
         {
             get => _propTimestampFormat;
-            set { _propTimestampFormat = value; InvokePropertyChanged(this, "Prop_TimestampFormat"); }
+            set { _propTimestampFormat = value; InvokePropertyChanged(this, nameof(Prop_TimestampFormat)); }
         }
 
         private string _propCustomTimestampFormat;
@@ -221,7 +221,7 @@ namespace Primo.MIA
         public string Prop_CustomTimestampFormat
         {
             get => _propCustomTimestampFormat;
-            set { _propCustomTimestampFormat = value; InvokePropertyChanged(this, "Prop_CustomTimestampFormat"); }
+            set { _propCustomTimestampFormat = value; InvokePropertyChanged(this, nameof(Prop_CustomTimestampFormat)); }
         }
 
         // =========================================================================
@@ -243,7 +243,7 @@ namespace Primo.MIA
         public string Prop_CounterKey
         {
             get => _propCounterKey;
-            set { _propCounterKey = value; InvokePropertyChanged(this, "Prop_CounterKey"); }
+            set { _propCounterKey = value; InvokePropertyChanged(this, nameof(Prop_CounterKey)); }
         }
 
         private string _propCounterStart;
@@ -261,7 +261,7 @@ namespace Primo.MIA
         public string Prop_CounterStart
         {
             get => _propCounterStart;
-            set { _propCounterStart = value; InvokePropertyChanged(this, "Prop_CounterStart"); }
+            set { _propCounterStart = value; InvokePropertyChanged(this, nameof(Prop_CounterStart)); }
         }
 
         private string _propCounterStep;
@@ -278,7 +278,7 @@ namespace Primo.MIA
         public string Prop_CounterStep
         {
             get => _propCounterStep;
-            set { _propCounterStep = value; InvokePropertyChanged(this, "Prop_CounterStep"); }
+            set { _propCounterStep = value; InvokePropertyChanged(this, nameof(Prop_CounterStep)); }
         }
 
         // =========================================================================
@@ -299,7 +299,7 @@ namespace Primo.MIA
         public string Prop_InputString
         {
             get => _propInputString;
-            set { _propInputString = value; InvokePropertyChanged(this, "Prop_InputString"); }
+            set { _propInputString = value; InvokePropertyChanged(this, nameof(Prop_InputString)); }
         }
 
         private string _propHashPrefix;
@@ -314,7 +314,7 @@ namespace Primo.MIA
         public string Prop_HashPrefix
         {
             get => _propHashPrefix;
-            set { _propHashPrefix = value; InvokePropertyChanged(this, "Prop_HashPrefix"); }
+            set { _propHashPrefix = value; InvokePropertyChanged(this, nameof(Prop_HashPrefix)); }
         }
 
         // =========================================================================
@@ -333,7 +333,7 @@ namespace Primo.MIA
         public string Prop_FirstName
         {
             get => _propFirstName;
-            set { _propFirstName = value; InvokePropertyChanged(this, "Prop_FirstName"); }
+            set { _propFirstName = value; InvokePropertyChanged(this, nameof(Prop_FirstName)); }
         }
 
         private string _propLastName;
@@ -349,7 +349,7 @@ namespace Primo.MIA
         public string Prop_LastName
         {
             get => _propLastName;
-            set { _propLastName = value; InvokePropertyChanged(this, "Prop_LastName"); }
+            set { _propLastName = value; InvokePropertyChanged(this, nameof(Prop_LastName)); }
         }
 
         private string _propDomain;
@@ -365,7 +365,7 @@ namespace Primo.MIA
         public string Prop_Domain
         {
             get => _propDomain;
-            set { _propDomain = value; InvokePropertyChanged(this, "Prop_Domain"); }
+            set { _propDomain = value; InvokePropertyChanged(this, nameof(Prop_Domain)); }
         }
 
         // =========================================================================
@@ -386,7 +386,7 @@ namespace Primo.MIA
         public string Prop_Template
         {
             get => _propTemplate;
-            set { _propTemplate = value; InvokePropertyChanged(this, "Prop_Template"); }
+            set { _propTemplate = value; InvokePropertyChanged(this, nameof(Prop_Template)); }
         }
 
         private string _propVariables;
@@ -402,7 +402,7 @@ namespace Primo.MIA
         public string Prop_Variables
         {
             get => _propVariables;
-            set { _propVariables = value; InvokePropertyChanged(this, "Prop_Variables"); }
+            set { _propVariables = value; InvokePropertyChanged(this, nameof(Prop_Variables)); }
         }
 
         // =========================================================================
@@ -421,7 +421,7 @@ namespace Primo.MIA
         public string Prop_OutputVariable
         {
             get => _propOutputVariable;
-            set { _propOutputVariable = value; InvokePropertyChanged(this, "Prop_OutputVariable"); }
+            set { _propOutputVariable = value; InvokePropertyChanged(this, nameof(Prop_OutputVariable)); }
         }
 
         // =========================================================================
@@ -575,6 +575,22 @@ namespace Primo.MIA
                 {
                     IsSuccess = true,
                     SuccessMessage = $"[{this.Type}] Сгенерировано: {result}"
+                };
+            }
+            catch (ArgumentException ex)
+            {
+                return new ExecutionResult
+                {
+                    IsSuccess = false,
+                    ErrorMessage = $"Неверный аргумент: {ex.Message}"
+                };
+            }
+            catch (InvalidOperationException ex)
+            {
+                return new ExecutionResult
+                {
+                    IsSuccess = false,
+                    ErrorMessage = $"Недопустимая операция: {ex.Message}"
                 };
             }
             catch (Exception ex)

@@ -49,7 +49,7 @@ namespace Primo.MIA
         public string Prop_SessionId
         {
             get => _propSessionId;
-            set { _propSessionId = value; InvokePropertyChanged(this, "Prop_SessionId"); }
+            set { _propSessionId = value; InvokePropertyChanged(this, nameof(Prop_SessionId)); }
         }
 
         private string _propElementId;
@@ -61,7 +61,7 @@ namespace Primo.MIA
         public string Prop_ElementId
         {
             get => _propElementId;
-            set { _propElementId = value; InvokePropertyChanged(this, "Prop_ElementId"); }
+            set { _propElementId = value; InvokePropertyChanged(this, nameof(Prop_ElementId)); }
         }
 
         private ElementLocatorType _propLocatorType;
@@ -72,7 +72,7 @@ namespace Primo.MIA
         public ElementLocatorType Prop_LocatorType
         {
             get => _propLocatorType;
-            set { _propLocatorType = value; InvokePropertyChanged(this, "Prop_LocatorType"); }
+            set { _propLocatorType = value; InvokePropertyChanged(this, nameof(Prop_LocatorType)); }
         }
 
         private string _propLocatorValue;
@@ -84,7 +84,7 @@ namespace Primo.MIA
         public string Prop_LocatorValue
         {
             get => _propLocatorValue;
-            set { _propLocatorValue = value; InvokePropertyChanged(this, "Prop_LocatorValue"); }
+            set { _propLocatorValue = value; InvokePropertyChanged(this, nameof(Prop_LocatorValue)); }
         }
 
         private string _propCssProperty;
@@ -96,7 +96,7 @@ namespace Primo.MIA
         public string Prop_CssProperty
         {
             get => _propCssProperty;
-            set { _propCssProperty = value; InvokePropertyChanged(this, "Prop_CssProperty"); }
+            set { _propCssProperty = value; InvokePropertyChanged(this, nameof(Prop_CssProperty)); }
         }
 
         private string _propWaitTimeout;
@@ -108,7 +108,7 @@ namespace Primo.MIA
         public string Prop_WaitTimeout
         {
             get => _propWaitTimeout;
-            set { _propWaitTimeout = value; InvokePropertyChanged(this, "Prop_WaitTimeout"); }
+            set { _propWaitTimeout = value; InvokePropertyChanged(this, nameof(Prop_WaitTimeout)); }
         }
 
         // ── Выходные параметры ─────────────────────────────────────────
@@ -122,7 +122,7 @@ namespace Primo.MIA
         public string Prop_OutValue
         {
             get => _propOutValue;
-            set { _propOutValue = value; InvokePropertyChanged(this, "Prop_OutValue"); }
+            set { _propOutValue = value; InvokePropertyChanged(this, nameof(Prop_OutValue)); }
         }
 
         // ── Конструктор ────────────────────────────────────────────────
@@ -194,7 +194,7 @@ namespace Primo.MIA
                 IWebElement element;
                 if (!string.IsNullOrWhiteSpace(locatorValue))
                 {
-                    string timeoutStr = GetPropertyValue<string>(Prop_WaitTimeout, "Prop_WaitTimeout", sd) ?? "10";
+                    string timeoutStr = GetPropertyValue<string>(Prop_WaitTimeout, nameof(Prop_WaitTimeout), sd) ?? "10";
                     int timeout = int.TryParse(timeoutStr, out int t) ? t : 10;
                     timeout = SeleniumHelper.ValidateTimeout(timeout, 10);
 
@@ -214,6 +214,14 @@ namespace Primo.MIA
                 SetVariableValue(Prop_OutValue, value, sd);
 
                 return CreateSuccessResult($"[Получить CSS стиль] {cssProperty} = {value}");
+            }
+            catch (OpenQA.Selenium.WebDriverException ex)
+            {
+                return CreateErrorResult(ex, "Получить CSS стиль");
+            }
+            catch (InvalidOperationException ex)
+            {
+                return CreateErrorResult(ex, "Получить CSS стиль");
             }
             catch (Exception ex)
             {

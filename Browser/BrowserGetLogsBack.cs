@@ -1,4 +1,4 @@
-// =============================================================================
+﻿// =============================================================================
 // BrowserGetLogsBack.cs — активность «Получение логов браузера».
 //
 // Получает логи консоли, сети, браузера и производительности.
@@ -50,7 +50,7 @@ namespace Primo.MIA
         public string Prop_SessionId
         {
             get => _propSessionId;
-            set { _propSessionId = value; InvokePropertyChanged(this, "Prop_SessionId"); }
+            set { _propSessionId = value; InvokePropertyChanged(this, nameof(Prop_SessionId)); }
         }
 
         private BrowserLogType _propLogType;
@@ -61,7 +61,7 @@ namespace Primo.MIA
         public BrowserLogType Prop_LogType
         {
             get => _propLogType;
-            set { _propLogType = value; InvokePropertyChanged(this, "Prop_LogType"); }
+            set { _propLogType = value; InvokePropertyChanged(this, nameof(Prop_LogType)); }
         }
 
         // ── Выходные параметры ─────────────────────────────────────────
@@ -75,7 +75,7 @@ namespace Primo.MIA
         public string Prop_OutLogs
         {
             get => _propOutLogs;
-            set { _propOutLogs = value; InvokePropertyChanged(this, "Prop_OutLogs"); }
+            set { _propOutLogs = value; InvokePropertyChanged(this, nameof(Prop_OutLogs)); }
         }
 
         private string _propOutLogCount;
@@ -87,7 +87,7 @@ namespace Primo.MIA
         public string Prop_OutLogCount
         {
             get => _propOutLogCount;
-            set { _propOutLogCount = value; InvokePropertyChanged(this, "Prop_OutLogCount"); }
+            set { _propOutLogCount = value; InvokePropertyChanged(this, nameof(Prop_OutLogCount)); }
         }
 
         // ── Конструктор ────────────────────────────────────────────────
@@ -154,6 +154,14 @@ namespace Primo.MIA
                 SetVariableValue(Prop_OutLogCount, logs.Count, sd);
 
                 return CreateSuccessResult($"[Получить логи] Получено записей: {logs.Count} ({Prop_LogType})");
+            }
+            catch (OpenQA.Selenium.WebDriverException ex)
+            {
+                return CreateErrorResult(ex, "Получить логи");
+            }
+            catch (InvalidOperationException ex)
+            {
+                return CreateErrorResult(ex, "Получить логи");
             }
             catch (Exception ex)
             {

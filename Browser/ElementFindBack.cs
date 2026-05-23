@@ -265,6 +265,22 @@ namespace Primo.MIA
                     ? ExecuteFindOne(sd, driver, locator, locatorValue, timeout)
                     : ExecuteFindAll(sd, driver, locator, locatorValue, timeout);
             }
+            catch (OpenQA.Selenium.WebDriverException ex)
+            {
+                return new ExecutionResult
+                {
+                    IsSuccess = false,
+                    ErrorMessage = $"Ошибка WebDriver: {ex.Message}"
+                };
+            }
+            catch (InvalidOperationException ex)
+            {
+                return new ExecutionResult
+                {
+                    IsSuccess = false,
+                    ErrorMessage = $"Недопустимая операция: {ex.Message}"
+                };
+            }
             catch (Exception ex)
             {
                 return new ExecutionResult

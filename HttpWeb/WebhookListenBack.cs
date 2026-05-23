@@ -531,6 +531,14 @@ namespace Primo.MIA
                     };
                 }
             }
+            catch (System.Net.Http.HttpRequestException ex)
+            {
+                return Fail($"Ошибка HTTP: {ex.Message}");
+            }
+            catch (TimeoutException ex)
+            {
+                return Fail($"Превышено время ожидания: {ex.Message}");
+            }
             catch (Exception ex)
             {
                 return Fail($"Ошибка вебхук-сервера: {ex.Message}");

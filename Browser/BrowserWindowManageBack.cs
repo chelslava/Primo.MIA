@@ -1,4 +1,4 @@
-// =============================================================================
+﻿// =============================================================================
 // BrowserWindowManageBack.cs — активность «Управление окном браузера».
 //
 // Управляет размером, позицией и состоянием окна браузера.
@@ -48,7 +48,7 @@ namespace Primo.MIA
         public string Prop_SessionId
         {
             get => _propSessionId;
-            set { _propSessionId = value; InvokePropertyChanged(this, "Prop_SessionId"); }
+            set { _propSessionId = value; InvokePropertyChanged(this, nameof(Prop_SessionId)); }
         }
 
         private WindowOperation _propOperation;
@@ -59,7 +59,7 @@ namespace Primo.MIA
         public WindowOperation Prop_Operation
         {
             get => _propOperation;
-            set { _propOperation = value; InvokePropertyChanged(this, "Prop_Operation"); }
+            set { _propOperation = value; InvokePropertyChanged(this, nameof(Prop_Operation)); }
         }
 
         private string _propWidth;
@@ -71,7 +71,7 @@ namespace Primo.MIA
         public string Prop_Width
         {
             get => _propWidth;
-            set { _propWidth = value; InvokePropertyChanged(this, "Prop_Width"); }
+            set { _propWidth = value; InvokePropertyChanged(this, nameof(Prop_Width)); }
         }
 
         private string _propHeight;
@@ -83,7 +83,7 @@ namespace Primo.MIA
         public string Prop_Height
         {
             get => _propHeight;
-            set { _propHeight = value; InvokePropertyChanged(this, "Prop_Height"); }
+            set { _propHeight = value; InvokePropertyChanged(this, nameof(Prop_Height)); }
         }
 
         private string _propX;
@@ -95,7 +95,7 @@ namespace Primo.MIA
         public string Prop_X
         {
             get => _propX;
-            set { _propX = value; InvokePropertyChanged(this, "Prop_X"); }
+            set { _propX = value; InvokePropertyChanged(this, nameof(Prop_X)); }
         }
 
         private string _propY;
@@ -107,7 +107,7 @@ namespace Primo.MIA
         public string Prop_Y
         {
             get => _propY;
-            set { _propY = value; InvokePropertyChanged(this, "Prop_Y"); }
+            set { _propY = value; InvokePropertyChanged(this, nameof(Prop_Y)); }
         }
 
         // ── Выходные параметры ─────────────────────────────────────────
@@ -121,7 +121,7 @@ namespace Primo.MIA
         public string Prop_OutWidth
         {
             get => _propOutWidth;
-            set { _propOutWidth = value; InvokePropertyChanged(this, "Prop_OutWidth"); }
+            set { _propOutWidth = value; InvokePropertyChanged(this, nameof(Prop_OutWidth)); }
         }
 
         private string _propOutHeight;
@@ -133,7 +133,7 @@ namespace Primo.MIA
         public string Prop_OutHeight
         {
             get => _propOutHeight;
-            set { _propOutHeight = value; InvokePropertyChanged(this, "Prop_OutHeight"); }
+            set { _propOutHeight = value; InvokePropertyChanged(this, nameof(Prop_OutHeight)); }
         }
 
         private string _propOutX;
@@ -145,7 +145,7 @@ namespace Primo.MIA
         public string Prop_OutX
         {
             get => _propOutX;
-            set { _propOutX = value; InvokePropertyChanged(this, "Prop_OutX"); }
+            set { _propOutX = value; InvokePropertyChanged(this, nameof(Prop_OutX)); }
         }
 
         private string _propOutY;
@@ -157,7 +157,7 @@ namespace Primo.MIA
         public string Prop_OutY
         {
             get => _propOutY;
-            set { _propOutY = value; InvokePropertyChanged(this, "Prop_OutY"); }
+            set { _propOutY = value; InvokePropertyChanged(this, nameof(Prop_OutY)); }
         }
 
         // ── Конструктор ────────────────────────────────────────────────
@@ -243,8 +243,8 @@ namespace Primo.MIA
 
                     case WindowOperation.SetSize:
                         {
-                            string widthStr = GetPropertyValue<string>(Prop_Width, "Prop_Width", sd) ?? "1024";
-                            string heightStr = GetPropertyValue<string>(Prop_Height, "Prop_Height", sd) ?? "768";
+                            string widthStr = GetPropertyValue<string>(Prop_Width, nameof(Prop_Width), sd) ?? "1024";
+                            string heightStr = GetPropertyValue<string>(Prop_Height, nameof(Prop_Height), sd) ?? "768";
                             int width = int.TryParse(widthStr, out int w) ? w : 1024;
                             int height = int.TryParse(heightStr, out int h) ? h : 768;
 
@@ -255,8 +255,8 @@ namespace Primo.MIA
 
                     case WindowOperation.SetPosition:
                         {
-                            string xStr = GetPropertyValue<string>(Prop_X, "Prop_X", sd) ?? "0";
-                            string yStr = GetPropertyValue<string>(Prop_Y, "Prop_Y", sd) ?? "0";
+                            string xStr = GetPropertyValue<string>(Prop_X, nameof(Prop_X), sd) ?? "0";
+                            string yStr = GetPropertyValue<string>(Prop_Y, nameof(Prop_Y), sd) ?? "0";
                             int x = int.TryParse(xStr, out int xVal) ? xVal : 0;
                             int y = int.TryParse(yStr, out int yVal) ? yVal : 0;
 
@@ -288,6 +288,14 @@ namespace Primo.MIA
                 }
 
                 return CreateSuccessResult(resultMsg);
+            }
+            catch (OpenQA.Selenium.WebDriverException ex)
+            {
+                return CreateErrorResult($"Ошибка WebDriver: {ex.Message}");
+            }
+            catch (InvalidOperationException ex)
+            {
+                return CreateErrorResult($"Недопустимая операция: {ex.Message}");
             }
             catch (Exception ex)
             {

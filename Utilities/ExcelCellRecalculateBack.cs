@@ -29,7 +29,7 @@ namespace Primo.MIA
         public string Prop_StartCell
         {
             get => _propStartCell;
-            set { _propStartCell = value; InvokePropertyChanged(this, "Prop_StartCell"); }
+            set { _propStartCell = value; InvokePropertyChanged(this, nameof(Prop_StartCell)); }
         }
 
         private string _propRowOffset;
@@ -39,7 +39,7 @@ namespace Primo.MIA
         public string Prop_RowOffset
         {
             get => _propRowOffset;
-            set { _propRowOffset = value; InvokePropertyChanged(this, "Prop_RowOffset"); }
+            set { _propRowOffset = value; InvokePropertyChanged(this, nameof(Prop_RowOffset)); }
         }
 
         private string _propColumnOffset;
@@ -49,7 +49,7 @@ namespace Primo.MIA
         public string Prop_ColumnOffset
         {
             get => _propColumnOffset;
-            set { _propColumnOffset = value; InvokePropertyChanged(this, "Prop_ColumnOffset"); }
+            set { _propColumnOffset = value; InvokePropertyChanged(this, nameof(Prop_ColumnOffset)); }
         }
 
         private string _propTargetCell;
@@ -59,7 +59,7 @@ namespace Primo.MIA
         public string Prop_TargetCell
         {
             get => _propTargetCell;
-            set { _propTargetCell = value; InvokePropertyChanged(this, "Prop_TargetCell"); }
+            set { _propTargetCell = value; InvokePropertyChanged(this, nameof(Prop_TargetCell)); }
         }
 
         public ExcelCellRecalculateBack(IWFContainer container) : base(container)
@@ -106,6 +106,22 @@ namespace Primo.MIA
                 {
                     IsSuccess = true,
                     SuccessMessage = $"Ячейка {startCell} + ({rowOffset}, {colOffset}) = {targetCell}"
+                };
+            }
+            catch (ArgumentException ex)
+            {
+                return new ExecutionResult
+                {
+                    IsSuccess = false,
+                    ErrorMessage = $"Неверный аргумент: {ex.Message}"
+                };
+            }
+            catch (InvalidOperationException ex)
+            {
+                return new ExecutionResult
+                {
+                    IsSuccess = false,
+                    ErrorMessage = $"Недопустимая операция: {ex.Message}"
                 };
             }
             catch (Exception ex)

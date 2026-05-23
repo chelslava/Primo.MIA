@@ -1,4 +1,4 @@
-// =============================================================================
+﻿// =============================================================================
 // ElementDragDropBack.cs — активность «Перетаскивание элемента».
 //
 // Выполняет Drag and Drop элемента из одной позиции в другую.
@@ -49,7 +49,7 @@ namespace Primo.MIA
         public string Prop_SessionId
         {
             get => _propSessionId;
-            set { _propSessionId = value; InvokePropertyChanged(this, "Prop_SessionId"); }
+            set { _propSessionId = value; InvokePropertyChanged(this, nameof(Prop_SessionId)); }
         }
 
         private string _propSourceElementId;
@@ -61,7 +61,7 @@ namespace Primo.MIA
         public string Prop_SourceElementId
         {
             get => _propSourceElementId;
-            set { _propSourceElementId = value; InvokePropertyChanged(this, "Prop_SourceElementId"); }
+            set { _propSourceElementId = value; InvokePropertyChanged(this, nameof(Prop_SourceElementId)); }
         }
 
         private ElementLocatorType _propSourceLocatorType;
@@ -72,7 +72,7 @@ namespace Primo.MIA
         public ElementLocatorType Prop_SourceLocatorType
         {
             get => _propSourceLocatorType;
-            set { _propSourceLocatorType = value; InvokePropertyChanged(this, "Prop_SourceLocatorType"); }
+            set { _propSourceLocatorType = value; InvokePropertyChanged(this, nameof(Prop_SourceLocatorType)); }
         }
 
         private string _propSourceLocatorValue;
@@ -84,7 +84,7 @@ namespace Primo.MIA
         public string Prop_SourceLocatorValue
         {
             get => _propSourceLocatorValue;
-            set { _propSourceLocatorValue = value; InvokePropertyChanged(this, "Prop_SourceLocatorValue"); }
+            set { _propSourceLocatorValue = value; InvokePropertyChanged(this, nameof(Prop_SourceLocatorValue)); }
         }
 
         private string _propTargetElementId;
@@ -96,7 +96,7 @@ namespace Primo.MIA
         public string Prop_TargetElementId
         {
             get => _propTargetElementId;
-            set { _propTargetElementId = value; InvokePropertyChanged(this, "Prop_TargetElementId"); }
+            set { _propTargetElementId = value; InvokePropertyChanged(this, nameof(Prop_TargetElementId)); }
         }
 
         private ElementLocatorType _propTargetLocatorType;
@@ -107,7 +107,7 @@ namespace Primo.MIA
         public ElementLocatorType Prop_TargetLocatorType
         {
             get => _propTargetLocatorType;
-            set { _propTargetLocatorType = value; InvokePropertyChanged(this, "Prop_TargetLocatorType"); }
+            set { _propTargetLocatorType = value; InvokePropertyChanged(this, nameof(Prop_TargetLocatorType)); }
         }
 
         private string _propTargetLocatorValue;
@@ -119,7 +119,7 @@ namespace Primo.MIA
         public string Prop_TargetLocatorValue
         {
             get => _propTargetLocatorValue;
-            set { _propTargetLocatorValue = value; InvokePropertyChanged(this, "Prop_TargetLocatorValue"); }
+            set { _propTargetLocatorValue = value; InvokePropertyChanged(this, nameof(Prop_TargetLocatorValue)); }
         }
 
         private string _propOffsetX;
@@ -131,7 +131,7 @@ namespace Primo.MIA
         public string Prop_OffsetX
         {
             get => _propOffsetX;
-            set { _propOffsetX = value; InvokePropertyChanged(this, "Prop_OffsetX"); }
+            set { _propOffsetX = value; InvokePropertyChanged(this, nameof(Prop_OffsetX)); }
         }
 
         private string _propOffsetY;
@@ -143,7 +143,7 @@ namespace Primo.MIA
         public string Prop_OffsetY
         {
             get => _propOffsetY;
-            set { _propOffsetY = value; InvokePropertyChanged(this, "Prop_OffsetY"); }
+            set { _propOffsetY = value; InvokePropertyChanged(this, nameof(Prop_OffsetY)); }
         }
 
         private string _propWaitMode;
@@ -154,7 +154,7 @@ namespace Primo.MIA
         public ElementWaitMode Prop_WaitMode
         {
             get => (ElementWaitMode)Enum.Parse(typeof(ElementWaitMode), _propWaitMode ?? "Clickable");
-            set { _propWaitMode = value.ToString(); InvokePropertyChanged(this, "Prop_WaitMode"); }
+            set { _propWaitMode = value.ToString(); InvokePropertyChanged(this, nameof(Prop_WaitMode)); }
         }
 
         private string _propWaitTimeout;
@@ -166,7 +166,7 @@ namespace Primo.MIA
         public string Prop_WaitTimeout
         {
             get => _propWaitTimeout;
-            set { _propWaitTimeout = value; InvokePropertyChanged(this, "Prop_WaitTimeout"); }
+            set { _propWaitTimeout = value; InvokePropertyChanged(this, nameof(Prop_WaitTimeout)); }
         }
 
         private bool _propUseJavaScript;
@@ -177,7 +177,7 @@ namespace Primo.MIA
         public bool Prop_UseJavaScript
         {
             get => _propUseJavaScript;
-            set { _propUseJavaScript = value; InvokePropertyChanged(this, "Prop_UseJavaScript"); }
+            set { _propUseJavaScript = value; InvokePropertyChanged(this, nameof(Prop_UseJavaScript)); }
         }
 
         // ── Конструктор ────────────────────────────────────────────────
@@ -251,11 +251,11 @@ namespace Primo.MIA
                 IWebDriver driver = GetDriverFromContext(sessionId);
                 IWebElement sourceElement = GetSourceElement(driver, sd);
 
-                string targetElementId = GetPropertyValue<string>(Prop_TargetElementId, "Prop_TargetElementId", sd);
-                string targetLocatorValue = GetPropertyValue<string>(Prop_TargetLocatorValue, "Prop_TargetLocatorValue", sd);
+                string targetElementId = GetPropertyValue<string>(Prop_TargetElementId, nameof(Prop_TargetElementId), sd);
+                string targetLocatorValue = GetPropertyValue<string>(Prop_TargetLocatorValue, nameof(Prop_TargetLocatorValue), sd);
 
-                string offsetXStr = GetPropertyValue<string>(Prop_OffsetX, "Prop_OffsetX", sd) ?? "0";
-                string offsetYStr = GetPropertyValue<string>(Prop_OffsetY, "Prop_OffsetY", sd) ?? "0";
+                string offsetXStr = GetPropertyValue<string>(Prop_OffsetX, nameof(Prop_OffsetX), sd) ?? "0";
+                string offsetYStr = GetPropertyValue<string>(Prop_OffsetY, nameof(Prop_OffsetY), sd) ?? "0";
                 int offsetX = int.TryParse(offsetXStr, out int ox) ? ox : 0;
                 int offsetY = int.TryParse(offsetYStr, out int oy) ? oy : 0;
 
@@ -287,6 +287,14 @@ namespace Primo.MIA
 
                 return CreateSuccessResult(resultMsg);
             }
+            catch (OpenQA.Selenium.WebDriverException ex)
+            {
+                return CreateErrorResult(ex, "Перетаскивание");
+            }
+            catch (InvalidOperationException ex)
+            {
+                return CreateErrorResult(ex, "Перетаскивание");
+            }
             catch (Exception ex)
             {
                 return CreateErrorResult(ex, "Перетаскивание");
@@ -300,12 +308,12 @@ namespace Primo.MIA
         /// </summary>
         private IWebElement GetSourceElement(IWebDriver driver, ScriptingData sd)
         {
-            string elementId = GetPropertyValue<string>(Prop_SourceElementId, "Prop_SourceElementId", sd);
-            string locatorValue = GetPropertyValue<string>(Prop_SourceLocatorValue, "Prop_SourceLocatorValue", sd);
+            string elementId = GetPropertyValue<string>(Prop_SourceElementId, nameof(Prop_SourceElementId), sd);
+            string locatorValue = GetPropertyValue<string>(Prop_SourceLocatorValue, nameof(Prop_SourceLocatorValue), sd);
 
             if (!string.IsNullOrWhiteSpace(locatorValue))
             {
-                string timeoutStr = GetPropertyValue<string>(Prop_WaitTimeout, "Prop_WaitTimeout", sd) ?? "10";
+                string timeoutStr = GetPropertyValue<string>(Prop_WaitTimeout, nameof(Prop_WaitTimeout), sd) ?? "10";
                 int timeout = int.TryParse(timeoutStr, out int t) ? t : 10;
                 ValidatePositive(timeout, "Prop_WaitTimeout");
 
@@ -343,12 +351,12 @@ namespace Primo.MIA
         /// </summary>
         private IWebElement GetTargetElement(IWebDriver driver, ScriptingData sd)
         {
-            string elementId = GetPropertyValue<string>(Prop_TargetElementId, "Prop_TargetElementId", sd);
-            string locatorValue = GetPropertyValue<string>(Prop_TargetLocatorValue, "Prop_TargetLocatorValue", sd);
+            string elementId = GetPropertyValue<string>(Prop_TargetElementId, nameof(Prop_TargetElementId), sd);
+            string locatorValue = GetPropertyValue<string>(Prop_TargetLocatorValue, nameof(Prop_TargetLocatorValue), sd);
 
             if (!string.IsNullOrWhiteSpace(locatorValue))
             {
-                string timeoutStr = GetPropertyValue<string>(Prop_WaitTimeout, "Prop_WaitTimeout", sd) ?? "10";
+                string timeoutStr = GetPropertyValue<string>(Prop_WaitTimeout, nameof(Prop_WaitTimeout), sd) ?? "10";
                 int timeout = int.TryParse(timeoutStr, out int t) ? t : 10;
                 ValidatePositive(timeout, "Prop_WaitTimeout");
 

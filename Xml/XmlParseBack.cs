@@ -208,8 +208,7 @@ namespace Primo.MIA
             {
                 // ── Чтение входных параметров ──────────────────────────────
                 string xmlString = GetPropertyValue<string>(this.Prop_XmlString, nameof(Prop_XmlString), sd);
-                if (string.IsNullOrWhiteSpace(xmlString))
-                    throw new ArgumentException("XML-строка не может быть пустой");
+                Guard.NotNullOrWhiteSpace(xmlString, nameof(Prop_XmlString));
 
                 string indentChars = GetPropertyValue<string>(this.Prop_IndentChars, nameof(Prop_IndentChars), sd) ?? "  ";
 
@@ -220,6 +219,22 @@ namespace Primo.MIA
                 {
                     IsSuccess = true,
                     SuccessMessage = resultMsg
+                };
+            }
+            catch (System.Xml.XmlException ex)
+            {
+                return new ExecutionResult
+                {
+                    IsSuccess = false,
+                    ErrorMessage = $"Ошибка XML: {ex.Message}"
+                };
+            }
+            catch (ArgumentException ex)
+            {
+                return new ExecutionResult
+                {
+                    IsSuccess = false,
+                    ErrorMessage = $"Неверный аргумент: {ex.Message}"
                 };
             }
             catch (Exception ex)

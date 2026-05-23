@@ -37,7 +37,7 @@ namespace Primo.MIA
         public string Prop_DirectoryPath
         {
             get { return this.prop_DirectoryPath; }
-            set { this.prop_DirectoryPath = value; this.InvokePropertyChanged(this, "Prop_DirectoryPath"); }
+            set { this.prop_DirectoryPath = value; this.InvokePropertyChanged(this, nameof(Prop_DirectoryPath)); }
         }
 
         private SearchFilterType _filterType = SearchFilterType.Wildcard;
@@ -49,7 +49,7 @@ namespace Primo.MIA
         public SearchFilterType FilterType
         {
             get => this._filterType;
-            set { this._filterType = value; this.InvokePropertyChanged(this, "FilterType"); }
+            set { this._filterType = value; this.InvokePropertyChanged(this, nameof(FilterType)); }
         }
 
         private string prop_Pattern;
@@ -62,7 +62,7 @@ namespace Primo.MIA
         public string Prop_Pattern
         {
             get { return this.prop_Pattern; }
-            set { this.prop_Pattern = value; this.InvokePropertyChanged(this, "Prop_Pattern"); }
+            set { this.prop_Pattern = value; this.InvokePropertyChanged(this, nameof(Prop_Pattern)); }
         }
 
         private SearchType _searchType = SearchType.FilesOnly;
@@ -74,7 +74,7 @@ namespace Primo.MIA
         public SearchType SearchTypeValue
         {
             get => this._searchType;
-            set { this._searchType = value; this.InvokePropertyChanged(this, "SearchTypeValue"); }
+            set { this._searchType = value; this.InvokePropertyChanged(this, nameof(SearchTypeValue)); }
         }
 
         private bool _searchInSubfolders = false;
@@ -86,7 +86,7 @@ namespace Primo.MIA
         public bool Prop_SearchInSubfolders
         {
             get { return this._searchInSubfolders; }
-            set { this._searchInSubfolders = value; this.InvokePropertyChanged(this, "Prop_SearchInSubfolders"); }
+            set { this._searchInSubfolders = value; this.InvokePropertyChanged(this, nameof(Prop_SearchInSubfolders)); }
         }
 
         private string prop_SearchTimeout;
@@ -99,7 +99,7 @@ namespace Primo.MIA
         public string Prop_SearchTimeout
         {
             get { return this.prop_SearchTimeout; }
-            set { this.prop_SearchTimeout = value; this.InvokePropertyChanged(this, "Prop_SearchTimeout"); }
+            set { this.prop_SearchTimeout = value; this.InvokePropertyChanged(this, nameof(Prop_SearchTimeout)); }
         }
 
         // ============== OUTPUT PROPERTIES ==============
@@ -117,7 +117,7 @@ namespace Primo.MIA
             set
             {
                 prop_FoundItems = value;
-                this.InvokePropertyChanged(this, "Prop_FoundItems");
+                this.InvokePropertyChanged(this, nameof(Prop_FoundItems));
             }
         }
 
@@ -134,7 +134,7 @@ namespace Primo.MIA
             set
             {
                 prop_ItemsCount = value;
-                this.InvokePropertyChanged(this, "Prop_ItemsCount");
+                this.InvokePropertyChanged(this, nameof(Prop_ItemsCount));
             }
         }
 
@@ -247,6 +247,22 @@ FilesAndFolders - Искать и файлы, и папки одновремен
                 {
                     IsSuccess = true,
                     SuccessMessage = $"Найдено элементов: {foundItems.Count}"
+                };
+            }
+            catch (System.IO.IOException ex)
+            {
+                return new ExecutionResult()
+                {
+                    IsSuccess = false,
+                    ErrorMessage = $"Ошибка ввода-вывода: {ex.Message}"
+                };
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return new ExecutionResult()
+                {
+                    IsSuccess = false,
+                    ErrorMessage = $"Нет доступа: {ex.Message}"
                 };
             }
             catch (Exception ex)

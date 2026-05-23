@@ -1,4 +1,4 @@
-// =============================================================================
+﻿// =============================================================================
 // ElementGetRectBack.cs — активность «Получить размер и позицию элемента».
 //
 // Получает координаты и размеры элемента на странице.
@@ -49,7 +49,7 @@ namespace Primo.MIA
         public string Prop_SessionId
         {
             get => _propSessionId;
-            set { _propSessionId = value; InvokePropertyChanged(this, "Prop_SessionId"); }
+            set { _propSessionId = value; InvokePropertyChanged(this, nameof(Prop_SessionId)); }
         }
 
         private string _propElementId;
@@ -61,7 +61,7 @@ namespace Primo.MIA
         public string Prop_ElementId
         {
             get => _propElementId;
-            set { _propElementId = value; InvokePropertyChanged(this, "Prop_ElementId"); }
+            set { _propElementId = value; InvokePropertyChanged(this, nameof(Prop_ElementId)); }
         }
 
         private ElementLocatorType _propLocatorType;
@@ -72,7 +72,7 @@ namespace Primo.MIA
         public ElementLocatorType Prop_LocatorType
         {
             get => _propLocatorType;
-            set { _propLocatorType = value; InvokePropertyChanged(this, "Prop_LocatorType"); }
+            set { _propLocatorType = value; InvokePropertyChanged(this, nameof(Prop_LocatorType)); }
         }
 
         private string _propLocatorValue;
@@ -84,7 +84,7 @@ namespace Primo.MIA
         public string Prop_LocatorValue
         {
             get => _propLocatorValue;
-            set { _propLocatorValue = value; InvokePropertyChanged(this, "Prop_LocatorValue"); }
+            set { _propLocatorValue = value; InvokePropertyChanged(this, nameof(Prop_LocatorValue)); }
         }
 
         private string _propWaitMode;
@@ -95,7 +95,7 @@ namespace Primo.MIA
         public ElementWaitMode Prop_WaitMode
         {
             get => (ElementWaitMode)Enum.Parse(typeof(ElementWaitMode), _propWaitMode ?? "Visible");
-            set { _propWaitMode = value.ToString(); InvokePropertyChanged(this, "Prop_WaitMode"); }
+            set { _propWaitMode = value.ToString(); InvokePropertyChanged(this, nameof(Prop_WaitMode)); }
         }
 
         private string _propWaitTimeout;
@@ -107,7 +107,7 @@ namespace Primo.MIA
         public string Prop_WaitTimeout
         {
             get => _propWaitTimeout;
-            set { _propWaitTimeout = value; InvokePropertyChanged(this, "Prop_WaitTimeout"); }
+            set { _propWaitTimeout = value; InvokePropertyChanged(this, nameof(Prop_WaitTimeout)); }
         }
 
         // ── Выходные параметры ─────────────────────────────────────────
@@ -121,7 +121,7 @@ namespace Primo.MIA
         public string Prop_X
         {
             get => _propX;
-            set { _propX = value; InvokePropertyChanged(this, "Prop_X"); }
+            set { _propX = value; InvokePropertyChanged(this, nameof(Prop_X)); }
         }
 
         private string _propY;
@@ -133,7 +133,7 @@ namespace Primo.MIA
         public string Prop_Y
         {
             get => _propY;
-            set { _propY = value; InvokePropertyChanged(this, "Prop_Y"); }
+            set { _propY = value; InvokePropertyChanged(this, nameof(Prop_Y)); }
         }
 
         private string _propWidth;
@@ -145,7 +145,7 @@ namespace Primo.MIA
         public string Prop_Width
         {
             get => _propWidth;
-            set { _propWidth = value; InvokePropertyChanged(this, "Prop_Width"); }
+            set { _propWidth = value; InvokePropertyChanged(this, nameof(Prop_Width)); }
         }
 
         private string _propHeight;
@@ -157,7 +157,7 @@ namespace Primo.MIA
         public string Prop_Height
         {
             get => _propHeight;
-            set { _propHeight = value; InvokePropertyChanged(this, "Prop_Height"); }
+            set { _propHeight = value; InvokePropertyChanged(this, nameof(Prop_Height)); }
         }
 
         // ── Конструктор ────────────────────────────────────────────────
@@ -230,7 +230,7 @@ namespace Primo.MIA
                 IWebElement element;
                 if (!string.IsNullOrWhiteSpace(locatorValue))
                 {
-                    string timeoutStr = GetPropertyValue<string>(Prop_WaitTimeout, "Prop_WaitTimeout", sd) ?? "10";
+                    string timeoutStr = GetPropertyValue<string>(Prop_WaitTimeout, nameof(Prop_WaitTimeout), sd) ?? "10";
                     int timeout = int.TryParse(timeoutStr, out int t) ? t : 10;
                     ValidatePositive(timeout, "Prop_WaitTimeout");
 
@@ -270,6 +270,14 @@ namespace Primo.MIA
                 SetVariableValue(Prop_Height, height, sd);
 
                 return CreateSuccessResult($"[Получить размер] X={x}, Y={y}, Ширина={width}, Высота={height}");
+            }
+            catch (OpenQA.Selenium.WebDriverException ex)
+            {
+                return CreateErrorResult(ex, "Получить размер");
+            }
+            catch (InvalidOperationException ex)
+            {
+                return CreateErrorResult(ex, "Получить размер");
             }
             catch (Exception ex)
             {

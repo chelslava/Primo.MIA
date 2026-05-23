@@ -385,8 +385,7 @@ namespace Primo.MIA
             {
                 // ── Чтение входных параметров ──────────────────────────────
                 string url = GetPropertyValue<string>(this.Prop_Url, nameof(Prop_Url), sd);
-                if (string.IsNullOrWhiteSpace(url))
-                    throw new ArgumentException("URL не может быть пустым");
+                Guard.NotNullOrWhiteSpace(url, nameof(Prop_Url));
 
                 string headersJson = GetPropertyValue<string>(this.Prop_Headers, nameof(Prop_Headers), sd) ?? "{}";
                 string body = GetPropertyValue<string>(this.Prop_Body, nameof(Prop_Body), sd) ?? string.Empty;
@@ -523,6 +522,22 @@ namespace Primo.MIA
                         };
                     }
                 }
+            }
+            catch (System.Net.Http.HttpRequestException ex)
+            {
+                return new ExecutionResult
+                {
+                    IsSuccess = false,
+                    ErrorMessage = $"Ошибка HTTP: {ex.Message}"
+                };
+            }
+            catch (TimeoutException ex)
+            {
+                return new ExecutionResult
+                {
+                    IsSuccess = false,
+                    ErrorMessage = $"Превышено время ожидания: {ex.Message}"
+                };
             }
             catch (Exception ex)
             {

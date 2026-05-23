@@ -53,7 +53,7 @@ namespace Primo.MIA
         public string Prop_SessionId
         {
             get => _propSessionId;
-            set { _propSessionId = value; InvokePropertyChanged(this, "Prop_SessionId"); }
+            set { _propSessionId = value; InvokePropertyChanged(this, nameof(Prop_SessionId)); }
         }
 
         private CookieOperation _propOperation;
@@ -64,7 +64,7 @@ namespace Primo.MIA
         public CookieOperation Prop_Operation
         {
             get => _propOperation;
-            set { _propOperation = value; InvokePropertyChanged(this, "Prop_Operation"); }
+            set { _propOperation = value; InvokePropertyChanged(this, nameof(Prop_Operation)); }
         }
 
         private string _propCookieName;
@@ -76,7 +76,7 @@ namespace Primo.MIA
         public string Prop_CookieName
         {
             get => _propCookieName;
-            set { _propCookieName = value; InvokePropertyChanged(this, "Prop_CookieName"); }
+            set { _propCookieName = value; InvokePropertyChanged(this, nameof(Prop_CookieName)); }
         }
 
         private string _propCookieValue;
@@ -88,7 +88,7 @@ namespace Primo.MIA
         public string Prop_CookieValue
         {
             get => _propCookieValue;
-            set { _propCookieValue = value; InvokePropertyChanged(this, "Prop_CookieValue"); }
+            set { _propCookieValue = value; InvokePropertyChanged(this, nameof(Prop_CookieValue)); }
         }
 
         // ── Выходные параметры ─────────────────────────────────────────
@@ -102,7 +102,7 @@ namespace Primo.MIA
         public string Prop_Result
         {
             get => _propResult;
-            set { _propResult = value; InvokePropertyChanged(this, "Prop_Result"); }
+            set { _propResult = value; InvokePropertyChanged(this, nameof(Prop_Result)); }
         }
 
         // ── Конструктор ────────────────────────────────────────────────
@@ -213,6 +213,14 @@ namespace Primo.MIA
                     SetVariableValue(Prop_Result, result, sd);
 
                 return CreateSuccessResult($"[Управление cookies] {actionMessage}");
+            }
+            catch (OpenQA.Selenium.WebDriverException ex)
+            {
+                return CreateErrorResult(ex, "Управление cookies");
+            }
+            catch (InvalidOperationException ex)
+            {
+                return CreateErrorResult(ex, "Управление cookies");
             }
             catch (Exception ex)
             {

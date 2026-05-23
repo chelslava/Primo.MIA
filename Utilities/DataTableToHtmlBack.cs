@@ -374,6 +374,22 @@ namespace Primo.MIA
                     SuccessMessage = $"HTML таблица создана: {this.Prop_RowCount} строк, {this.Prop_ColumnCount} столбцов"
                 };
             }
+            catch (ArgumentException ex)
+            {
+                return new ExecutionResult
+                {
+                    IsSuccess = false,
+                    ErrorMessage = $"Неверный аргумент: {ex.Message}"
+                };
+            }
+            catch (InvalidOperationException ex)
+            {
+                return new ExecutionResult
+                {
+                    IsSuccess = false,
+                    ErrorMessage = $"Недопустимая операция: {ex.Message}"
+                };
+            }
             catch (Exception ex)
             {
                 return new ExecutionResult

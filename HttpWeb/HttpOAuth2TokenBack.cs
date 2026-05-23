@@ -362,8 +362,7 @@ namespace Primo.MIA
             {
                 // ── Чтение входных параметров ──────────────────────────────
                 string tokenUrl = GetPropertyValue<string>(this.Prop_TokenUrl, nameof(Prop_TokenUrl), sd);
-                if (string.IsNullOrWhiteSpace(tokenUrl))
-                    throw new ArgumentException("Token URL не может быть пустым");
+                Guard.NotNullOrWhiteSpace(tokenUrl, nameof(Prop_TokenUrl));
 
                 string clientId = GetPropertyValue<string>(this.Prop_ClientId, nameof(Prop_ClientId), sd);
                 string clientSecret = GetPropertyValue<string>(this.Prop_ClientSecret, nameof(Prop_ClientSecret), sd);
@@ -412,6 +411,22 @@ namespace Primo.MIA
                         SuccessMessage = $"[HTTP: OAuth2 токен] Получен токен ({this.Prop_GrantType}), expires_in: {tokenResponse.ExpiresIn} сек"
                     };
                 }
+            }
+            catch (System.Net.Http.HttpRequestException ex)
+            {
+                return new ExecutionResult
+                {
+                    IsSuccess = false,
+                    ErrorMessage = $"Ошибка HTTP: {ex.Message}"
+                };
+            }
+            catch (TimeoutException ex)
+            {
+                return new ExecutionResult
+                {
+                    IsSuccess = false,
+                    ErrorMessage = $"Превышено время ожидания: {ex.Message}"
+                };
             }
             catch (Exception ex)
             {

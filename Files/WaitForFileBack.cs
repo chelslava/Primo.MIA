@@ -37,7 +37,7 @@ namespace Primo.MIA
         public WaitFileMode WaitMode
         {
             get => this._waitMode;
-            set { this._waitMode = value; this.InvokePropertyChanged(this, "WaitMode"); }
+            set { this._waitMode = value; this.InvokePropertyChanged(this, nameof(WaitMode)); }
         }
 
         private string prop_DirectoryPath;
@@ -50,7 +50,7 @@ namespace Primo.MIA
         public string Prop_DirectoryPath
         {
             get { return this.prop_DirectoryPath; }
-            set { this.prop_DirectoryPath = value; this.InvokePropertyChanged(this, "Prop_DirectoryPath"); }
+            set { this.prop_DirectoryPath = value; this.InvokePropertyChanged(this, nameof(Prop_DirectoryPath)); }
         }
 
         private FileFilterType _filterType = FileFilterType.Wildcard;
@@ -62,7 +62,7 @@ namespace Primo.MIA
         public FileFilterType FilterType
         {
             get => this._filterType;
-            set { this._filterType = value; this.InvokePropertyChanged(this, "FilterType"); }
+            set { this._filterType = value; this.InvokePropertyChanged(this, nameof(FilterType)); }
         }
 
         private string prop_FilePattern;
@@ -75,7 +75,7 @@ namespace Primo.MIA
         public string Prop_FilePattern
         {
             get { return this.prop_FilePattern; }
-            set { this.prop_FilePattern = value; this.InvokePropertyChanged(this, "Prop_FilePattern"); }
+            set { this.prop_FilePattern = value; this.InvokePropertyChanged(this, nameof(Prop_FilePattern)); }
         }
 
         private string prop_Timeout;
@@ -88,7 +88,7 @@ namespace Primo.MIA
         public string Prop_Timeout
         {
             get { return this.prop_Timeout; }
-            set { this.prop_Timeout = value; this.InvokePropertyChanged(this, "Prop_Timeout"); }
+            set { this.prop_Timeout = value; this.InvokePropertyChanged(this, nameof(Prop_Timeout)); }
         }
 
         private string prop_CheckInterval;
@@ -101,7 +101,7 @@ namespace Primo.MIA
         public string Prop_CheckInterval
         {
             get { return this.prop_CheckInterval; }
-            set { this.prop_CheckInterval = value; this.InvokePropertyChanged(this, "Prop_CheckInterval"); }
+            set { this.prop_CheckInterval = value; this.InvokePropertyChanged(this, nameof(Prop_CheckInterval)); }
         }
 
         private bool _waitForStability = false;
@@ -113,7 +113,7 @@ namespace Primo.MIA
         public bool Prop_WaitForStability
         {
             get { return this._waitForStability; }
-            set { this._waitForStability = value; this.InvokePropertyChanged(this, "Prop_WaitForStability"); }
+            set { this._waitForStability = value; this.InvokePropertyChanged(this, nameof(Prop_WaitForStability)); }
         }
 
         private string prop_StabilityTimeout;
@@ -126,7 +126,7 @@ namespace Primo.MIA
         public string Prop_StabilityTimeout
         {
             get { return this.prop_StabilityTimeout; }
-            set { this.prop_StabilityTimeout = value; this.InvokePropertyChanged(this, "Prop_StabilityTimeout"); }
+            set { this.prop_StabilityTimeout = value; this.InvokePropertyChanged(this, nameof(Prop_StabilityTimeout)); }
         }
 
         private bool _throwOnTimeout = false;
@@ -138,7 +138,7 @@ namespace Primo.MIA
         public bool Prop_ThrowOnTimeout
         {
             get { return this._throwOnTimeout; }
-            set { this._throwOnTimeout = value; this.InvokePropertyChanged(this, "Prop_ThrowOnTimeout"); }
+            set { this._throwOnTimeout = value; this.InvokePropertyChanged(this, nameof(Prop_ThrowOnTimeout)); }
         }
 
         // ============== OUTPUT PROPERTIES ==============
@@ -156,7 +156,7 @@ namespace Primo.MIA
             set
             {
                 prop_FileFound = value;
-                this.InvokePropertyChanged(this, "Prop_FileFound");
+                this.InvokePropertyChanged(this, nameof(Prop_FileFound));
             }
         }
 
@@ -173,7 +173,7 @@ namespace Primo.MIA
             set
             {
                 prop_FilePath = value;
-                this.InvokePropertyChanged(this, "Prop_FilePath");
+                this.InvokePropertyChanged(this, nameof(Prop_FilePath));
             }
         }
 
@@ -190,7 +190,7 @@ namespace Primo.MIA
             set
             {
                 prop_FileName = value;
-                this.InvokePropertyChanged(this, "Prop_FileName");
+                this.InvokePropertyChanged(this, nameof(Prop_FileName));
             }
         }
 
@@ -207,7 +207,7 @@ namespace Primo.MIA
             set
             {
                 prop_FileSize = value;
-                this.InvokePropertyChanged(this, "Prop_FileSize");
+                this.InvokePropertyChanged(this, nameof(Prop_FileSize));
             }
         }
 
@@ -224,7 +224,7 @@ namespace Primo.MIA
             set
             {
                 prop_WaitTime = value;
-                this.InvokePropertyChanged(this, "Prop_WaitTime");
+                this.InvokePropertyChanged(this, nameof(Prop_WaitTime));
             }
         }
 
@@ -338,6 +338,22 @@ Regex - Использование регулярных выражений. На
                 {
                     IsSuccess = true,
                     SuccessMessage = $"Таймаут ожидания файла истек после {parameters.TimeoutMs / 1000} секунд"
+                };
+            }
+            catch (System.IO.IOException ex)
+            {
+                return new ExecutionResult()
+                {
+                    IsSuccess = false,
+                    ErrorMessage = $"Ошибка ввода-вывода: {ex.Message}"
+                };
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return new ExecutionResult()
+                {
+                    IsSuccess = false,
+                    ErrorMessage = $"Нет доступа: {ex.Message}"
                 };
             }
             catch (Exception ex)

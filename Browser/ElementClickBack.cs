@@ -27,7 +27,7 @@ namespace Primo.MIA
     /// Объединённая активность для выполнения различных типов кликов по элементу.
     /// Режим клика задаётся через свойство <see cref="Prop_ClickMode"/>.
     /// </summary>
-    public class ElementClickBack : PrimoComponentTO<ElementClick>
+    public class ElementClickBack : BrowserActivityBase<ElementClick>
     {
         // ── Группа и таймаут ──────────────────────────────────────────────────
 
@@ -285,6 +285,22 @@ namespace Primo.MIA
                 {
                     IsSuccess = true,
                     SuccessMessage = resultMsg
+                };
+            }
+            catch (OpenQA.Selenium.WebDriverException ex)
+            {
+                return new ExecutionResult
+                {
+                    IsSuccess = false,
+                    ErrorMessage = $"Ошибка WebDriver: {ex.Message}"
+                };
+            }
+            catch (InvalidOperationException ex)
+            {
+                return new ExecutionResult
+                {
+                    IsSuccess = false,
+                    ErrorMessage = $"Недопустимая операция: {ex.Message}"
                 };
             }
             catch (Exception ex)
