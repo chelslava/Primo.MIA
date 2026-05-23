@@ -191,6 +191,8 @@
       <DependentUpon>ElementClick.xaml</DependentUpon>
     </Compile>
     <Compile Include="Browser\ElementClickBack.cs" />
+    <Compile Include="Browser\ElementInteractionLogic.cs" />
+    <Compile Include="Browser\BrowserWaitLogic.cs" />
     <Compile Include="Browser\ElementDragDrop.xaml.cs">
       <DependentUpon>ElementDragDrop.xaml</DependentUpon>
     </Compile>
@@ -268,13 +270,22 @@
       <DependentUpon>CalendarWorkdaysList.xaml</DependentUpon>
     </Compile>
     <Compile Include="Calendar\CalendarWorkdaysListBack.cs" />
-    <Compile Include="Calendar\Models\ProductionCalendar.cs" />
     <Compile Include="Common\ActivityCategories.cs" />
     <Compile Include="Common\ActivityIcons.cs" />
     <Compile Include="Common\ActivityStrings.cs" />
     <Compile Include="Common\ComparisonHelper.cs" />
     <Compile Include="Common\Guard.cs" />
-<Compile Include="Enums.cs" />
+<Compile Include="BrowserEnums.cs" />
+    <Compile Include="DatabaseEnums.cs" />
+    <Compile Include="HttpWebEnums.cs" />
+    <Compile Include="ListEnums.cs" />
+    <Compile Include="CalendarEnums.cs" />
+    <Compile Include="TextEnums.cs" />
+    <Compile Include="DictionaryEnums.cs" />
+    <Compile Include="TupleEnums.cs" />
+    <Compile Include="FileEnums.cs" />
+    <Compile Include="UtilitiesEnums.cs" />
+    <Compile Include="Enums.cs" />
     <Compile Include="Common\FileHelper.cs" />
 <Compile Include="Common\NaturalComparer.cs" />
 <Compile Include="Common\PropertyBuilder.cs" />
@@ -503,6 +514,14 @@
     <Compile Include="Calendar\Parsers\JsonCalendarParser.cs" />
     <Compile Include="Calendar\Parsers\CsvCalendarParser.cs" />
     <Compile Include="Calendar\Parsers\TxtCalendarParser.cs" />
+    <Compile Include="Database\DatabaseException.cs" />
+    <Compile Include="Browser\BrowserException.cs" />
+    <Compile Include="HttpWeb\HttpActivityException.cs" />
+    <Compile Include="Json\JsonActivityException.cs" />
+    <Compile Include="Xml\XmlActivityException.cs" />
+    <Compile Include="Files\FileActivityException.cs" />
+    <Compile Include="Text\TextActivityException.cs" />
+    <Compile Include="Utilities\UtilityException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -925,6 +944,10 @@
     </Compile>
     <Compile Include="Database\DatabaseBulkInsertBack.cs" />
     <Compile Include="Database\DatabaseHelper.cs" />
+    <Compile Include="Database\DatabaseConnectionHelper.cs" />
+    <Compile Include="Database\DatabaseCommandHelper.cs" />
+    <Compile Include="Database\DatabaseTransactionHelper.cs" />
+    <Compile Include="Database\DatabaseSchemaHelper.cs" />
     <Compile Include="Database\DatabaseTransactionBegin.xaml.cs">
       <DependentUpon>DatabaseTransactionBegin.xaml</DependentUpon>
     </Compile>
@@ -973,6 +996,10 @@
       <DependentUpon>DatabaseQuery.xaml</DependentUpon>
     </Compile>
     <Compile Include="Database\DatabaseQueryBack.cs" />
+    <Compile Include="Database\DatabaseQueryLogic.cs" />
+    <Compile Include="Database\DatabaseCommandLogic.cs" />
+    <Compile Include="Database\DatabaseBulkLogic.cs" />
+    <Compile Include="Database\DatabaseStoredProcLogic.cs" />
     <Compile Include="Database\DatabaseScalar.xaml.cs">
       <DependentUpon>DatabaseScalar.xaml</DependentUpon>
     </Compile>
