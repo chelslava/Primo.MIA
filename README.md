@@ -150,7 +150,7 @@ scripts\run-tests-vs.ps1
 | Пакет | Версия | Назначение |
 |-------|--------|------------|
 | Newtonsoft.Json | 13.0.4 | JSON сериализация |
-| Tomlyn | 0.16.2 | Парсинг TOML конфигов |
+| Tomlyn | 2.4.0 | Парсинг TOML конфигов |
 | Selenium.WebDriver | 4.21.0 | Браузерная автоматизация |
 | Selenium.Support | 4.21.0 | Вспомогательные классы Selenium |
 | Selenium.WebDriver.ChromeDriver | 125.0.6422.14100 | Chrome WebDriver |

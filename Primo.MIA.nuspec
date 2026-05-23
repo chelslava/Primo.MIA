@@ -12,10 +12,10 @@
 		<dependencies>
 			<group targetFramework=".NETFramework4.6.1">
 				<dependency id="Hjson" version="3.0.0" />
-				<dependency id="Newtonsoft.Json" version="13.0.4" />
-				<dependency id="Selenium.WebDriver" version="4.41.0" />
-				<dependency id="Selenium.Support" version="4.41.0" />
-				<dependency id="Tomlyn" version="0.16.2" />
+				<dependency id="Newtonsoft.Json" version="13.0.5-beta1" />
+				<dependency id="Selenium.WebDriver" version="4.44.0" />
+				<dependency id="Selenium.Support" version="4.44.0" />
+				<dependency id="Tomlyn.Signed" version="2.4.0" />
 			</group>
 		</dependencies>
 	</metadata>

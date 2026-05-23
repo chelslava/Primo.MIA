@@ -125,7 +125,7 @@ namespace Primo.MIA
         private static TomlTable ParseTomlFile(string filePath, string encodingName)
         {
             string tomlContent = File.ReadAllText(filePath, ResolveEncoding(encodingName));
-            return Toml.ToModel(tomlContent);
+            return TomlSerializer.Deserialize<TomlTable>(tomlContent, default(TomlSerializerOptions));
         }
 
         private static Encoding ResolveEncoding(string encodingName)

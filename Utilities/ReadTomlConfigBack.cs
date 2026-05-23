@@ -2,20 +2,15 @@
 // Активность ReadTomlConfig — универсальное чтение конфигурационных файлов TOML.
 //
 // ВАЖНО — совместимость:
-//   Используется Tomlyn версии 0.16.2, которая поддерживает:
-//     - netstandard2.0  → совместима с .NET Framework 4.7.2+
-//     - net6.0          → совместима с современными рантаймами
-//   Версии 0.16+ требуют .NET 8 и НЕ работают в Primo RPA на .NET Framework.
+//   Используется Tomlyn версии 2.4.0 (netstandard2.0), совместима с .NET Framework 4.8.1.
 //
 //   В .csproj укажите:
-//     <PackageReference Include="Tomlyn" Version="0.10.1" />
+//     <package id="Tomlyn" version="2.4.0" targetFramework="net481" />
 //
-// Отличия Tomlyn 0.10.x от 0.16.x (важно для совместимости):
-//   - Toml.ToModel(string) — есть в обеих версиях, API совпадает
-//   - TomlTable, TomlArray, TomlTableArray — есть в обеих, API совпадает
-//   - DateTimeOffset — в 0.10.x НЕТ, вместо него Tomlyn.Syntax.TomlDateTime
-//     (структура с полями DateTime и Kind: Local / LocalDate / LocalTime / Offset)
-//   - В 0.10.x TomlTableArray реализует IList<TomlTable>, перебираем через foreach
+//   API v2.x замена для v0.16.x:
+//     - Toml.ToModel(string)        → TomlSerializer.Deserialize<TomlTable>(string, default)
+//     - Toml.FromModel(TomlTable)    → TomlSerializer.Serialize(TomlTable)
+//     - TomlTable, TomlArray, TomlTableArray — без изменений
 //
 // Поддерживаемые режимы (TomlReadMode):
 //   1. SingleValue         — одно значение по ключу с вложенностью (a.b.c)
@@ -567,20 +562,18 @@ ReadProfile         — мёрж [default] + [production/staging/...]
         }
 
         // =========================================================================
-        // ПАРСИНГ ФАЙЛА ЧЕРЕЗ TOMLYN 0.10.1
+        // ПАРСИНГ ФАЙЛА ЧЕРЕЗ TOMLYN 2.4.0
         // =========================================================================
 
         /// <summary>
-        /// Читает файл и парсит через Toml.ToModel() в TomlTable.
-        /// API совместимо между Tomlyn 0.10.x и 0.16.x.
+        /// Читает файл и парсит через TomlSerializer.Deserialize() в TomlTable.
         /// </summary>
         private TomlTable ParseTomlFile(string filePath, string encodingName)
         {
             Encoding fileEncoding = ResolveEncoding(encodingName);
             string tomlContent = File.ReadAllText(filePath, fileEncoding);
 
-            // Toml.ToModel присутствует в обеих версиях Tomlyn
-            return Toml.ToModel(tomlContent);
+            return TomlSerializer.Deserialize<TomlTable>(tomlContent, default(TomlSerializerOptions));
         }
 
         /// <summary>

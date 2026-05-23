@@ -21,15 +21,17 @@
 
 > **Важно — совместимость версий Tomlyn:**
 >
-> | Версия | Работает в Primo RPA | Причина |
+> | Версия | Работает на .NET Framework 4.6.1 | Причина |
 > |--------|----------------------|---------|
 > | **0.9.1** | ✅ Работает | Проверено, содержит `netstandard2.0` |
 > | 0.10.1 | ⚠️ Только с `AssetTargetFallback` | NuGet выбирает `net6.0` |
 > | 0.16.2 | ⚠️ Только с `AssetTargetFallback` | NuGet выбирает `net6.0` |
-> | 0.16.3 | ❌ | Только `net8.0`, нет `netstandard2.0` |
+> | 0.17.0–0.20.0 | ✅ Работает | Содержат `netstandard2.0` |
+> | **2.4.0** | ✅ Работает (текущая) | API v2, `TomlSerializer.Deserialize<TomlTable>()` |
 >
-> Без `AssetTargetFallback` NuGet выбирает `net6.0` сборку вместо `netstandard2.0`,
-> что приводит к ошибке `System.Runtime Version=6.0.0.0 не найден`.
+> Для версий 0.17.0+ Tomlyn продолжает поставлять `netstandard2.0` сборку.
+> Начиная с v1.0.0 (март 2026) API изменён: `Toml.ToModel()` → `TomlSerializer.Deserialize()`.
+> Tomlyn v1+ поддерживает только TOML 1.1.
 
 ---
 
