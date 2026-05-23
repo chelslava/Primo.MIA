@@ -222,13 +222,13 @@ namespace Primo.MIA
 
         #region Prop_RowCount
 
-        private int _propRowCount;
+        private string _propRowCount;
 
-        /// <summary>Количество строк в исходной таблице.</summary>
+        /// <summary>Имя переменной для записи количества строк исходной таблицы.</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
         [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_RowCount)]
-        public int Prop_RowCount
+        public string Prop_RowCount
         {
             get => _propRowCount;
             set { _propRowCount = value; InvokePropertyChanged(this, nameof(Prop_RowCount)); }
@@ -238,13 +238,13 @@ namespace Primo.MIA
 
         #region Prop_ColumnCount
 
-        private int _propColumnCount;
+        private string _propColumnCount;
 
-        /// <summary>Количество столбцов в исходной таблице.</summary>
+        /// <summary>Имя переменной для записи количества столбцов исходной таблицы.</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
         [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_ColumnCount)]
-        public int Prop_ColumnCount
+        public string Prop_ColumnCount
         {
             get => _propColumnCount;
             set { _propColumnCount = value; InvokePropertyChanged(this, nameof(Prop_ColumnCount)); }
@@ -364,14 +364,14 @@ namespace Primo.MIA
                     };
                 }
 
-                this.Prop_RowCount = result.RowCount;
-                this.Prop_ColumnCount = result.ColumnCount;
-                this.Prop_HtmlOutput = result.Html;
+                SetVariableValue(this.Prop_RowCount, result.RowCount, sd);
+                SetVariableValue(this.Prop_ColumnCount, result.ColumnCount, sd);
+                SetVariableValue(this.Prop_HtmlOutput, result.Html, sd);
 
                 return new ExecutionResult
                 {
                     IsSuccess = true,
-                    SuccessMessage = $"HTML таблица создана: {this.Prop_RowCount} строк, {this.Prop_ColumnCount} столбцов"
+                    SuccessMessage = $"HTML таблица создана: {result.RowCount} строк, {result.ColumnCount} столбцов"
                 };
             }
             catch (ArgumentException ex)
