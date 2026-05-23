@@ -22,6 +22,8 @@ namespace Primo.MIA
     /// </summary>
     public class XmlQueryBack : PrimoComponentTO<XmlQuery>
     {
+        private readonly XmlQueryLogic _logic = new XmlQueryLogic();
+
         // ── Свойства SDK ──────────────────────────────────────────────────
 
         /// <summary>
@@ -238,17 +240,8 @@ namespace Primo.MIA
                 string nsPrefix = GetPropertyValue<string>(this.Prop_NamespacePrefix, nameof(Prop_NamespacePrefix), sd);
                 string nsUri = GetPropertyValue<string>(this.Prop_NamespaceUri, nameof(Prop_NamespaceUri), sd);
 
-                // ── Парсинг XML ───────────────────────────────────────────
-                var doc = XDocument.Parse(xmlString);
-                var navigator = doc.CreateNavigator();
-
-                // ── Настройка namespace (если задан) ──────────────────────
-                // Для XPath запросов с namespace требуется XmlNamespaceManager.
-                // Текущая реализация поддерживает только простые XPath без namespace.
-                // Если нужны namespace, используйте полный путь с префиксами в XPath.
-
                 // ── Выполнение в зависимости от режима ────────────────────
-                string resultMsg = ExecuteQueryMode(sd, navigator, xpath, nsPrefix, nsUri);
+                string resultMsg = ExecuteQueryMode(sd, xmlString, xpath, nsPrefix, nsUri);
 
                 return new ExecutionResult
                 {
@@ -284,34 +277,18 @@ namespace Primo.MIA
 
         // ── Приватные методы ──────────────────────────────────────────────
 
-        /// <summary>
-        /// Выполняет запрос в зависимости от режима.
-        /// </summary>
-        /// <param name="sd">Данные скрипта.</param>
-        /// <param name="navigator">XPath навигатор по XML документу.</param>
-        /// <param name="xpath">XPath выражение.</param>
-        /// <param name="nsPrefix">Префикс пространства имён (опционально).</param>
-        /// <param name="nsUri">URI пространства имён (опционально).</param>
-        private string ExecuteQueryMode(ScriptingData sd, XPathNavigator navigator, string xpath, string nsPrefix, string nsUri)
+        private string ExecuteQueryMode(ScriptingData sd, string xmlString, string xpath, string nsPrefix, string nsUri)
         {
-            // Если заданы параметры namespace, создаём XmlNamespaceManager
-            System.Xml.XmlNamespaceManager nsManager = null;
-            if (!string.IsNullOrWhiteSpace(nsPrefix) && !string.IsNullOrWhiteSpace(nsUri))
-            {
-                nsManager = new System.Xml.XmlNamespaceManager(navigator.NameTable);
-                nsManager.AddNamespace(nsPrefix, nsUri);
-            }
-
             switch (this.Prop_QueryMode)
             {
                 case XmlQueryMode.SingleValue:
-                    return QuerySingleValue(sd, navigator, xpath, nsManager);
+                    return QuerySingleValue(sd, xmlString, xpath, nsPrefix, nsUri);
 
                 case XmlQueryMode.List:
-                    return QueryList(sd, navigator, xpath, nsManager);
+                    return QueryList(sd, xmlString, xpath, nsPrefix, nsUri);
 
                 case XmlQueryMode.Count:
-                    return QueryCount(sd, navigator, xpath, nsManager);
+                    return QueryCount(sd, xmlString, xpath, nsPrefix, nsUri);
 
                 default:
                     throw new ArgumentOutOfRangeException(nameof(Prop_QueryMode),
@@ -319,20 +296,11 @@ namespace Primo.MIA
             }
         }
 
-        /// <summary>
-        /// Возвращает одно значение.
-        /// </summary>
-        /// <param name="sd">Данные скрипта.</param>
-        /// <param name="navigator">XPath навигатор.</param>
-        /// <param name="xpath">XPath выражение.</param>
-        /// <param name="nsManager">Менеджер пространств имён (может быть null).</param>
-        private string QuerySingleValue(ScriptingData sd, XPathNavigator navigator, string xpath, System.Xml.XmlNamespaceManager nsManager)
+        private string QuerySingleValue(ScriptingData sd, string xmlString, string xpath, string nsPrefix, string nsUri)
         {
-            var result = nsManager != null
-                ? navigator.SelectSingleNode(xpath, nsManager)
-                : navigator.SelectSingleNode(xpath);
+            string value = _logic.QuerySingleValue(xmlString, xpath, nsPrefix, nsUri);
 
-            if (result == null)
+            if (value == null)
             {
                 if (!string.IsNullOrWhiteSpace(this.Prop_Result))
                     SetVariableValue<string>(this.Prop_Result, null, sd);
@@ -343,8 +311,6 @@ namespace Primo.MIA
                 return $"[Одно значение] Элемент не найден: {xpath}";
             }
 
-            string value = result.Value;
-
             if (!string.IsNullOrWhiteSpace(this.Prop_Result))
                 SetVariableValue(this.Prop_Result, value, sd);
 
@@ -354,24 +320,9 @@ namespace Primo.MIA
             return $"[Одно значение] Найдено: {value}";
         }
 
-        /// <summary>
-        /// Возвращает список значений.
-        /// </summary>
-        /// <param name="sd">Данные скрипта.</param>
-        /// <param name="navigator">XPath навигатор.</param>
-        /// <param name="xpath">XPath выражение.</param>
-        /// <param name="nsManager">Менеджер пространств имён (может быть null).</param>
-        private string QueryList(ScriptingData sd, XPathNavigator navigator, string xpath, System.Xml.XmlNamespaceManager nsManager)
+        private string QueryList(ScriptingData sd, string xmlString, string xpath, string nsPrefix, string nsUri)
         {
-            var iterator = nsManager != null
-                ? navigator.Select(xpath, nsManager)
-                : navigator.Select(xpath);
-            var results = new List<string>();
-
-            while (iterator.MoveNext())
-            {
-                results.Add(iterator.Current.Value);
-            }
+            var results = _logic.QueryList(xmlString, xpath, nsPrefix, nsUri);
 
             if (!string.IsNullOrWhiteSpace(this.Prop_Result))
                 SetVariableValue(this.Prop_Result, results, sd);
@@ -382,19 +333,9 @@ namespace Primo.MIA
             return $"[Список] Найдено элементов: {results.Count}";
         }
 
-        /// <summary>
-        /// Возвращает количество элементов.
-        /// </summary>
-        /// <param name="sd">Данные скрипта.</param>
-        /// <param name="navigator">XPath навигатор.</param>
-        /// <param name="xpath">XPath выражение.</param>
-        /// <param name="nsManager">Менеджер пространств имён (может быть null).</param>
-        private string QueryCount(ScriptingData sd, XPathNavigator navigator, string xpath, System.Xml.XmlNamespaceManager nsManager)
+        private string QueryCount(ScriptingData sd, string xmlString, string xpath, string nsPrefix, string nsUri)
         {
-            var iterator = nsManager != null
-                ? navigator.Select(xpath, nsManager)
-                : navigator.Select(xpath);
-            int count = iterator.Count;
+            int count = _logic.QueryCount(xmlString, xpath, nsPrefix, nsUri);
 
             if (!string.IsNullOrWhiteSpace(this.Prop_Result))
                 SetVariableValue(this.Prop_Result, count, sd);

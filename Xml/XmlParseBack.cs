@@ -21,6 +21,8 @@ namespace Primo.MIA
     /// </summary>
     public class XmlParseBack : PrimoComponentTO<XmlParse>
     {
+        private readonly XmlParseLogic _logic = new XmlParseLogic();
+
         // ── Свойства SDK ──────────────────────────────────────────────────
 
         /// <summary>
@@ -277,7 +279,7 @@ namespace Primo.MIA
         private string ParseToStructure(ScriptingData sd, string xmlString)
         {
             var doc = XDocument.Parse(xmlString);
-            var result = ElementToDictionary(doc.Root);
+            var result = _logic.ElementToDictionary(doc.Root);
 
             if (!string.IsNullOrWhiteSpace(this.Prop_Result))
                 SetVariableValue(this.Prop_Result, result, sd);
@@ -296,28 +298,18 @@ namespace Primo.MIA
         /// </summary>
         private string ValidateXml(ScriptingData sd, string xmlString)
         {
-            try
-            {
-                var doc = XDocument.Parse(xmlString);
+            string error, rootName;
+            bool isValid = _logic.ValidateXml(xmlString, out error, out rootName);
 
-                if (!string.IsNullOrWhiteSpace(this.Prop_IsValid))
-                    SetVariableValue(this.Prop_IsValid, true, sd);
+            if (!string.IsNullOrWhiteSpace(this.Prop_IsValid))
+                SetVariableValue(this.Prop_IsValid, isValid, sd);
 
-                if (!string.IsNullOrWhiteSpace(this.Prop_ParseError))
-                    SetVariableValue(this.Prop_ParseError, "", sd);
+            if (!string.IsNullOrWhiteSpace(this.Prop_ParseError))
+                SetVariableValue(this.Prop_ParseError, error, sd);
 
-                return $"[Валидация] XML валиден, корневой элемент: {doc.Root.Name.LocalName}";
-            }
-            catch (Exception ex)
-            {
-                if (!string.IsNullOrWhiteSpace(this.Prop_IsValid))
-                    SetVariableValue(this.Prop_IsValid, false, sd);
-
-                if (!string.IsNullOrWhiteSpace(this.Prop_ParseError))
-                    SetVariableValue(this.Prop_ParseError, ex.Message, sd);
-
-                return $"[Валидация] XML невалиден: {ex.Message}";
-            }
+            return isValid
+                ? $"[Валидация] XML валиден, корневой элемент: {rootName}"
+                : $"[Валидация] XML невалиден: {error}";
         }
 
         /// <summary>
@@ -325,65 +317,12 @@ namespace Primo.MIA
         /// </summary>
         private string FormatXml(ScriptingData sd, string xmlString, string indentChars)
         {
-            var doc = XDocument.Parse(xmlString);
-            string formatted = doc.ToString(SaveOptions.None);
+            string formatted = _logic.FormatXml(xmlString);
 
             if (!string.IsNullOrWhiteSpace(this.Prop_Result))
                 SetVariableValue(this.Prop_Result, formatted, sd);
 
             return $"[Форматирование] XML отформатирован, длина: {formatted.Length}";
-        }
-
-        /// <summary>
-        /// Преобразует XElement в Dictionary.
-        /// </summary>
-        private Dictionary<string, object> ElementToDictionary(XElement element)
-        {
-            var result = new Dictionary<string, object>();
-
-            // Атрибуты
-            foreach (var attr in element.Attributes())
-            {
-                result[$"@{attr.Name.LocalName}"] = attr.Value;
-            }
-
-            // Дочерние элементы
-            var childGroups = new Dictionary<string, List<object>>();
-
-            foreach (var child in element.Elements())
-            {
-                string name = child.Name.LocalName;
-
-                if (!childGroups.ContainsKey(name))
-                    childGroups[name] = new List<object>();
-
-                // Если элемент имеет только текст — берём текст
-                if (!child.HasElements && !child.HasAttributes)
-                {
-                    childGroups[name].Add(child.Value);
-                }
-                else
-                {
-                    childGroups[name].Add(ElementToDictionary(child));
-                }
-            }
-
-            // Добавляем группы в результат
-            foreach (var group in childGroups)
-            {
-                if (group.Value.Count == 1)
-                    result[group.Key] = group.Value[0];
-                else
-                    result[group.Key] = group.Value;
-            }
-
-            // Текстовое содержимое
-            if (!string.IsNullOrWhiteSpace(element.Value) && !element.HasElements)
-            {
-                result["#text"] = element.Value.Trim();
-            }
-
-            return result;
         }
 
         // ── Валидация ─────────────────────────────────────────────────────

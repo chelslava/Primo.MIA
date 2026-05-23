@@ -26,6 +26,8 @@ namespace Primo.MIA
     /// </summary>
     public class JsonParseBack : PrimoComponentTO<JsonParse>
     {
+        private readonly JsonParseLogic _logic = new JsonParseLogic();
+
         // ── Свойства SDK ──────────────────────────────────────────────────
 
         /// <summary>
@@ -266,12 +268,12 @@ namespace Primo.MIA
                 switch (this.Prop_Mode)
                 {
                     case JsonParseMode.ToDictionary:
-                        result = ParseToDictionary(json);
+                        result = _logic.ParseToDictionary(json);
                         successMessage = "преобразован в Dictionary";
                         break;
 
                     case JsonParseMode.ToList:
-                        result = ParseToList(json);
+                        result = _logic.ParseToList(json);
                         successMessage = "преобразован в List";
                         break;
 
@@ -281,7 +283,7 @@ namespace Primo.MIA
                         break;
 
                     case JsonParseMode.Format:
-                        result = HttpHelper.FormatJson(json);
+                        result = _logic.FormatJson(json);
                         successMessage = "отформатирован";
                         break;
 
@@ -329,101 +331,6 @@ namespace Primo.MIA
                     IsSuccess = false,
                     ErrorMessage = $"Ошибка [JSON: Парсинг]: {ex.Message}"
                 };
-            }
-        }
-
-        // ── Приватные методы ──────────────────────────────────────────────
-
-        /// <summary>
-        /// Парсит JSON-объект в Dictionary.
-        /// </summary>
-        private Dictionary<string, object> ParseToDictionary(string json)
-        {
-            var jObject = JObject.Parse(json);
-            return JObjectToDictionary(jObject);
-        }
-
-        /// <summary>
-        /// Парсит JSON-массив в List.
-        /// </summary>
-        private List<object> ParseToList(string json)
-        {
-            var jArray = JArray.Parse(json);
-            return JArrayToList(jArray);
-        }
-
-        /// <summary>
-        /// Рекурсивно преобразует JObject в Dictionary.
-        /// </summary>
-        private Dictionary<string, object> JObjectToDictionary(JObject jObject)
-        {
-            var result = new Dictionary<string, object>();
-
-            foreach (var property in jObject.Properties())
-            {
-                result[property.Name] = JTokenToObject(property.Value);
-            }
-
-            return result;
-        }
-
-        /// <summary>
-        /// Рекурсивно преобразует JArray в List.
-        /// </summary>
-        private List<object> JArrayToList(JArray jArray)
-        {
-            var result = new List<object>();
-
-            foreach (var item in jArray)
-            {
-                result.Add(JTokenToObject(item));
-            }
-
-            return result;
-        }
-
-        /// <summary>
-        /// Преобразует JToken в соответствующий .NET тип.
-        /// </summary>
-        private object JTokenToObject(JToken token)
-        {
-            switch (token.Type)
-            {
-                case JTokenType.Object:
-                    return JObjectToDictionary((JObject)token);
-
-                case JTokenType.Array:
-                    return JArrayToList((JArray)token);
-
-                case JTokenType.String:
-                    return token.ToString();
-
-                case JTokenType.Integer:
-                    return token.Value<long>();
-
-                case JTokenType.Float:
-                    return token.Value<double>();
-
-                case JTokenType.Boolean:
-                    return token.Value<bool>();
-
-                case JTokenType.Null:
-                    return null;
-
-                case JTokenType.Date:
-                    return token.Value<DateTime>();
-
-                case JTokenType.Guid:
-                    return token.Value<Guid>();
-
-                case JTokenType.Uri:
-                    return token.Value<Uri>();
-
-                case JTokenType.TimeSpan:
-                    return token.Value<TimeSpan>();
-
-                default:
-                    return token.ToString();
             }
         }
 

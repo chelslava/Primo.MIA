@@ -518,7 +518,11 @@
     <Compile Include="Browser\BrowserException.cs" />
     <Compile Include="HttpWeb\HttpActivityException.cs" />
     <Compile Include="Json\JsonActivityException.cs" />
+    <Compile Include="Json\JsonParseLogic.cs" />
+    <Compile Include="Json\JsonQueryLogic.cs" />
     <Compile Include="Xml\XmlActivityException.cs" />
+    <Compile Include="Xml\XmlParseLogic.cs" />
+    <Compile Include="Xml\XmlQueryLogic.cs" />
     <Compile Include="Files\FileActivityException.cs" />
     <Compile Include="Text\TextActivityException.cs" />
     <Compile Include="Utilities\UtilityException.cs" />

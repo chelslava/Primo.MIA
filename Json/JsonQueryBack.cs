@@ -30,6 +30,8 @@ namespace Primo.MIA
     /// </summary>
     public class JsonQueryBack : PrimoComponentTO<JsonQuery>
     {
+        private readonly JsonQueryLogic _logic = new JsonQueryLogic();
+
         // ── Свойства SDK ──────────────────────────────────────────────────
 
         /// <summary>
@@ -238,43 +240,22 @@ namespace Primo.MIA
                     throw new ArgumentException("Невалидный JSON формат");
 
                 // ── Выполнение JSONPath запроса ───────────────────────────
-                var jToken = JToken.Parse(json);
-                var results = jToken.SelectTokens(jsonPath).ToList();
-
-                int count = results.Count;
-                bool found = count > 0;
-
-                // ── Формирование результата ──────────────────────────────
-                object result = null;
-
-                if (found)
-                {
-                    if (this.Prop_ReturnFirst)
-                    {
-                        // Возвращаем только первое значение
-                        result = JTokenToObject(results[0]);
-                    }
-                    else
-                    {
-                        // Возвращаем список всех значений
-                        result = results.Select(JTokenToObject).ToList();
-                    }
-                }
+                var queryResult = _logic.Query(json, jsonPath, this.Prop_ReturnFirst);
 
                 // ── Запись выходных параметров ────────────────────────────
-                if (!string.IsNullOrWhiteSpace(this.Prop_Result) && result != null)
-                    SetVariableValue(this.Prop_Result, result, sd);
+                if (!string.IsNullOrWhiteSpace(this.Prop_Result) && queryResult.Result != null)
+                    SetVariableValue(this.Prop_Result, queryResult.Result, sd);
 
                 if (!string.IsNullOrWhiteSpace(this.Prop_Count))
-                    SetVariableValue(this.Prop_Count, count, sd);
+                    SetVariableValue(this.Prop_Count, queryResult.Count, sd);
 
                 if (!string.IsNullOrWhiteSpace(this.Prop_Found))
-                    SetVariableValue(this.Prop_Found, found, sd);
+                    SetVariableValue(this.Prop_Found, queryResult.Found, sd);
 
                 return new ExecutionResult
                 {
                     IsSuccess = true,
-                    SuccessMessage = $"[JSON: Запрос] Найдено {count} элементов по пути {jsonPath}"
+                    SuccessMessage = $"[JSON: Запрос] Найдено {queryResult.Count} элементов по пути {jsonPath}"
                 };
             }
             catch (JsonException jex)
@@ -301,83 +282,6 @@ namespace Primo.MIA
                     ErrorMessage = $"Ошибка [JSON: Запрос]: {ex.Message}"
                 };
             }
-        }
-
-        // ── Приватные методы ──────────────────────────────────────────────
-
-        /// <summary>
-        /// Преобразует JToken в соответствующий .NET тип.
-        /// </summary>
-        private object JTokenToObject(JToken token)
-        {
-            switch (token.Type)
-            {
-                case JTokenType.Object:
-                    return JObjectToDictionary((JObject)token);
-
-                case JTokenType.Array:
-                    return JArrayToList((JArray)token);
-
-                case JTokenType.String:
-                    return token.ToString();
-
-                case JTokenType.Integer:
-                    return token.Value<long>();
-
-                case JTokenType.Float:
-                    return token.Value<double>();
-
-                case JTokenType.Boolean:
-                    return token.Value<bool>();
-
-                case JTokenType.Null:
-                    return null;
-
-                case JTokenType.Date:
-                    return token.Value<DateTime>();
-
-                case JTokenType.Guid:
-                    return token.Value<Guid>();
-
-                case JTokenType.Uri:
-                    return token.Value<Uri>();
-
-                case JTokenType.TimeSpan:
-                    return token.Value<TimeSpan>();
-
-                default:
-                    return token.ToString();
-            }
-        }
-
-        /// <summary>
-        /// Рекурсивно преобразует JObject в Dictionary.
-        /// </summary>
-        private Dictionary<string, object> JObjectToDictionary(JObject jObject)
-        {
-            var result = new Dictionary<string, object>();
-
-            foreach (var property in jObject.Properties())
-            {
-                result[property.Name] = JTokenToObject(property.Value);
-            }
-
-            return result;
-        }
-
-        /// <summary>
-        /// Рекурсивно преобразует JArray в List.
-        /// </summary>
-        private List<object> JArrayToList(JArray jArray)
-        {
-            var result = new List<object>();
-
-            foreach (var item in jArray)
-            {
-                result.Add(JTokenToObject(item));
-            }
-
-            return result;
         }
 
         // ── Валидация ─────────────────────────────────────────────────────
