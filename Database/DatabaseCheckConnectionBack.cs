@@ -1,3 +1,7 @@
+// =============================================================================
+// DatabaseCheckConnectionBack.cs — активность «Database: Проверить подключение (CheckConnection)».
+// Открывает соединение с БД через ADO.NET провайдер, читает версию сервера и немедленно закрывает.
+// =============================================================================
 using LTools.Common.Model;
 using LTools.Common.UIElements;
 using LTools.SDK;
@@ -29,6 +33,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
         [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_DbProviderInvariantName)]
+        /// <summary>Инвариантное имя ADO.NET провайдера (например, System.Data.SqlClient).</summary>
         public string Prop_ProviderInvariantName
         {
             get => _propProviderInvariantName;
@@ -39,6 +44,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
         [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_ConnectionString)]
+        /// <summary>Строка подключения к базе данных.</summary>
         public string Prop_ConnectionString
         {
             get => _propConnectionString;
@@ -49,6 +55,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
         [System.ComponentModel.Category(ActivityStrings.Category_Settings), System.ComponentModel.DisplayName(ActivityStrings.Field_CommandTimeoutSeconds)]
+        /// <summary>Таймаут попытки подключения в секундах.</summary>
         public string Prop_CommandTimeoutSeconds
         {
             get => _propCommandTimeoutSeconds;
@@ -59,6 +66,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(bool))]
         [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_IsAvailable)]
+        /// <summary>Признак успешного подключения к базе данных.</summary>
         public string Prop_IsAvailable
         {
             get => _propIsAvailable;
@@ -69,6 +77,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
         [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_ServerVersion)]
+        /// <summary>Версия сервера базы данных, возвращённая при успешном подключении.</summary>
         public string Prop_ServerVersion
         {
             get => _propServerVersion;
@@ -79,6 +88,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
         [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_ElapsedMs)]
+        /// <summary>Длительность проверки подключения в миллисекундах.</summary>
         public string Prop_ElapsedMs
         {
             get => _propElapsedMs;
@@ -89,6 +99,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
         [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_ErrorText)]
+        /// <summary>Текст ошибки подключения; пустая строка при успехе.</summary>
         public string Prop_ErrorText
         {
             get => _propErrorText;
@@ -138,6 +149,24 @@ namespace Primo.MIA
                         SuccessMessage = $"Подключение к БД успешно. Версия сервера: {connection.ServerVersion}"
                     };
                 }
+            }
+            catch (System.Data.Common.DbException ex)
+            {
+                stopwatch.Stop();
+                SetVariableValue(Prop_IsAvailable, false, sd);
+                SetVariableValue(Prop_ServerVersion, string.Empty, sd);
+                SetVariableValue(Prop_ElapsedMs, (int)stopwatch.ElapsedMilliseconds, sd);
+                SetVariableValue(Prop_ErrorText, ex.Message, sd);
+                return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Ошибка БД: {ex.Message}" };
+            }
+            catch (InvalidOperationException ex)
+            {
+                stopwatch.Stop();
+                SetVariableValue(Prop_IsAvailable, false, sd);
+                SetVariableValue(Prop_ServerVersion, string.Empty, sd);
+                SetVariableValue(Prop_ElapsedMs, (int)stopwatch.ElapsedMilliseconds, sd);
+                SetVariableValue(Prop_ErrorText, ex.Message, sd);
+                return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Недопустимая операция: {ex.Message}" };
             }
             catch (Exception ex)
             {

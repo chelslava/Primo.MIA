@@ -31,7 +31,7 @@ namespace Primo.MIA
         public string Prop_List
         {
             get => _propList;
-            set { _propList = value; InvokePropertyChanged(this, "Prop_List"); }
+            set { _propList = value; InvokePropertyChanged(this, nameof(Prop_List)); }
         }
 
         private string _propSearchValue;
@@ -42,7 +42,7 @@ namespace Primo.MIA
         public string Prop_SearchValue
         {
             get => _propSearchValue;
-            set { _propSearchValue = value; InvokePropertyChanged(this, "Prop_SearchValue"); }
+            set { _propSearchValue = value; InvokePropertyChanged(this, nameof(Prop_SearchValue)); }
         }
 
         private bool _caseSensitive = false;
@@ -51,7 +51,7 @@ namespace Primo.MIA
         public bool Prop_CaseSensitive
         {
             get => _caseSensitive;
-            set { _caseSensitive = value; InvokePropertyChanged(this, "Prop_CaseSensitive"); }
+            set { _caseSensitive = value; InvokePropertyChanged(this, nameof(Prop_CaseSensitive)); }
         }
 
         // — OUTPUT: базовая статистика —
@@ -60,31 +60,31 @@ namespace Primo.MIA
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
         [System.ComponentModel.Category(ActivityStrings.Category_Statistics), System.ComponentModel.DisplayName(ActivityStrings.Field_TotalCount)]
-        public string Prop_TotalCount { get => _propTotalCount; set { _propTotalCount = value; InvokePropertyChanged(this, "Prop_TotalCount"); } }
+        public string Prop_TotalCount { get => _propTotalCount; set { _propTotalCount = value; InvokePropertyChanged(this, nameof(Prop_TotalCount)); } }
 
         private string _propUniqueCount;
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
         [System.ComponentModel.Category(ActivityStrings.Category_Statistics), System.ComponentModel.DisplayName(ActivityStrings.Field_UniqueCount)]
-        public string Prop_UniqueCount { get => _propUniqueCount; set { _propUniqueCount = value; InvokePropertyChanged(this, "Prop_UniqueCount"); } }
+        public string Prop_UniqueCount { get => _propUniqueCount; set { _propUniqueCount = value; InvokePropertyChanged(this, nameof(Prop_UniqueCount)); } }
 
         private string _propEmptyCount;
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
         [System.ComponentModel.Category(ActivityStrings.Category_Statistics), System.ComponentModel.DisplayName(ActivityStrings.Field_EmptyCount)]
-        public string Prop_EmptyCount { get => _propEmptyCount; set { _propEmptyCount = value; InvokePropertyChanged(this, "Prop_EmptyCount"); } }
+        public string Prop_EmptyCount { get => _propEmptyCount; set { _propEmptyCount = value; InvokePropertyChanged(this, nameof(Prop_EmptyCount)); } }
 
         private string _propHasDuplicates;
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(bool))]
         [System.ComponentModel.Category(ActivityStrings.Category_Statistics), System.ComponentModel.DisplayName(ActivityStrings.Field_HasDuplicates)]
-        public string Prop_HasDuplicates { get => _propHasDuplicates; set { _propHasDuplicates = value; InvokePropertyChanged(this, "Prop_HasDuplicates"); } }
+        public string Prop_HasDuplicates { get => _propHasDuplicates; set { _propHasDuplicates = value; InvokePropertyChanged(this, nameof(Prop_HasDuplicates)); } }
 
         private string _propDuplicates;
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(List<string>))]
         [System.ComponentModel.Category(ActivityStrings.Category_Statistics), System.ComponentModel.DisplayName(ActivityStrings.Field_Duplicates)]
-        public string Prop_Duplicates { get => _propDuplicates; set { _propDuplicates = value; InvokePropertyChanged(this, "Prop_Duplicates"); } }
+        public string Prop_Duplicates { get => _propDuplicates; set { _propDuplicates = value; InvokePropertyChanged(this, nameof(Prop_Duplicates)); } }
 
         // — OUTPUT: статистика длин —
 
@@ -92,19 +92,19 @@ namespace Primo.MIA
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
         [System.ComponentModel.Category(ActivityStrings.Category_Lengths), System.ComponentModel.DisplayName(ActivityStrings.Field_MinLength)]
-        public string Prop_MinLength { get => _propMinLength; set { _propMinLength = value; InvokePropertyChanged(this, "Prop_MinLength"); } }
+        public string Prop_MinLength { get => _propMinLength; set { _propMinLength = value; InvokePropertyChanged(this, nameof(Prop_MinLength)); } }
 
         private string _propMaxLength;
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
         [System.ComponentModel.Category(ActivityStrings.Category_Lengths), System.ComponentModel.DisplayName(ActivityStrings.Field_MaxLength)]
-        public string Prop_MaxLength { get => _propMaxLength; set { _propMaxLength = value; InvokePropertyChanged(this, "Prop_MaxLength"); } }
+        public string Prop_MaxLength { get => _propMaxLength; set { _propMaxLength = value; InvokePropertyChanged(this, nameof(Prop_MaxLength)); } }
 
         private string _propAvgLength;
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(double))]
         [System.ComponentModel.Category(ActivityStrings.Category_Lengths), System.ComponentModel.DisplayName(ActivityStrings.Field_AvgLength)]
-        public string Prop_AvgLength { get => _propAvgLength; set { _propAvgLength = value; InvokePropertyChanged(this, "Prop_AvgLength"); } }
+        public string Prop_AvgLength { get => _propAvgLength; set { _propAvgLength = value; InvokePropertyChanged(this, nameof(Prop_AvgLength)); } }
 
         // — OUTPUT: поиск —
 
@@ -112,25 +112,25 @@ namespace Primo.MIA
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(bool))]
         [System.ComponentModel.Category(ActivityStrings.Category_Search), System.ComponentModel.DisplayName(ActivityStrings.Field_Contains)]
-        public string Prop_Contains { get => _propContains; set { _propContains = value; InvokePropertyChanged(this, "Prop_Contains"); } }
+        public string Prop_Contains { get => _propContains; set { _propContains = value; InvokePropertyChanged(this, nameof(Prop_Contains)); } }
 
         private string _propFirstIndex;
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
         [System.ComponentModel.Category(ActivityStrings.Category_Search), System.ComponentModel.DisplayName(ActivityStrings.Field_FirstIndex)]
-        public string Prop_FirstIndex { get => _propFirstIndex; set { _propFirstIndex = value; InvokePropertyChanged(this, "Prop_FirstIndex"); } }
+        public string Prop_FirstIndex { get => _propFirstIndex; set { _propFirstIndex = value; InvokePropertyChanged(this, nameof(Prop_FirstIndex)); } }
 
         private string _propAllIndexes;
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(List<int>))]
         [System.ComponentModel.Category(ActivityStrings.Category_Search), System.ComponentModel.DisplayName(ActivityStrings.Field_AllIndexes)]
-        public string Prop_AllIndexes { get => _propAllIndexes; set { _propAllIndexes = value; InvokePropertyChanged(this, "Prop_AllIndexes"); } }
+        public string Prop_AllIndexes { get => _propAllIndexes; set { _propAllIndexes = value; InvokePropertyChanged(this, nameof(Prop_AllIndexes)); } }
 
         private string _propOccurrenceCount;
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
         [System.ComponentModel.Category(ActivityStrings.Category_Search), System.ComponentModel.DisplayName(ActivityStrings.Field_OccurrenceCount)]
-        public string Prop_OccurrenceCount { get => _propOccurrenceCount; set { _propOccurrenceCount = value; InvokePropertyChanged(this, "Prop_OccurrenceCount"); } }
+        public string Prop_OccurrenceCount { get => _propOccurrenceCount; set { _propOccurrenceCount = value; InvokePropertyChanged(this, nameof(Prop_OccurrenceCount)); } }
 
         public ListInspectBack(IWFContainer container) : base(container)
         {
@@ -256,6 +256,14 @@ namespace Primo.MIA
                     IsSuccess = true,
                     SuccessMessage = $"Анализ: всего {totalCount}, уникальных {uniqueCount}, дублей {duplicates.Count}"
                 };
+            }
+            catch (ArgumentException ex)
+            {
+                return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Неверный аргумент: {ex.Message}" };
+            }
+            catch (InvalidOperationException ex)
+            {
+                return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Недопустимая операция: {ex.Message}" };
             }
             catch (Exception ex)
             {

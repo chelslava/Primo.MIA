@@ -1,3 +1,7 @@
+// =============================================================================
+// DatabaseQueryPagedBack.cs — активность «Database: Постраничный запрос (QueryPaged)».
+// Выполняет SQL-запрос с пагинацией, возвращая одну страницу результата и метаданные навигации.
+// =============================================================================
 using LTools.Common.Model;
 using LTools.Common.UIElements;
 using LTools.SDK;
@@ -29,6 +33,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
         [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_DbProviderInvariantName)]
+        /// <summary>Инвариантное имя ADO.NET провайдера (например, System.Data.SqlClient).</summary>
         public string Prop_ProviderInvariantName
         {
             get => _propProviderInvariantName;
@@ -39,6 +44,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
         [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_ConnectionString)]
+        /// <summary>Строка подключения к базе данных.</summary>
         public string Prop_ConnectionString
         {
             get => _propConnectionString;
@@ -49,6 +55,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
         [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_TransactionId)]
+        /// <summary>Идентификатор активной транзакции; если не задан, используется ambient-контекст или прямое соединение.</summary>
         public string Prop_TransactionId
         {
             get => _propTransactionId;
@@ -59,6 +66,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
         [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_CommandText)]
+        /// <summary>Исходный SQL-запрос, используемый как подзапрос для пагинации.</summary>
         public string Prop_CommandText
         {
             get => _propCommandText;
@@ -69,6 +77,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
         [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_OrderByExpression)]
+        /// <summary>Выражение ORDER BY для стабильной и воспроизводимой пагинации.</summary>
         public string Prop_OrderByExpression
         {
             get => _propOrderByExpression;
@@ -79,6 +88,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
         [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_PageNumber)]
+        /// <summary>Номер запрашиваемой страницы, начиная с 1.</summary>
         public string Prop_PageNumber
         {
             get => _propPageNumber;
@@ -89,6 +99,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
         [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_PageSize)]
+        /// <summary>Максимальное количество строк на одной странице.</summary>
         public string Prop_PageSize
         {
             get => _propPageSize;
@@ -99,6 +110,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(Dictionary<string, string>))]
         [System.ComponentModel.Category(ActivityStrings.Category_Parameters), System.ComponentModel.DisplayName(ActivityStrings.Field_ParametersDictionary)]
+        /// <summary>Словарь параметров SQL-запроса (имя → значение).</summary>
         public string Prop_Parameters
         {
             get => _propParameters;
@@ -109,6 +121,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
         [System.ComponentModel.Category(ActivityStrings.Category_Settings), System.ComponentModel.DisplayName(ActivityStrings.Field_CommandTimeoutSeconds)]
+        /// <summary>Таймаут выполнения запроса в секундах.</summary>
         public string Prop_CommandTimeoutSeconds
         {
             get => _propCommandTimeoutSeconds;
@@ -119,6 +132,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(DataTable))]
         [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_ResultTable)]
+        /// <summary>Страница результата в виде DataTable.</summary>
         public string Prop_ResultTable
         {
             get => _propResultTable;
@@ -129,6 +143,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
         [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_RowCount)]
+        /// <summary>Количество строк на текущей странице.</summary>
         public string Prop_RowCount
         {
             get => _propRowCount;
@@ -139,6 +154,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
         [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_TotalRows)]
+        /// <summary>Общее количество строк во всём результирующем наборе.</summary>
         public string Prop_TotalRows
         {
             get => _propTotalRows;
@@ -149,6 +165,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
         [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_TotalPages)]
+        /// <summary>Общее количество страниц при заданном размере страницы.</summary>
         public string Prop_TotalPages
         {
             get => _propTotalPages;
@@ -159,6 +176,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(bool))]
         [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_HasNextPage)]
+        /// <summary>Признак наличия следующей страницы после текущей.</summary>
         public string Prop_HasNextPage
         {
             get => _propHasNextPage;
@@ -169,6 +187,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(bool))]
         [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_HasPreviousPage)]
+        /// <summary>Признак наличия предыдущей страницы перед текущей.</summary>
         public string Prop_HasPreviousPage
         {
             get => _propHasPreviousPage;
@@ -235,6 +254,14 @@ namespace Primo.MIA
                     IsSuccess = true,
                     SuccessMessage = $"Получена страница {result.PageNumber} из {result.TotalPages}. Строк на странице: {result.ResultTable.Rows.Count}, всего: {result.TotalRows}"
                 };
+            }
+            catch (System.Data.Common.DbException ex)
+            {
+                return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Ошибка БД: {ex.Message}" };
+            }
+            catch (InvalidOperationException ex)
+            {
+                return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Недопустимая операция: {ex.Message}" };
             }
             catch (Exception ex)
             {

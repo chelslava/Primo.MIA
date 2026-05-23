@@ -479,6 +479,14 @@ namespace Primo.MIA
                                      $"({result.DayOfWeek.ToRussianName()})"
                 };
             }
+            catch (ArgumentException ex)
+            {
+                return Fail($"Неверный аргумент: {ex.Message}");
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Fail($"Недопустимая операция: {ex.Message}");
+            }
             catch (Exception ex)
             {
                 return Fail($"Ошибка поиска N-го рабочего дня: {ex.Message}");

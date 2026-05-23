@@ -1,4 +1,4 @@
-using LTools.Common.Model;
+﻿using LTools.Common.Model;
 using LTools.Common.UIElements;
 using LTools.SDK;
 using Primo.MIA.Common;
@@ -31,7 +31,7 @@ namespace Primo.MIA
         public string Prop_Dictionary
         {
             get => _propDictionary;
-            set { _propDictionary = value; InvokePropertyChanged(this, "Prop_Dictionary"); }
+            set { _propDictionary = value; InvokePropertyChanged(this, nameof(Prop_Dictionary)); }
         }
 
         private string _propSearchValue;
@@ -42,7 +42,7 @@ namespace Primo.MIA
         public string Prop_SearchValue
         {
             get => _propSearchValue;
-            set { _propSearchValue = value; InvokePropertyChanged(this, "Prop_SearchValue"); }
+            set { _propSearchValue = value; InvokePropertyChanged(this, nameof(Prop_SearchValue)); }
         }
 
         private bool _caseSensitive = false;
@@ -55,7 +55,7 @@ namespace Primo.MIA
         public bool Prop_CaseSensitive
         {
             get => _caseSensitive;
-            set { _caseSensitive = value; InvokePropertyChanged(this, "Prop_CaseSensitive"); }
+            set { _caseSensitive = value; InvokePropertyChanged(this, nameof(Prop_CaseSensitive)); }
         }
 
         private string _propResult;
@@ -66,7 +66,7 @@ namespace Primo.MIA
         public string Prop_Result
         {
             get => _propResult;
-            set { _propResult = value; InvokePropertyChanged(this, "Prop_Result"); }
+            set { _propResult = value; InvokePropertyChanged(this, nameof(Prop_Result)); }
         }
 
         private string _propFoundKeys;
@@ -80,7 +80,7 @@ namespace Primo.MIA
         public string Prop_FoundKeys
         {
             get => _propFoundKeys;
-            set { _propFoundKeys = value; InvokePropertyChanged(this, "Prop_FoundKeys"); }
+            set { _propFoundKeys = value; InvokePropertyChanged(this, nameof(Prop_FoundKeys)); }
         }
 
         public DictionaryContainsValueBack(IWFContainer container) : base(container)
@@ -126,6 +126,14 @@ namespace Primo.MIA
                 SetVariableValue(this.Prop_FoundKeys, result.Keys, sd);
 
                 return new ExecutionResult { IsSuccess = true, SuccessMessage = $"Значение '{searchVal}': найдено у {result.Count} ключей" };
+            }
+            catch (ArgumentException ex)
+            {
+                return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Неверный аргумент: {ex.Message}" };
+            }
+            catch (InvalidOperationException ex)
+            {
+                return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Недопустимая операция: {ex.Message}" };
             }
             catch (Exception ex)
             {

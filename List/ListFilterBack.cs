@@ -56,7 +56,7 @@ namespace Primo.MIA
         public string Prop_List
         {
             get => _propList;
-            set { _propList = value; InvokePropertyChanged(this, "Prop_List"); }
+            set { _propList = value; InvokePropertyChanged(this, nameof(Prop_List)); }
         }
 
         private ListFilterMode _mode = ListFilterMode.Contains;
@@ -66,7 +66,7 @@ namespace Primo.MIA
         public ListFilterMode Mode
         {
             get => _mode;
-            set { _mode = value; InvokePropertyChanged(this, "Mode"); }
+            set { _mode = value; InvokePropertyChanged(this, nameof(Mode)); }
         }
 
         private string _propPattern;
@@ -80,7 +80,7 @@ namespace Primo.MIA
         public string Prop_Pattern
         {
             get => _propPattern;
-            set { _propPattern = value; InvokePropertyChanged(this, "Prop_Pattern"); }
+            set { _propPattern = value; InvokePropertyChanged(this, nameof(Prop_Pattern)); }
         }
 
         private bool _caseSensitive = false;
@@ -94,7 +94,7 @@ namespace Primo.MIA
         public bool Prop_CaseSensitive
         {
             get => _caseSensitive;
-            set { _caseSensitive = value; InvokePropertyChanged(this, "Prop_CaseSensitive"); }
+            set { _caseSensitive = value; InvokePropertyChanged(this, nameof(Prop_CaseSensitive)); }
         }
 
         private string _propMinLength;
@@ -105,7 +105,7 @@ namespace Primo.MIA
         public string Prop_MinLength
         {
             get => _propMinLength;
-            set { _propMinLength = value; InvokePropertyChanged(this, "Prop_MinLength"); }
+            set { _propMinLength = value; InvokePropertyChanged(this, nameof(Prop_MinLength)); }
         }
 
         private string _propMaxLength;
@@ -116,7 +116,7 @@ namespace Primo.MIA
         public string Prop_MaxLength
         {
             get => _propMaxLength;
-            set { _propMaxLength = value; InvokePropertyChanged(this, "Prop_MaxLength"); }
+            set { _propMaxLength = value; InvokePropertyChanged(this, nameof(Prop_MaxLength)); }
         }
 
         // ── OUTPUT ─────────────────────────────────────────────────────────────
@@ -129,7 +129,7 @@ namespace Primo.MIA
         public string Prop_Matched
         {
             get => _propMatched;
-            set { _propMatched = value; InvokePropertyChanged(this, "Prop_Matched"); }
+            set { _propMatched = value; InvokePropertyChanged(this, nameof(Prop_Matched)); }
         }
 
         private string _propRejected;
@@ -140,7 +140,7 @@ namespace Primo.MIA
         public string Prop_Rejected
         {
             get => _propRejected;
-            set { _propRejected = value; InvokePropertyChanged(this, "Prop_Rejected"); }
+            set { _propRejected = value; InvokePropertyChanged(this, nameof(Prop_Rejected)); }
         }
 
         private string _propMatchedCount;
@@ -151,7 +151,7 @@ namespace Primo.MIA
         public string Prop_MatchedCount
         {
             get => _propMatchedCount;
-            set { _propMatchedCount = value; InvokePropertyChanged(this, "Prop_MatchedCount"); }
+            set { _propMatchedCount = value; InvokePropertyChanged(this, nameof(Prop_MatchedCount)); }
         }
 
         private string _propRejectedCount;
@@ -162,7 +162,7 @@ namespace Primo.MIA
         public string Prop_RejectedCount
         {
             get => _propRejectedCount;
-            set { _propRejectedCount = value; InvokePropertyChanged(this, "Prop_RejectedCount"); }
+            set { _propRejectedCount = value; InvokePropertyChanged(this, nameof(Prop_RejectedCount)); }
         }
 
         // ── КОНСТРУКТОР ────────────────────────────────────────────────────────
@@ -234,6 +234,14 @@ namespace Primo.MIA
                 SetVariableValue(this.Prop_RejectedCount, result.Rejected.Count, sd);
 
                 return new ExecutionResult { IsSuccess = true, SuccessMessage = $"Прошло: {result.Matched.Count}, отсеяно: {result.Rejected.Count}" };
+            }
+            catch (ArgumentException ex)
+            {
+                return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Неверный аргумент: {ex.Message}" };
+            }
+            catch (InvalidOperationException ex)
+            {
+                return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Недопустимая операция: {ex.Message}" };
             }
             catch (Exception ex)
             {

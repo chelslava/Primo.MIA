@@ -48,7 +48,7 @@ namespace Primo.MIA
         public string Prop_SessionId
         {
             get => _propSessionId;
-            set { _propSessionId = value; InvokePropertyChanged(this, "Prop_SessionId"); }
+            set { _propSessionId = value; InvokePropertyChanged(this, nameof(Prop_SessionId)); }
         }
 
         private string _propFilePath;
@@ -60,7 +60,7 @@ namespace Primo.MIA
         public string Prop_FilePath
         {
             get => _propFilePath;
-            set { _propFilePath = value; InvokePropertyChanged(this, "Prop_FilePath"); }
+            set { _propFilePath = value; InvokePropertyChanged(this, nameof(Prop_FilePath)); }
         }
 
         // ── Выходные параметры ─────────────────────────────────────────
@@ -74,7 +74,7 @@ namespace Primo.MIA
         public string Prop_Base64
         {
             get => _propBase64;
-            set { _propBase64 = value; InvokePropertyChanged(this, "Prop_Base64"); }
+            set { _propBase64 = value; InvokePropertyChanged(this, nameof(Prop_Base64)); }
         }
 
         // ── Конструктор ────────────────────────────────────────────────

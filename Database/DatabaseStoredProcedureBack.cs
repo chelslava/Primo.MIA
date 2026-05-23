@@ -1,3 +1,7 @@
+// =============================================================================
+// DatabaseStoredProcedureBack.cs — активность «Database: Хранимая процедура (StoredProcedure)».
+// Вызывает хранимую процедуру через ADO.NET с поддержкой input, output и return-параметров.
+// =============================================================================
 using LTools.Common.Model;
 using LTools.Common.UIElements;
 using LTools.SDK;
@@ -28,6 +32,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
         [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_DbProviderInvariantName)]
+        /// <summary>Инвариантное имя ADO.NET провайдера (например, System.Data.SqlClient).</summary>
         public string Prop_ProviderInvariantName
         {
             get => _propProviderInvariantName;
@@ -38,6 +43,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
         [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_ConnectionString)]
+        /// <summary>Строка подключения к базе данных.</summary>
         public string Prop_ConnectionString
         {
             get => _propConnectionString;
@@ -48,6 +54,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
         [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_TransactionId)]
+        /// <summary>Идентификатор активной транзакции; если не задан, используется ambient-контекст или прямое соединение.</summary>
         public string Prop_TransactionId
         {
             get => _propTransactionId;
@@ -58,6 +65,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
         [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_CommandText)]
+        /// <summary>Имя хранимой процедуры для выполнения.</summary>
         public string Prop_ProcedureName
         {
             get => _propProcedureName;
@@ -68,6 +76,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(Dictionary<string, string>))]
         [System.ComponentModel.Category(ActivityStrings.Category_Parameters), System.ComponentModel.DisplayName(ActivityStrings.Field_ParametersDictionary)]
+        /// <summary>Словарь входных параметров процедуры (имя → значение).</summary>
         public string Prop_InputParameters
         {
             get => _propInputParameters;
@@ -78,6 +87,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(List<string>))]
         [System.ComponentModel.Category(ActivityStrings.Category_Parameters), System.ComponentModel.DisplayName(ActivityStrings.Field_OutputParameterNames)]
+        /// <summary>Список имён output-параметров процедуры, значения которых нужно получить.</summary>
         public string Prop_OutputParameterNames
         {
             get => _propOutputParameterNames;
@@ -88,6 +98,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(Dictionary<string, string>))]
         [System.ComponentModel.Category(ActivityStrings.Category_Parameters), System.ComponentModel.DisplayName(ActivityStrings.Field_InputOutputParameters)]
+        /// <summary>Словарь параметров типа InputOutput процедуры (имя → начальное значение).</summary>
         public string Prop_InputOutputParameters
         {
             get => _propInputOutputParameters;
@@ -97,6 +108,7 @@ namespace Primo.MIA
         private bool _propIncludeReturnValue = true;
         [LTools.Common.Model.Serialization.StoringProperty]
         [System.ComponentModel.Category(ActivityStrings.Category_Optional), System.ComponentModel.DisplayName(ActivityStrings.Field_IncludeReturnValue)]
+        /// <summary>Получать return value процедуры.</summary>
         public bool Prop_IncludeReturnValue
         {
             get => _propIncludeReturnValue;
@@ -107,6 +119,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
         [System.ComponentModel.Category(ActivityStrings.Category_Settings), System.ComponentModel.DisplayName(ActivityStrings.Field_OutputParameterSize)]
+        /// <summary>Максимальный размер в символах для output/inputoutput строковых параметров.</summary>
         public string Prop_OutputParameterSize
         {
             get => _propOutputParameterSize;
@@ -117,6 +130,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
         [System.ComponentModel.Category(ActivityStrings.Category_Settings), System.ComponentModel.DisplayName(ActivityStrings.Field_CommandTimeoutSeconds)]
+        /// <summary>Таймаут выполнения процедуры в секундах.</summary>
         public string Prop_CommandTimeoutSeconds
         {
             get => _propCommandTimeoutSeconds;
@@ -127,6 +141,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(Dictionary<string, string>))]
         [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_OutputParameters)]
+        /// <summary>Словарь значений output-параметров, возвращённых процедурой.</summary>
         public string Prop_OutputParameters
         {
             get => _propOutputParameters;
@@ -137,6 +152,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
         [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_ReturnValue)]
+        /// <summary>Return value хранимой процедуры в виде строки.</summary>
         public string Prop_ReturnValue
         {
             get => _propReturnValue;
@@ -147,6 +163,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
         [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_AffectedRows)]
+        /// <summary>Количество строк, затронутых выполнением процедуры.</summary>
         public string Prop_AffectedRows
         {
             get => _propAffectedRows;
@@ -201,20 +218,37 @@ namespace Primo.MIA
                     outputParameterSize = 4000;
 
                 var transactionId = DatabaseTransactionResolver.ResolveOptional(explicitTransactionId);
-                var transactionHandle = DatabaseTransactionManager.Get(transactionId);
-                var executionResult = transactionHandle != null
-                    ? DatabaseHelper.ExecuteStoredProcedure(transactionHandle, procedureName, timeout, inputParameters, inputOutputParameters, outputParameterNames, outputParameterSize, Prop_IncludeReturnValue)
-                    : DatabaseHelper.ExecuteStoredProcedure(provider, connectionString, procedureName, timeout, inputParameters, inputOutputParameters, outputParameterNames, outputParameterSize, Prop_IncludeReturnValue);
 
-                SetVariableValue(Prop_OutputParameters, executionResult.OutputParameters ?? new Dictionary<string, string>(), sd);
-                SetVariableValue(Prop_ReturnValue, executionResult.ReturnValue ?? string.Empty, sd);
-                SetVariableValue(Prop_AffectedRows, executionResult.AffectedRows, sd);
+                var logic = new DatabaseStoredProcLogic();
+                var procResult = logic.Execute(provider, connectionString, transactionId, procedureName, timeout, inputParameters, inputOutputParameters, outputParameterNames, outputParameterSize, Prop_IncludeReturnValue);
+
+                var outputParams = new Dictionary<string, string>();
+                foreach (var kvp in procResult.OutputParams)
+                {
+                    if (kvp.Key != "__ReturnValue")
+                        outputParams[kvp.Key] = kvp.Value != null ? kvp.Value.ToString() : string.Empty;
+                }
+                var returnValue = procResult.OutputParams.ContainsKey("__ReturnValue")
+                    ? (procResult.OutputParams["__ReturnValue"] != null ? procResult.OutputParams["__ReturnValue"].ToString() : string.Empty)
+                    : string.Empty;
+
+                SetVariableValue(Prop_OutputParameters, outputParams, sd);
+                SetVariableValue(Prop_ReturnValue, returnValue, sd);
+                SetVariableValue(Prop_AffectedRows, procResult.RowCount, sd);
 
                 return new ExecutionResult
                 {
                     IsSuccess = true,
-                    SuccessMessage = $"Stored procedure выполнена. Output: {(executionResult.OutputParameters != null ? executionResult.OutputParameters.Count : 0)}, affected rows: {executionResult.AffectedRows}"
+                    SuccessMessage = $"Stored procedure выполнена. Output: {outputParams.Count}, affected rows: {procResult.RowCount}"
                 };
+            }
+            catch (System.Data.Common.DbException ex)
+            {
+                return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Ошибка БД: {ex.Message}" };
+            }
+            catch (InvalidOperationException ex)
+            {
+                return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Недопустимая операция: {ex.Message}" };
             }
             catch (Exception ex)
             {

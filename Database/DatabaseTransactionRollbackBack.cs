@@ -1,3 +1,7 @@
+// =============================================================================
+// DatabaseTransactionRollbackBack.cs — активность «Database: Откатить транзакцию (TransactionRollback)».
+// Откатывает транзакцию по явному идентификатору или текущему ambient-контексту модуля.
+// =============================================================================
 using LTools.Common.Model;
 using LTools.Common.UIElements;
 using LTools.SDK;
@@ -22,6 +26,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
         [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_TransactionId)]
+        /// <summary>Идентификатор транзакции для отката; если не задан, используется ambient-контекст.</summary>
         public string Prop_TransactionId
         {
             get => _propTransactionId;
@@ -56,6 +61,14 @@ namespace Primo.MIA
                     IsSuccess = true,
                     SuccessMessage = $"Транзакция откатена: {transactionId}"
                 };
+            }
+            catch (System.Data.Common.DbException ex)
+            {
+                return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Ошибка БД: {ex.Message}" };
+            }
+            catch (InvalidOperationException ex)
+            {
+                return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Недопустимая операция: {ex.Message}" };
             }
             catch (Exception ex)
             {

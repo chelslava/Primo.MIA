@@ -1,4 +1,4 @@
-// =============================================================================
+﻿// =============================================================================
 // DictionaryOperationsSmall.cs — четыре компактные активности:
 //
 //   DictionaryRemoveKeyBack    — Словарь: Удалить ключ
@@ -44,7 +44,7 @@ namespace Primo.MIA
         public string Prop_Dictionary
         {
             get => _propDictionary;
-            set { _propDictionary = value; InvokePropertyChanged(this, "Prop_Dictionary"); }
+            set { _propDictionary = value; InvokePropertyChanged(this, nameof(Prop_Dictionary)); }
         }
 
         private string _propKey;
@@ -55,7 +55,7 @@ namespace Primo.MIA
         public string Prop_Key
         {
             get => _propKey;
-            set { _propKey = value; InvokePropertyChanged(this, "Prop_Key"); }
+            set { _propKey = value; InvokePropertyChanged(this, nameof(Prop_Key)); }
         }
 
         private bool _throwIfNotFound = false;
@@ -68,7 +68,7 @@ namespace Primo.MIA
         public bool Prop_ThrowIfNotFound
         {
             get => _throwIfNotFound;
-            set { _throwIfNotFound = value; InvokePropertyChanged(this, "Prop_ThrowIfNotFound"); }
+            set { _throwIfNotFound = value; InvokePropertyChanged(this, nameof(Prop_ThrowIfNotFound)); }
         }
 
         private string _propResultDictionary;
@@ -79,7 +79,7 @@ namespace Primo.MIA
         public string Prop_ResultDictionary
         {
             get => _propResultDictionary;
-            set { _propResultDictionary = value; InvokePropertyChanged(this, "Prop_ResultDictionary"); }
+            set { _propResultDictionary = value; InvokePropertyChanged(this, nameof(Prop_ResultDictionary)); }
         }
 
         private string _propRemoved;
@@ -90,7 +90,7 @@ namespace Primo.MIA
         public string Prop_Removed
         {
             get => _propRemoved;
-            set { _propRemoved = value; InvokePropertyChanged(this, "Prop_Removed"); }
+            set { _propRemoved = value; InvokePropertyChanged(this, nameof(Prop_Removed)); }
         }
 
         public DictionaryRemoveKeyBack(IWFContainer container) : base(container)
@@ -146,6 +146,14 @@ namespace Primo.MIA
                 SetVariableValue(this.Prop_Removed, exists, sd);
 
                 return new ExecutionResult { IsSuccess = true, SuccessMessage = exists ? $"Ключ '{key}' удалён" : $"Ключ '{key}' не найден" };
+            }
+            catch (ArgumentException ex)
+            {
+                return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Неверный аргумент: {ex.Message}" };
+            }
+            catch (InvalidOperationException ex)
+            {
+                return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Недопустимая операция: {ex.Message}" };
             }
             catch (Exception ex)
             {

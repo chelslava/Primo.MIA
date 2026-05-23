@@ -442,6 +442,14 @@ namespace Primo.MIA
                         : $"Рабочих дней в диапазоне {rangeMsg}{filterMsg} не найдено"
                 };
             }
+            catch (ArgumentException ex)
+            {
+                return Fail($"Неверный аргумент: {ex.Message}");
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Fail($"Недопустимая операция: {ex.Message}");
+            }
             catch (Exception ex)
             {
                 return Fail($"Ошибка построения списка рабочих дней: {ex.Message}");

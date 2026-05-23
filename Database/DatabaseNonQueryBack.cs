@@ -1,3 +1,7 @@
+// =============================================================================
+// DatabaseNonQueryBack.cs — активность «Database: Выполнить команду (NonQuery)».
+// Выполняет INSERT/UPDATE/DELETE или хранимую процедуру без табличного результата.
+// =============================================================================
 using LTools.Common.Model;
 using LTools.Common.UIElements;
 using LTools.SDK;
@@ -28,6 +32,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
         [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_DbProviderInvariantName)]
+        /// <summary>Инвариантное имя ADO.NET провайдера (например, System.Data.SqlClient).</summary>
         public string Prop_ProviderInvariantName
         {
             get => _propProviderInvariantName;
@@ -38,6 +43,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
         [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_ConnectionString)]
+        /// <summary>Строка подключения к базе данных.</summary>
         public string Prop_ConnectionString
         {
             get => _propConnectionString;
@@ -48,6 +54,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
         [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_TransactionId)]
+        /// <summary>Идентификатор активной транзакции; если не задан, используется ambient-контекст или прямое соединение.</summary>
         public string Prop_TransactionId
         {
             get => _propTransactionId;
@@ -57,6 +64,7 @@ namespace Primo.MIA
         private DatabaseCommandType _propCommandType = DatabaseCommandType.Text;
         [LTools.Common.Model.Serialization.StoringProperty]
         [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_CommandType)]
+        /// <summary>Тип команды: Text (SQL-запрос) или StoredProcedure.</summary>
         public DatabaseCommandType Prop_CommandType
         {
             get => _propCommandType;
@@ -67,6 +75,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
         [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_CommandText)]
+        /// <summary>Текст SQL-команды или имя хранимой процедуры.</summary>
         public string Prop_CommandText
         {
             get => _propCommandText;
@@ -77,6 +86,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(Dictionary<string, string>))]
         [System.ComponentModel.Category(ActivityStrings.Category_Parameters), System.ComponentModel.DisplayName(ActivityStrings.Field_ParametersDictionary)]
+        /// <summary>Словарь параметров команды (имя → значение).</summary>
         public string Prop_Parameters
         {
             get => _propParameters;
@@ -87,6 +97,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
         [System.ComponentModel.Category(ActivityStrings.Category_Settings), System.ComponentModel.DisplayName(ActivityStrings.Field_CommandTimeoutSeconds)]
+        /// <summary>Таймаут выполнения команды в секундах.</summary>
         public string Prop_CommandTimeoutSeconds
         {
             get => _propCommandTimeoutSeconds;
@@ -96,6 +107,7 @@ namespace Primo.MIA
         private bool _propSplitByGoBatches;
         [LTools.Common.Model.Serialization.StoringProperty]
         [System.ComponentModel.Category(ActivityStrings.Category_Settings), System.ComponentModel.DisplayName(ActivityStrings.Field_SplitByGoBatches)]
+        /// <summary>Разбивать SQL-текст по batch-разделителю GO перед выполнением.</summary>
         public bool Prop_SplitByGoBatches
         {
             get => _propSplitByGoBatches;
@@ -105,6 +117,7 @@ namespace Primo.MIA
         private bool _propReturnIdentity;
         [LTools.Common.Model.Serialization.StoringProperty]
         [System.ComponentModel.Category(ActivityStrings.Category_Settings), System.ComponentModel.DisplayName(ActivityStrings.Field_ReturnIdentity)]
+        /// <summary>Возвращать значение последнего вставленного идентификатора (last inserted id).</summary>
         public bool Prop_ReturnIdentity
         {
             get => _propReturnIdentity;
@@ -115,6 +128,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
         [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_AffectedRows)]
+        /// <summary>Количество строк, затронутых выполненной командой.</summary>
         public string Prop_AffectedRows
         {
             get => _propAffectedRows;
@@ -125,6 +139,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(bool))]
         [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_HasAffectedRows)]
+        /// <summary>Признак того, что хотя бы одна строка была затронута командой.</summary>
         public string Prop_HasAffectedRows
         {
             get => _propHasAffectedRows;
@@ -135,6 +150,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
         [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_BatchCount)]
+        /// <summary>Количество выполненных GO-batch блоков (актуально при Prop_SplitByGoBatches = true).</summary>
         public string Prop_BatchCount
         {
             get => _propBatchCount;
@@ -145,6 +161,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
         [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_IdentityValue)]
+        /// <summary>Значение последнего вставленного идентификатора (актуально при Prop_ReturnIdentity = true).</summary>
         public string Prop_IdentityValue
         {
             get => _propIdentityValue;
@@ -192,13 +209,12 @@ namespace Primo.MIA
                     timeout = 30;
 
                 var transactionId = DatabaseTransactionResolver.ResolveOptional(explicitTransactionId);
-                var transactionHandle = DatabaseTransactionManager.Get(transactionId);
-                var executionResult = transactionHandle != null
-                    ? DatabaseHelper.ExecuteNonQuery(transactionHandle, commandText, Prop_CommandType, timeout, Prop_SplitByGoBatches, Prop_ReturnIdentity, parameters)
-                    : DatabaseHelper.ExecuteNonQuery(provider, connectionString, commandText, Prop_CommandType, timeout, Prop_SplitByGoBatches, Prop_ReturnIdentity, parameters);
 
-                SetVariableValue(Prop_AffectedRows, executionResult.AffectedRows, sd);
-                SetVariableValue(Prop_HasAffectedRows, executionResult.AffectedRows > 0, sd);
+                var logic = new DatabaseCommandLogic();
+                var executionResult = logic.ExecuteNonQuery(provider, connectionString, Prop_CommandType, commandText, parameters, timeout, transactionId, Prop_SplitByGoBatches, Prop_ReturnIdentity);
+
+                SetVariableValue(Prop_AffectedRows, executionResult.RowsAffected, sd);
+                SetVariableValue(Prop_HasAffectedRows, executionResult.RowsAffected > 0, sd);
                 SetVariableValue(Prop_BatchCount, executionResult.BatchCount, sd);
                 SetVariableValue(Prop_IdentityValue, executionResult.IdentityValue ?? string.Empty, sd);
 
@@ -206,9 +222,17 @@ namespace Primo.MIA
                 {
                     IsSuccess = true,
                     SuccessMessage = string.IsNullOrWhiteSpace(executionResult.IdentityValue)
-                        ? $"Команда выполнена. Затронуто строк: {executionResult.AffectedRows}. Batch: {executionResult.BatchCount}"
-                        : $"Команда выполнена. Затронуто строк: {executionResult.AffectedRows}. Identity: {executionResult.IdentityValue}"
+                        ? $"Команда выполнена. Затронуто строк: {executionResult.RowsAffected}. Batch: {executionResult.BatchCount}"
+                        : $"Команда выполнена. Затронуто строк: {executionResult.RowsAffected}. Identity: {executionResult.IdentityValue}"
                 };
+            }
+            catch (System.Data.Common.DbException ex)
+            {
+                return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Ошибка БД: {ex.Message}" };
+            }
+            catch (InvalidOperationException ex)
+            {
+                return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Недопустимая операция: {ex.Message}" };
             }
             catch (Exception ex)
             {

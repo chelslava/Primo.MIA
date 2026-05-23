@@ -49,7 +49,7 @@ namespace Primo.MIA
         public string Prop_SessionId
         {
             get => _propSessionId;
-            set { _propSessionId = value; InvokePropertyChanged(this, "Prop_SessionId"); }
+            set { _propSessionId = value; InvokePropertyChanged(this, nameof(Prop_SessionId)); }
         }
 
         private string _propScript;
@@ -61,7 +61,7 @@ namespace Primo.MIA
         public string Prop_Script
         {
             get => _propScript;
-            set { _propScript = value; InvokePropertyChanged(this, "Prop_Script"); }
+            set { _propScript = value; InvokePropertyChanged(this, nameof(Prop_Script)); }
         }
 
         private string _propArguments;
@@ -73,7 +73,7 @@ namespace Primo.MIA
         public string Prop_Arguments
         {
             get => _propArguments;
-            set { _propArguments = value; InvokePropertyChanged(this, "Prop_Arguments"); }
+            set { _propArguments = value; InvokePropertyChanged(this, nameof(Prop_Arguments)); }
         }
 
         // ── Выходные параметры ─────────────────────────────────────────
@@ -87,7 +87,7 @@ namespace Primo.MIA
         public string Prop_Result
         {
             get => _propResult;
-            set { _propResult = value; InvokePropertyChanged(this, "Prop_Result"); }
+            set { _propResult = value; InvokePropertyChanged(this, nameof(Prop_Result)); }
         }
 
         // ── Конструктор ────────────────────────────────────────────────
@@ -150,7 +150,7 @@ namespace Primo.MIA
                 object[] args = null;
                 if (!string.IsNullOrWhiteSpace(Prop_Arguments))
                 {
-                    var argsList = GetPropertyValue<List<object>>(Prop_Arguments, "Prop_Arguments", sd);
+                    var argsList = GetPropertyValue<List<object>>(Prop_Arguments, nameof(Prop_Arguments), sd);
                     if (argsList != null && argsList.Count > 0)
                     {
                         args = argsList.ToArray();

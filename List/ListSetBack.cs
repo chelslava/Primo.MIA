@@ -44,7 +44,7 @@ namespace Primo.MIA
         public string Prop_ListA
         {
             get => _propListA;
-            set { _propListA = value; InvokePropertyChanged(this, "Prop_ListA"); }
+            set { _propListA = value; InvokePropertyChanged(this, nameof(Prop_ListA)); }
         }
 
         private string _propListB;
@@ -55,7 +55,7 @@ namespace Primo.MIA
         public string Prop_ListB
         {
             get => _propListB;
-            set { _propListB = value; InvokePropertyChanged(this, "Prop_ListB"); }
+            set { _propListB = value; InvokePropertyChanged(this, nameof(Prop_ListB)); }
         }
 
         private ListSetOperation _operation = ListSetOperation.Union;
@@ -64,7 +64,7 @@ namespace Primo.MIA
         public ListSetOperation Operation
         {
             get => _operation;
-            set { _operation = value; InvokePropertyChanged(this, "Operation"); }
+            set { _operation = value; InvokePropertyChanged(this, nameof(Operation)); }
         }
 
         private bool _caseSensitive = false;
@@ -74,7 +74,7 @@ namespace Primo.MIA
         public bool Prop_CaseSensitive
         {
             get => _caseSensitive;
-            set { _caseSensitive = value; InvokePropertyChanged(this, "Prop_CaseSensitive"); }
+            set { _caseSensitive = value; InvokePropertyChanged(this, nameof(Prop_CaseSensitive)); }
         }
 
         private string _propResult;
@@ -84,7 +84,7 @@ namespace Primo.MIA
         public string Prop_Result
         {
             get => _propResult;
-            set { _propResult = value; InvokePropertyChanged(this, "Prop_Result"); }
+            set { _propResult = value; InvokePropertyChanged(this, nameof(Prop_Result)); }
         }
 
         private string _propCount;
@@ -94,7 +94,7 @@ namespace Primo.MIA
         public string Prop_Count
         {
             get => _propCount;
-            set { _propCount = value; InvokePropertyChanged(this, "Prop_Count"); }
+            set { _propCount = value; InvokePropertyChanged(this, nameof(Prop_Count)); }
         }
 
         public ListSetBack(IWFContainer container) : base(container)
@@ -168,6 +168,14 @@ namespace Primo.MIA
                 SetVariableValue(this.Prop_Count, result.Count, sd);
 
                 return new ExecutionResult { IsSuccess = true, SuccessMessage = $"{this.Operation}: {result.Count} элементов" };
+            }
+            catch (ArgumentException ex)
+            {
+                return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Неверный аргумент: {ex.Message}" };
+            }
+            catch (InvalidOperationException ex)
+            {
+                return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Недопустимая операция: {ex.Message}" };
             }
             catch (Exception ex)
             {

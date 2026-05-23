@@ -71,6 +71,7 @@ namespace Primo.MIA
 
         #region Prop_CalendarPath
         private string _propCalendarPath;
+        /// <summary>Путь к папке для хранения файлов производственного календаря.</summary>
         [StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
         [System.ComponentModel.Category(ActivityStrings.Category_Main),
@@ -98,6 +99,7 @@ namespace Primo.MIA
 
         #region Prop_Format
         private CalendarFormat _propFormat = CalendarFormat.Xml;
+        /// <summary>Формат файла календаря: Xml, Json, Csv или Txt.</summary>
         [StoringProperty]
         [System.ComponentModel.Category(ActivityStrings.Category_Format),
          System.ComponentModel.DisplayName(ActivityStrings.Field_CalendarFormat)]
@@ -110,6 +112,7 @@ namespace Primo.MIA
 
         #region Prop_Region
         private CalendarRegion _propRegion = CalendarRegion.Russia;
+        /// <summary>Регион производственного календаря: Россия, Казахстан, Беларусь или Узбекистан.</summary>
         [StoringProperty]
         [System.ComponentModel.Category(ActivityStrings.Category_Main),
          System.ComponentModel.DisplayName(ActivityStrings.Field_CalendarRegion)]
@@ -122,6 +125,7 @@ namespace Primo.MIA
 
         #region Prop_DownloadIfMissing
         private bool _propDownloadIfMissing = true;
+        /// <summary>Скачать файл календаря с xmlcalendar.ru если он отсутствует локально (по умолчанию true).</summary>
         [StoringProperty]
         [System.ComponentModel.Category(ActivityStrings.Category_Settings),
          System.ComponentModel.DisplayName(ActivityStrings.Field_DownloadIfMissing)]
@@ -180,6 +184,7 @@ namespace Primo.MIA
 
         #region Prop_CalendarId (Выходной)
         private string _propCalendarId;
+        /// <summary>Имя переменной скрипта для записи GUID загруженного календаря — используется как ID в последующих активностях.</summary>
         [StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
         [System.ComponentModel.Category(ActivityStrings.Category_Output),
@@ -193,6 +198,7 @@ namespace Primo.MIA
 
         #region Prop_CalendarLoaded (Выходной)
         private string _propCalendarLoaded;
+        /// <summary>Имя переменной скрипта для записи признака успешной загрузки календаря (bool).</summary>
         [StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(bool))]
         [System.ComponentModel.Category(ActivityStrings.Category_Output),
@@ -206,6 +212,7 @@ namespace Primo.MIA
 
         #region Prop_FilePath (Выходной)
         private string _propFilePath;
+        /// <summary>Имя переменной скрипта для записи полного пути к загруженному файлу календаря (string).</summary>
         [StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
         [System.ComponentModel.Category(ActivityStrings.Category_Output),

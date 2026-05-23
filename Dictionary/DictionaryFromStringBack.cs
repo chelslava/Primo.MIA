@@ -1,4 +1,4 @@
-using LTools.Common.Model;
+﻿using LTools.Common.Model;
 using LTools.Common.UIElements;
 using LTools.SDK;
 using Primo.MIA.Common;
@@ -41,7 +41,7 @@ namespace Primo.MIA
         public string Prop_InputString
         {
             get => _propInputString;
-            set { _propInputString = value; InvokePropertyChanged(this, "Prop_InputString"); }
+            set { _propInputString = value; InvokePropertyChanged(this, nameof(Prop_InputString)); }
         }
 
         private string _propPairSeparator;
@@ -55,7 +55,7 @@ namespace Primo.MIA
         public string Prop_PairSeparator
         {
             get => _propPairSeparator;
-            set { _propPairSeparator = value; InvokePropertyChanged(this, "Prop_PairSeparator"); }
+            set { _propPairSeparator = value; InvokePropertyChanged(this, nameof(Prop_PairSeparator)); }
         }
 
         private string _propKeyValueSeparator;
@@ -70,7 +70,7 @@ namespace Primo.MIA
         public string Prop_KeyValueSeparator
         {
             get => _propKeyValueSeparator;
-            set { _propKeyValueSeparator = value; InvokePropertyChanged(this, "Prop_KeyValueSeparator"); }
+            set { _propKeyValueSeparator = value; InvokePropertyChanged(this, nameof(Prop_KeyValueSeparator)); }
         }
 
         private bool _trimWhitespace = true;
@@ -83,7 +83,7 @@ namespace Primo.MIA
         public bool Prop_TrimWhitespace
         {
             get => _trimWhitespace;
-            set { _trimWhitespace = value; InvokePropertyChanged(this, "Prop_TrimWhitespace"); }
+            set { _trimWhitespace = value; InvokePropertyChanged(this, nameof(Prop_TrimWhitespace)); }
         }
 
         // =========================================================================
@@ -98,7 +98,7 @@ namespace Primo.MIA
         public string Prop_ResultDictionary
         {
             get => _propResultDictionary;
-            set { _propResultDictionary = value; InvokePropertyChanged(this, "Prop_ResultDictionary"); }
+            set { _propResultDictionary = value; InvokePropertyChanged(this, nameof(Prop_ResultDictionary)); }
         }
 
         private string _propCount;
@@ -109,7 +109,7 @@ namespace Primo.MIA
         public string Prop_Count
         {
             get => _propCount;
-            set { _propCount = value; InvokePropertyChanged(this, "Prop_Count"); }
+            set { _propCount = value; InvokePropertyChanged(this, nameof(Prop_Count)); }
         }
 
         private string _propSkippedCount;
@@ -123,7 +123,7 @@ namespace Primo.MIA
         public string Prop_SkippedCount
         {
             get => _propSkippedCount;
-            set { _propSkippedCount = value; InvokePropertyChanged(this, "Prop_SkippedCount"); }
+            set { _propSkippedCount = value; InvokePropertyChanged(this, nameof(Prop_SkippedCount)); }
         }
 
         // =========================================================================
@@ -224,6 +224,14 @@ namespace Primo.MIA
                     : $"Разобрано: {result.Count} пар";
 
                 return new ExecutionResult { IsSuccess = true, SuccessMessage = msg };
+            }
+            catch (ArgumentException ex)
+            {
+                return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Неверный аргумент: {ex.Message}" };
+            }
+            catch (InvalidOperationException ex)
+            {
+                return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Недопустимая операция: {ex.Message}" };
             }
             catch (Exception ex)
             {

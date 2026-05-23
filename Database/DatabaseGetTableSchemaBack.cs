@@ -1,3 +1,7 @@
+// =============================================================================
+// DatabaseGetTableSchemaBack.cs — активность «Database: Схема таблицы (GetTableSchema)».
+// Возвращает DataTable с метаданными колонок указанной таблицы через schema metadata провайдера.
+// =============================================================================
 using LTools.Common.Model;
 using LTools.Common.UIElements;
 using LTools.SDK;
@@ -8,6 +12,7 @@ using System.Data;
 
 namespace Primo.MIA
 {
+    /// <summary>Активность для получения schema metadata колонок таблицы из БД.</summary>
     public class DatabaseGetTableSchemaBack : PrimoComponentTO<DatabaseGetTableSchema>
     {
         public override string GroupName { get => ActivityCategories.Database; protected set { } }
@@ -17,30 +22,35 @@ namespace Primo.MIA
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
         [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_DbProviderInvariantName)]
+        /// <summary>Инвариантное имя ADO.NET провайдера (например, System.Data.SqlClient).</summary>
         public string Prop_ProviderInvariantName { get => _propProviderInvariantName; set { _propProviderInvariantName = value; InvokePropertyChanged(this, nameof(Prop_ProviderInvariantName)); } }
 
         private string _propConnectionString;
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
         [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_ConnectionString)]
+        /// <summary>Строка подключения к базе данных.</summary>
         public string Prop_ConnectionString { get => _propConnectionString; set { _propConnectionString = value; InvokePropertyChanged(this, nameof(Prop_ConnectionString)); } }
 
         private string _propTableName;
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
         [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_TableName)]
+        /// <summary>Имя таблицы, для которой запрашивается schema metadata.</summary>
         public string Prop_TableName { get => _propTableName; set { _propTableName = value; InvokePropertyChanged(this, nameof(Prop_TableName)); } }
 
         private string _propSchemaName;
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
         [System.ComponentModel.Category(ActivityStrings.Category_Optional), System.ComponentModel.DisplayName(ActivityStrings.Field_SchemaName)]
+        /// <summary>Имя схемы для уточнения таблицы; если не задано, используется схема по умолчанию.</summary>
         public string Prop_SchemaName { get => _propSchemaName; set { _propSchemaName = value; InvokePropertyChanged(this, nameof(Prop_SchemaName)); } }
 
         private string _propSchemaTable;
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(DataTable))]
         [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_ResultTable)]
+        /// <summary>DataTable с описанием колонок таблицы: имя, тип данных, допустимость null и другие атрибуты.</summary>
         public string Prop_SchemaTable { get => _propSchemaTable; set { _propSchemaTable = value; InvokePropertyChanged(this, nameof(Prop_SchemaTable)); } }
 
         public DatabaseGetTableSchemaBack(IWFContainer container) : base(container)
@@ -72,6 +82,14 @@ namespace Primo.MIA
                 SetVariableValue(Prop_SchemaTable, schemaTable, sd);
 
                 return new ExecutionResult { IsSuccess = true, SuccessMessage = $"Получено строк схемы: {schemaTable.Rows.Count}" };
+            }
+            catch (System.Data.Common.DbException ex)
+            {
+                return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Ошибка БД: {ex.Message}" };
+            }
+            catch (InvalidOperationException ex)
+            {
+                return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Недопустимая операция: {ex.Message}" };
             }
             catch (Exception ex)
             {

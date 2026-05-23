@@ -1,4 +1,4 @@
-// =============================================================================
+﻿// =============================================================================
 // DictionarySetValue.cs — активность «Словарь: Установить значение».
 //
 // Добавляет новый ключ или обновляет значение существующего.
@@ -43,7 +43,7 @@ namespace Primo.MIA
         public string Prop_Dictionary
         {
             get => _propDictionary;
-            set { _propDictionary = value; InvokePropertyChanged(this, "Prop_Dictionary"); }
+            set { _propDictionary = value; InvokePropertyChanged(this, nameof(Prop_Dictionary)); }
         }
 
         private string _propKey;
@@ -54,7 +54,7 @@ namespace Primo.MIA
         public string Prop_Key
         {
             get => _propKey;
-            set { _propKey = value; InvokePropertyChanged(this, "Prop_Key"); }
+            set { _propKey = value; InvokePropertyChanged(this, nameof(Prop_Key)); }
         }
 
         private string _propValue;
@@ -65,7 +65,7 @@ namespace Primo.MIA
         public string Prop_Value
         {
             get => _propValue;
-            set { _propValue = value; InvokePropertyChanged(this, "Prop_Value"); }
+            set { _propValue = value; InvokePropertyChanged(this, nameof(Prop_Value)); }
         }
 
         // =========================================================================
@@ -83,7 +83,7 @@ namespace Primo.MIA
         public string Prop_ResultDictionary
         {
             get => _propResultDictionary;
-            set { _propResultDictionary = value; InvokePropertyChanged(this, "Prop_ResultDictionary"); }
+            set { _propResultDictionary = value; InvokePropertyChanged(this, nameof(Prop_ResultDictionary)); }
         }
 
         private string _propIsUpdate;
@@ -97,7 +97,7 @@ namespace Primo.MIA
         public string Prop_IsUpdate
         {
             get => _propIsUpdate;
-            set { _propIsUpdate = value; InvokePropertyChanged(this, "Prop_IsUpdate"); }
+            set { _propIsUpdate = value; InvokePropertyChanged(this, nameof(Prop_IsUpdate)); }
         }
 
         // =========================================================================
@@ -159,6 +159,14 @@ namespace Primo.MIA
 
                 string action = result.IsUpdate ? "обновлён" : "добавлен";
                 return new ExecutionResult { IsSuccess = true, SuccessMessage = $"Ключ '{key}' {action}" };
+            }
+            catch (ArgumentException ex)
+            {
+                return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Неверный аргумент: {ex.Message}" };
+            }
+            catch (InvalidOperationException ex)
+            {
+                return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Недопустимая операция: {ex.Message}" };
             }
             catch (Exception ex)
             {

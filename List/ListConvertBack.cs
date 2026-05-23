@@ -51,7 +51,7 @@ namespace Primo.MIA
         public string Prop_List
         {
             get => _propList;
-            set { _propList = value; InvokePropertyChanged(this, "Prop_List"); }
+            set { _propList = value; InvokePropertyChanged(this, nameof(Prop_List)); }
         }
 
         private ListConvertMode _mode = ListConvertMode.ToDict;
@@ -60,7 +60,7 @@ namespace Primo.MIA
         public ListConvertMode Mode
         {
             get => _mode;
-            set { _mode = value; InvokePropertyChanged(this, "Mode"); }
+            set { _mode = value; InvokePropertyChanged(this, nameof(Mode)); }
         }
 
         private string _propListB;
@@ -71,7 +71,7 @@ namespace Primo.MIA
         public string Prop_ListB
         {
             get => _propListB;
-            set { _propListB = value; InvokePropertyChanged(this, "Prop_ListB"); }
+            set { _propListB = value; InvokePropertyChanged(this, nameof(Prop_ListB)); }
         }
 
         private string _propSeparator;
@@ -82,7 +82,7 @@ namespace Primo.MIA
         public string Prop_Separator
         {
             get => _propSeparator;
-            set { _propSeparator = value; InvokePropertyChanged(this, "Prop_Separator"); }
+            set { _propSeparator = value; InvokePropertyChanged(this, nameof(Prop_Separator)); }
         }
 
         private string _propChunkSize;
@@ -93,7 +93,7 @@ namespace Primo.MIA
         public string Prop_ChunkSize
         {
             get => _propChunkSize;
-            set { _propChunkSize = value; InvokePropertyChanged(this, "Prop_ChunkSize"); }
+            set { _propChunkSize = value; InvokePropertyChanged(this, nameof(Prop_ChunkSize)); }
         }
 
         private string _propCsvInput;
@@ -104,7 +104,7 @@ namespace Primo.MIA
         public string Prop_CsvInput
         {
             get => _propCsvInput;
-            set { _propCsvInput = value; InvokePropertyChanged(this, "Prop_CsvInput"); }
+            set { _propCsvInput = value; InvokePropertyChanged(this, nameof(Prop_CsvInput)); }
         }
 
         // — OUTPUT —
@@ -116,7 +116,7 @@ namespace Primo.MIA
         public string Prop_ResultList
         {
             get => _propResultList;
-            set { _propResultList = value; InvokePropertyChanged(this, "Prop_ResultList"); }
+            set { _propResultList = value; InvokePropertyChanged(this, nameof(Prop_ResultList)); }
         }
 
         private string _propResultDict;
@@ -126,7 +126,7 @@ namespace Primo.MIA
         public string Prop_ResultDict
         {
             get => _propResultDict;
-            set { _propResultDict = value; InvokePropertyChanged(this, "Prop_ResultDict"); }
+            set { _propResultDict = value; InvokePropertyChanged(this, nameof(Prop_ResultDict)); }
         }
 
         private string _propResultString;
@@ -136,7 +136,7 @@ namespace Primo.MIA
         public string Prop_ResultString
         {
             get => _propResultString;
-            set { _propResultString = value; InvokePropertyChanged(this, "Prop_ResultString"); }
+            set { _propResultString = value; InvokePropertyChanged(this, nameof(Prop_ResultString)); }
         }
 
         private string _propCount;
@@ -146,7 +146,7 @@ namespace Primo.MIA
         public string Prop_Count
         {
             get => _propCount;
-            set { _propCount = value; InvokePropertyChanged(this, "Prop_Count"); }
+            set { _propCount = value; InvokePropertyChanged(this, nameof(Prop_Count)); }
         }
 
         public ListConvertBack(IWFContainer container) : base(container)
@@ -267,6 +267,14 @@ namespace Primo.MIA
                 }
 
                 return new ExecutionResult { IsSuccess = true, SuccessMessage = $"Конвертация ({this.Mode}) выполнена" };
+            }
+            catch (ArgumentException ex)
+            {
+                return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Неверный аргумент: {ex.Message}" };
+            }
+            catch (InvalidOperationException ex)
+            {
+                return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Недопустимая операция: {ex.Message}" };
             }
             catch (Exception ex)
             {

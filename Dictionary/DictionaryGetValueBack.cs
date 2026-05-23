@@ -1,4 +1,4 @@
-// =============================================================================
+﻿// =============================================================================
 // DictionaryGetValue.cs — активность «Словарь: Получить значение».
 //
 // Читает значение из Dictionary<string, string> по заданному ключу.
@@ -43,7 +43,7 @@ namespace Primo.MIA
         public string Prop_Dictionary
         {
             get => _propDictionary;
-            set { _propDictionary = value; InvokePropertyChanged(this, "Prop_Dictionary"); }
+            set { _propDictionary = value; InvokePropertyChanged(this, nameof(Prop_Dictionary)); }
         }
 
         private string _propKey;
@@ -54,7 +54,7 @@ namespace Primo.MIA
         public string Prop_Key
         {
             get => _propKey;
-            set { _propKey = value; InvokePropertyChanged(this, "Prop_Key"); }
+            set { _propKey = value; InvokePropertyChanged(this, nameof(Prop_Key)); }
         }
 
         private string _propDefaultValue;
@@ -68,7 +68,7 @@ namespace Primo.MIA
         public string Prop_DefaultValue
         {
             get => _propDefaultValue;
-            set { _propDefaultValue = value; InvokePropertyChanged(this, "Prop_DefaultValue"); }
+            set { _propDefaultValue = value; InvokePropertyChanged(this, nameof(Prop_DefaultValue)); }
         }
 
         private bool _throwIfNotFound = false;
@@ -81,7 +81,7 @@ namespace Primo.MIA
         public bool Prop_ThrowIfNotFound
         {
             get => _throwIfNotFound;
-            set { _throwIfNotFound = value; InvokePropertyChanged(this, "Prop_ThrowIfNotFound"); }
+            set { _throwIfNotFound = value; InvokePropertyChanged(this, nameof(Prop_ThrowIfNotFound)); }
         }
 
         // =========================================================================
@@ -96,7 +96,7 @@ namespace Primo.MIA
         public string Prop_Value
         {
             get => _propValue;
-            set { _propValue = value; InvokePropertyChanged(this, "Prop_Value"); }
+            set { _propValue = value; InvokePropertyChanged(this, nameof(Prop_Value)); }
         }
 
         private string _propFound;
@@ -107,7 +107,7 @@ namespace Primo.MIA
         public string Prop_Found
         {
             get => _propFound;
-            set { _propFound = value; InvokePropertyChanged(this, "Prop_Found"); }
+            set { _propFound = value; InvokePropertyChanged(this, nameof(Prop_Found)); }
         }
 
         // =========================================================================
@@ -170,6 +170,14 @@ namespace Primo.MIA
                 SetVariableValue(this.Prop_Found, result.Found, sd);
 
                 return new ExecutionResult { IsSuccess = true, SuccessMessage = $"Ключ '{key}': {(result.Found ? "найден" : "не найден, возвращено значение по умолчанию")}" };
+            }
+            catch (ArgumentException ex)
+            {
+                return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Неверный аргумент: {ex.Message}" };
+            }
+            catch (InvalidOperationException ex)
+            {
+                return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Недопустимая операция: {ex.Message}" };
             }
             catch (Exception ex)
             {

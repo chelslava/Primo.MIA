@@ -1,4 +1,4 @@
-using LTools.Common.Model;
+﻿using LTools.Common.Model;
 using LTools.Common.UIElements;
 using LTools.SDK;
 using Primo.MIA.Common;
@@ -29,7 +29,7 @@ namespace Primo.MIA
         public string Prop_Dictionary
         {
             get => _propDictionary;
-            set { _propDictionary = value; InvokePropertyChanged(this, "Prop_Dictionary"); }
+            set { _propDictionary = value; InvokePropertyChanged(this, nameof(Prop_Dictionary)); }
         }
 
         private string _propKey;
@@ -40,7 +40,7 @@ namespace Primo.MIA
         public string Prop_Key
         {
             get => _propKey;
-            set { _propKey = value; InvokePropertyChanged(this, "Prop_Key"); }
+            set { _propKey = value; InvokePropertyChanged(this, nameof(Prop_Key)); }
         }
 
         private string _propResult;
@@ -51,7 +51,7 @@ namespace Primo.MIA
         public string Prop_Result
         {
             get => _propResult;
-            set { _propResult = value; InvokePropertyChanged(this, "Prop_Result"); }
+            set { _propResult = value; InvokePropertyChanged(this, nameof(Prop_Result)); }
         }
 
         public DictionaryContainsKeyBack(IWFContainer container) : base(container)
@@ -92,6 +92,14 @@ namespace Primo.MIA
                 SetVariableValue(this.Prop_Result, result.Found, sd);
 
                 return new ExecutionResult { IsSuccess = true, SuccessMessage = $"Ключ '{key}': {(result.Found ? "найден" : "не найден")}" };
+            }
+            catch (ArgumentException ex)
+            {
+                return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Неверный аргумент: {ex.Message}" };
+            }
+            catch (InvalidOperationException ex)
+            {
+                return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Недопустимая операция: {ex.Message}" };
             }
             catch (Exception ex)
             {

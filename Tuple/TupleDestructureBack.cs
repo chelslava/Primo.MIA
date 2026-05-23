@@ -36,7 +36,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(object))]
         [System.ComponentModel.Category(ActivityStrings.Category_Main)]
         [System.ComponentModel.DisplayName(ActivityStrings.Field_Tuple)]
-        public string Prop_Tuple { get => _propTuple; set { _propTuple = value; InvokePropertyChanged(this, "Prop_Tuple"); } }
+        public string Prop_Tuple { get => _propTuple; set { _propTuple = value; InvokePropertyChanged(this, nameof(Prop_Tuple)); } }
 
         // ── OUTPUT: переменные для каждого элемента ────────────────────────────
 
@@ -45,56 +45,56 @@ namespace Primo.MIA
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(object))]
         [System.ComponentModel.Category(ActivityStrings.Category_Elements)]
         [System.ComponentModel.DisplayName(ActivityStrings.Field_OutItem1)]
-        public string Prop_Out1 { get => _propOut1; set { _propOut1 = value; InvokePropertyChanged(this, "Prop_Out1"); } }
+        public string Prop_Out1 { get => _propOut1; set { _propOut1 = value; InvokePropertyChanged(this, nameof(Prop_Out1)); } }
 
         private string _propOut2;
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(object))]
         [System.ComponentModel.Category(ActivityStrings.Category_Elements)]
         [System.ComponentModel.DisplayName(ActivityStrings.Field_OutItem2)]
-        public string Prop_Out2 { get => _propOut2; set { _propOut2 = value; InvokePropertyChanged(this, "Prop_Out2"); } }
+        public string Prop_Out2 { get => _propOut2; set { _propOut2 = value; InvokePropertyChanged(this, nameof(Prop_Out2)); } }
 
         private string _propOut3;
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(object))]
         [System.ComponentModel.Category(ActivityStrings.Category_Elements)]
         [System.ComponentModel.DisplayName(ActivityStrings.Field_OutItem3)]
-        public string Prop_Out3 { get => _propOut3; set { _propOut3 = value; InvokePropertyChanged(this, "Prop_Out3"); } }
+        public string Prop_Out3 { get => _propOut3; set { _propOut3 = value; InvokePropertyChanged(this, nameof(Prop_Out3)); } }
 
         private string _propOut4;
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(object))]
         [System.ComponentModel.Category(ActivityStrings.Category_Elements)]
         [System.ComponentModel.DisplayName(ActivityStrings.Field_OutItem4)]
-        public string Prop_Out4 { get => _propOut4; set { _propOut4 = value; InvokePropertyChanged(this, "Prop_Out4"); } }
+        public string Prop_Out4 { get => _propOut4; set { _propOut4 = value; InvokePropertyChanged(this, nameof(Prop_Out4)); } }
 
         private string _propOut5;
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(object))]
         [System.ComponentModel.Category(ActivityStrings.Category_Elements)]
         [System.ComponentModel.DisplayName(ActivityStrings.Field_OutItem5)]
-        public string Prop_Out5 { get => _propOut5; set { _propOut5 = value; InvokePropertyChanged(this, "Prop_Out5"); } }
+        public string Prop_Out5 { get => _propOut5; set { _propOut5 = value; InvokePropertyChanged(this, nameof(Prop_Out5)); } }
 
         private string _propOut6;
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(object))]
         [System.ComponentModel.Category(ActivityStrings.Category_Elements)]
         [System.ComponentModel.DisplayName(ActivityStrings.Field_OutItem6)]
-        public string Prop_Out6 { get => _propOut6; set { _propOut6 = value; InvokePropertyChanged(this, "Prop_Out6"); } }
+        public string Prop_Out6 { get => _propOut6; set { _propOut6 = value; InvokePropertyChanged(this, nameof(Prop_Out6)); } }
 
         private string _propOut7;
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(object))]
         [System.ComponentModel.Category(ActivityStrings.Category_Elements)]
         [System.ComponentModel.DisplayName(ActivityStrings.Field_OutItem7)]
-        public string Prop_Out7 { get => _propOut7; set { _propOut7 = value; InvokePropertyChanged(this, "Prop_Out7"); } }
+        public string Prop_Out7 { get => _propOut7; set { _propOut7 = value; InvokePropertyChanged(this, nameof(Prop_Out7)); } }
 
         private string _propArity;
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
         [System.ComponentModel.Category(ActivityStrings.Category_Output)]
         [System.ComponentModel.DisplayName(ActivityStrings.Field_Arity)]
-        public string Prop_Arity { get => _propArity; set { _propArity = value; InvokePropertyChanged(this, "Prop_Arity"); } }
+        public string Prop_Arity { get => _propArity; set { _propArity = value; InvokePropertyChanged(this, nameof(Prop_Arity)); } }
 
         private string _propKindName;
         /// <summary>Имя типа кортежа: "Tuple`3" или "ValueTuple`3". Для диагностики.</summary>
@@ -102,7 +102,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
         [System.ComponentModel.Category(ActivityStrings.Category_Output)]
         [System.ComponentModel.DisplayName(ActivityStrings.Field_KindName)]
-        public string Prop_KindName { get => _propKindName; set { _propKindName = value; InvokePropertyChanged(this, "Prop_KindName"); } }
+        public string Prop_KindName { get => _propKindName; set { _propKindName = value; InvokePropertyChanged(this, nameof(Prop_KindName)); } }
 
         // ── КОНСТРУКТОР ────────────────────────────────────────────────────────
 
@@ -174,6 +174,14 @@ namespace Primo.MIA
                     IsSuccess = true,
                     SuccessMessage = $"Деструктуризован {tupleObj.GetType().Name} ({arity} эл.), извлечено: {extracted}"
                 };
+            }
+            catch (ArgumentException ex)
+            {
+                return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Неверный аргумент: {ex.Message}" };
+            }
+            catch (InvalidOperationException ex)
+            {
+                return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Недопустимая операция: {ex.Message}" };
             }
             catch (Exception ex)
             {

@@ -36,7 +36,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(List<string>))]
         [System.ComponentModel.Category(ActivityStrings.Category_Main)]
         [System.ComponentModel.DisplayName(ActivityStrings.Field_ListA_Item1)]
-        public string Prop_ListA { get => _propListA; set { _propListA = value; InvokePropertyChanged(this, "Prop_ListA"); } }
+        public string Prop_ListA { get => _propListA; set { _propListA = value; InvokePropertyChanged(this, nameof(Prop_ListA)); } }
 
         private string _propListB;
         /// <summary>Второй список — значения становятся Item2 каждого кортежа.</summary>
@@ -44,7 +44,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(List<string>))]
         [System.ComponentModel.Category(ActivityStrings.Category_Main)]
         [System.ComponentModel.DisplayName(ActivityStrings.Field_ListB_Item2)]
-        public string Prop_ListB { get => _propListB; set { _propListB = value; InvokePropertyChanged(this, "Prop_ListB"); } }
+        public string Prop_ListB { get => _propListB; set { _propListB = value; InvokePropertyChanged(this, nameof(Prop_ListB)); } }
 
         private string _propListC;
         /// <summary>
@@ -55,7 +55,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(List<string>))]
         [System.ComponentModel.Category(ActivityStrings.Category_Optional)]
         [System.ComponentModel.DisplayName(ActivityStrings.Field_ListC_Item3)]
-        public string Prop_ListC { get => _propListC; set { _propListC = value; InvokePropertyChanged(this, "Prop_ListC"); } }
+        public string Prop_ListC { get => _propListC; set { _propListC = value; InvokePropertyChanged(this, nameof(Prop_ListC)); } }
 
         // ── INPUT: вид кортежей ────────────────────────────────────────────────
 
@@ -71,7 +71,7 @@ namespace Primo.MIA
         public TupleKind Kind
         {
             get => _kind;
-            set { _kind = value; InvokePropertyChanged(this, "Kind"); }
+            set { _kind = value; InvokePropertyChanged(this, nameof(Kind)); }
         }
 
         // ── OUTPUT ─────────────────────────────────────────────────────────────
@@ -87,7 +87,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(object))]
         [System.ComponentModel.Category(ActivityStrings.Category_Output)]
         [System.ComponentModel.DisplayName(ActivityStrings.Field_TupleList)]
-        public string Prop_Result { get => _propResult; set { _propResult = value; InvokePropertyChanged(this, "Prop_Result"); } }
+        public string Prop_Result { get => _propResult; set { _propResult = value; InvokePropertyChanged(this, nameof(Prop_Result)); } }
 
         private string _propCount;
         /// <summary>Количество кортежей в результате (длина минимального из входных списков).</summary>
@@ -95,7 +95,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
         [System.ComponentModel.Category(ActivityStrings.Category_Output)]
         [System.ComponentModel.DisplayName(ActivityStrings.Field_Count)]
-        public string Prop_Count { get => _propCount; set { _propCount = value; InvokePropertyChanged(this, "Prop_Count"); } }
+        public string Prop_Count { get => _propCount; set { _propCount = value; InvokePropertyChanged(this, nameof(Prop_Count)); } }
 
         private string _propArity;
         /// <summary>Арность каждого кортежа в результате (2 или 3).</summary>
@@ -103,7 +103,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
         [System.ComponentModel.Category(ActivityStrings.Category_Output)]
         [System.ComponentModel.DisplayName(ActivityStrings.Field_TupleArity)]
-        public string Prop_Arity { get => _propArity; set { _propArity = value; InvokePropertyChanged(this, "Prop_Arity"); } }
+        public string Prop_Arity { get => _propArity; set { _propArity = value; InvokePropertyChanged(this, nameof(Prop_Arity)); } }
 
         // ── КОНСТРУКТОР ────────────────────────────────────────────────────────
 
@@ -187,6 +187,14 @@ namespace Primo.MIA
                     IsSuccess = true,
                     SuccessMessage = $"Zip: создано {count} кортежей Tuple<string,string{(arity == 3 ? ",string" : "")}>"
                 };
+            }
+            catch (ArgumentException ex)
+            {
+                return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Неверный аргумент: {ex.Message}" };
+            }
+            catch (InvalidOperationException ex)
+            {
+                return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Недопустимая операция: {ex.Message}" };
             }
             catch (Exception ex)
             {

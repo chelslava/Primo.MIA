@@ -30,7 +30,7 @@ namespace Primo.MIA
         public string Prop_List
         {
             get => _propList;
-            set { _propList = value; InvokePropertyChanged(this, "Prop_List"); }
+            set { _propList = value; InvokePropertyChanged(this, nameof(Prop_List)); }
         }
 
         private ListGroupMode _mode = ListGroupMode.ByFirstChar;
@@ -39,7 +39,7 @@ namespace Primo.MIA
         public ListGroupMode Mode
         {
             get => _mode;
-            set { _mode = value; InvokePropertyChanged(this, "Mode"); }
+            set { _mode = value; InvokePropertyChanged(this, nameof(Mode)); }
         }
 
         private string _propPrefixLength;
@@ -50,7 +50,7 @@ namespace Primo.MIA
         public string Prop_PrefixLength
         {
             get => _propPrefixLength;
-            set { _propPrefixLength = value; InvokePropertyChanged(this, "Prop_PrefixLength"); }
+            set { _propPrefixLength = value; InvokePropertyChanged(this, nameof(Prop_PrefixLength)); }
         }
 
         private string _propRegexPattern;
@@ -61,7 +61,7 @@ namespace Primo.MIA
         public string Prop_RegexPattern
         {
             get => _propRegexPattern;
-            set { _propRegexPattern = value; InvokePropertyChanged(this, "Prop_RegexPattern"); }
+            set { _propRegexPattern = value; InvokePropertyChanged(this, nameof(Prop_RegexPattern)); }
         }
 
         private string _propTopN;
@@ -72,7 +72,7 @@ namespace Primo.MIA
         public string Prop_TopN
         {
             get => _propTopN;
-            set { _propTopN = value; InvokePropertyChanged(this, "Prop_TopN"); }
+            set { _propTopN = value; InvokePropertyChanged(this, nameof(Prop_TopN)); }
         }
 
         private string _propGroupedResult;
@@ -83,7 +83,7 @@ namespace Primo.MIA
         public string Prop_GroupedResult
         {
             get => _propGroupedResult;
-            set { _propGroupedResult = value; InvokePropertyChanged(this, "Prop_GroupedResult"); }
+            set { _propGroupedResult = value; InvokePropertyChanged(this, nameof(Prop_GroupedResult)); }
         }
 
         private string _propGroupCount;
@@ -94,7 +94,7 @@ namespace Primo.MIA
         public string Prop_GroupCount
         {
             get => _propGroupCount;
-            set { _propGroupCount = value; InvokePropertyChanged(this, "Prop_GroupCount"); }
+            set { _propGroupCount = value; InvokePropertyChanged(this, nameof(Prop_GroupCount)); }
         }
 
         private string _propFrequencyMap;
@@ -105,7 +105,7 @@ namespace Primo.MIA
         public string Prop_FrequencyMap
         {
             get => _propFrequencyMap;
-            set { _propFrequencyMap = value; InvokePropertyChanged(this, "Prop_FrequencyMap"); }
+            set { _propFrequencyMap = value; InvokePropertyChanged(this, nameof(Prop_FrequencyMap)); }
         }
 
         public ListGroupBack(IWFContainer container) : base(container)
@@ -163,6 +163,14 @@ namespace Primo.MIA
                 SetVariableValue(this.Prop_FrequencyMap, freqMap, sd);
 
                 return new ExecutionResult { IsSuccess = true, SuccessMessage = $"Сгруппировано в {grouped.Count} групп" };
+            }
+            catch (ArgumentException ex)
+            {
+                return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Неверный аргумент: {ex.Message}" };
+            }
+            catch (InvalidOperationException ex)
+            {
+                return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Недопустимая операция: {ex.Message}" };
             }
             catch (Exception ex)
             {

@@ -1,4 +1,4 @@
-// =============================================================================
+﻿// =============================================================================
 // DictionaryFilter.cs — активность «Словарь: Фильтровать».
 //
 // Логика фильтрации разделена на два независимых параметра:
@@ -55,7 +55,7 @@ namespace Primo.MIA
         public string Prop_Dictionary
         {
             get => _propDictionary;
-            set { _propDictionary = value; InvokePropertyChanged(this, "Prop_Dictionary"); }
+            set { _propDictionary = value; InvokePropertyChanged(this, nameof(Prop_Dictionary)); }
         }
 
         private string _propQuery;
@@ -69,7 +69,7 @@ namespace Primo.MIA
         public string Prop_Query
         {
             get => _propQuery;
-            set { _propQuery = value; InvokePropertyChanged(this, "Prop_Query"); }
+            set { _propQuery = value; InvokePropertyChanged(this, nameof(Prop_Query)); }
         }
 
         private DictionaryFilterTarget _target = DictionaryFilterTarget.Values;
@@ -79,7 +79,7 @@ namespace Primo.MIA
         public DictionaryFilterTarget Prop_Target
         {
             get => _target;
-            set { _target = value; InvokePropertyChanged(this, "Prop_Target"); }
+            set { _target = value; InvokePropertyChanged(this, nameof(Prop_Target)); }
         }
 
         private DictionaryFilterMethod _method = DictionaryFilterMethod.Contains;
@@ -89,7 +89,7 @@ namespace Primo.MIA
         public DictionaryFilterMethod Prop_Method
         {
             get => _method;
-            set { _method = value; InvokePropertyChanged(this, "Prop_Method"); }
+            set { _method = value; InvokePropertyChanged(this, nameof(Prop_Method)); }
         }
 
         private bool _caseSensitive = false;
@@ -103,7 +103,7 @@ namespace Primo.MIA
         public bool Prop_CaseSensitive
         {
             get => _caseSensitive;
-            set { _caseSensitive = value; InvokePropertyChanged(this, "Prop_CaseSensitive"); }
+            set { _caseSensitive = value; InvokePropertyChanged(this, nameof(Prop_CaseSensitive)); }
         }
 
         // =========================================================================
@@ -118,7 +118,7 @@ namespace Primo.MIA
         public string Prop_ResultDictionary
         {
             get => _propResultDictionary;
-            set { _propResultDictionary = value; InvokePropertyChanged(this, "Prop_ResultDictionary"); }
+            set { _propResultDictionary = value; InvokePropertyChanged(this, nameof(Prop_ResultDictionary)); }
         }
 
         private string _propCount;
@@ -129,7 +129,7 @@ namespace Primo.MIA
         public string Prop_Count
         {
             get => _propCount;
-            set { _propCount = value; InvokePropertyChanged(this, "Prop_Count"); }
+            set { _propCount = value; InvokePropertyChanged(this, nameof(Prop_Count)); }
         }
 
         private string _propFilteredOutCount;
@@ -140,7 +140,7 @@ namespace Primo.MIA
         public string Prop_FilteredOutCount
         {
             get => _propFilteredOutCount;
-            set { _propFilteredOutCount = value; InvokePropertyChanged(this, "Prop_FilteredOutCount"); }
+            set { _propFilteredOutCount = value; InvokePropertyChanged(this, nameof(Prop_FilteredOutCount)); }
         }
 
         // =========================================================================

@@ -72,6 +72,7 @@ namespace Primo.MIA
 
         #region Prop_OperationMode
         private BusinessCalendarMode _propOperationMode = BusinessCalendarMode.AddWorkDays;
+        /// <summary>Режим операции с календарём: AddWorkDays, SubtractWorkDays, CheckDayType, CountWorkdays, NextWorkday, PrevWorkday.</summary>
         [StoringProperty]
         [System.ComponentModel.Category(ActivityStrings.Category_Main),
          System.ComponentModel.DisplayName(ActivityStrings.Field_OperationMode)]
@@ -160,6 +161,7 @@ namespace Primo.MIA
 
         #region Prop_IsWorkday (Выходной)
         private string _propIsWorkday;
+        /// <summary>Имя переменной скрипта для записи признака рабочего дня (bool): true если день рабочий или сокращённый.</summary>
         [StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(bool))]
         [System.ComponentModel.Category(ActivityStrings.Category_Output),
@@ -173,6 +175,7 @@ namespace Primo.MIA
 
         #region Prop_HolidayName (Выходной)
         private string _propHolidayName;
+        /// <summary>Имя переменной скрипта для записи названия праздника (string). Пустая строка если день не праздничный.</summary>
         [StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
         [System.ComponentModel.Category(ActivityStrings.Category_Output),
@@ -186,6 +189,7 @@ namespace Primo.MIA
 
         #region Prop_WorkdaysInYear (Выходной)
         private string _propWorkdaysInYear;
+        /// <summary>Имя переменной скрипта для записи количества рабочих дней в году (int) по статистике календаря.</summary>
         [StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
         [System.ComponentModel.Category(ActivityStrings.Category_Output),
@@ -199,6 +203,7 @@ namespace Primo.MIA
 
         #region Prop_HolidaysInYear (Выходной)
         private string _propHolidaysInYear;
+        /// <summary>Имя переменной скрипта для записи количества праздничных дней в году (int) по статистике календаря.</summary>
         [StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
         [System.ComponentModel.Category(ActivityStrings.Category_Output),
@@ -359,6 +364,14 @@ namespace Primo.MIA
                     default:
                         return Fail($"Неизвестный режим операции: {this.Prop_OperationMode}");
                 }
+            }
+            catch (ArgumentException ex)
+            {
+                return Fail($"Неверный аргумент: {ex.Message}");
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Fail($"Недопустимая операция: {ex.Message}");
             }
             catch (Exception ex)
             {

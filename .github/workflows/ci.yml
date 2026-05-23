@@ -36,10 +36,71 @@ jobs:
         if ($content -match "\.kiro/") { Write-Host "✅ .kiro in .gitignore" } else { Write-Host "⚠️ .kiro NOT in .gitignore" }
         if ($content -match "\.dotnet/") { Write-Host "✅ .dotnet in .gitignore" } else { Write-Host "⚠️ .dotnet NOT in .gitignore" }
 
+  code-quality:
+    name: Code Quality Gates
+    runs-on: ubuntu-latest
+    needs: validate
+
+    steps:
+    - uses: actions/checkout@v4
+      name: Checkout code
+
+    - name: Check file headers
+      shell: bash
+      run: |
+        missing=0
+        while IFS= read -r f; do
+          if ! head -1 "$f" | grep -q "^// ==="; then
+            echo "Missing header: $f"
+            missing=$((missing + 1))
+          fi
+        done < <(find . -name "*Back.cs" -not -path "*/obj/*")
+        if [ $missing -gt 0 ]; then
+          echo "::warning::$missing files missing // === headers"
+        fi
+        echo "Header check complete"
+
+    - name: Check csproj duplicates
+      shell: pwsh
+      run: |
+        $content = Get-Content "Primo.MIA.csproj" -Raw
+        $matches = [regex]::Matches($content, '<Compile Include="([^"]+)"')
+        $includes = $matches | ForEach-Object { $_.Groups[1].Value }
+        $dupes = $includes | Group-Object | Where-Object { $_.Count -gt 1 }
+        if ($dupes) {
+          $dupes | ForEach-Object { Write-Warning "Duplicate: $($_.Name)" }
+          exit 1
+        }
+        Write-Host "No duplicate Compile includes found"
+
+    - name: Check no raw ArgumentException throws
+      shell: bash
+      run: |
+        count=$(grep -r "throw new ArgumentNullException\|throw new ArgumentException" \
+          --include="*Back.cs" \
+          . | grep -v "/obj/" | wc -l)
+        if [ $count -gt 0 ]; then
+          echo "::warning::Found $count raw ArgumentException throws (should use Guard.*)"
+          grep -rn "throw new ArgumentNullException\|throw new ArgumentException" \
+            --include="*Back.cs" . | grep -v "/obj/"
+        fi
+        echo "Exception check complete: $count raw throws"
+
+    - name: Statistics Summary
+      shell: bash
+      run: |
+        back_count=$(find . -name "*Back.cs" -not -path "*/obj/*" | wc -l)
+        logic_count=$(find . -name "*Logic.cs" -not -path "*/obj/*" | wc -l)
+        echo "## Code Statistics" >> $GITHUB_STEP_SUMMARY
+        echo "| Metric | Count |" >> $GITHUB_STEP_SUMMARY
+        echo "|--------|-------|" >> $GITHUB_STEP_SUMMARY
+        echo "| Activities (*Back.cs) | $back_count |" >> $GITHUB_STEP_SUMMARY
+        echo "| Logic classes (*Logic.cs) | $logic_count |" >> $GITHUB_STEP_SUMMARY
+
   note-about-primo-sdk:
     name: ℹ️ Primo SDK Note
     runs-on: ubuntu-latest
-    needs: validate
+    needs: [validate, code-quality]
     
     steps:
     - name: Information Message

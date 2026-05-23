@@ -1,4 +1,4 @@
-using LTools.Common.Model;
+﻿using LTools.Common.Model;
 using LTools.Common.UIElements;
 using LTools.SDK;
 using Primo.MIA.Common;
@@ -35,7 +35,7 @@ namespace Primo.MIA
         public string Prop_Dictionary
         {
             get => _propDictionary;
-            set { _propDictionary = value; InvokePropertyChanged(this, "Prop_Dictionary"); }
+            set { _propDictionary = value; InvokePropertyChanged(this, nameof(Prop_Dictionary)); }
         }
 
         private string _propPairSeparator;
@@ -49,7 +49,7 @@ namespace Primo.MIA
         public string Prop_PairSeparator
         {
             get => _propPairSeparator;
-            set { _propPairSeparator = value; InvokePropertyChanged(this, "Prop_PairSeparator"); }
+            set { _propPairSeparator = value; InvokePropertyChanged(this, nameof(Prop_PairSeparator)); }
         }
 
         private string _propKeyValueSeparator;
@@ -63,7 +63,7 @@ namespace Primo.MIA
         public string Prop_KeyValueSeparator
         {
             get => _propKeyValueSeparator;
-            set { _propKeyValueSeparator = value; InvokePropertyChanged(this, "Prop_KeyValueSeparator"); }
+            set { _propKeyValueSeparator = value; InvokePropertyChanged(this, nameof(Prop_KeyValueSeparator)); }
         }
 
         // =========================================================================
@@ -82,7 +82,7 @@ namespace Primo.MIA
         public string Prop_Result
         {
             get => _propResult;
-            set { _propResult = value; InvokePropertyChanged(this, "Prop_Result"); }
+            set { _propResult = value; InvokePropertyChanged(this, nameof(Prop_Result)); }
         }
 
         private string _propCount;
@@ -93,7 +93,7 @@ namespace Primo.MIA
         public string Prop_Count
         {
             get => _propCount;
-            set { _propCount = value; InvokePropertyChanged(this, "Prop_Count"); }
+            set { _propCount = value; InvokePropertyChanged(this, nameof(Prop_Count)); }
         }
 
         // =========================================================================
@@ -166,6 +166,14 @@ namespace Primo.MIA
                 SetVariableValue(this.Prop_Count, dict.Count, sd);
 
                 return new ExecutionResult { IsSuccess = true, SuccessMessage = $"Словарь сериализован: {dict.Count} пар" };
+            }
+            catch (ArgumentException ex)
+            {
+                return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Неверный аргумент: {ex.Message}" };
+            }
+            catch (InvalidOperationException ex)
+            {
+                return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Недопустимая операция: {ex.Message}" };
             }
             catch (Exception ex)
             {

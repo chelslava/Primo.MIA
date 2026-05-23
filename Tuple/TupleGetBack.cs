@@ -45,7 +45,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(object))]
         [System.ComponentModel.Category(ActivityStrings.Category_Main)]
         [System.ComponentModel.DisplayName(ActivityStrings.Field_Tuple)]
-        public string Prop_Tuple { get => _propTuple; set { _propTuple = value; InvokePropertyChanged(this, "Prop_Tuple"); } }
+        public string Prop_Tuple { get => _propTuple; set { _propTuple = value; InvokePropertyChanged(this, nameof(Prop_Tuple)); } }
 
         private TupleItemIndex _index = TupleItemIndex.Item1;
         /// <summary>Номер извлекаемого элемента: Item1–Item7.</summary>
@@ -57,7 +57,7 @@ namespace Primo.MIA
         public TupleItemIndex Index
         {
             get => _index;
-            set { _index = value; InvokePropertyChanged(this, "Index"); }
+            set { _index = value; InvokePropertyChanged(this, nameof(Index)); }
         }
 
         // ── OUTPUT ─────────────────────────────────────────────────────────────
@@ -74,7 +74,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(object))]
         [System.ComponentModel.Category(ActivityStrings.Category_Output)]
         [System.ComponentModel.DisplayName(ActivityStrings.Field_Value)]
-        public string Prop_Value { get => _propValue; set { _propValue = value; InvokePropertyChanged(this, "Prop_Value"); } }
+        public string Prop_Value { get => _propValue; set { _propValue = value; InvokePropertyChanged(this, nameof(Prop_Value)); } }
 
         private string _propTypeName;
         /// <summary>
@@ -88,7 +88,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
         [System.ComponentModel.Category(ActivityStrings.Category_Output)]
         [System.ComponentModel.DisplayName(ActivityStrings.Field_ValueType)]
-        public string Prop_TypeName { get => _propTypeName; set { _propTypeName = value; InvokePropertyChanged(this, "Prop_TypeName"); } }
+        public string Prop_TypeName { get => _propTypeName; set { _propTypeName = value; InvokePropertyChanged(this, nameof(Prop_TypeName)); } }
 
         // ── КОНСТРУКТОР ────────────────────────────────────────────────────────
 
@@ -153,6 +153,14 @@ namespace Primo.MIA
                     IsSuccess = true,
                     SuccessMessage = $"Получен Item{itemNum} = {value} (тип: {value?.GetType().Name ?? "null"})"
                 };
+            }
+            catch (ArgumentException ex)
+            {
+                return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Неверный аргумент: {ex.Message}" };
+            }
+            catch (InvalidOperationException ex)
+            {
+                return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Недопустимая операция: {ex.Message}" };
             }
             catch (Exception ex)
             {

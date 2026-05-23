@@ -1,4 +1,4 @@
-// =============================================================================
+﻿// =============================================================================
 // DictionaryMerge.cs — активность «Словарь: Объединить».
 //
 // Объединяет два Dictionary<string, string> в один новый словарь.
@@ -47,7 +47,7 @@ namespace Primo.MIA
         public string Prop_FirstDictionary
         {
             get => _propFirstDictionary;
-            set { _propFirstDictionary = value; InvokePropertyChanged(this, "Prop_FirstDictionary"); }
+            set { _propFirstDictionary = value; InvokePropertyChanged(this, nameof(Prop_FirstDictionary)); }
         }
 
         private string _propSecondDictionary;
@@ -58,7 +58,7 @@ namespace Primo.MIA
         public string Prop_SecondDictionary
         {
             get => _propSecondDictionary;
-            set { _propSecondDictionary = value; InvokePropertyChanged(this, "Prop_SecondDictionary"); }
+            set { _propSecondDictionary = value; InvokePropertyChanged(this, nameof(Prop_SecondDictionary)); }
         }
 
         private DictionaryMergeStrategy _strategy = DictionaryMergeStrategy.KeepSecond;
@@ -73,7 +73,7 @@ namespace Primo.MIA
         public DictionaryMergeStrategy Strategy
         {
             get => _strategy;
-            set { _strategy = value; InvokePropertyChanged(this, "Strategy"); }
+            set { _strategy = value; InvokePropertyChanged(this, nameof(Strategy)); }
         }
 
         // =========================================================================
@@ -88,7 +88,7 @@ namespace Primo.MIA
         public string Prop_ResultDictionary
         {
             get => _propResultDictionary;
-            set { _propResultDictionary = value; InvokePropertyChanged(this, "Prop_ResultDictionary"); }
+            set { _propResultDictionary = value; InvokePropertyChanged(this, nameof(Prop_ResultDictionary)); }
         }
 
         private string _propCount;
@@ -99,7 +99,7 @@ namespace Primo.MIA
         public string Prop_Count
         {
             get => _propCount;
-            set { _propCount = value; InvokePropertyChanged(this, "Prop_Count"); }
+            set { _propCount = value; InvokePropertyChanged(this, nameof(Prop_Count)); }
         }
 
         private string _propHadConflicts;
@@ -110,7 +110,7 @@ namespace Primo.MIA
         public string Prop_HadConflicts
         {
             get => _propHadConflicts;
-            set { _propHadConflicts = value; InvokePropertyChanged(this, "Prop_HadConflicts"); }
+            set { _propHadConflicts = value; InvokePropertyChanged(this, nameof(Prop_HadConflicts)); }
         }
 
         private string _propConflictKeys;
@@ -124,7 +124,7 @@ namespace Primo.MIA
         public string Prop_ConflictKeys
         {
             get => _propConflictKeys;
-            set { _propConflictKeys = value; InvokePropertyChanged(this, "Prop_ConflictKeys"); }
+            set { _propConflictKeys = value; InvokePropertyChanged(this, nameof(Prop_ConflictKeys)); }
         }
 
         // =========================================================================
@@ -201,6 +201,14 @@ namespace Primo.MIA
                     : "Слияние выполнено без конфликтов";
 
                 return new ExecutionResult { IsSuccess = true, SuccessMessage = msg };
+            }
+            catch (ArgumentException ex)
+            {
+                return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Неверный аргумент: {ex.Message}" };
+            }
+            catch (InvalidOperationException ex)
+            {
+                return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Недопустимая операция: {ex.Message}" };
             }
             catch (Exception ex)
             {

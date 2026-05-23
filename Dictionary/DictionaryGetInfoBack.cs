@@ -1,4 +1,4 @@
-// =============================================================================
+﻿// =============================================================================
 // DictionaryOperationsSmall.cs — четыре компактные активности:
 //
 //   DictionaryRemoveKeyBack    — Словарь: Удалить ключ
@@ -43,7 +43,7 @@ namespace Primo.MIA
         public string Prop_Dictionary
         {
             get => _propDictionary;
-            set { _propDictionary = value; InvokePropertyChanged(this, "Prop_Dictionary"); }
+            set { _propDictionary = value; InvokePropertyChanged(this, nameof(Prop_Dictionary)); }
         }
 
         private string _propCount;
@@ -54,7 +54,7 @@ namespace Primo.MIA
         public string Prop_Count
         {
             get => _propCount;
-            set { _propCount = value; InvokePropertyChanged(this, "Prop_Count"); }
+            set { _propCount = value; InvokePropertyChanged(this, nameof(Prop_Count)); }
         }
 
         private string _propKeys;
@@ -65,7 +65,7 @@ namespace Primo.MIA
         public string Prop_Keys
         {
             get => _propKeys;
-            set { _propKeys = value; InvokePropertyChanged(this, "Prop_Keys"); }
+            set { _propKeys = value; InvokePropertyChanged(this, nameof(Prop_Keys)); }
         }
 
         private string _propValues;
@@ -79,7 +79,7 @@ namespace Primo.MIA
         public string Prop_Values
         {
             get => _propValues;
-            set { _propValues = value; InvokePropertyChanged(this, "Prop_Values"); }
+            set { _propValues = value; InvokePropertyChanged(this, nameof(Prop_Values)); }
         }
 
         private string _propIsEmpty;
@@ -90,7 +90,7 @@ namespace Primo.MIA
         public string Prop_IsEmpty
         {
             get => _propIsEmpty;
-            set { _propIsEmpty = value; InvokePropertyChanged(this, "Prop_IsEmpty"); }
+            set { _propIsEmpty = value; InvokePropertyChanged(this, nameof(Prop_IsEmpty)); }
         }
 
         public DictionaryGetInfoBack(IWFContainer container) : base(container)
@@ -144,6 +144,14 @@ namespace Primo.MIA
                 SetVariableValue(this.Prop_IsEmpty, dict.Count == 0, sd);
 
                 return new ExecutionResult { IsSuccess = true, SuccessMessage = $"Словарь содержит {dict.Count} элементов" };
+            }
+            catch (ArgumentException ex)
+            {
+                return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Неверный аргумент: {ex.Message}" };
+            }
+            catch (InvalidOperationException ex)
+            {
+                return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Недопустимая операция: {ex.Message}" };
             }
             catch (Exception ex)
             {

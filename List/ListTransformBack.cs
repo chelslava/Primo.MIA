@@ -60,7 +60,7 @@ namespace Primo.MIA
         public string Prop_List
         {
             get => _propList;
-            set { _propList = value; InvokePropertyChanged(this, "Prop_List"); }
+            set { _propList = value; InvokePropertyChanged(this, nameof(Prop_List)); }
         }
 
         private ListTransformMode _mode = ListTransformMode.Trim;
@@ -69,7 +69,7 @@ namespace Primo.MIA
         public ListTransformMode Mode
         {
             get => _mode;
-            set { _mode = value; InvokePropertyChanged(this, "Mode"); }
+            set { _mode = value; InvokePropertyChanged(this, nameof(Mode)); }
         }
 
         private string _propFind;
@@ -80,7 +80,7 @@ namespace Primo.MIA
         public string Prop_Find
         {
             get => _propFind;
-            set { _propFind = value; InvokePropertyChanged(this, "Prop_Find"); }
+            set { _propFind = value; InvokePropertyChanged(this, nameof(Prop_Find)); }
         }
 
         private string _propReplacement;
@@ -91,7 +91,7 @@ namespace Primo.MIA
         public string Prop_Replacement
         {
             get => _propReplacement;
-            set { _propReplacement = value; InvokePropertyChanged(this, "Prop_Replacement"); }
+            set { _propReplacement = value; InvokePropertyChanged(this, nameof(Prop_Replacement)); }
         }
 
         private string _propPrefix;
@@ -102,7 +102,7 @@ namespace Primo.MIA
         public string Prop_Prefix
         {
             get => _propPrefix;
-            set { _propPrefix = value; InvokePropertyChanged(this, "Prop_Prefix"); }
+            set { _propPrefix = value; InvokePropertyChanged(this, nameof(Prop_Prefix)); }
         }
 
         private string _propSuffix;
@@ -113,7 +113,7 @@ namespace Primo.MIA
         public string Prop_Suffix
         {
             get => _propSuffix;
-            set { _propSuffix = value; InvokePropertyChanged(this, "Prop_Suffix"); }
+            set { _propSuffix = value; InvokePropertyChanged(this, nameof(Prop_Suffix)); }
         }
 
         private string _propPadWidth;
@@ -124,7 +124,7 @@ namespace Primo.MIA
         public string Prop_PadWidth
         {
             get => _propPadWidth;
-            set { _propPadWidth = value; InvokePropertyChanged(this, "Prop_PadWidth"); }
+            set { _propPadWidth = value; InvokePropertyChanged(this, nameof(Prop_PadWidth)); }
         }
 
         private string _propPadChar;
@@ -135,7 +135,7 @@ namespace Primo.MIA
         public string Prop_PadChar
         {
             get => _propPadChar;
-            set { _propPadChar = value; InvokePropertyChanged(this, "Prop_PadChar"); }
+            set { _propPadChar = value; InvokePropertyChanged(this, nameof(Prop_PadChar)); }
         }
 
         private string _propMaxLength;
@@ -146,7 +146,7 @@ namespace Primo.MIA
         public string Prop_MaxLength
         {
             get => _propMaxLength;
-            set { _propMaxLength = value; InvokePropertyChanged(this, "Prop_MaxLength"); }
+            set { _propMaxLength = value; InvokePropertyChanged(this, nameof(Prop_MaxLength)); }
         }
 
         private bool _caseSensitive = false;
@@ -156,7 +156,7 @@ namespace Primo.MIA
         public bool Prop_CaseSensitive
         {
             get => _caseSensitive;
-            set { _caseSensitive = value; InvokePropertyChanged(this, "Prop_CaseSensitive"); }
+            set { _caseSensitive = value; InvokePropertyChanged(this, nameof(Prop_CaseSensitive)); }
         }
 
         // ── OUTPUT ─────────────────────────────────────────────────────────────
@@ -168,7 +168,7 @@ namespace Primo.MIA
         public string Prop_Result
         {
             get => _propResult;
-            set { _propResult = value; InvokePropertyChanged(this, "Prop_Result"); }
+            set { _propResult = value; InvokePropertyChanged(this, nameof(Prop_Result)); }
         }
 
         private string _propCount;
@@ -178,7 +178,7 @@ namespace Primo.MIA
         public string Prop_Count
         {
             get => _propCount;
-            set { _propCount = value; InvokePropertyChanged(this, "Prop_Count"); }
+            set { _propCount = value; InvokePropertyChanged(this, nameof(Prop_Count)); }
         }
 
         private string _propChangedCount;
@@ -189,7 +189,7 @@ namespace Primo.MIA
         public string Prop_ChangedCount
         {
             get => _propChangedCount;
-            set { _propChangedCount = value; InvokePropertyChanged(this, "Prop_ChangedCount"); }
+            set { _propChangedCount = value; InvokePropertyChanged(this, nameof(Prop_ChangedCount)); }
         }
 
         // ── КОНСТРУКТОР ────────────────────────────────────────────────────────
@@ -276,6 +276,14 @@ namespace Primo.MIA
                 SetVariableValue(this.Prop_ChangedCount, changed, sd);
 
                 return new ExecutionResult { IsSuccess = true, SuccessMessage = $"Преобразовано: {result.Count} элементов, изменилось: {changed}" };
+            }
+            catch (ArgumentException ex)
+            {
+                return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Неверный аргумент: {ex.Message}" };
+            }
+            catch (InvalidOperationException ex)
+            {
+                return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Недопустимая операция: {ex.Message}" };
             }
             catch (Exception ex)
             {

@@ -37,7 +37,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(object))]
         [System.ComponentModel.Category(ActivityStrings.Category_Main)]
         [System.ComponentModel.DisplayName(ActivityStrings.Field_Tuple)]
-        public string Prop_Tuple { get => _propTuple; set { _propTuple = value; InvokePropertyChanged(this, "Prop_Tuple"); } }
+        public string Prop_Tuple { get => _propTuple; set { _propTuple = value; InvokePropertyChanged(this, nameof(Prop_Tuple)); } }
 
         private TupleItemIndex _index = TupleItemIndex.Item1;
         /// <summary>Номер заменяемого элемента: Item1–Item7. Должен быть ≤ арности кортежа.</summary>
@@ -47,7 +47,7 @@ namespace Primo.MIA
         public TupleItemIndex Index
         {
             get => _index;
-            set { _index = value; InvokePropertyChanged(this, "Index"); }
+            set { _index = value; InvokePropertyChanged(this, nameof(Index)); }
         }
 
         private string _propNewValue;
@@ -56,7 +56,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(object))]
         [System.ComponentModel.Category(ActivityStrings.Category_Main)]
         [System.ComponentModel.DisplayName(ActivityStrings.Field_NewValue)]
-        public string Prop_NewValue { get => _propNewValue; set { _propNewValue = value; InvokePropertyChanged(this, "Prop_NewValue"); } }
+        public string Prop_NewValue { get => _propNewValue; set { _propNewValue = value; InvokePropertyChanged(this, nameof(Prop_NewValue)); } }
 
         // ── OUTPUT ─────────────────────────────────────────────────────────────
 
@@ -69,7 +69,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(object))]
         [System.ComponentModel.Category(ActivityStrings.Category_Output)]
         [System.ComponentModel.DisplayName(ActivityStrings.Field_NewTuple)]
-        public string Prop_Result { get => _propResult; set { _propResult = value; InvokePropertyChanged(this, "Prop_Result"); } }
+        public string Prop_Result { get => _propResult; set { _propResult = value; InvokePropertyChanged(this, nameof(Prop_Result)); } }
 
         // ── КОНСТРУКТОР ────────────────────────────────────────────────────────
 
@@ -120,6 +120,14 @@ namespace Primo.MIA
                     IsSuccess = true,
                     SuccessMessage = $"Item{itemNum} заменён на {newValue}. Создан новый кортеж."
                 };
+            }
+            catch (ArgumentException ex)
+            {
+                return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Неверный аргумент: {ex.Message}" };
+            }
+            catch (InvalidOperationException ex)
+            {
+                return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Недопустимая операция: {ex.Message}" };
             }
             catch (Exception ex)
             {

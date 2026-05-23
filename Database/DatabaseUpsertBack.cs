@@ -1,3 +1,7 @@
+// =============================================================================
+// DatabaseUpsertBack.cs — активность «Database: Upsert по ключу (Upsert)».
+// Выполняет UPDATE или INSERT для каждой строки DataTable по заданным ключевым колонкам.
+// =============================================================================
 using LTools.Common.Model;
 using LTools.Common.UIElements;
 using LTools.SDK;
@@ -29,6 +33,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(DataTable))]
         [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_DataTable)]
+        /// <summary>Исходная таблица данных DataTable, строки которой будут обработаны операцией upsert.</summary>
         public string Prop_DataTable
         {
             get => _propDataTable;
@@ -39,6 +44,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
         [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_DbProviderInvariantName)]
+        /// <summary>Инвариантное имя ADO.NET провайдера (например, System.Data.SqlClient).</summary>
         public string Prop_ProviderInvariantName
         {
             get => _propProviderInvariantName;
@@ -49,6 +55,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
         [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_ConnectionString)]
+        /// <summary>Строка подключения к базе данных.</summary>
         public string Prop_ConnectionString
         {
             get => _propConnectionString;
@@ -59,6 +66,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
         [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_TransactionId)]
+        /// <summary>Идентификатор активной транзакции; если не задан, используется ambient-контекст или прямое соединение.</summary>
         public string Prop_TransactionId
         {
             get => _propTransactionId;
@@ -69,6 +77,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
         [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_DestinationTable)]
+        /// <summary>Имя целевой таблицы в базе данных для операции upsert.</summary>
         public string Prop_DestinationTable
         {
             get => _propDestinationTable;
@@ -79,6 +88,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(List<string>))]
         [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_KeyColumns)]
+        /// <summary>Список ключевых колонок, по которым определяется существование строки (используются в условии WHERE).</summary>
         public string Prop_KeyColumns
         {
             get => _propKeyColumns;
@@ -89,6 +99,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(List<string>))]
         [System.ComponentModel.Category(ActivityStrings.Category_Optional), System.ComponentModel.DisplayName(ActivityStrings.Field_UpdateColumns)]
+        /// <summary>Список колонок, обновляемых при UPDATE. Если не задан, обновляются все не-ключевые колонки.</summary>
         public string Prop_UpdateColumns
         {
             get => _propUpdateColumns;
@@ -99,6 +110,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(Dictionary<string, string>))]
         [System.ComponentModel.Category(ActivityStrings.Category_Parameters), System.ComponentModel.DisplayName(ActivityStrings.Field_ColumnMappings)]
+        /// <summary>Словарь маппинга колонок: SourceColumn → DestinationColumn.</summary>
         public string Prop_ColumnMappings
         {
             get => _propColumnMappings;
@@ -109,6 +121,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
         [System.ComponentModel.Category(ActivityStrings.Category_Settings), System.ComponentModel.DisplayName(ActivityStrings.Field_CommandTimeoutSeconds)]
+        /// <summary>Таймаут выполнения каждой команды в секундах.</summary>
         public string Prop_CommandTimeoutSeconds
         {
             get => _propCommandTimeoutSeconds;
@@ -119,6 +132,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
         [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_InsertedCount)]
+        /// <summary>Количество строк, вставленных операцией INSERT.</summary>
         public string Prop_InsertedCount
         {
             get => _propInsertedCount;
@@ -129,6 +143,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
         [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_UpdatedCount)]
+        /// <summary>Количество строк, обновлённых операцией UPDATE.</summary>
         public string Prop_UpdatedCount
         {
             get => _propUpdatedCount;
@@ -177,19 +192,26 @@ namespace Primo.MIA
                 var timeout = ParseIntOrDefault(GetPropertyValue<string>(Prop_CommandTimeoutSeconds, nameof(Prop_CommandTimeoutSeconds), sd), 60);
 
                 var transactionId = DatabaseTransactionResolver.ResolveOptional(explicitTransactionId);
-                var transactionHandle = DatabaseTransactionManager.Get(transactionId);
-                var result = transactionHandle != null
-                    ? DatabaseHelper.ExecuteUpsert(transactionHandle, dataTable, destinationTable, keyColumns, updateColumns, columnMappings, timeout)
-                    : DatabaseHelper.ExecuteUpsert(provider, connectionString, dataTable, destinationTable, keyColumns, updateColumns, columnMappings, timeout);
 
-                SetVariableValue(Prop_InsertedCount, result.InsertedCount, sd);
-                SetVariableValue(Prop_UpdatedCount, result.UpdatedCount, sd);
+                var logic = new DatabaseBulkLogic();
+                var upsertResult = logic.Upsert(provider, connectionString, transactionId, dataTable, destinationTable, keyColumns, updateColumns, columnMappings, timeout);
+
+                SetVariableValue(Prop_InsertedCount, upsertResult.InsertedCount, sd);
+                SetVariableValue(Prop_UpdatedCount, upsertResult.UpdatedCount, sd);
 
                 return new ExecutionResult
                 {
                     IsSuccess = true,
-                    SuccessMessage = $"Upsert завершён. Inserted: {result.InsertedCount}, Updated: {result.UpdatedCount}"
+                    SuccessMessage = $"Upsert завершён. Inserted: {upsertResult.InsertedCount}, Updated: {upsertResult.UpdatedCount}"
                 };
+            }
+            catch (System.Data.Common.DbException ex)
+            {
+                return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Ошибка БД: {ex.Message}" };
+            }
+            catch (InvalidOperationException ex)
+            {
+                return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Недопустимая операция: {ex.Message}" };
             }
             catch (Exception ex)
             {

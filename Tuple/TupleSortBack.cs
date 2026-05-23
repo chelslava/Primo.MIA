@@ -39,7 +39,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(object))]
         [System.ComponentModel.Category(ActivityStrings.Category_Main)]
         [System.ComponentModel.DisplayName(ActivityStrings.Field_TupleList)]
-        public string Prop_TupleList { get => _propTupleList; set { _propTupleList = value; InvokePropertyChanged(this, "Prop_TupleList"); } }
+        public string Prop_TupleList { get => _propTupleList; set { _propTupleList = value; InvokePropertyChanged(this, nameof(Prop_TupleList)); } }
 
         private TupleItemIndex _sortKey = TupleItemIndex.Item1;
         /// <summary>По значению какого элемента сортировать (Item1–Item7).</summary>
@@ -49,7 +49,7 @@ namespace Primo.MIA
         public TupleItemIndex SortKey
         {
             get => _sortKey;
-            set { _sortKey = value; InvokePropertyChanged(this, "SortKey"); }
+            set { _sortKey = value; InvokePropertyChanged(this, nameof(SortKey)); }
         }
 
         private TupleSortDirection _direction = TupleSortDirection.Ascending;
@@ -60,7 +60,7 @@ namespace Primo.MIA
         public TupleSortDirection Direction
         {
             get => _direction;
-            set { _direction = value; InvokePropertyChanged(this, "Direction"); }
+            set { _direction = value; InvokePropertyChanged(this, nameof(Direction)); }
         }
 
         private TupleSortType _sortType = TupleSortType.Alphabetical;
@@ -71,7 +71,7 @@ namespace Primo.MIA
         public TupleSortType SortType
         {
             get => _sortType;
-            set { _sortType = value; InvokePropertyChanged(this, "SortType"); }
+            set { _sortType = value; InvokePropertyChanged(this, nameof(SortType)); }
         }
 
         // ── OUTPUT ─────────────────────────────────────────────────────────────
@@ -82,7 +82,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(object))]
         [System.ComponentModel.Category(ActivityStrings.Category_Output)]
         [System.ComponentModel.DisplayName(ActivityStrings.Field_OutputVariable)]
-        public string Prop_Result { get => _propResult; set { _propResult = value; InvokePropertyChanged(this, "Prop_Result"); } }
+        public string Prop_Result { get => _propResult; set { _propResult = value; InvokePropertyChanged(this, nameof(Prop_Result)); } }
 
         private string _propCount;
         /// <summary>Количество кортежей в результате.</summary>
@@ -90,7 +90,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
         [System.ComponentModel.Category(ActivityStrings.Category_Output)]
         [System.ComponentModel.DisplayName(ActivityStrings.Field_Count)]
-        public string Prop_Count { get => _propCount; set { _propCount = value; InvokePropertyChanged(this, "Prop_Count"); } }
+        public string Prop_Count { get => _propCount; set { _propCount = value; InvokePropertyChanged(this, nameof(Prop_Count)); } }
 
         // ── КОНСТРУКТОР ────────────────────────────────────────────────────────
 
@@ -192,6 +192,14 @@ namespace Primo.MIA
                     IsSuccess = true,
                     SuccessMessage = $"Отсортировано {resultList.Count} кортежей по Item{keyNum} ({this.SortType}, {this.Direction})"
                 };
+            }
+            catch (ArgumentException ex)
+            {
+                return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Неверный аргумент: {ex.Message}" };
+            }
+            catch (InvalidOperationException ex)
+            {
+                return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Недопустимая операция: {ex.Message}" };
             }
             catch (Exception ex)
             {

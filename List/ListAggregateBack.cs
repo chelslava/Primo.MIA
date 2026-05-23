@@ -43,7 +43,7 @@ namespace Primo.MIA
         public string Prop_List
         {
             get => _propList;
-            set { _propList = value; InvokePropertyChanged(this, "Prop_List"); }
+            set { _propList = value; InvokePropertyChanged(this, nameof(Prop_List)); }
         }
 
         private ListAggregateMode _mode = ListAggregateMode.Count;
@@ -52,7 +52,7 @@ namespace Primo.MIA
         public ListAggregateMode Mode
         {
             get => _mode;
-            set { _mode = value; InvokePropertyChanged(this, "Mode"); }
+            set { _mode = value; InvokePropertyChanged(this, nameof(Mode)); }
         }
 
         private string _propSeparator;
@@ -63,7 +63,7 @@ namespace Primo.MIA
         public string Prop_Separator
         {
             get => _propSeparator;
-            set { _propSeparator = value; InvokePropertyChanged(this, "Prop_Separator"); }
+            set { _propSeparator = value; InvokePropertyChanged(this, nameof(Prop_Separator)); }
         }
 
         private string _propStringResult;
@@ -74,7 +74,7 @@ namespace Primo.MIA
         public string Prop_StringResult
         {
             get => _propStringResult;
-            set { _propStringResult = value; InvokePropertyChanged(this, "Prop_StringResult"); }
+            set { _propStringResult = value; InvokePropertyChanged(this, nameof(Prop_StringResult)); }
         }
 
         private string _propNumericResult;
@@ -85,7 +85,7 @@ namespace Primo.MIA
         public string Prop_NumericResult
         {
             get => _propNumericResult;
-            set { _propNumericResult = value; InvokePropertyChanged(this, "Prop_NumericResult"); }
+            set { _propNumericResult = value; InvokePropertyChanged(this, nameof(Prop_NumericResult)); }
         }
 
         private string _propNumericCount;
@@ -96,7 +96,7 @@ namespace Primo.MIA
         public string Prop_NumericCount
         {
             get => _propNumericCount;
-            set { _propNumericCount = value; InvokePropertyChanged(this, "Prop_NumericCount"); }
+            set { _propNumericCount = value; InvokePropertyChanged(this, nameof(Prop_NumericCount)); }
         }
 
         public ListAggregateBack(IWFContainer container) : base(container)
@@ -143,6 +143,14 @@ namespace Primo.MIA
                 SetVariableValue(this.Prop_NumericCount, result.NumericCount, sd);
 
                 return new ExecutionResult { IsSuccess = true, SuccessMessage = $"{this.Mode} = {(string.IsNullOrEmpty(result.StringResult) ? result.NumericResult.ToString() : result.StringResult)}" };
+            }
+            catch (ArgumentException ex)
+            {
+                return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Неверный аргумент: {ex.Message}" };
+            }
+            catch (InvalidOperationException ex)
+            {
+                return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Недопустимая операция: {ex.Message}" };
             }
             catch (Exception ex)
             {

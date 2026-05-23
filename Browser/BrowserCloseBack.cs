@@ -45,7 +45,7 @@ namespace Primo.MIA
         public string Prop_SessionId
         {
             get => _propSessionId;
-            set { _propSessionId = value; InvokePropertyChanged(this, "Prop_SessionId"); }
+            set { _propSessionId = value; InvokePropertyChanged(this, nameof(Prop_SessionId)); }
         }
 
         // ── Конструктор ────────────────────────────────────────────────

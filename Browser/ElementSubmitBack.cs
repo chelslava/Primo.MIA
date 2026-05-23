@@ -46,7 +46,7 @@ namespace Primo.MIA
         public string Prop_SessionId
         {
             get => _propSessionId;
-            set { _propSessionId = value; InvokePropertyChanged(this, "Prop_SessionId"); }
+            set { _propSessionId = value; InvokePropertyChanged(this, nameof(Prop_SessionId)); }
         }
 
         private string _propElementId;
@@ -58,7 +58,7 @@ namespace Primo.MIA
         public string Prop_ElementId
         {
             get => _propElementId;
-            set { _propElementId = value; InvokePropertyChanged(this, "Prop_ElementId"); }
+            set { _propElementId = value; InvokePropertyChanged(this, nameof(Prop_ElementId)); }
         }
 
         private ElementLocatorType _propLocatorType;
@@ -69,7 +69,7 @@ namespace Primo.MIA
         public ElementLocatorType Prop_LocatorType
         {
             get => _propLocatorType;
-            set { _propLocatorType = value; InvokePropertyChanged(this, "Prop_LocatorType"); }
+            set { _propLocatorType = value; InvokePropertyChanged(this, nameof(Prop_LocatorType)); }
         }
 
         private string _propLocatorValue;
@@ -81,7 +81,7 @@ namespace Primo.MIA
         public string Prop_LocatorValue
         {
             get => _propLocatorValue;
-            set { _propLocatorValue = value; InvokePropertyChanged(this, "Prop_LocatorValue"); }
+            set { _propLocatorValue = value; InvokePropertyChanged(this, nameof(Prop_LocatorValue)); }
         }
 
         private string _propWaitMode;
@@ -92,7 +92,7 @@ namespace Primo.MIA
         public ElementWaitMode Prop_WaitMode
         {
             get => (ElementWaitMode)Enum.Parse(typeof(ElementWaitMode), _propWaitMode ?? "Clickable");
-            set { _propWaitMode = value.ToString(); InvokePropertyChanged(this, "Prop_WaitMode"); }
+            set { _propWaitMode = value.ToString(); InvokePropertyChanged(this, nameof(Prop_WaitMode)); }
         }
 
         private string _propWaitTimeout;
@@ -104,7 +104,7 @@ namespace Primo.MIA
         public string Prop_WaitTimeout
         {
             get => _propWaitTimeout;
-            set { _propWaitTimeout = value; InvokePropertyChanged(this, "Prop_WaitTimeout"); }
+            set { _propWaitTimeout = value; InvokePropertyChanged(this, nameof(Prop_WaitTimeout)); }
         }
 
         // ── Конструктор ────────────────────────────────────────────────
@@ -168,7 +168,7 @@ namespace Primo.MIA
                 IWebElement element;
                 if (!string.IsNullOrWhiteSpace(locatorValue))
                 {
-                    string timeoutStr = GetPropertyValue<string>(Prop_WaitTimeout, "Prop_WaitTimeout", sd) ?? "10";
+                    string timeoutStr = GetPropertyValue<string>(Prop_WaitTimeout, nameof(Prop_WaitTimeout), sd) ?? "10";
                     int timeout = int.TryParse(timeoutStr, out int t) ? t : 10;
                     ValidatePositive(timeout, "Prop_WaitTimeout");
 

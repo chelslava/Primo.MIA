@@ -259,7 +259,7 @@ namespace Primo.MIA
                 if (!string.IsNullOrWhiteSpace(locatorValue))
                 {
                     // Поиск элемента по локатору
-                    string timeoutStr = GetPropertyValue<string>(this.Prop_WaitTimeout, "Prop_WaitTimeout", sd) ?? "10";
+                    string timeoutStr = GetPropertyValue<string>(this.Prop_WaitTimeout, nameof(Prop_WaitTimeout), sd) ?? "10";
                     int timeout = int.TryParse(timeoutStr, out int t) ? t : 10;
                     ValidatePositive(timeout, "Prop_WaitTimeout");
 
@@ -301,8 +301,8 @@ namespace Primo.MIA
 
                     case HoverMode.WithOffset:
                         // Наведение с смещением
-                        string offsetXStr = GetPropertyValue<string>(this.Prop_OffsetX, "Prop_OffsetX", sd) ?? "0";
-                        string offsetYStr = GetPropertyValue<string>(this.Prop_OffsetY, "Prop_OffsetY", sd) ?? "0";
+                        string offsetXStr = GetPropertyValue<string>(this.Prop_OffsetX, nameof(Prop_OffsetX), sd) ?? "0";
+                        string offsetYStr = GetPropertyValue<string>(this.Prop_OffsetY, nameof(Prop_OffsetY), sd) ?? "0";
                         int offsetX = int.TryParse(offsetXStr, out int ox) ? ox : 0;
                         int offsetY = int.TryParse(offsetYStr, out int oy) ? oy : 0;
 

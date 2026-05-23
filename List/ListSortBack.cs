@@ -48,7 +48,7 @@ namespace Primo.MIA
         public string Prop_List
         {
             get => _propList;
-            set { _propList = value; InvokePropertyChanged(this, "Prop_List"); }
+            set { _propList = value; InvokePropertyChanged(this, nameof(Prop_List)); }
         }
 
         private ListSortMode _mode = ListSortMode.Alphabetical;
@@ -58,7 +58,7 @@ namespace Primo.MIA
         public ListSortMode Mode
         {
             get => _mode;
-            set { _mode = value; InvokePropertyChanged(this, "Mode"); }
+            set { _mode = value; InvokePropertyChanged(this, nameof(Mode)); }
         }
 
         private string _propRandomSeed;
@@ -72,7 +72,7 @@ namespace Primo.MIA
         public string Prop_RandomSeed
         {
             get => _propRandomSeed;
-            set { _propRandomSeed = value; InvokePropertyChanged(this, "Prop_RandomSeed"); }
+            set { _propRandomSeed = value; InvokePropertyChanged(this, nameof(Prop_RandomSeed)); }
         }
 
         // ── OUTPUT ─────────────────────────────────────────────────────────────
@@ -85,7 +85,7 @@ namespace Primo.MIA
         public string Prop_Result
         {
             get => _propResult;
-            set { _propResult = value; InvokePropertyChanged(this, "Prop_Result"); }
+            set { _propResult = value; InvokePropertyChanged(this, nameof(Prop_Result)); }
         }
 
         private string _propCount;
@@ -96,7 +96,7 @@ namespace Primo.MIA
         public string Prop_Count
         {
             get => _propCount;
-            set { _propCount = value; InvokePropertyChanged(this, "Prop_Count"); }
+            set { _propCount = value; InvokePropertyChanged(this, nameof(Prop_Count)); }
         }
 
         // ── КОНСТРУКТОР ────────────────────────────────────────────────────────
@@ -149,6 +149,14 @@ namespace Primo.MIA
                 SetVariableValue(this.Prop_Count, result.Count, sd);
 
                 return new ExecutionResult { IsSuccess = true, SuccessMessage = $"Отсортировано {result.Count} элементов ({this.Mode})" };
+            }
+            catch (ArgumentException ex)
+            {
+                return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Неверный аргумент: {ex.Message}" };
+            }
+            catch (InvalidOperationException ex)
+            {
+                return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Недопустимая операция: {ex.Message}" };
             }
             catch (Exception ex)
             {

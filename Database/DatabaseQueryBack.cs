@@ -1,3 +1,7 @@
+// =============================================================================
+// DatabaseQueryBack.cs — активность «Database: Запрос данных (Query)».
+// Выполняет SQL-запрос или хранимую процедуру и возвращает результат в DataTable.
+// =============================================================================
 using LTools.Common.Model;
 using LTools.Common.UIElements;
 using LTools.SDK;
@@ -30,6 +34,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
         [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_DbProviderInvariantName)]
+        /// <summary>Инвариантное имя ADO.NET провайдера (например, System.Data.SqlClient).</summary>
         public string Prop_ProviderInvariantName
         {
             get => _propProviderInvariantName;
@@ -40,6 +45,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
         [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_ConnectionString)]
+        /// <summary>Строка подключения к базе данных.</summary>
         public string Prop_ConnectionString
         {
             get => _propConnectionString;
@@ -50,6 +56,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
         [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_TransactionId)]
+        /// <summary>Идентификатор активной транзакции; если не задан, используется ambient-контекст или прямое соединение.</summary>
         public string Prop_TransactionId
         {
             get => _propTransactionId;
@@ -59,6 +66,7 @@ namespace Primo.MIA
         private DatabaseCommandType _propCommandType = DatabaseCommandType.Text;
         [LTools.Common.Model.Serialization.StoringProperty]
         [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_CommandType)]
+        /// <summary>Тип команды: Text (SQL-запрос) или StoredProcedure.</summary>
         public DatabaseCommandType Prop_CommandType
         {
             get => _propCommandType;
@@ -69,6 +77,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
         [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_CommandText)]
+        /// <summary>Текст SQL-запроса или имя хранимой процедуры.</summary>
         public string Prop_CommandText
         {
             get => _propCommandText;
@@ -79,6 +88,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(Dictionary<string, string>))]
         [System.ComponentModel.Category(ActivityStrings.Category_Parameters), System.ComponentModel.DisplayName(ActivityStrings.Field_ParametersDictionary)]
+        /// <summary>Словарь параметров команды (имя → значение).</summary>
         public string Prop_Parameters
         {
             get => _propParameters;
@@ -89,6 +99,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
         [System.ComponentModel.Category(ActivityStrings.Category_Settings), System.ComponentModel.DisplayName(ActivityStrings.Field_CommandTimeoutSeconds)]
+        /// <summary>Таймаут выполнения команды в секундах.</summary>
         public string Prop_CommandTimeoutSeconds
         {
             get => _propCommandTimeoutSeconds;
@@ -99,6 +110,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(DataTable))]
         [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_ResultTable)]
+        /// <summary>Результат запроса в виде DataTable.</summary>
         public string Prop_ResultTable
         {
             get => _propResultTable;
@@ -109,6 +121,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
         [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_RowCount)]
+        /// <summary>Количество строк в результирующей таблице.</summary>
         public string Prop_RowCount
         {
             get => _propRowCount;
@@ -119,6 +132,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
         [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_ColumnCount)]
+        /// <summary>Количество столбцов в результирующей таблице.</summary>
         public string Prop_ColumnCount
         {
             get => _propColumnCount;
@@ -129,6 +143,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(List<string>))]
         [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_ColumnNames)]
+        /// <summary>Список имён столбцов результирующей таблицы.</summary>
         public string Prop_ColumnNames
         {
             get => _propColumnNames;
@@ -139,6 +154,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(bool))]
         [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_HasRows)]
+        /// <summary>Признак наличия строк в результирующей таблице.</summary>
         public string Prop_HasRows
         {
             get => _propHasRows;
@@ -185,24 +201,29 @@ namespace Primo.MIA
                     timeout = 30;
 
                 var transactionId = DatabaseTransactionResolver.ResolveOptional(explicitTransactionId);
-                var transactionHandle = DatabaseTransactionManager.Get(transactionId);
 
-                var table = transactionHandle != null
-                    ? DatabaseHelper.ExecuteQuery(transactionHandle, commandText, Prop_CommandType, timeout, parameters)
-                    : DatabaseHelper.ExecuteQuery(provider, connectionString, commandText, Prop_CommandType, timeout, parameters);
-                var columnNames = table.Columns.Cast<DataColumn>().Select(column => column.ColumnName).ToList();
+                var logic = new DatabaseQueryLogic();
+                var result = logic.Execute(provider, connectionString, Prop_CommandType, commandText, parameters, timeout, transactionId);
 
-                SetVariableValue(Prop_ResultTable, table, sd);
-                SetVariableValue(Prop_RowCount, table.Rows.Count, sd);
-                SetVariableValue(Prop_ColumnCount, table.Columns.Count, sd);
-                SetVariableValue(Prop_ColumnNames, columnNames, sd);
-                SetVariableValue(Prop_HasRows, table.Rows.Count > 0, sd);
+                SetVariableValue(Prop_ResultTable, result.Table, sd);
+                SetVariableValue(Prop_RowCount, result.RowCount, sd);
+                SetVariableValue(Prop_ColumnCount, result.ColumnCount, sd);
+                SetVariableValue(Prop_ColumnNames, result.ColumnNames, sd);
+                SetVariableValue(Prop_HasRows, result.HasRows, sd);
 
                 return new ExecutionResult
                 {
                     IsSuccess = true,
-                    SuccessMessage = $"Получено строк: {table.Rows.Count}, столбцов: {table.Columns.Count}"
+                    SuccessMessage = $"Получено строк: {result.RowCount}, столбцов: {result.ColumnCount}"
                 };
+            }
+            catch (System.Data.Common.DbException ex)
+            {
+                return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Ошибка БД: {ex.Message}" };
+            }
+            catch (InvalidOperationException ex)
+            {
+                return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Недопустимая операция: {ex.Message}" };
             }
             catch (Exception ex)
             {

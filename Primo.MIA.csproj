@@ -18,8 +18,8 @@
     <Version>1.0.0</Version>
     <Authors>Your Team</Authors>
     <Description>Централизованное хранилище для глобальных переменных и конфигураций MIA</Description>
-     <PackageProjectUrl>https://github.com/chelslava/Primo.MIA</PackageProjectUrl>
-     <RepositoryUrl>https://github.com/chelslava/Primo.MIA</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/chelslava/Primo.MIA</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/chelslava/Primo.MIA</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <NuGetPackageImportStamp>
@@ -275,24 +275,23 @@
     <Compile Include="Common\ActivityStrings.cs" />
     <Compile Include="Common\ComparisonHelper.cs" />
     <Compile Include="Common\Guard.cs" />
-<Compile Include="BrowserEnums.cs" />
-    <Compile Include="DatabaseEnums.cs" />
-    <Compile Include="HttpWebEnums.cs" />
-    <Compile Include="ListEnums.cs" />
-    <Compile Include="CalendarEnums.cs" />
-    <Compile Include="TextEnums.cs" />
-    <Compile Include="DictionaryEnums.cs" />
-    <Compile Include="TupleEnums.cs" />
-    <Compile Include="FileEnums.cs" />
-    <Compile Include="UtilitiesEnums.cs" />
-    <Compile Include="Enums.cs" />
+    <Compile Include="Enums\BrowserEnums.cs" />
+    <Compile Include="Enums\DatabaseEnums.cs" />
+    <Compile Include="Enums\HttpWebEnums.cs" />
+    <Compile Include="Enums\ListEnums.cs" />
+    <Compile Include="Enums\CalendarEnums.cs" />
+    <Compile Include="Enums\TextEnums.cs" />
+    <Compile Include="Enums\DictionaryEnums.cs" />
+    <Compile Include="Enums\TupleEnums.cs" />
+    <Compile Include="Enums\FileEnums.cs" />
+    <Compile Include="Enums\UtilitiesEnums.cs" />
     <Compile Include="Common\FileHelper.cs" />
-<Compile Include="Common\NaturalComparer.cs" />
-<Compile Include="Common\PropertyBuilder.cs" />
-<Compile Include="Common\SeleniumHelper.cs" />
-<Compile Include="Common\StringHelper.cs" />
-<Compile Include="Common\TupleHelper.cs" />
-<Compile Include="Common\ValidationHelper.cs" />
+    <Compile Include="Common\NaturalComparer.cs" />
+    <Compile Include="Common\PropertyBuilder.cs" />
+    <Compile Include="Common\SeleniumHelper.cs" />
+    <Compile Include="Common\StringHelper.cs" />
+    <Compile Include="Common\TupleHelper.cs" />
+    <Compile Include="Common\ValidationHelper.cs" />
     <Compile Include="Common\Converters\EnumToVisibilityConverter.cs" />
     <Compile Include="Files\FileCleanup.xaml.cs">
       <DependentUpon>FileCleanup.xaml</DependentUpon>

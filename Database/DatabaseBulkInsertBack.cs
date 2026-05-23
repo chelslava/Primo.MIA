@@ -1,3 +1,7 @@
+// =============================================================================
+// DatabaseBulkInsertBack.cs — активность «Database: Массовая запись (BulkInsert)».
+// Выполняет высокопроизводительную массовую загрузку строк DataTable в таблицу БД.
+// =============================================================================
 using LTools.Common.Model;
 using LTools.Common.UIElements;
 using LTools.SDK;
@@ -29,6 +33,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(DataTable))]
         [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_DataTable)]
+        /// <summary>Исходная таблица данных DataTable, строки которой будут записаны в БД.</summary>
         public string Prop_DataTable
         {
             get => _propDataTable;
@@ -39,6 +44,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
         [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_DbProviderInvariantName)]
+        /// <summary>Инвариантное имя ADO.NET провайдера (например, System.Data.SqlClient).</summary>
         public string Prop_ProviderInvariantName
         {
             get => _propProviderInvariantName;
@@ -49,6 +55,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
         [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_ConnectionString)]
+        /// <summary>Строка подключения к базе данных.</summary>
         public string Prop_ConnectionString
         {
             get => _propConnectionString;
@@ -59,6 +66,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
         [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_TransactionId)]
+        /// <summary>Идентификатор активной транзакции; если не задан, используется ambient-контекст или прямое соединение.</summary>
         public string Prop_TransactionId
         {
             get => _propTransactionId;
@@ -69,6 +77,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
         [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_DestinationTable)]
+        /// <summary>Имя целевой таблицы в базе данных, в которую записываются строки.</summary>
         public string Prop_DestinationTable
         {
             get => _propDestinationTable;
@@ -79,6 +88,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(Dictionary<string, string>))]
         [System.ComponentModel.Category(ActivityStrings.Category_Parameters), System.ComponentModel.DisplayName(ActivityStrings.Field_ColumnMappings)]
+        /// <summary>Словарь маппинга колонок: SourceColumn → DestinationColumn. Если не задан, используются одинаковые имена.</summary>
         public string Prop_ColumnMappings
         {
             get => _propColumnMappings;
@@ -89,6 +99,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
         [System.ComponentModel.Category(ActivityStrings.Category_Settings), System.ComponentModel.DisplayName(ActivityStrings.Field_BatchSize)]
+        /// <summary>Размер пакета строк при батч-записи.</summary>
         public string Prop_BatchSize
         {
             get => _propBatchSize;
@@ -99,6 +110,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
         [System.ComponentModel.Category(ActivityStrings.Category_Settings), System.ComponentModel.DisplayName(ActivityStrings.Field_BulkCopyTimeoutSeconds)]
+        /// <summary>Таймаут операции массовой записи в секундах.</summary>
         public string Prop_BulkCopyTimeoutSeconds
         {
             get => _propBulkCopyTimeoutSeconds;
@@ -108,6 +120,7 @@ namespace Primo.MIA
         private bool _propUseTableLock = true;
         [LTools.Common.Model.Serialization.StoringProperty]
         [System.ComponentModel.Category(ActivityStrings.Category_Settings), System.ComponentModel.DisplayName(ActivityStrings.Field_UseTableLock)]
+        /// <summary>Использовать блокировку таблицы для ускорения записи (актуально для SqlBulkCopy).</summary>
         public bool Prop_UseTableLock
         {
             get => _propUseTableLock;
@@ -117,6 +130,7 @@ namespace Primo.MIA
         private bool _propKeepIdentity = false;
         [LTools.Common.Model.Serialization.StoringProperty]
         [System.ComponentModel.Category(ActivityStrings.Category_Settings), System.ComponentModel.DisplayName(ActivityStrings.Field_KeepIdentity)]
+        /// <summary>Сохранять значения identity-колонок из источника вместо автогенерации (актуально для SqlBulkCopy).</summary>
         public bool Prop_KeepIdentity
         {
             get => _propKeepIdentity;
@@ -126,6 +140,7 @@ namespace Primo.MIA
         private DatabaseBulkPreloadMode _propPreloadMode = DatabaseBulkPreloadMode.None;
         [LTools.Common.Model.Serialization.StoringProperty]
         [System.ComponentModel.Category(ActivityStrings.Category_Settings), System.ComponentModel.DisplayName(ActivityStrings.Field_PreloadMode)]
+        /// <summary>Режим предварительной очистки целевой таблицы перед массовой загрузкой.</summary>
         public DatabaseBulkPreloadMode Prop_PreloadMode
         {
             get => _propPreloadMode;
@@ -136,6 +151,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
         [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_RowsWritten)]
+        /// <summary>Количество строк, успешно записанных в целевую таблицу.</summary>
         public string Prop_RowsWritten
         {
             get => _propRowsWritten;
@@ -146,6 +162,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
         [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_MappingCount)]
+        /// <summary>Количество использованных маппингов колонок при записи.</summary>
         public string Prop_MappingCount
         {
             get => _propMappingCount;
@@ -156,6 +173,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
         [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_WriteMode)]
+        /// <summary>Фактически использованный режим записи (SqlBulkCopy или batched insert).</summary>
         public string Prop_WriteMode
         {
             get => _propWriteMode;
@@ -209,24 +227,31 @@ namespace Primo.MIA
                 var timeout = ParseIntOrDefault(GetPropertyValue<string>(Prop_BulkCopyTimeoutSeconds, nameof(Prop_BulkCopyTimeoutSeconds), sd), 60);
 
                 var transactionId = DatabaseTransactionResolver.ResolveOptional(explicitTransactionId);
-                var transactionHandle = DatabaseTransactionManager.Get(transactionId);
-                var writeResult = transactionHandle != null
-                    ? DatabaseHelper.ExecuteBulkInsert(transactionHandle, dataTable, destinationTable, batchSize, timeout, Prop_UseTableLock, Prop_KeepIdentity, Prop_PreloadMode, columnMappings)
-                    : DatabaseHelper.ExecuteBulkInsert(provider, connectionString, dataTable, destinationTable, batchSize, timeout, Prop_UseTableLock, Prop_KeepIdentity, Prop_PreloadMode, columnMappings);
+
+                var logic = new DatabaseBulkLogic();
+                var bulkResult = logic.BulkInsert(provider, connectionString, transactionId, dataTable, destinationTable, columnMappings, batchSize, timeout, Prop_UseTableLock, Prop_KeepIdentity, Prop_PreloadMode);
 
                 var mappingCount = columnMappings != null && columnMappings.Count > 0
                     ? columnMappings.Count
                     : dataTable.Columns.Count;
 
-                SetVariableValue(Prop_RowsWritten, writeResult.RowsWritten, sd);
+                SetVariableValue(Prop_RowsWritten, bulkResult.RowsAffected, sd);
                 SetVariableValue(Prop_MappingCount, mappingCount, sd);
-                SetVariableValue(Prop_WriteMode, writeResult.Mode ?? string.Empty, sd);
+                SetVariableValue(Prop_WriteMode, bulkResult.WriteMode ?? string.Empty, sd);
 
                 return new ExecutionResult
                 {
                     IsSuccess = true,
-                    SuccessMessage = $"Массовая запись завершена. Записано строк: {writeResult.RowsWritten}. Режим: {writeResult.Mode}"
+                    SuccessMessage = $"Массовая запись завершена. Записано строк: {bulkResult.RowsAffected}. Режим: {bulkResult.WriteMode}"
                 };
+            }
+            catch (System.Data.Common.DbException ex)
+            {
+                return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Ошибка БД: {ex.Message}" };
+            }
+            catch (InvalidOperationException ex)
+            {
+                return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Недопустимая операция: {ex.Message}" };
             }
             catch (Exception ex)
             {

@@ -1,58 +1,28 @@
-﻿using Primo.MIA.Common;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
-using System.Data.Odbc;
-using System.Data.OleDb;
 using System.Data.SqlClient;
 using System.Globalization;
-using System.Linq;
-using System.Text.RegularExpressions;
 
 namespace Primo.MIA
 {
     /// <summary>
-    /// Вспомогательные методы для ADO.NET активностей.
-    /// Работают через DbProviderFactory и подходят для любых
-    /// зарегистрированных провайдеров с invariant name.
+    /// Фасад для обратной совместимости. Делегирует вызовы к специализированным хелперам.
     /// </summary>
     public static class DatabaseHelper
     {
         public const string DefaultProviderInvariantName = "System.Data.SqlClient";
 
-        public static DbProviderFactory GetFactory(string providerInvariantName)
-        {
-            var provider = string.IsNullOrWhiteSpace(providerInvariantName)
-                ? DefaultProviderInvariantName
-                : providerInvariantName.Trim();
+        // --- Connection ---
 
-            try
-            {
-                return DbProviderFactories.GetFactory(provider);
-            }
-            catch (Exception ex)
-            {
-                throw new InvalidOperationException(
-                    $"Не удалось получить DbProviderFactory для '{provider}'. " +
-                    "Проверьте invariant name и установлен ли ADO.NET провайдер.",
-                    ex);
-            }
-        }
+        public static DbProviderFactory GetFactory(string providerInvariantName)
+            => DatabaseConnectionHelper.GetFactory(providerInvariantName);
 
         public static DbConnection OpenConnection(string providerInvariantName, string connectionString)
-        {
-            Guard.NotNullOrWhiteSpace(connectionString, nameof(connectionString));
+            => DatabaseConnectionHelper.OpenConnection(providerInvariantName, connectionString);
 
-            var factory = GetFactory(providerInvariantName);
-            var connection = factory.CreateConnection();
-            if (connection == null)
-                throw new InvalidOperationException("Провайдер не смог создать объект подключения.");
-
-            connection.ConnectionString = connectionString;
-            connection.Open();
-            return connection;
-        }
+        // --- Command ---
 
         public static DbCommand CreateCommand(
             DbConnection connection,
@@ -61,55 +31,18 @@ namespace Primo.MIA
             int commandTimeoutSeconds,
             Dictionary<string, string> parameters = null,
             DbTransaction transaction = null)
-        {
-            if (connection == null)
-                throw new ArgumentNullException(nameof(connection));
-            Guard.NotNullOrWhiteSpace(commandText, nameof(commandText));
-
-            var command = connection.CreateCommand();
-            command.CommandText = commandText;
-            command.CommandType = commandType == DatabaseCommandType.StoredProcedure
-                ? CommandType.StoredProcedure
-                : CommandType.Text;
-            command.CommandTimeout = commandTimeoutSeconds > 0 ? commandTimeoutSeconds : 30;
-            command.Transaction = transaction;
-
-            AddParameters(command, parameters);
-            return command;
-        }
+            => DatabaseCommandHelper.CreateCommand(connection, commandText, commandType, commandTimeoutSeconds, parameters, transaction);
 
         public static void AddParameters(DbCommand command, Dictionary<string, string> parameters)
-        {
-            if (command == null)
-                throw new ArgumentNullException(nameof(command));
-            if (parameters == null || parameters.Count == 0)
-                return;
-
-            foreach (var pair in parameters)
-            {
-                var parameter = command.CreateParameter();
-                parameter.ParameterName = NormalizeParameterName(pair.Key);
-                parameter.Value = string.IsNullOrEmpty(pair.Value)
-                    ? (object)DBNull.Value
-                    : pair.Value;
-                command.Parameters.Add(parameter);
-            }
-        }
+            => DatabaseCommandHelper.AddParameters(command, parameters);
 
         public static string NormalizeParameterName(string parameterName)
-        {
-            Guard.NotNullOrWhiteSpace(parameterName, nameof(parameterName));
+            => DatabaseCommandHelper.NormalizeParameterName(parameterName);
 
-            var trimmed = parameterName.Trim();
-            if (trimmed.StartsWith("@", StringComparison.Ordinal) ||
-                trimmed.StartsWith(":", StringComparison.Ordinal) ||
-                trimmed.StartsWith("?", StringComparison.Ordinal))
-            {
-                return trimmed;
-            }
+        public static string NormalizeOutputParameterName(string providerInvariantName, string parameterName)
+            => DatabaseCommandHelper.NormalizeOutputParameterName(providerInvariantName, parameterName);
 
-            return "@" + trimmed;
-        }
+        // --- Execute ---
 
         public static DataTable ExecuteQuery(
             string providerInvariantName,
@@ -420,22 +353,24 @@ namespace Primo.MIA
             }
         }
 
+        // --- Scalar converters ---
+
         public static string ConvertScalarToString(object value)
-        {
-            if (value == null || value == DBNull.Value)
-                return null;
+            => DatabaseCommandHelper.ConvertScalarToString(value);
 
-            if (value is DateTime dt)
-                return dt.ToString("O", CultureInfo.InvariantCulture);
+        public static int? ConvertScalarToInt32(object value)
+            => DatabaseCommandHelper.ConvertScalarToInt32(value);
 
-            if (value is DateTimeOffset dto)
-                return dto.ToString("O", CultureInfo.InvariantCulture);
+        public static decimal? ConvertScalarToDecimal(object value)
+            => DatabaseCommandHelper.ConvertScalarToDecimal(value);
 
-            if (value is IFormattable formattable)
-                return formattable.ToString(null, CultureInfo.InvariantCulture);
+        public static bool? ConvertScalarToBoolean(object value)
+            => DatabaseCommandHelper.ConvertScalarToBoolean(value);
 
-            return value.ToString();
-        }
+        public static DateTime? ConvertScalarToDateTime(object value)
+            => DatabaseCommandHelper.ConvertScalarToDateTime(value);
+
+        // --- Upsert ---
 
         public static UpsertResult ExecuteUpsert(
             string providerInvariantName,
@@ -487,248 +422,8 @@ namespace Primo.MIA
                 commandTimeoutSeconds);
         }
 
-        public static int? ConvertScalarToInt32(object value)
-        {
-            if (value == null || value == DBNull.Value)
-                return null;
+        // --- Bulk Insert ---
 
-            if (value is int intValue)
-                return intValue;
-
-            if (value is IConvertible)
-            {
-                try
-                {
-                    return Convert.ToInt32(value, CultureInfo.InvariantCulture);
-                }
-                catch
-                {
-                }
-            }
-
-            int parsed;
-            return int.TryParse(ConvertScalarToString(value), NumberStyles.Integer, CultureInfo.InvariantCulture, out parsed)
-                ? parsed
-                : (int?)null;
-        }
-
-        public static decimal? ConvertScalarToDecimal(object value)
-        {
-            if (value == null || value == DBNull.Value)
-                return null;
-
-            if (value is decimal decimalValue)
-                return decimalValue;
-
-            if (value is IConvertible)
-            {
-                try
-                {
-                    return Convert.ToDecimal(value, CultureInfo.InvariantCulture);
-                }
-                catch
-                {
-                }
-            }
-
-            decimal parsed;
-            return decimal.TryParse(ConvertScalarToString(value), NumberStyles.Any, CultureInfo.InvariantCulture, out parsed)
-                ? parsed
-                : (decimal?)null;
-        }
-
-        public static bool? ConvertScalarToBoolean(object value)
-        {
-            if (value == null || value == DBNull.Value)
-                return null;
-
-            if (value is bool boolValue)
-                return boolValue;
-
-            if (value is IConvertible)
-            {
-                try
-                {
-                    return Convert.ToBoolean(value, CultureInfo.InvariantCulture);
-                }
-                catch
-                {
-                }
-            }
-
-            var text = ConvertScalarToString(value);
-            if (string.IsNullOrWhiteSpace(text))
-                return null;
-
-            bool parsedBool;
-            if (bool.TryParse(text, out parsedBool))
-                return parsedBool;
-
-            if (string.Equals(text, "1", StringComparison.Ordinal))
-                return true;
-            if (string.Equals(text, "0", StringComparison.Ordinal))
-                return false;
-
-            return null;
-        }
-
-        public static DateTime? ConvertScalarToDateTime(object value)
-        {
-            if (value == null || value == DBNull.Value)
-                return null;
-
-            if (value is DateTime dateTimeValue)
-                return dateTimeValue;
-
-            if (value is DateTimeOffset dateTimeOffsetValue)
-                return dateTimeOffsetValue.UtcDateTime;
-
-            if (value is IConvertible)
-            {
-                try
-                {
-                    return Convert.ToDateTime(value, CultureInfo.InvariantCulture);
-                }
-                catch
-                {
-                }
-            }
-
-            DateTime parsed;
-            return DateTime.TryParse(
-                ConvertScalarToString(value),
-                CultureInfo.InvariantCulture,
-                DateTimeStyles.RoundtripKind | DateTimeStyles.AllowWhiteSpaces,
-                out parsed)
-                ? parsed
-                : (DateTime?)null;
-        }
-
-        public static DataTable GetSchema(
-            string providerInvariantName,
-            string connectionString,
-            string collectionName)
-        {
-            using (var connection = OpenConnection(providerInvariantName, connectionString))
-            {
-                return connection.GetSchema(collectionName);
-            }
-        }
-
-        public static DataTable GetTablesSchema(
-            string providerInvariantName,
-            string connectionString,
-            string schemaName = null,
-            bool includeViews = false)
-        {
-            var schema = GetSchema(providerInvariantName, connectionString, "Tables");
-            var filtered = schema.Clone();
-
-            foreach (DataRow row in schema.Rows)
-            {
-                var tableSchema = GetSchemaValue(row, "TABLE_SCHEMA");
-                var tableName = GetSchemaValue(row, "TABLE_NAME");
-                var tableType = GetSchemaValue(row, "TABLE_TYPE");
-
-                if (string.IsNullOrWhiteSpace(tableName))
-                    continue;
-                if (!string.IsNullOrWhiteSpace(schemaName) &&
-                    !string.Equals(tableSchema, schemaName, StringComparison.OrdinalIgnoreCase))
-                    continue;
-                if (!includeViews &&
-                    !string.IsNullOrWhiteSpace(tableType) &&
-                    tableType.IndexOf("VIEW", StringComparison.OrdinalIgnoreCase) >= 0)
-                    continue;
-
-                filtered.ImportRow(row);
-            }
-
-            return filtered;
-        }
-
-        public static bool TableExists(
-            string providerInvariantName,
-            string connectionString,
-            string tableName,
-            string schemaName = null,
-            bool includeViews = false)
-        {
-            if (string.IsNullOrWhiteSpace(tableName))
-                throw new ArgumentException("Имя таблицы не может быть пустым.", nameof(tableName));
-
-            var schema = GetTablesSchema(providerInvariantName, connectionString, schemaName, includeViews);
-            return schema.Rows.Cast<DataRow>()
-                .Any(row => string.Equals(GetSchemaValue(row, "TABLE_NAME"), tableName, StringComparison.OrdinalIgnoreCase));
-        }
-
-        public static List<string> GetTableNames(
-            string providerInvariantName,
-            string connectionString,
-            string schemaName = null,
-            bool includeViews = false)
-        {
-            var schema = GetTablesSchema(providerInvariantName, connectionString, schemaName, includeViews);
-            return schema.Rows.Cast<DataRow>()
-                .Select(row =>
-                {
-                    var tableSchema = GetSchemaValue(row, "TABLE_SCHEMA");
-                    var tableName = GetSchemaValue(row, "TABLE_NAME");
-                    return string.IsNullOrWhiteSpace(tableSchema) ? tableName : tableSchema + "." + tableName;
-                })
-                .Where(name => !string.IsNullOrWhiteSpace(name))
-                .Distinct(StringComparer.OrdinalIgnoreCase)
-                .OrderBy(name => name, StringComparer.OrdinalIgnoreCase)
-                .ToList();
-        }
-
-        public static DataTable GetColumnsSchema(
-            string providerInvariantName,
-            string connectionString,
-            string tableName,
-            string schemaName = null)
-        {
-            if (string.IsNullOrWhiteSpace(tableName))
-                throw new ArgumentException("Имя таблицы не может быть пустым.", nameof(tableName));
-
-            var schema = GetSchema(providerInvariantName, connectionString, "Columns");
-            var filtered = schema.Clone();
-
-            foreach (DataRow row in schema.Rows)
-            {
-                var rowSchema = GetSchemaValue(row, "TABLE_SCHEMA");
-                var rowTable = GetSchemaValue(row, "TABLE_NAME");
-                if (!string.Equals(rowTable, tableName, StringComparison.OrdinalIgnoreCase))
-                    continue;
-                if (!string.IsNullOrWhiteSpace(schemaName) &&
-                    !string.Equals(rowSchema, schemaName, StringComparison.OrdinalIgnoreCase))
-                    continue;
-
-                filtered.ImportRow(row);
-            }
-
-            return filtered;
-        }
-
-        public static List<string> GetColumnNames(
-            string providerInvariantName,
-            string connectionString,
-            string tableName,
-            string schemaName = null)
-        {
-            var schema = GetColumnsSchema(providerInvariantName, connectionString, tableName, schemaName);
-            return schema.Rows.Cast<DataRow>()
-                .Select(row => GetSchemaValue(row, "COLUMN_NAME"))
-                .Where(name => !string.IsNullOrWhiteSpace(name))
-                .Distinct(StringComparer.OrdinalIgnoreCase)
-                .OrderBy(name => name, StringComparer.OrdinalIgnoreCase)
-                .ToList();
-        }
-
-        /// <summary>
-        /// Универсальная массовая запись DataTable.
-        /// Для SQL Server использует SqlBulkCopy, для остальных провайдеров —
-        /// batched insert через DbProviderFactory и транзакцию.
-        /// </summary>
         public static BulkInsertResult ExecuteBulkInsert(
             string providerInvariantName,
             string connectionString,
@@ -778,6 +473,292 @@ namespace Primo.MIA
                 columnMappings);
         }
 
+        public static BulkInsertResult ExecuteBulkInsert(
+            DatabaseTransactionHandle transactionHandle,
+            DataTable dataTable,
+            string destinationTableName,
+            int batchSize,
+            int bulkCopyTimeoutSeconds,
+            bool useTableLock,
+            bool keepIdentity,
+            DatabaseBulkPreloadMode preloadMode,
+            Dictionary<string, string> columnMappings = null)
+        {
+            EnsureTransactionHandle(transactionHandle);
+
+            if (dataTable == null)
+                throw new ArgumentNullException(nameof(dataTable), "Исходная таблица данных не указана.");
+            if (string.IsNullOrWhiteSpace(destinationTableName))
+                throw new ArgumentException("Имя таблицы-приёмника не может быть пустым.", nameof(destinationTableName));
+            if (dataTable.Columns.Count == 0)
+                return new BulkInsertResult { RowsWritten = dataTable.Rows.Count, Mode = "NoColumns" };
+
+            if (string.Equals(transactionHandle.ProviderInvariantName, DefaultProviderInvariantName, StringComparison.OrdinalIgnoreCase))
+            {
+                return ExecuteSqlServerBulkInsert(transactionHandle, dataTable, destinationTableName, batchSize, bulkCopyTimeoutSeconds, useTableLock, keepIdentity, preloadMode, columnMappings);
+            }
+
+            return ExecuteBatchedInsert(transactionHandle, dataTable, destinationTableName, batchSize, bulkCopyTimeoutSeconds, preloadMode, columnMappings);
+        }
+
+        // --- Schema ---
+
+        public static DataTable GetSchema(string providerInvariantName, string connectionString, string collectionName)
+            => DatabaseSchemaHelper.GetSchema(providerInvariantName, connectionString, collectionName);
+
+        public static DataTable GetTablesSchema(
+            string providerInvariantName,
+            string connectionString,
+            string schemaName = null,
+            bool includeViews = false)
+            => DatabaseSchemaHelper.GetTablesSchema(providerInvariantName, connectionString, schemaName, includeViews);
+
+        public static bool TableExists(
+            string providerInvariantName,
+            string connectionString,
+            string tableName,
+            string schemaName = null,
+            bool includeViews = false)
+            => DatabaseSchemaHelper.TableExists(providerInvariantName, connectionString, tableName, schemaName, includeViews);
+
+        public static List<string> GetTableNames(
+            string providerInvariantName,
+            string connectionString,
+            string schemaName = null,
+            bool includeViews = false)
+            => DatabaseSchemaHelper.GetTableNames(providerInvariantName, connectionString, schemaName, includeViews);
+
+        public static DataTable GetColumnsSchema(
+            string providerInvariantName,
+            string connectionString,
+            string tableName,
+            string schemaName = null)
+            => DatabaseSchemaHelper.GetColumnsSchema(providerInvariantName, connectionString, tableName, schemaName);
+
+        public static List<string> GetColumnNames(
+            string providerInvariantName,
+            string connectionString,
+            string tableName,
+            string schemaName = null)
+            => DatabaseSchemaHelper.GetColumnNames(providerInvariantName, connectionString, tableName, schemaName);
+
+        // --- Query builders ---
+
+        public static string BuildPagedQuery(
+            string providerInvariantName,
+            string sourceQuery,
+            string orderByExpression,
+            int pageNumber,
+            int pageSize)
+            => DatabaseCommandHelper.BuildPagedQuery(providerInvariantName, sourceQuery, orderByExpression, pageNumber, pageSize);
+
+        public static string BuildCountQuery(string providerInvariantName, string sourceQuery)
+            => DatabaseCommandHelper.BuildCountQuery(providerInvariantName, sourceQuery);
+
+        public static string GetIdentityQuery(string providerInvariantName)
+            => DatabaseCommandHelper.GetIdentityQuery(providerInvariantName);
+
+        public static List<string> SplitSqlBatches(string commandText)
+            => DatabaseCommandHelper.SplitSqlBatches(commandText);
+
+        public static string QuoteIdentifier(string providerInvariantName, string identifier)
+        {
+            if (string.IsNullOrWhiteSpace(identifier))
+                throw new ArgumentException("Идентификатор не может быть пустым.", nameof(identifier));
+
+            var trimmed = identifier.Trim();
+            if (IsAlreadyQuoted(trimmed))
+                return trimmed;
+
+            var commandBuilder = TryCreateCommandBuilder(providerInvariantName);
+            if (commandBuilder != null)
+            {
+                try
+                {
+                    return commandBuilder.QuoteIdentifier(trimmed);
+                }
+                catch
+                {
+                }
+            }
+
+            string prefix;
+            string suffix;
+            GetIdentifierQuotes(providerInvariantName, out prefix, out suffix);
+            return prefix + trimmed.Replace(suffix, suffix + suffix) + suffix;
+        }
+
+        public static string QuoteQualifiedIdentifier(string providerInvariantName, string qualifiedIdentifier)
+        {
+            if (string.IsNullOrWhiteSpace(qualifiedIdentifier))
+                throw new ArgumentException("Идентификатор не может быть пустым.", nameof(qualifiedIdentifier));
+
+            var parts = SplitQualifiedIdentifier(qualifiedIdentifier);
+            return string.Join(".", System.Linq.Enumerable.Select(parts, part => QuoteIdentifier(providerInvariantName, part)));
+        }
+
+        public static string BuildPreloadCommandText(string destinationTableName, DatabaseBulkPreloadMode preloadMode)
+        {
+            if (string.IsNullOrWhiteSpace(destinationTableName))
+                throw new ArgumentException("Имя таблицы-приёмника не может быть пустым.", nameof(destinationTableName));
+
+            return BuildPreloadCommandText(DefaultProviderInvariantName, destinationTableName, preloadMode);
+        }
+
+        public static string BuildPreloadCommandText(
+            string providerInvariantName,
+            string destinationTableName,
+            DatabaseBulkPreloadMode preloadMode)
+        {
+            if (string.IsNullOrWhiteSpace(destinationTableName))
+                throw new ArgumentException("Имя таблицы-приёмника не может быть пустым.", nameof(destinationTableName));
+
+            var safeTableName = QuoteQualifiedIdentifier(providerInvariantName, destinationTableName);
+
+            switch (preloadMode)
+            {
+                case DatabaseBulkPreloadMode.DeleteAll:
+                    return $"DELETE FROM {safeTableName}";
+                case DatabaseBulkPreloadMode.Truncate:
+                    return $"TRUNCATE TABLE {safeTableName}";
+                default:
+                    return null;
+            }
+        }
+
+        public static void ApplyBulkCopyMappings(
+            SqlBulkCopy bulkCopy,
+            DataTable dataTable,
+            Dictionary<string, string> columnMappings = null)
+        {
+            if (bulkCopy == null)
+                throw new ArgumentNullException(nameof(bulkCopy));
+            if (dataTable == null)
+                throw new ArgumentNullException(nameof(dataTable));
+
+            bulkCopy.ColumnMappings.Clear();
+
+            if (columnMappings != null && columnMappings.Count > 0)
+            {
+                foreach (var pair in columnMappings)
+                {
+                    EnsureColumnExists(dataTable, pair.Key);
+                    bulkCopy.ColumnMappings.Add(pair.Key, pair.Value);
+                }
+
+                return;
+            }
+
+            foreach (DataColumn column in dataTable.Columns)
+            {
+                bulkCopy.ColumnMappings.Add(column.ColumnName, column.ColumnName);
+            }
+        }
+
+        // --- Private helpers ---
+
+        private static void EnsureTransactionHandle(DatabaseTransactionHandle transactionHandle)
+            => DatabaseTransactionHelper.EnsureTransactionHandle(transactionHandle);
+
+        private static void EnsureColumnExists(DataTable dataTable, string columnName)
+        {
+            if (string.IsNullOrWhiteSpace(columnName))
+                throw new ArgumentException("Имя колонки не может быть пустым.", nameof(columnName));
+
+            if (!dataTable.Columns.Contains(columnName))
+                throw new InvalidOperationException($"Колонка '{columnName}' отсутствует в DataTable.");
+        }
+
+        private static List<BulkInsertColumnMapping> BuildMappings(
+            DataTable dataTable,
+            Dictionary<string, string> columnMappings)
+        {
+            if (columnMappings != null && columnMappings.Count > 0)
+            {
+                return System.Linq.Enumerable.ToList(System.Linq.Enumerable.Select(columnMappings, pair =>
+                {
+                    EnsureColumnExists(dataTable, pair.Key);
+                    return new BulkInsertColumnMapping
+                    {
+                        SourceColumn = pair.Key,
+                        DestinationColumn = pair.Value
+                    };
+                }));
+            }
+
+            return System.Linq.Enumerable.ToList(System.Linq.Enumerable.Select(
+                System.Linq.Enumerable.Cast<DataColumn>(dataTable.Columns),
+                column => new BulkInsertColumnMapping
+                {
+                    SourceColumn = column.ColumnName,
+                    DestinationColumn = column.ColumnName
+                }));
+        }
+
+        private static string BuildInsertCommandText(
+            string providerInvariantName,
+            string destinationTableName,
+            List<BulkInsertColumnMapping> mappings)
+        {
+            var safeTableName = QuoteQualifiedIdentifier(providerInvariantName, destinationTableName);
+            var columnList = string.Join(", ", System.Linq.Enumerable.Select(mappings, m => QuoteIdentifier(providerInvariantName, m.DestinationColumn)));
+            var valuesList = string.Join(", ", System.Linq.Enumerable.Select(mappings, (m, index) => DatabaseCommandHelper.GetParameterPlaceholder(providerInvariantName, index)));
+            return $"INSERT INTO {safeTableName} ({columnList}) VALUES ({valuesList})";
+        }
+
+        private static void CreateInsertParameters(
+            DbCommand command,
+            string providerInvariantName,
+            List<BulkInsertColumnMapping> mappings)
+        {
+            command.Parameters.Clear();
+
+            for (int i = 0; i < mappings.Count; i++)
+            {
+                var parameter = command.CreateParameter();
+                parameter.ParameterName = DatabaseCommandHelper.GetParameterName(providerInvariantName, i);
+                command.Parameters.Add(parameter);
+            }
+        }
+
+        private static void AssignInsertParameterValues(
+            DbCommand command,
+            DataRow row,
+            List<BulkInsertColumnMapping> mappings)
+        {
+            for (int i = 0; i < mappings.Count; i++)
+            {
+                var value = row[mappings[i].SourceColumn];
+                command.Parameters[i].Value = value ?? DBNull.Value;
+            }
+        }
+
+        private static void ExecutePreloadCommand(
+            DbConnection connection,
+            DbTransaction transaction,
+            string destinationTableName,
+            DatabaseBulkPreloadMode preloadMode)
+        {
+            var preloadCommandText = BuildPreloadCommandText(DatabaseConnectionHelper.GetProviderInvariantName(connection), destinationTableName, preloadMode);
+            if (string.IsNullOrWhiteSpace(preloadCommandText))
+                return;
+
+            using (var preloadCommand = connection.CreateCommand())
+            {
+                preloadCommand.Transaction = transaction;
+                preloadCommand.CommandType = CommandType.Text;
+                preloadCommand.CommandText = preloadCommandText;
+                preloadCommand.ExecuteNonQuery();
+            }
+        }
+
+        private static string BuildBulkInsertModeName(string baseMode, DatabaseBulkPreloadMode preloadMode)
+        {
+            return preloadMode == DatabaseBulkPreloadMode.None
+                ? baseMode
+                : baseMode + "+" + preloadMode;
+        }
+
         private static BulkInsertResult ExecuteSqlServerBulkInsert(
             string connectionString,
             DataTable dataTable,
@@ -814,34 +795,6 @@ namespace Primo.MIA
                 RowsWritten = dataTable.Rows.Count,
                 Mode = BuildBulkInsertModeName("SqlBulkCopy", preloadMode)
             };
-        }
-
-        public static BulkInsertResult ExecuteBulkInsert(
-            DatabaseTransactionHandle transactionHandle,
-            DataTable dataTable,
-            string destinationTableName,
-            int batchSize,
-            int bulkCopyTimeoutSeconds,
-            bool useTableLock,
-            bool keepIdentity,
-            DatabaseBulkPreloadMode preloadMode,
-            Dictionary<string, string> columnMappings = null)
-        {
-            EnsureTransactionHandle(transactionHandle);
-
-            if (dataTable == null)
-                throw new ArgumentNullException(nameof(dataTable), "Исходная таблица данных не указана.");
-            if (string.IsNullOrWhiteSpace(destinationTableName))
-                throw new ArgumentException("Имя таблицы-приёмника не может быть пустым.", nameof(destinationTableName));
-            if (dataTable.Columns.Count == 0)
-                return new BulkInsertResult { RowsWritten = dataTable.Rows.Count, Mode = "NoColumns" };
-
-            if (string.Equals(transactionHandle.ProviderInvariantName, DefaultProviderInvariantName, StringComparison.OrdinalIgnoreCase))
-            {
-                return ExecuteSqlServerBulkInsert(transactionHandle, dataTable, destinationTableName, batchSize, bulkCopyTimeoutSeconds, useTableLock, keepIdentity, preloadMode, columnMappings);
-            }
-
-            return ExecuteBatchedInsert(transactionHandle, dataTable, destinationTableName, batchSize, bulkCopyTimeoutSeconds, preloadMode, columnMappings);
         }
 
         private static BulkInsertResult ExecuteSqlServerBulkInsert(
@@ -909,7 +862,7 @@ namespace Primo.MIA
                 command.CommandText = BuildInsertCommandText(providerInvariantName, destinationTableName, mappings);
 
                 CreateInsertParameters(command, providerInvariantName, mappings);
-                TryPrepareCommand(command);
+                DatabaseCommandHelper.TryPrepareCommand(command);
 
                 var rowsWritten = 0;
 
@@ -959,7 +912,7 @@ namespace Primo.MIA
                 command.CommandText = BuildInsertCommandText(transactionHandle.ProviderInvariantName, destinationTableName, mappings);
 
                 CreateInsertParameters(command, transactionHandle.ProviderInvariantName, mappings);
-                TryPrepareCommand(command);
+                DatabaseCommandHelper.TryPrepareCommand(command);
 
                 var rowsWritten = 0;
                 foreach (DataRow row in dataTable.Rows)
@@ -977,474 +930,6 @@ namespace Primo.MIA
                 {
                     RowsWritten = rowsWritten,
                     Mode = BuildBulkInsertModeName("BatchedInsert", preloadMode)
-                };
-            }
-        }
-
-        public static string BuildPreloadCommandText(string destinationTableName, DatabaseBulkPreloadMode preloadMode)
-        {
-            if (string.IsNullOrWhiteSpace(destinationTableName))
-                throw new ArgumentException("Имя таблицы-приёмника не может быть пустым.", nameof(destinationTableName));
-
-            return BuildPreloadCommandText(DefaultProviderInvariantName, destinationTableName, preloadMode);
-        }
-
-        public static string BuildPreloadCommandText(
-            string providerInvariantName,
-            string destinationTableName,
-            DatabaseBulkPreloadMode preloadMode)
-        {
-            if (string.IsNullOrWhiteSpace(destinationTableName))
-                throw new ArgumentException("Имя таблицы-приёмника не может быть пустым.", nameof(destinationTableName));
-
-            var safeTableName = QuoteQualifiedIdentifier(providerInvariantName, destinationTableName);
-
-            switch (preloadMode)
-            {
-                case DatabaseBulkPreloadMode.DeleteAll:
-                    return $"DELETE FROM {safeTableName}";
-                case DatabaseBulkPreloadMode.Truncate:
-                    return $"TRUNCATE TABLE {safeTableName}";
-                default:
-                    return null;
-            }
-        }
-
-        public static List<string> SplitSqlBatches(string commandText)
-        {
-            if (string.IsNullOrWhiteSpace(commandText))
-                return new List<string>();
-
-            var batches = Regex.Split(
-                    commandText,
-                    @"^\s*GO(?:\s+\d+)?\s*(?:--.*)?$",
-                    RegexOptions.IgnoreCase | RegexOptions.Multiline)
-                .Select(batch => batch?.Trim())
-                .Where(batch => !string.IsNullOrWhiteSpace(batch))
-                .ToList();
-
-            return batches;
-        }
-
-        /// <summary>
-        /// Настраивает маппинг колонок для bulk copy.
-        /// Если словарь не указан, колонки маппятся по одинаковым именам.
-        /// </summary>
-        public static void ApplyBulkCopyMappings(
-            SqlBulkCopy bulkCopy,
-            DataTable dataTable,
-            Dictionary<string, string> columnMappings = null)
-        {
-            if (bulkCopy == null)
-                throw new ArgumentNullException(nameof(bulkCopy));
-            if (dataTable == null)
-                throw new ArgumentNullException(nameof(dataTable));
-
-            bulkCopy.ColumnMappings.Clear();
-
-            if (columnMappings != null && columnMappings.Count > 0)
-            {
-                foreach (var pair in columnMappings)
-                {
-                    EnsureColumnExists(dataTable, pair.Key);
-                    bulkCopy.ColumnMappings.Add(pair.Key, pair.Value);
-                }
-
-                return;
-            }
-
-            foreach (DataColumn column in dataTable.Columns)
-            {
-                bulkCopy.ColumnMappings.Add(column.ColumnName, column.ColumnName);
-            }
-        }
-
-        private static void EnsureColumnExists(DataTable dataTable, string columnName)
-        {
-            if (string.IsNullOrWhiteSpace(columnName))
-                throw new ArgumentException("Имя колонки не может быть пустым.", nameof(columnName));
-
-            if (!dataTable.Columns.Contains(columnName))
-                throw new InvalidOperationException($"Колонка '{columnName}' отсутствует в DataTable.");
-        }
-
-        private static List<BulkInsertColumnMapping> BuildMappings(
-            DataTable dataTable,
-            Dictionary<string, string> columnMappings)
-        {
-            if (columnMappings != null && columnMappings.Count > 0)
-            {
-                return columnMappings
-                    .Select(pair =>
-                    {
-                        EnsureColumnExists(dataTable, pair.Key);
-                        return new BulkInsertColumnMapping
-                        {
-                            SourceColumn = pair.Key,
-                            DestinationColumn = pair.Value
-                        };
-                    })
-                    .ToList();
-            }
-
-            return dataTable.Columns
-                .Cast<DataColumn>()
-                .Select(column => new BulkInsertColumnMapping
-                {
-                    SourceColumn = column.ColumnName,
-                    DestinationColumn = column.ColumnName
-                })
-                .ToList();
-        }
-
-        private static string BuildInsertCommandText(
-            string providerInvariantName,
-            string destinationTableName,
-            List<BulkInsertColumnMapping> mappings)
-        {
-            var safeTableName = QuoteQualifiedIdentifier(providerInvariantName, destinationTableName);
-            var columnList = string.Join(", ", mappings.Select(m => QuoteIdentifier(providerInvariantName, m.DestinationColumn)));
-            var valuesList = string.Join(", ", mappings.Select((m, index) => GetParameterPlaceholder(providerInvariantName, index)));
-            return $"INSERT INTO {safeTableName} ({columnList}) VALUES ({valuesList})";
-        }
-
-        private static void CreateInsertParameters(
-            DbCommand command,
-            string providerInvariantName,
-            List<BulkInsertColumnMapping> mappings)
-        {
-            command.Parameters.Clear();
-
-            for (int i = 0; i < mappings.Count; i++)
-            {
-                var parameter = command.CreateParameter();
-                parameter.ParameterName = GetParameterName(providerInvariantName, i);
-                command.Parameters.Add(parameter);
-            }
-        }
-
-        private static void AssignInsertParameterValues(
-            DbCommand command,
-            DataRow row,
-            List<BulkInsertColumnMapping> mappings)
-        {
-            for (int i = 0; i < mappings.Count; i++)
-            {
-                var value = row[mappings[i].SourceColumn];
-                command.Parameters[i].Value = value ?? DBNull.Value;
-            }
-        }
-
-        private static string GetParameterPlaceholder(string providerInvariantName, int index)
-        {
-            if (IsPositionalProvider(providerInvariantName))
-                return "?";
-
-            return GetParameterPrefix(providerInvariantName) + "p" + index;
-        }
-
-        private static string GetParameterName(string providerInvariantName, int index)
-        {
-            if (IsPositionalProvider(providerInvariantName))
-                return "p" + index;
-
-            return GetParameterPrefix(providerInvariantName) + "p" + index;
-        }
-
-        private static string GetParameterPrefix(string providerInvariantName)
-        {
-            if (string.IsNullOrWhiteSpace(providerInvariantName))
-                return "@";
-
-            if (providerInvariantName.IndexOf("Oracle", StringComparison.OrdinalIgnoreCase) >= 0)
-                return ":";
-
-            return "@";
-        }
-
-        private static bool IsPositionalProvider(string providerInvariantName)
-        {
-            if (string.IsNullOrWhiteSpace(providerInvariantName))
-                return false;
-
-            return providerInvariantName.IndexOf(typeof(OdbcFactory).Namespace, StringComparison.OrdinalIgnoreCase) >= 0 ||
-                   providerInvariantName.IndexOf(typeof(OleDbFactory).Namespace, StringComparison.OrdinalIgnoreCase) >= 0;
-        }
-
-        private static void TryPrepareCommand(DbCommand command)
-        {
-            try
-            {
-                command.Prepare();
-            }
-            catch
-            {
-                // Не все провайдеры поддерживают Prepare — это допустимо.
-            }
-        }
-
-        private static void ExecutePreloadCommand(
-            DbConnection connection,
-            DbTransaction transaction,
-            string destinationTableName,
-            DatabaseBulkPreloadMode preloadMode)
-        {
-            var preloadCommandText = BuildPreloadCommandText(GetProviderInvariantName(connection), destinationTableName, preloadMode);
-            if (string.IsNullOrWhiteSpace(preloadCommandText))
-                return;
-
-            using (var preloadCommand = connection.CreateCommand())
-            {
-                preloadCommand.Transaction = transaction;
-                preloadCommand.CommandType = CommandType.Text;
-                preloadCommand.CommandText = preloadCommandText;
-                preloadCommand.ExecuteNonQuery();
-            }
-        }
-
-        private static string BuildBulkInsertModeName(string baseMode, DatabaseBulkPreloadMode preloadMode)
-        {
-            return preloadMode == DatabaseBulkPreloadMode.None
-                ? baseMode
-                : baseMode + "+" + preloadMode;
-        }
-
-        private static string GetProviderInvariantName(DbConnection connection)
-        {
-            if (connection is SqlConnection)
-                return DefaultProviderInvariantName;
-
-            return connection != null ? connection.GetType().Namespace : DefaultProviderInvariantName;
-        }
-
-        public static string QuoteIdentifier(string providerInvariantName, string identifier)
-        {
-            if (string.IsNullOrWhiteSpace(identifier))
-                throw new ArgumentException("Идентификатор не может быть пустым.", nameof(identifier));
-
-            var trimmed = identifier.Trim();
-            if (IsAlreadyQuoted(trimmed))
-                return trimmed;
-
-            var commandBuilder = TryCreateCommandBuilder(providerInvariantName);
-            if (commandBuilder != null)
-            {
-                try
-                {
-                    return commandBuilder.QuoteIdentifier(trimmed);
-                }
-                catch
-                {
-                }
-            }
-
-            string prefix;
-            string suffix;
-            GetIdentifierQuotes(providerInvariantName, out prefix, out suffix);
-            return prefix + trimmed.Replace(suffix, suffix + suffix) + suffix;
-        }
-
-        public static string QuoteQualifiedIdentifier(string providerInvariantName, string qualifiedIdentifier)
-        {
-            if (string.IsNullOrWhiteSpace(qualifiedIdentifier))
-                throw new ArgumentException("Идентификатор не может быть пустым.", nameof(qualifiedIdentifier));
-
-            var parts = SplitQualifiedIdentifier(qualifiedIdentifier);
-            return string.Join(".", parts.Select(part => QuoteIdentifier(providerInvariantName, part)));
-        }
-
-        public static string BuildPagedQuery(
-            string providerInvariantName,
-            string sourceQuery,
-            string orderByExpression,
-            int pageNumber,
-            int pageSize)
-        {
-            if (string.IsNullOrWhiteSpace(sourceQuery))
-                throw new ArgumentException("Исходный SQL-запрос не может быть пустым.", nameof(sourceQuery));
-            if (string.IsNullOrWhiteSpace(orderByExpression))
-                throw new ArgumentException("Order by выражение не может быть пустым.", nameof(orderByExpression));
-
-            var safePageNumber = pageNumber > 0 ? pageNumber : 1;
-            var safePageSize = pageSize > 0 ? pageSize : 100;
-            var offset = (safePageNumber - 1) * safePageSize;
-            var normalizedProvider = string.IsNullOrWhiteSpace(providerInvariantName)
-                ? DefaultProviderInvariantName
-                : providerInvariantName.Trim();
-            var alias = GetDerivedTableAlias(normalizedProvider);
-
-            if (normalizedProvider.IndexOf("SqlClient", StringComparison.OrdinalIgnoreCase) >= 0)
-            {
-                return $"SELECT * FROM ({sourceQuery}) {alias} ORDER BY {orderByExpression} OFFSET {offset} ROWS FETCH NEXT {safePageSize} ROWS ONLY";
-            }
-
-            if (normalizedProvider.IndexOf("Oracle", StringComparison.OrdinalIgnoreCase) >= 0)
-            {
-                return $"SELECT * FROM ({sourceQuery}) {alias} ORDER BY {orderByExpression} OFFSET {offset} ROWS FETCH NEXT {safePageSize} ROWS ONLY";
-            }
-
-            return $"SELECT * FROM ({sourceQuery}) {alias} ORDER BY {orderByExpression} LIMIT {safePageSize} OFFSET {offset}";
-        }
-
-        public static string BuildCountQuery(string providerInvariantName, string sourceQuery)
-        {
-            if (string.IsNullOrWhiteSpace(sourceQuery))
-                throw new ArgumentException("Исходный SQL-запрос не может быть пустым.", nameof(sourceQuery));
-
-            return $"SELECT COUNT(1) FROM ({sourceQuery}) {GetDerivedTableAlias(providerInvariantName)}";
-        }
-
-        public static string NormalizeOutputParameterName(string providerInvariantName, string parameterName)
-        {
-            if (string.IsNullOrWhiteSpace(parameterName))
-                throw new ArgumentException("Имя параметра не может быть пустым.", nameof(parameterName));
-
-            var trimmed = parameterName.Trim();
-            if (trimmed.StartsWith("@", StringComparison.Ordinal) ||
-                trimmed.StartsWith(":", StringComparison.Ordinal) ||
-                trimmed.StartsWith("?", StringComparison.Ordinal))
-            {
-                return trimmed;
-            }
-
-            return GetParameterPrefix(providerInvariantName) + trimmed;
-        }
-
-        private static List<string> SplitQualifiedIdentifier(string qualifiedIdentifier)
-        {
-            var parts = new List<string>();
-            var current = string.Empty;
-            var squareDepth = 0;
-            var doubleQuoteDepth = 0;
-            var backtickDepth = 0;
-
-            foreach (var ch in qualifiedIdentifier.Trim())
-            {
-                if (ch == '[')
-                    squareDepth++;
-                else if (ch == ']' && squareDepth > 0)
-                    squareDepth--;
-                else if (ch == '"')
-                    doubleQuoteDepth = doubleQuoteDepth == 0 ? 1 : 0;
-                else if (ch == '`')
-                    backtickDepth = backtickDepth == 0 ? 1 : 0;
-
-                if (ch == '.' && squareDepth == 0 && doubleQuoteDepth == 0 && backtickDepth == 0)
-                {
-                    if (!string.IsNullOrWhiteSpace(current))
-                        parts.Add(current.Trim());
-                    current = string.Empty;
-                    continue;
-                }
-
-                current += ch;
-            }
-
-            if (!string.IsNullOrWhiteSpace(current))
-                parts.Add(current.Trim());
-
-            return parts;
-        }
-
-        private static bool IsAlreadyQuoted(string identifier)
-        {
-            return (identifier.StartsWith("[", StringComparison.Ordinal) && identifier.EndsWith("]", StringComparison.Ordinal)) ||
-                   (identifier.StartsWith("\"", StringComparison.Ordinal) && identifier.EndsWith("\"", StringComparison.Ordinal)) ||
-                   (identifier.StartsWith("`", StringComparison.Ordinal) && identifier.EndsWith("`", StringComparison.Ordinal));
-        }
-
-        private static DbCommandBuilder TryCreateCommandBuilder(string providerInvariantName)
-        {
-            try
-            {
-                return GetFactory(providerInvariantName).CreateCommandBuilder();
-            }
-            catch
-            {
-                return null;
-            }
-        }
-
-        private static void GetIdentifierQuotes(string providerInvariantName, out string prefix, out string suffix)
-        {
-            prefix = "[";
-            suffix = "]";
-
-            if (string.IsNullOrWhiteSpace(providerInvariantName))
-                return;
-
-            if (providerInvariantName.IndexOf("MySql", StringComparison.OrdinalIgnoreCase) >= 0)
-            {
-                prefix = "`";
-                suffix = "`";
-                return;
-            }
-
-            if (providerInvariantName.IndexOf("Oracle", StringComparison.OrdinalIgnoreCase) >= 0 ||
-                providerInvariantName.IndexOf("Npgsql", StringComparison.OrdinalIgnoreCase) >= 0 ||
-                providerInvariantName.IndexOf("SQLite", StringComparison.OrdinalIgnoreCase) >= 0)
-            {
-                prefix = "\"";
-                suffix = "\"";
-            }
-        }
-
-        private static string GetDerivedTableAlias(string providerInvariantName)
-        {
-            if (!string.IsNullOrWhiteSpace(providerInvariantName) &&
-                providerInvariantName.IndexOf("Oracle", StringComparison.OrdinalIgnoreCase) >= 0)
-            {
-                return "src";
-            }
-
-            return "AS src";
-        }
-
-        private static PagedQueryResult ExecutePagedQueryCore(
-            DbConnection connection,
-            DbTransaction transaction,
-            string providerInvariantName,
-            string sourceQuery,
-            string orderByExpression,
-            int pageNumber,
-            int pageSize,
-            int commandTimeoutSeconds,
-            Dictionary<string, string> parameters)
-        {
-            var safePageNumber = pageNumber > 0 ? pageNumber : 1;
-            var safePageSize = pageSize > 0 ? pageSize : 100;
-            var countQuery = BuildCountQuery(providerInvariantName, sourceQuery);
-            var pageQuery = BuildPagedQuery(providerInvariantName, sourceQuery, orderByExpression, safePageNumber, safePageSize);
-
-            int totalRows;
-            using (var countCommand = CreateCommand(connection, countQuery, DatabaseCommandType.Text, commandTimeoutSeconds, parameters, transaction))
-            {
-                totalRows = ConvertScalarToInt32(countCommand.ExecuteScalar()) ?? 0;
-            }
-
-            using (var pageCommand = CreateCommand(connection, pageQuery, DatabaseCommandType.Text, commandTimeoutSeconds, parameters, transaction))
-            using (var adapter = GetFactory(providerInvariantName).CreateDataAdapter())
-            {
-                if (adapter == null)
-                    throw new InvalidOperationException("Провайдер не смог создать DataAdapter.");
-
-                adapter.SelectCommand = pageCommand;
-                var table = new DataTable();
-                adapter.Fill(table);
-
-                var totalPages = safePageSize > 0
-                    ? (int)Math.Ceiling(totalRows / (double)safePageSize)
-                    : 0;
-
-                return new PagedQueryResult
-                {
-                    ResultTable = table,
-                    TotalRows = totalRows,
-                    PageNumber = safePageNumber,
-                    PageSize = safePageSize,
-                    TotalPages = totalPages,
-                    HasNextPage = safePageNumber < totalPages,
-                    HasPreviousPage = safePageNumber > 1
                 };
             }
         }
@@ -1471,7 +956,7 @@ namespace Primo.MIA
             var keyMappings = ResolveMappings(allMappings, keyColumns);
             var updateMappings = updateColumns != null && updateColumns.Count > 0
                 ? ResolveMappings(allMappings, updateColumns)
-                : allMappings.Where(m => keyMappings.All(k => !string.Equals(k.SourceColumn, m.SourceColumn, StringComparison.OrdinalIgnoreCase))).ToList();
+                : System.Linq.Enumerable.ToList(System.Linq.Enumerable.Where(allMappings, m => System.Linq.Enumerable.All(keyMappings, k => !string.Equals(k.SourceColumn, m.SourceColumn, StringComparison.OrdinalIgnoreCase))));
 
             using (var updateCommand = CreateUpsertUpdateCommand(connection, transaction, providerInvariantName, destinationTableName, keyMappings, updateMappings, commandTimeoutSeconds))
             using (var insertCommand = CreateUpsertInsertCommand(connection, transaction, providerInvariantName, destinationTableName, allMappings, commandTimeoutSeconds))
@@ -1520,11 +1005,11 @@ namespace Primo.MIA
             List<BulkInsertColumnMapping> mappings,
             List<string> names)
         {
-            return names
-                .Where(name => !string.IsNullOrWhiteSpace(name))
-                .Select(name =>
+            return System.Linq.Enumerable.ToList(System.Linq.Enumerable.Select(
+                System.Linq.Enumerable.Where(names, name => !string.IsNullOrWhiteSpace(name)),
+                name =>
                 {
-                    var mapping = mappings.FirstOrDefault(m =>
+                    var mapping = System.Linq.Enumerable.FirstOrDefault(mappings, m =>
                         string.Equals(m.SourceColumn, name, StringComparison.OrdinalIgnoreCase) ||
                         string.Equals(m.DestinationColumn, name, StringComparison.OrdinalIgnoreCase));
 
@@ -1532,9 +1017,7 @@ namespace Primo.MIA
                         throw new InvalidOperationException($"Колонка '{name}' не найдена в DataTable или маппинге.");
 
                     return mapping;
-                })
-                .Distinct(new BulkInsertMappingComparer())
-                .ToList();
+                }));
         }
 
         private static DbCommand CreateUpsertUpdateCommand(
@@ -1552,7 +1035,7 @@ namespace Primo.MIA
             command.CommandTimeout = commandTimeoutSeconds > 0 ? commandTimeoutSeconds : 60;
             command.CommandText = BuildUpdateCommandText(providerInvariantName, destinationTableName, keyMappings, updateMappings);
             CreateUpsertUpdateParameters(command, providerInvariantName, updateMappings, keyMappings);
-            TryPrepareCommand(command);
+            DatabaseCommandHelper.TryPrepareCommand(command);
             return command;
         }
 
@@ -1570,7 +1053,7 @@ namespace Primo.MIA
             command.CommandTimeout = commandTimeoutSeconds > 0 ? commandTimeoutSeconds : 60;
             command.CommandText = BuildInsertCommandText(providerInvariantName, destinationTableName, mappings);
             CreateInsertParameters(command, providerInvariantName, mappings);
-            TryPrepareCommand(command);
+            DatabaseCommandHelper.TryPrepareCommand(command);
             return command;
         }
 
@@ -1588,7 +1071,7 @@ namespace Primo.MIA
             command.CommandTimeout = commandTimeoutSeconds > 0 ? commandTimeoutSeconds : 60;
             command.CommandText = BuildExistsCommandText(providerInvariantName, destinationTableName, keyMappings);
             CreateUpsertExistsParameters(command, providerInvariantName, keyMappings);
-            TryPrepareCommand(command);
+            DatabaseCommandHelper.TryPrepareCommand(command);
             return command;
         }
 
@@ -1602,10 +1085,10 @@ namespace Primo.MIA
                 throw new ArgumentException("Список колонок обновления не может быть пустым.", nameof(updateMappings));
 
             var safeTableName = QuoteQualifiedIdentifier(providerInvariantName, destinationTableName);
-            var setClause = string.Join(", ", updateMappings.Select((m, index) =>
-                QuoteIdentifier(providerInvariantName, m.DestinationColumn) + " = " + GetParameterPlaceholder(providerInvariantName, index)));
-            var whereClause = string.Join(" AND ", keyMappings.Select((m, index) =>
-                QuoteIdentifier(providerInvariantName, m.DestinationColumn) + " = " + GetParameterPlaceholder(providerInvariantName, updateMappings.Count + index)));
+            var setClause = string.Join(", ", System.Linq.Enumerable.Select(updateMappings, (m, index) =>
+                QuoteIdentifier(providerInvariantName, m.DestinationColumn) + " = " + DatabaseCommandHelper.GetParameterPlaceholder(providerInvariantName, index)));
+            var whereClause = string.Join(" AND ", System.Linq.Enumerable.Select(keyMappings, (m, index) =>
+                QuoteIdentifier(providerInvariantName, m.DestinationColumn) + " = " + DatabaseCommandHelper.GetParameterPlaceholder(providerInvariantName, updateMappings.Count + index)));
             return $"UPDATE {safeTableName} SET {setClause} WHERE {whereClause}";
         }
 
@@ -1615,8 +1098,8 @@ namespace Primo.MIA
             List<BulkInsertColumnMapping> keyMappings)
         {
             var safeTableName = QuoteQualifiedIdentifier(providerInvariantName, destinationTableName);
-            var whereClause = string.Join(" AND ", keyMappings.Select((m, index) =>
-                QuoteIdentifier(providerInvariantName, m.DestinationColumn) + " = " + GetParameterPlaceholder(providerInvariantName, index)));
+            var whereClause = string.Join(" AND ", System.Linq.Enumerable.Select(keyMappings, (m, index) =>
+                QuoteIdentifier(providerInvariantName, m.DestinationColumn) + " = " + DatabaseCommandHelper.GetParameterPlaceholder(providerInvariantName, index)));
             return $"SELECT COUNT(1) FROM {safeTableName} WHERE {whereClause}";
         }
 
@@ -1631,7 +1114,7 @@ namespace Primo.MIA
             for (int i = 0; i < updateMappings.Count + keyMappings.Count; i++)
             {
                 var parameter = command.CreateParameter();
-                parameter.ParameterName = GetParameterName(providerInvariantName, i);
+                parameter.ParameterName = DatabaseCommandHelper.GetParameterName(providerInvariantName, i);
                 command.Parameters.Add(parameter);
             }
         }
@@ -1646,7 +1129,7 @@ namespace Primo.MIA
             for (int i = 0; i < keyMappings.Count; i++)
             {
                 var parameter = command.CreateParameter();
-                parameter.ParameterName = GetParameterName(providerInvariantName, i);
+                parameter.ParameterName = DatabaseCommandHelper.GetParameterName(providerInvariantName, i);
                 command.Parameters.Add(parameter);
             }
         }
@@ -1739,9 +1222,9 @@ namespace Primo.MIA
 
             if (outputParameterNames != null)
             {
-                foreach (var outputParameterName in outputParameterNames
-                    .Where(name => !string.IsNullOrWhiteSpace(name))
-                    .Distinct(StringComparer.OrdinalIgnoreCase))
+                foreach (var outputParameterName in System.Linq.Enumerable.Distinct(
+                    System.Linq.Enumerable.Where(outputParameterNames, name => !string.IsNullOrWhiteSpace(name)),
+                    StringComparer.OrdinalIgnoreCase))
                 {
                     var parameter = command.CreateParameter();
                     parameter.ParameterName = NormalizeOutputParameterName(providerInvariantName, outputParameterName);
@@ -1786,14 +1269,6 @@ namespace Primo.MIA
                 OutputParameters = outputValues,
                 ReturnValue = returnValue
             };
-        }
-
-        private static void EnsureTransactionHandle(DatabaseTransactionHandle transactionHandle)
-        {
-            if (transactionHandle == null)
-                throw new InvalidOperationException("Транзакция БД не найдена.");
-            if (transactionHandle.Connection == null || transactionHandle.Transaction == null)
-                throw new InvalidOperationException("Транзакция БД не инициализирована корректно.");
         }
 
         private static NonQueryExecutionResult ExecuteNonQueryBatches(
@@ -1891,39 +1366,132 @@ namespace Primo.MIA
             }
         }
 
-        public static string GetIdentityQuery(string providerInvariantName)
+        private static PagedQueryResult ExecutePagedQueryCore(
+            DbConnection connection,
+            DbTransaction transaction,
+            string providerInvariantName,
+            string sourceQuery,
+            string orderByExpression,
+            int pageNumber,
+            int pageSize,
+            int commandTimeoutSeconds,
+            Dictionary<string, string> parameters)
         {
-            if (string.IsNullOrWhiteSpace(providerInvariantName))
-                return "SELECT SCOPE_IDENTITY()";
+            var safePageNumber = pageNumber > 0 ? pageNumber : 1;
+            var safePageSize = pageSize > 0 ? pageSize : 100;
+            var countQuery = BuildCountQuery(providerInvariantName, sourceQuery);
+            var pageQuery = BuildPagedQuery(providerInvariantName, sourceQuery, orderByExpression, safePageNumber, safePageSize);
 
-            if (providerInvariantName.IndexOf("Npgsql", StringComparison.OrdinalIgnoreCase) >= 0)
-                return "SELECT LASTVAL()";
+            int totalRows;
+            using (var countCommand = CreateCommand(connection, countQuery, DatabaseCommandType.Text, commandTimeoutSeconds, parameters, transaction))
+            {
+                totalRows = ConvertScalarToInt32(countCommand.ExecuteScalar()) ?? 0;
+            }
 
-            if (providerInvariantName.IndexOf("MySql", StringComparison.OrdinalIgnoreCase) >= 0)
-                return "SELECT LAST_INSERT_ID()";
+            using (var pageCommand = CreateCommand(connection, pageQuery, DatabaseCommandType.Text, commandTimeoutSeconds, parameters, transaction))
+            using (var adapter = GetFactory(providerInvariantName).CreateDataAdapter())
+            {
+                if (adapter == null)
+                    throw new InvalidOperationException("Провайдер не смог создать DataAdapter.");
 
-            if (providerInvariantName.IndexOf("SQLite", StringComparison.OrdinalIgnoreCase) >= 0)
-                return "SELECT last_insert_rowid()";
+                adapter.SelectCommand = pageCommand;
+                var table = new DataTable();
+                adapter.Fill(table);
 
-            if (providerInvariantName.IndexOf("SqlClient", StringComparison.OrdinalIgnoreCase) >= 0)
-                return "SELECT SCOPE_IDENTITY()";
+                var totalPages = safePageSize > 0
+                    ? (int)Math.Ceiling(totalRows / (double)safePageSize)
+                    : 0;
 
-            return null;
+                return new PagedQueryResult
+                {
+                    ResultTable = table,
+                    TotalRows = totalRows,
+                    PageNumber = safePageNumber,
+                    PageSize = safePageSize,
+                    TotalPages = totalPages,
+                    HasNextPage = safePageNumber < totalPages,
+                    HasPreviousPage = safePageNumber > 1
+                };
+            }
         }
 
-        private static string GetSchemaValue(DataRow row, string columnName)
+        private static List<string> SplitQualifiedIdentifier(string qualifiedIdentifier)
         {
-            if (row == null || row.Table == null)
+            var parts = new List<string>();
+            var current = string.Empty;
+            var squareDepth = 0;
+            var doubleQuoteDepth = 0;
+            var backtickDepth = 0;
+
+            foreach (var ch in qualifiedIdentifier.Trim())
+            {
+                if (ch == '[')
+                    squareDepth++;
+                else if (ch == ']' && squareDepth > 0)
+                    squareDepth--;
+                else if (ch == '"')
+                    doubleQuoteDepth = doubleQuoteDepth == 0 ? 1 : 0;
+                else if (ch == '`')
+                    backtickDepth = backtickDepth == 0 ? 1 : 0;
+
+                if (ch == '.' && squareDepth == 0 && doubleQuoteDepth == 0 && backtickDepth == 0)
+                {
+                    if (!string.IsNullOrWhiteSpace(current))
+                        parts.Add(current.Trim());
+                    current = string.Empty;
+                    continue;
+                }
+
+                current += ch;
+            }
+
+            if (!string.IsNullOrWhiteSpace(current))
+                parts.Add(current.Trim());
+
+            return parts;
+        }
+
+        private static bool IsAlreadyQuoted(string identifier)
+        {
+            return (identifier.StartsWith("[", StringComparison.Ordinal) && identifier.EndsWith("]", StringComparison.Ordinal)) ||
+                   (identifier.StartsWith("\"", StringComparison.Ordinal) && identifier.EndsWith("\"", StringComparison.Ordinal)) ||
+                   (identifier.StartsWith("`", StringComparison.Ordinal) && identifier.EndsWith("`", StringComparison.Ordinal));
+        }
+
+        private static DbCommandBuilder TryCreateCommandBuilder(string providerInvariantName)
+        {
+            try
+            {
+                return GetFactory(providerInvariantName).CreateCommandBuilder();
+            }
+            catch
+            {
                 return null;
+            }
+        }
 
-            if (row.Table.Columns.Contains(columnName))
-                return row[columnName]?.ToString();
+        private static void GetIdentifierQuotes(string providerInvariantName, out string prefix, out string suffix)
+        {
+            prefix = "[";
+            suffix = "]";
 
-            var matchingColumn = row.Table.Columns
-                .Cast<DataColumn>()
-                .FirstOrDefault(col => string.Equals(col.ColumnName, columnName, StringComparison.OrdinalIgnoreCase));
+            if (string.IsNullOrWhiteSpace(providerInvariantName))
+                return;
 
-            return matchingColumn != null ? row[matchingColumn]?.ToString() : null;
+            if (providerInvariantName.IndexOf("MySql", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                prefix = "`";
+                suffix = "`";
+                return;
+            }
+
+            if (providerInvariantName.IndexOf("Oracle", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                providerInvariantName.IndexOf("Npgsql", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                providerInvariantName.IndexOf("SQLite", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                prefix = "\"";
+                suffix = "\"";
+            }
         }
     }
 

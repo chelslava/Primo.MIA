@@ -35,7 +35,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(object))]
         [System.ComponentModel.Category(ActivityStrings.Category_Main)]
         [System.ComponentModel.DisplayName(ActivityStrings.Field_Tuple)]
-        public string Prop_Tuple { get => _propTuple; set { _propTuple = value; InvokePropertyChanged(this, "Prop_Tuple"); } }
+        public string Prop_Tuple { get => _propTuple; set { _propTuple = value; InvokePropertyChanged(this, nameof(Prop_Tuple)); } }
 
         private TupleConvertMode _mode = TupleConvertMode.ToList;
         /// <summary>Режим конвертации.</summary>
@@ -45,7 +45,7 @@ namespace Primo.MIA
         public TupleConvertMode Mode
         {
             get => _mode;
-            set { _mode = value; InvokePropertyChanged(this, "Mode"); }
+            set { _mode = value; InvokePropertyChanged(this, nameof(Mode)); }
         }
 
         private string _propSourceList;
@@ -54,7 +54,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(List<object>))]
         [System.ComponentModel.Category(ActivityStrings.Category_FromList)]
         [System.ComponentModel.DisplayName(ActivityStrings.Field_SourceList)]
-        public string Prop_SourceList { get => _propSourceList; set { _propSourceList = value; InvokePropertyChanged(this, "Prop_SourceList"); } }
+        public string Prop_SourceList { get => _propSourceList; set { _propSourceList = value; InvokePropertyChanged(this, nameof(Prop_SourceList)); } }
 
         private string _propSeparator;
         /// <summary>Разделитель для режима ToString. По умолчанию "; ".</summary>
@@ -62,7 +62,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
         [System.ComponentModel.Category(ActivityStrings.Category_ToString)]
         [System.ComponentModel.DisplayName(ActivityStrings.Field_Separator)]
-        public string Prop_Separator { get => _propSeparator; set { _propSeparator = value; InvokePropertyChanged(this, "Prop_Separator"); } }
+        public string Prop_Separator { get => _propSeparator; set { _propSeparator = value; InvokePropertyChanged(this, nameof(Prop_Separator)); } }
 
         private string _propIncludeKeys;
         /// <summary>
@@ -74,7 +74,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(bool))]
         [System.ComponentModel.Category(ActivityStrings.Category_ToString)]
         [System.ComponentModel.DisplayName(ActivityStrings.Field_IncludeKeys)]
-        public string Prop_IncludeKeys { get => _propIncludeKeys; set { _propIncludeKeys = value; InvokePropertyChanged(this, "Prop_IncludeKeys"); } }
+        public string Prop_IncludeKeys { get => _propIncludeKeys; set { _propIncludeKeys = value; InvokePropertyChanged(this, nameof(Prop_IncludeKeys)); } }
 
         // ── OUTPUT ─────────────────────────────────────────────────────────────
 
@@ -84,7 +84,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(object))]
         [System.ComponentModel.Category(ActivityStrings.Category_Output)]
         [System.ComponentModel.DisplayName(ActivityStrings.Field_ResultTuple)]
-        public string Prop_ResultTuple { get => _propResultTuple; set { _propResultTuple = value; InvokePropertyChanged(this, "Prop_ResultTuple"); } }
+        public string Prop_ResultTuple { get => _propResultTuple; set { _propResultTuple = value; InvokePropertyChanged(this, nameof(Prop_ResultTuple)); } }
 
         private string _propResultList;
         /// <summary>Результирующий список. Заполняется только для режима ToList.</summary>
@@ -92,7 +92,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(List<object>))]
         [System.ComponentModel.Category(ActivityStrings.Category_Output)]
         [System.ComponentModel.DisplayName(ActivityStrings.Field_ResultList)]
-        public string Prop_ResultList { get => _propResultList; set { _propResultList = value; InvokePropertyChanged(this, "Prop_ResultList"); } }
+        public string Prop_ResultList { get => _propResultList; set { _propResultList = value; InvokePropertyChanged(this, nameof(Prop_ResultList)); } }
 
         private string _propResultDict;
         /// <summary>Результирующий словарь. Заполняется только для режима ToDictionary.</summary>
@@ -100,7 +100,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(Dictionary<string, object>))]
         [System.ComponentModel.Category(ActivityStrings.Category_Output)]
         [System.ComponentModel.DisplayName(ActivityStrings.Field_ResultDict)]
-        public string Prop_ResultDict { get => _propResultDict; set { _propResultDict = value; InvokePropertyChanged(this, "Prop_ResultDict"); } }
+        public string Prop_ResultDict { get => _propResultDict; set { _propResultDict = value; InvokePropertyChanged(this, nameof(Prop_ResultDict)); } }
 
         private string _propResultString;
         /// <summary>Результирующая строка. Заполняется только для режима ToString.</summary>
@@ -108,7 +108,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
         [System.ComponentModel.Category(ActivityStrings.Category_Output)]
         [System.ComponentModel.DisplayName(ActivityStrings.Field_ResultString)]
-        public string Prop_ResultString { get => _propResultString; set { _propResultString = value; InvokePropertyChanged(this, "Prop_ResultString"); } }
+        public string Prop_ResultString { get => _propResultString; set { _propResultString = value; InvokePropertyChanged(this, nameof(Prop_ResultString)); } }
 
         private string _propArity;
         /// <summary>Арность кортежа — количество элементов (1–7).</summary>
@@ -116,7 +116,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
         [System.ComponentModel.Category(ActivityStrings.Category_Output)]
         [System.ComponentModel.DisplayName(ActivityStrings.Field_Arity)]
-        public string Prop_Arity { get => _propArity; set { _propArity = value; InvokePropertyChanged(this, "Prop_Arity"); } }
+        public string Prop_Arity { get => _propArity; set { _propArity = value; InvokePropertyChanged(this, nameof(Prop_Arity)); } }
 
         // ── КОНСТРУКТОР ────────────────────────────────────────────────────────
 
@@ -171,6 +171,14 @@ namespace Primo.MIA
                     case TupleConvertMode.ToString: return DoToString(sd);
                     default: throw new InvalidOperationException($"Неизвестный режим: {this.Mode}");
                 }
+            }
+            catch (ArgumentException ex)
+            {
+                return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Неверный аргумент: {ex.Message}" };
+            }
+            catch (InvalidOperationException ex)
+            {
+                return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Недопустимая операция: {ex.Message}" };
             }
             catch (Exception ex)
             {

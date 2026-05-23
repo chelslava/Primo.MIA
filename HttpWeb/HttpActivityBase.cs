@@ -169,8 +169,7 @@ namespace Primo.MIA
                 string certPath = GetPropertyValue<string>(this.Prop_CertPath, nameof(Prop_CertPath), sd);
                 string certPassword = GetPropertyValue<string>(this.Prop_CertPassword, nameof(Prop_CertPassword), sd) ?? string.Empty;
 
-                if (string.IsNullOrWhiteSpace(certPath))
-                    throw new ArgumentException("Путь к сертификату не указан");
+                Guard.NotNullOrWhiteSpace(certPath, nameof(Prop_CertPath));
 
                 if (!File.Exists(certPath))
                     throw new FileNotFoundException($"Файл сертификата не найден: {certPath}");

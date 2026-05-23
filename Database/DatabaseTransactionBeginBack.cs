@@ -1,3 +1,7 @@
+// =============================================================================
+// DatabaseTransactionBeginBack.cs — активность «Database: Начать транзакцию (TransactionBegin)».
+// Открывает соединение с БД, начинает транзакцию и помещает её в ambient-контекст модуля.
+// =============================================================================
 using LTools.Common.Model;
 using LTools.Common.UIElements;
 using LTools.SDK;
@@ -22,6 +26,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
         [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_DbProviderInvariantName)]
+        /// <summary>Инвариантное имя ADO.NET провайдера (например, System.Data.SqlClient).</summary>
         public string Prop_ProviderInvariantName
         {
             get => _propProviderInvariantName;
@@ -32,6 +37,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
         [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_ConnectionString)]
+        /// <summary>Строка подключения к базе данных.</summary>
         public string Prop_ConnectionString
         {
             get => _propConnectionString;
@@ -41,6 +47,7 @@ namespace Primo.MIA
         private DatabaseIsolationLevel _propIsolationLevel = DatabaseIsolationLevel.ReadCommitted;
         [LTools.Common.Model.Serialization.StoringProperty]
         [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_IsolationLevel)]
+        /// <summary>Уровень изоляции открываемой транзакции.</summary>
         public DatabaseIsolationLevel Prop_IsolationLevel
         {
             get => _propIsolationLevel;
@@ -51,6 +58,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
         [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_TransactionId)]
+        /// <summary>Уникальный идентификатор открытой транзакции для передачи в последующие активности.</summary>
         public string Prop_TransactionId
         {
             get => _propTransactionId;
@@ -61,6 +69,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
         [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_StartedAtUtc)]
+        /// <summary>Метка времени начала транзакции в формате ISO 8601 UTC.</summary>
         public string Prop_StartedAtUtc
         {
             get => _propStartedAtUtc;
@@ -103,6 +112,14 @@ namespace Primo.MIA
                     IsSuccess = true,
                     SuccessMessage = $"Транзакция открыта: {handle.TransactionId}"
                 };
+            }
+            catch (System.Data.Common.DbException ex)
+            {
+                return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Ошибка БД: {ex.Message}" };
+            }
+            catch (InvalidOperationException ex)
+            {
+                return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Недопустимая операция: {ex.Message}" };
             }
             catch (Exception ex)
             {

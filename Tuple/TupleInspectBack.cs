@@ -32,7 +32,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(object))]
         [System.ComponentModel.Category(ActivityStrings.Category_Main)]
         [System.ComponentModel.DisplayName(ActivityStrings.Field_Tuple)]
-        public string Prop_Tuple { get => _propTuple; set { _propTuple = value; InvokePropertyChanged(this, "Prop_Tuple"); } }
+        public string Prop_Tuple { get => _propTuple; set { _propTuple = value; InvokePropertyChanged(this, nameof(Prop_Tuple)); } }
 
         private string _propTupleB;
         /// <summary>
@@ -44,7 +44,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(object))]
         [System.ComponentModel.Category(ActivityStrings.Category_Comparison)]
         [System.ComponentModel.DisplayName(ActivityStrings.Field_SecondTuple)]
-        public string Prop_TupleB { get => _propTupleB; set { _propTupleB = value; InvokePropertyChanged(this, "Prop_TupleB"); } }
+        public string Prop_TupleB { get => _propTupleB; set { _propTupleB = value; InvokePropertyChanged(this, nameof(Prop_TupleB)); } }
 
         // ── OUTPUT: основные ──────────────────────────────────────────────────
 
@@ -54,7 +54,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
         [System.ComponentModel.Category(ActivityStrings.Category_Structure)]
         [System.ComponentModel.DisplayName(ActivityStrings.Field_Arity)]
-        public string Prop_Arity { get => _propArity; set { _propArity = value; InvokePropertyChanged(this, "Prop_Arity"); } }
+        public string Prop_Arity { get => _propArity; set { _propArity = value; InvokePropertyChanged(this, nameof(Prop_Arity)); } }
 
         private string _propTypeName;
         /// <summary>
@@ -65,7 +65,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
         [System.ComponentModel.Category(ActivityStrings.Category_Structure)]
         [System.ComponentModel.DisplayName(ActivityStrings.Field_TypeName)]
-        public string Prop_TypeName { get => _propTypeName; set { _propTypeName = value; InvokePropertyChanged(this, "Prop_TypeName"); } }
+        public string Prop_TypeName { get => _propTypeName; set { _propTypeName = value; InvokePropertyChanged(this, nameof(Prop_TypeName)); } }
 
         private string _propItemTypes;
         /// <summary>
@@ -76,7 +76,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
         [System.ComponentModel.Category(ActivityStrings.Category_Structure)]
         [System.ComponentModel.DisplayName(ActivityStrings.Field_ItemTypes)]
-        public string Prop_ItemTypes { get => _propItemTypes; set { _propItemTypes = value; InvokePropertyChanged(this, "Prop_ItemTypes"); } }
+        public string Prop_ItemTypes { get => _propItemTypes; set { _propItemTypes = value; InvokePropertyChanged(this, nameof(Prop_ItemTypes)); } }
 
         private string _propItemValues;
         /// <summary>
@@ -87,7 +87,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
         [System.ComponentModel.Category(ActivityStrings.Category_Structure)]
         [System.ComponentModel.DisplayName(ActivityStrings.Field_ItemValues)]
-        public string Prop_ItemValues { get => _propItemValues; set { _propItemValues = value; InvokePropertyChanged(this, "Prop_ItemValues"); } }
+        public string Prop_ItemValues { get => _propItemValues; set { _propItemValues = value; InvokePropertyChanged(this, nameof(Prop_ItemValues)); } }
 
         private string _propHasNulls;
         /// <summary>true если хотя бы один элемент кортежа равен null.</summary>
@@ -95,7 +95,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(bool))]
         [System.ComponentModel.Category(ActivityStrings.Category_Structure)]
         [System.ComponentModel.DisplayName(ActivityStrings.Field_HasNulls)]
-        public string Prop_HasNulls { get => _propHasNulls; set { _propHasNulls = value; InvokePropertyChanged(this, "Prop_HasNulls"); } }
+        public string Prop_HasNulls { get => _propHasNulls; set { _propHasNulls = value; InvokePropertyChanged(this, nameof(Prop_HasNulls)); } }
 
         // ── OUTPUT: сравнение ─────────────────────────────────────────────────
 
@@ -108,7 +108,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(bool))]
         [System.ComponentModel.Category(ActivityStrings.Category_Comparison)]
         [System.ComponentModel.DisplayName(ActivityStrings.Field_AreEqual)]
-        public string Prop_AreEqual { get => _propAreEqual; set { _propAreEqual = value; InvokePropertyChanged(this, "Prop_AreEqual"); } }
+        public string Prop_AreEqual { get => _propAreEqual; set { _propAreEqual = value; InvokePropertyChanged(this, nameof(Prop_AreEqual)); } }
 
         private string _propSameArity;
         /// <summary>true если оба кортежа имеют одинаковую арность.</summary>
@@ -116,7 +116,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(bool))]
         [System.ComponentModel.Category(ActivityStrings.Category_Comparison)]
         [System.ComponentModel.DisplayName(ActivityStrings.Field_SameArity)]
-        public string Prop_SameArity { get => _propSameArity; set { _propSameArity = value; InvokePropertyChanged(this, "Prop_SameArity"); } }
+        public string Prop_SameArity { get => _propSameArity; set { _propSameArity = value; InvokePropertyChanged(this, nameof(Prop_SameArity)); } }
 
         private string _propSameTypes;
         /// <summary>true если оба кортежа имеют одинаковую арность И одинаковые типы всех элементов.</summary>
@@ -124,7 +124,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(bool))]
         [System.ComponentModel.Category(ActivityStrings.Category_Comparison)]
         [System.ComponentModel.DisplayName(ActivityStrings.Field_SameTypes)]
-        public string Prop_SameTypes { get => _propSameTypes; set { _propSameTypes = value; InvokePropertyChanged(this, "Prop_SameTypes"); } }
+        public string Prop_SameTypes { get => _propSameTypes; set { _propSameTypes = value; InvokePropertyChanged(this, nameof(Prop_SameTypes)); } }
 
         // ── КОНСТРУКТОР ────────────────────────────────────────────────────────
 
@@ -225,6 +225,14 @@ namespace Primo.MIA
                     IsSuccess = true,
                     SuccessMessage = $"Tuple({arityA}): [{itemTypes}] = [{itemValues}]"
                 };
+            }
+            catch (ArgumentException ex)
+            {
+                return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Неверный аргумент: {ex.Message}" };
+            }
+            catch (InvalidOperationException ex)
+            {
+                return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Недопустимая операция: {ex.Message}" };
             }
             catch (Exception ex)
             {

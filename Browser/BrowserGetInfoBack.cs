@@ -48,7 +48,7 @@ namespace Primo.MIA
         public string Prop_SessionId
         {
             get => _propSessionId;
-            set { _propSessionId = value; InvokePropertyChanged(this, "Prop_SessionId"); }
+            set { _propSessionId = value; InvokePropertyChanged(this, nameof(Prop_SessionId)); }
         }
 
         // ── Выходные параметры ─────────────────────────────────────────
@@ -62,7 +62,7 @@ namespace Primo.MIA
         public string Prop_CurrentUrl
         {
             get => _propCurrentUrl;
-            set { _propCurrentUrl = value; InvokePropertyChanged(this, "Prop_CurrentUrl"); }
+            set { _propCurrentUrl = value; InvokePropertyChanged(this, nameof(Prop_CurrentUrl)); }
         }
 
         private string _propPageTitle;
@@ -74,7 +74,7 @@ namespace Primo.MIA
         public string Prop_PageTitle
         {
             get => _propPageTitle;
-            set { _propPageTitle = value; InvokePropertyChanged(this, "Prop_PageTitle"); }
+            set { _propPageTitle = value; InvokePropertyChanged(this, nameof(Prop_PageTitle)); }
         }
 
         private string _propPageSource;
@@ -86,7 +86,7 @@ namespace Primo.MIA
         public string Prop_PageSource
         {
             get => _propPageSource;
-            set { _propPageSource = value; InvokePropertyChanged(this, "Prop_PageSource"); }
+            set { _propPageSource = value; InvokePropertyChanged(this, nameof(Prop_PageSource)); }
         }
 
         // ── Конструктор ────────────────────────────────────────────────

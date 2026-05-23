@@ -1,4 +1,4 @@
-// =============================================================================
+﻿// =============================================================================
 // DictionaryCreate.cs — активность «Словарь: Создать».
 //
 // Режимы (DictionaryCreateMode):
@@ -47,7 +47,7 @@ namespace Primo.MIA
         public DictionaryCreateMode Mode
         {
             get => _mode;
-            set { _mode = value; InvokePropertyChanged(this, "Mode"); }
+            set { _mode = value; InvokePropertyChanged(this, nameof(Mode)); }
         }
 
         private string _propDictionary;
@@ -61,7 +61,7 @@ namespace Primo.MIA
         public string Prop_Dictionary
         {
             get => _propDictionary;
-            set { _propDictionary = value; InvokePropertyChanged(this, "Prop_Dictionary"); }
+            set { _propDictionary = value; InvokePropertyChanged(this, nameof(Prop_Dictionary)); }
         }
 
         private string _propKeysList;
@@ -75,7 +75,7 @@ namespace Primo.MIA
         public string Prop_KeysList
         {
             get => _propKeysList;
-            set { _propKeysList = value; InvokePropertyChanged(this, "Prop_KeysList"); }
+            set { _propKeysList = value; InvokePropertyChanged(this, nameof(Prop_KeysList)); }
         }
 
         private string _propValuesList;
@@ -89,7 +89,7 @@ namespace Primo.MIA
         public string Prop_ValuesList
         {
             get => _propValuesList;
-            set { _propValuesList = value; InvokePropertyChanged(this, "Prop_ValuesList"); }
+            set { _propValuesList = value; InvokePropertyChanged(this, nameof(Prop_ValuesList)); }
         }
 
         private bool _throwOnDuplicates = false;
@@ -103,7 +103,7 @@ namespace Primo.MIA
         public bool Prop_ThrowOnDuplicates
         {
             get => _throwOnDuplicates;
-            set { _throwOnDuplicates = value; InvokePropertyChanged(this, "Prop_ThrowOnDuplicates"); }
+            set { _throwOnDuplicates = value; InvokePropertyChanged(this, nameof(Prop_ThrowOnDuplicates)); }
         }
 
         // =========================================================================
@@ -118,7 +118,7 @@ namespace Primo.MIA
         public string Prop_ResultDictionary
         {
             get => _propResultDictionary;
-            set { _propResultDictionary = value; InvokePropertyChanged(this, "Prop_ResultDictionary"); }
+            set { _propResultDictionary = value; InvokePropertyChanged(this, nameof(Prop_ResultDictionary)); }
         }
 
         private string _propCount;
@@ -129,7 +129,7 @@ namespace Primo.MIA
         public string Prop_Count
         {
             get => _propCount;
-            set { _propCount = value; InvokePropertyChanged(this, "Prop_Count"); }
+            set { _propCount = value; InvokePropertyChanged(this, nameof(Prop_Count)); }
         }
 
         private string _propDuplicatesCount;
@@ -143,7 +143,7 @@ namespace Primo.MIA
         public string Prop_DuplicatesCount
         {
             get => _propDuplicatesCount;
-            set { _propDuplicatesCount = value; InvokePropertyChanged(this, "Prop_DuplicatesCount"); }
+            set { _propDuplicatesCount = value; InvokePropertyChanged(this, nameof(Prop_DuplicatesCount)); }
         }
 
         // =========================================================================
@@ -225,6 +225,14 @@ namespace Primo.MIA
                 SetVariableValue(this.Prop_DuplicatesCount, result.DuplicatesSkipped, sd);
 
                 return new ExecutionResult { IsSuccess = true, SuccessMessage = $"Режим '{this.Mode}' выполнен" };
+            }
+            catch (ArgumentException ex)
+            {
+                return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Неверный аргумент: {ex.Message}" };
+            }
+            catch (InvalidOperationException ex)
+            {
+                return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Недопустимая операция: {ex.Message}" };
             }
             catch (Exception ex)
             {

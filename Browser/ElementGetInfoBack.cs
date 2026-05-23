@@ -45,7 +45,7 @@ namespace Primo.MIA
         public ElementInfoMode Prop_Mode
         {
             get => _propMode;
-            set { _propMode = value; InvokePropertyChanged(this, "Prop_Mode"); }
+            set { _propMode = value; InvokePropertyChanged(this, nameof(Prop_Mode)); }
         }
 
         private string _propSessionId;
@@ -57,7 +57,7 @@ namespace Primo.MIA
         public string Prop_SessionId
         {
             get => _propSessionId;
-            set { _propSessionId = value; InvokePropertyChanged(this, "Prop_SessionId"); }
+            set { _propSessionId = value; InvokePropertyChanged(this, nameof(Prop_SessionId)); }
         }
 
         private string _propElementId;
@@ -69,7 +69,7 @@ namespace Primo.MIA
         public string Prop_ElementId
         {
             get => _propElementId;
-            set { _propElementId = value; InvokePropertyChanged(this, "Prop_ElementId"); }
+            set { _propElementId = value; InvokePropertyChanged(this, nameof(Prop_ElementId)); }
         }
 
         private ElementLocatorType _propLocatorType;
@@ -80,7 +80,7 @@ namespace Primo.MIA
         public ElementLocatorType Prop_LocatorType
         {
             get => _propLocatorType;
-            set { _propLocatorType = value; InvokePropertyChanged(this, "Prop_LocatorType"); }
+            set { _propLocatorType = value; InvokePropertyChanged(this, nameof(Prop_LocatorType)); }
         }
 
         private string _propLocatorValue;
@@ -92,7 +92,7 @@ namespace Primo.MIA
         public string Prop_LocatorValue
         {
             get => _propLocatorValue;
-            set { _propLocatorValue = value; InvokePropertyChanged(this, "Prop_LocatorValue"); }
+            set { _propLocatorValue = value; InvokePropertyChanged(this, nameof(Prop_LocatorValue)); }
         }
 
         private string _propPropertyName;
@@ -104,7 +104,7 @@ namespace Primo.MIA
         public string Prop_PropertyName
         {
             get => _propPropertyName;
-            set { _propPropertyName = value; InvokePropertyChanged(this, "Prop_PropertyName"); }
+            set { _propPropertyName = value; InvokePropertyChanged(this, nameof(Prop_PropertyName)); }
         }
 
         private string _propWaitTimeout;
@@ -116,7 +116,7 @@ namespace Primo.MIA
         public string Prop_WaitTimeout
         {
             get => _propWaitTimeout;
-            set { _propWaitTimeout = value; InvokePropertyChanged(this, "Prop_WaitTimeout"); }
+            set { _propWaitTimeout = value; InvokePropertyChanged(this, nameof(Prop_WaitTimeout)); }
         }
 
         // ── Выходные параметры ─────────────────────────────────────────
@@ -130,7 +130,7 @@ namespace Primo.MIA
         public string Prop_Value
         {
             get => _propValue;
-            set { _propValue = value; InvokePropertyChanged(this, "Prop_Value"); }
+            set { _propValue = value; InvokePropertyChanged(this, nameof(Prop_Value)); }
         }
 
         private string _propX;
@@ -142,7 +142,7 @@ namespace Primo.MIA
         public string Prop_X
         {
             get => _propX;
-            set { _propX = value; InvokePropertyChanged(this, "Prop_X"); }
+            set { _propX = value; InvokePropertyChanged(this, nameof(Prop_X)); }
         }
 
         private string _propY;
@@ -154,7 +154,7 @@ namespace Primo.MIA
         public string Prop_Y
         {
             get => _propY;
-            set { _propY = value; InvokePropertyChanged(this, "Prop_Y"); }
+            set { _propY = value; InvokePropertyChanged(this, nameof(Prop_Y)); }
         }
 
         private string _propWidth;
@@ -166,7 +166,7 @@ namespace Primo.MIA
         public string Prop_Width
         {
             get => _propWidth;
-            set { _propWidth = value; InvokePropertyChanged(this, "Prop_Width"); }
+            set { _propWidth = value; InvokePropertyChanged(this, nameof(Prop_Width)); }
         }
 
         private string _propHeight;
@@ -178,7 +178,7 @@ namespace Primo.MIA
         public string Prop_Height
         {
             get => _propHeight;
-            set { _propHeight = value; InvokePropertyChanged(this, "Prop_Height"); }
+            set { _propHeight = value; InvokePropertyChanged(this, nameof(Prop_Height)); }
         }
 
         // ── Конструктор ────────────────────────────────────────────────
@@ -292,7 +292,7 @@ namespace Primo.MIA
         {
             if (!string.IsNullOrWhiteSpace(locatorValue))
             {
-                string timeoutStr = GetPropertyValue<string>(this.Prop_WaitTimeout, "Prop_WaitTimeout", sd) ?? "10";
+                string timeoutStr = GetPropertyValue<string>(this.Prop_WaitTimeout, nameof(Prop_WaitTimeout), sd) ?? "10";
                 int timeout = int.TryParse(timeoutStr, out int t) ? t : 10;
                 ValidatePositive(timeout, "Prop_WaitTimeout");
 
@@ -322,7 +322,7 @@ namespace Primo.MIA
         /// </summary>
         private ExecutionResult ExecutePropertyMode(IWebElement element, ScriptingData sd)
         {
-            string propertyName = GetPropertyValue<string>(this.Prop_PropertyName, "Prop_PropertyName", sd);
+            string propertyName = GetPropertyValue<string>(this.Prop_PropertyName, nameof(Prop_PropertyName), sd);
 
             Guard.NotNullOrWhiteSpace(propertyName, nameof(propertyName));
 
@@ -343,7 +343,7 @@ namespace Primo.MIA
         /// </summary>
         private ExecutionResult ExecuteComputedStyleMode(IWebDriver driver, IWebElement element, ScriptingData sd)
         {
-            string cssProperty = GetPropertyValue<string>(this.Prop_PropertyName, "Prop_PropertyName", sd);
+            string cssProperty = GetPropertyValue<string>(this.Prop_PropertyName, nameof(Prop_PropertyName), sd);
 
             Guard.NotNullOrWhiteSpace(cssProperty, nameof(cssProperty));
 

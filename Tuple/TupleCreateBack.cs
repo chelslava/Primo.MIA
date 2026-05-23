@@ -54,7 +54,7 @@ namespace Primo.MIA
         public TupleKind Kind
         {
             get => _kind;
-            set { _kind = value; InvokePropertyChanged(this, "Kind"); }
+            set { _kind = value; InvokePropertyChanged(this, nameof(Kind)); }
         }
 
         // ── INPUT: элементы ────────────────────────────────────────────────────
@@ -65,7 +65,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(object))]
         [System.ComponentModel.Category(ActivityStrings.Category_Elements)]
         [System.ComponentModel.DisplayName(ActivityStrings.Field_Item1)]
-        public string Prop_Item1 { get => _propItem1; set { _propItem1 = value; InvokePropertyChanged(this, "Prop_Item1"); } }
+        public string Prop_Item1 { get => _propItem1; set { _propItem1 = value; InvokePropertyChanged(this, nameof(Prop_Item1)); } }
 
         private string _propItem2;
         /// <summary>Item2 — второй элемент.</summary>
@@ -73,7 +73,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(object))]
         [System.ComponentModel.Category(ActivityStrings.Category_Elements)]
         [System.ComponentModel.DisplayName(ActivityStrings.Field_Item2)]
-        public string Prop_Item2 { get => _propItem2; set { _propItem2 = value; InvokePropertyChanged(this, "Prop_Item2"); } }
+        public string Prop_Item2 { get => _propItem2; set { _propItem2 = value; InvokePropertyChanged(this, nameof(Prop_Item2)); } }
 
         private string _propItem3;
         /// <summary>Item3 — третий элемент.</summary>
@@ -81,7 +81,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(object))]
         [System.ComponentModel.Category(ActivityStrings.Category_Elements)]
         [System.ComponentModel.DisplayName(ActivityStrings.Field_Item3)]
-        public string Prop_Item3 { get => _propItem3; set { _propItem3 = value; InvokePropertyChanged(this, "Prop_Item3"); } }
+        public string Prop_Item3 { get => _propItem3; set { _propItem3 = value; InvokePropertyChanged(this, nameof(Prop_Item3)); } }
 
         private string _propItem4;
         /// <summary>Item4 — четвёртый элемент.</summary>
@@ -89,7 +89,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(object))]
         [System.ComponentModel.Category(ActivityStrings.Category_Elements)]
         [System.ComponentModel.DisplayName(ActivityStrings.Field_Item4)]
-        public string Prop_Item4 { get => _propItem4; set { _propItem4 = value; InvokePropertyChanged(this, "Prop_Item4"); } }
+        public string Prop_Item4 { get => _propItem4; set { _propItem4 = value; InvokePropertyChanged(this, nameof(Prop_Item4)); } }
 
         private string _propItem5;
         /// <summary>Item5 — пятый элемент.</summary>
@@ -97,7 +97,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(object))]
         [System.ComponentModel.Category(ActivityStrings.Category_Elements)]
         [System.ComponentModel.DisplayName(ActivityStrings.Field_Item5)]
-        public string Prop_Item5 { get => _propItem5; set { _propItem5 = value; InvokePropertyChanged(this, "Prop_Item5"); } }
+        public string Prop_Item5 { get => _propItem5; set { _propItem5 = value; InvokePropertyChanged(this, nameof(Prop_Item5)); } }
 
         private string _propItem6;
         /// <summary>Item6 — шестой элемент.</summary>
@@ -105,7 +105,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(object))]
         [System.ComponentModel.Category(ActivityStrings.Category_Elements)]
         [System.ComponentModel.DisplayName(ActivityStrings.Field_Item6)]
-        public string Prop_Item6 { get => _propItem6; set { _propItem6 = value; InvokePropertyChanged(this, "Prop_Item6"); } }
+        public string Prop_Item6 { get => _propItem6; set { _propItem6 = value; InvokePropertyChanged(this, nameof(Prop_Item6)); } }
 
         private string _propItem7;
         /// <summary>Item7 — седьмой элемент. Максимально допустимый.</summary>
@@ -113,7 +113,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(object))]
         [System.ComponentModel.Category(ActivityStrings.Category_Elements)]
         [System.ComponentModel.DisplayName(ActivityStrings.Field_Item7)]
-        public string Prop_Item7 { get => _propItem7; set { _propItem7 = value; InvokePropertyChanged(this, "Prop_Item7"); } }
+        public string Prop_Item7 { get => _propItem7; set { _propItem7 = value; InvokePropertyChanged(this, nameof(Prop_Item7)); } }
 
         // ── OUTPUT ─────────────────────────────────────────────────────────────
 
@@ -123,7 +123,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(object))]
         [System.ComponentModel.Category(ActivityStrings.Category_Output)]
         [System.ComponentModel.DisplayName(ActivityStrings.Field_Result)]
-        public string Prop_Result { get => _propResult; set { _propResult = value; InvokePropertyChanged(this, "Prop_Result"); } }
+        public string Prop_Result { get => _propResult; set { _propResult = value; InvokePropertyChanged(this, nameof(Prop_Result)); } }
 
         private string _propArity;
         /// <summary>Арность созданного кортежа (1–7).</summary>
@@ -131,7 +131,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
         [System.ComponentModel.Category(ActivityStrings.Category_Output)]
         [System.ComponentModel.DisplayName(ActivityStrings.Field_Arity)]
-        public string Prop_Arity { get => _propArity; set { _propArity = value; InvokePropertyChanged(this, "Prop_Arity"); } }
+        public string Prop_Arity { get => _propArity; set { _propArity = value; InvokePropertyChanged(this, nameof(Prop_Arity)); } }
 
         private string _propKindName;
         /// <summary>Имя типа созданного кортежа: "Tuple`2" или "ValueTuple`2". Для диагностики.</summary>
@@ -139,7 +139,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
         [System.ComponentModel.Category(ActivityStrings.Category_Output)]
         [System.ComponentModel.DisplayName(ActivityStrings.Field_KindName)]
-        public string Prop_KindName { get => _propKindName; set { _propKindName = value; InvokePropertyChanged(this, "Prop_KindName"); } }
+        public string Prop_KindName { get => _propKindName; set { _propKindName = value; InvokePropertyChanged(this, nameof(Prop_KindName)); } }
 
         // ── КОНСТРУКТОР ────────────────────────────────────────────────────────
 
@@ -213,6 +213,14 @@ namespace Primo.MIA
 
                 string label = useVT ? "ValueTuple" : "Tuple";
                 return new ExecutionResult { IsSuccess = true, SuccessMessage = $"Создан {label} с {arity} элементами" };
+            }
+            catch (ArgumentException ex)
+            {
+                return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Неверный аргумент: {ex.Message}" };
+            }
+            catch (InvalidOperationException ex)
+            {
+                return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Недопустимая операция: {ex.Message}" };
             }
             catch (Exception ex)
             {

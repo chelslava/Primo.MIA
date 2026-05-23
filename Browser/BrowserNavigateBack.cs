@@ -43,7 +43,7 @@ namespace Primo.MIA
         public NavigateMode Prop_Mode
         {
             get => _propMode;
-            set { _propMode = value; InvokePropertyChanged(this, "Prop_Mode"); }
+            set { _propMode = value; InvokePropertyChanged(this, nameof(Prop_Mode)); }
         }
 
         private string _propSessionId;
@@ -55,7 +55,7 @@ namespace Primo.MIA
         public string Prop_SessionId
         {
             get => _propSessionId;
-            set { _propSessionId = value; InvokePropertyChanged(this, "Prop_SessionId"); }
+            set { _propSessionId = value; InvokePropertyChanged(this, nameof(Prop_SessionId)); }
         }
 
         private string _propUrl;
@@ -67,7 +67,7 @@ namespace Primo.MIA
         public string Prop_Url
         {
             get => _propUrl;
-            set { _propUrl = value; InvokePropertyChanged(this, "Prop_Url"); }
+            set { _propUrl = value; InvokePropertyChanged(this, nameof(Prop_Url)); }
         }
 
         // ── Конструктор ────────────────────────────────────────────────
@@ -129,7 +129,7 @@ namespace Primo.MIA
                 switch (Prop_Mode)
                 {
                     case NavigateMode.ToUrl:
-                        string url = GetPropertyValue<string>(Prop_Url, "Prop_Url", sd);
+                        string url = GetPropertyValue<string>(Prop_Url, nameof(Prop_Url), sd);
                         Guard.NotNullOrWhiteSpace(url, nameof(url));
                         ValidateUrl(url);
 

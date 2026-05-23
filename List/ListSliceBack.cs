@@ -43,7 +43,7 @@ namespace Primo.MIA
         public string Prop_List
         {
             get => _propList;
-            set { _propList = value; InvokePropertyChanged(this, "Prop_List"); }
+            set { _propList = value; InvokePropertyChanged(this, nameof(Prop_List)); }
         }
 
         private ListSliceMode _mode = ListSliceMode.FirstN;
@@ -52,7 +52,7 @@ namespace Primo.MIA
         public ListSliceMode Mode
         {
             get => _mode;
-            set { _mode = value; InvokePropertyChanged(this, "Mode"); }
+            set { _mode = value; InvokePropertyChanged(this, nameof(Mode)); }
         }
 
         private string _propN;
@@ -63,7 +63,7 @@ namespace Primo.MIA
         public string Prop_N
         {
             get => _propN;
-            set { _propN = value; InvokePropertyChanged(this, "Prop_N"); }
+            set { _propN = value; InvokePropertyChanged(this, nameof(Prop_N)); }
         }
 
         private string _propPage;
@@ -74,7 +74,7 @@ namespace Primo.MIA
         public string Prop_Page
         {
             get => _propPage;
-            set { _propPage = value; InvokePropertyChanged(this, "Prop_Page"); }
+            set { _propPage = value; InvokePropertyChanged(this, nameof(Prop_Page)); }
         }
 
         private string _propPageSize;
@@ -85,7 +85,7 @@ namespace Primo.MIA
         public string Prop_PageSize
         {
             get => _propPageSize;
-            set { _propPageSize = value; InvokePropertyChanged(this, "Prop_PageSize"); }
+            set { _propPageSize = value; InvokePropertyChanged(this, nameof(Prop_PageSize)); }
         }
 
         private string _propFromIndex;
@@ -96,7 +96,7 @@ namespace Primo.MIA
         public string Prop_FromIndex
         {
             get => _propFromIndex;
-            set { _propFromIndex = value; InvokePropertyChanged(this, "Prop_FromIndex"); }
+            set { _propFromIndex = value; InvokePropertyChanged(this, nameof(Prop_FromIndex)); }
         }
 
         private string _propToIndex;
@@ -107,7 +107,7 @@ namespace Primo.MIA
         public string Prop_ToIndex
         {
             get => _propToIndex;
-            set { _propToIndex = value; InvokePropertyChanged(this, "Prop_ToIndex"); }
+            set { _propToIndex = value; InvokePropertyChanged(this, nameof(Prop_ToIndex)); }
         }
 
         private string _propResult;
@@ -117,7 +117,7 @@ namespace Primo.MIA
         public string Prop_Result
         {
             get => _propResult;
-            set { _propResult = value; InvokePropertyChanged(this, "Prop_Result"); }
+            set { _propResult = value; InvokePropertyChanged(this, nameof(Prop_Result)); }
         }
 
         private string _propCount;
@@ -127,7 +127,7 @@ namespace Primo.MIA
         public string Prop_Count
         {
             get => _propCount;
-            set { _propCount = value; InvokePropertyChanged(this, "Prop_Count"); }
+            set { _propCount = value; InvokePropertyChanged(this, nameof(Prop_Count)); }
         }
 
         private string _propTotalPages;
@@ -138,7 +138,7 @@ namespace Primo.MIA
         public string Prop_TotalPages
         {
             get => _propTotalPages;
-            set { _propTotalPages = value; InvokePropertyChanged(this, "Prop_TotalPages"); }
+            set { _propTotalPages = value; InvokePropertyChanged(this, nameof(Prop_TotalPages)); }
         }
 
         public ListSliceBack(IWFContainer container) : base(container)
@@ -196,6 +196,14 @@ namespace Primo.MIA
                 SetVariableValue(this.Prop_TotalPages, slice.TotalPages, sd);
 
                 return new ExecutionResult { IsSuccess = true, SuccessMessage = $"Срез: {slice.Result.Count} из {list.Count} элементов" };
+            }
+            catch (ArgumentException ex)
+            {
+                return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Неверный аргумент: {ex.Message}" };
+            }
+            catch (InvalidOperationException ex)
+            {
+                return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Недопустимая операция: {ex.Message}" };
             }
             catch (Exception ex)
             {

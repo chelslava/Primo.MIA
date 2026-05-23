@@ -1,3 +1,7 @@
+// =============================================================================
+// DatabaseListColumnsBack.cs — активность «Database: Список колонок (ListColumns)».
+// Возвращает список имён колонок указанной таблицы через schema metadata провайдера.
+// =============================================================================
 using LTools.Common.Model;
 using LTools.Common.UIElements;
 using LTools.SDK;
@@ -7,6 +11,7 @@ using System.Collections.Generic;
 
 namespace Primo.MIA
 {
+    /// <summary>Активность для получения списка колонок таблицы из БД по schema metadata.</summary>
     public class DatabaseListColumnsBack : PrimoComponentTO<DatabaseListColumns>
     {
         public override string GroupName { get => ActivityCategories.Database; protected set { } }
@@ -16,36 +21,42 @@ namespace Primo.MIA
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
         [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_DbProviderInvariantName)]
+        /// <summary>Инвариантное имя ADO.NET провайдера (например, System.Data.SqlClient).</summary>
         public string Prop_ProviderInvariantName { get => _propProviderInvariantName; set { _propProviderInvariantName = value; InvokePropertyChanged(this, nameof(Prop_ProviderInvariantName)); } }
 
         private string _propConnectionString;
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
         [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_ConnectionString)]
+        /// <summary>Строка подключения к базе данных.</summary>
         public string Prop_ConnectionString { get => _propConnectionString; set { _propConnectionString = value; InvokePropertyChanged(this, nameof(Prop_ConnectionString)); } }
 
         private string _propTableName;
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
         [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_TableName)]
+        /// <summary>Имя таблицы, для которой запрашивается список колонок.</summary>
         public string Prop_TableName { get => _propTableName; set { _propTableName = value; InvokePropertyChanged(this, nameof(Prop_TableName)); } }
 
         private string _propSchemaName;
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
         [System.ComponentModel.Category(ActivityStrings.Category_Optional), System.ComponentModel.DisplayName(ActivityStrings.Field_SchemaName)]
+        /// <summary>Имя схемы для уточнения таблицы; если не задано, используется схема по умолчанию.</summary>
         public string Prop_SchemaName { get => _propSchemaName; set { _propSchemaName = value; InvokePropertyChanged(this, nameof(Prop_SchemaName)); } }
 
         private string _propColumnNames;
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(List<string>))]
         [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_ColumnNames)]
+        /// <summary>Список имён колонок указанной таблицы.</summary>
         public string Prop_ColumnNames { get => _propColumnNames; set { _propColumnNames = value; InvokePropertyChanged(this, nameof(Prop_ColumnNames)); } }
 
         private string _propCount;
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
         [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_Count)]
+        /// <summary>Количество колонок в указанной таблице.</summary>
         public string Prop_Count { get => _propCount; set { _propCount = value; InvokePropertyChanged(this, nameof(Prop_Count)); } }
 
         public DatabaseListColumnsBack(IWFContainer container) : base(container)
@@ -79,6 +90,14 @@ namespace Primo.MIA
                 SetVariableValue(Prop_Count, columns.Count, sd);
 
                 return new ExecutionResult { IsSuccess = true, SuccessMessage = $"Найдено колонок: {columns.Count}" };
+            }
+            catch (System.Data.Common.DbException ex)
+            {
+                return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Ошибка БД: {ex.Message}" };
+            }
+            catch (InvalidOperationException ex)
+            {
+                return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Недопустимая операция: {ex.Message}" };
             }
             catch (Exception ex)
             {

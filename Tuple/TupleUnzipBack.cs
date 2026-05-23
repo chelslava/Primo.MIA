@@ -40,7 +40,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(object))]
         [System.ComponentModel.Category(ActivityStrings.Category_Main)]
         [System.ComponentModel.DisplayName(ActivityStrings.Field_TupleList)]
-        public string Prop_TupleList { get => _propTupleList; set { _propTupleList = value; InvokePropertyChanged(this, "Prop_TupleList"); } }
+        public string Prop_TupleList { get => _propTupleList; set { _propTupleList = value; InvokePropertyChanged(this, nameof(Prop_TupleList)); } }
 
         // ── OUTPUT ─────────────────────────────────────────────────────────────
 
@@ -50,7 +50,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(List<string>))]
         [System.ComponentModel.Category(ActivityStrings.Category_Output)]
         [System.ComponentModel.DisplayName(ActivityStrings.Field_ListA_FromItem1)]
-        public string Prop_ListA { get => _propListA; set { _propListA = value; InvokePropertyChanged(this, "Prop_ListA"); } }
+        public string Prop_ListA { get => _propListA; set { _propListA = value; InvokePropertyChanged(this, nameof(Prop_ListA)); } }
 
         private string _propListB;
         /// <summary>Список значений Item2 из каждого кортежа.</summary>
@@ -58,7 +58,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(List<string>))]
         [System.ComponentModel.Category(ActivityStrings.Category_Output)]
         [System.ComponentModel.DisplayName(ActivityStrings.Field_ListB_FromItem2)]
-        public string Prop_ListB { get => _propListB; set { _propListB = value; InvokePropertyChanged(this, "Prop_ListB"); } }
+        public string Prop_ListB { get => _propListB; set { _propListB = value; InvokePropertyChanged(this, nameof(Prop_ListB)); } }
 
         private string _propListC;
         /// <summary>
@@ -69,7 +69,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(List<string>))]
         [System.ComponentModel.Category(ActivityStrings.Category_Output)]
         [System.ComponentModel.DisplayName(ActivityStrings.Field_ListC_FromItem3)]
-        public string Prop_ListC { get => _propListC; set { _propListC = value; InvokePropertyChanged(this, "Prop_ListC"); } }
+        public string Prop_ListC { get => _propListC; set { _propListC = value; InvokePropertyChanged(this, nameof(Prop_ListC)); } }
 
         private string _propCount;
         /// <summary>Количество обработанных кортежей.</summary>
@@ -77,7 +77,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
         [System.ComponentModel.Category(ActivityStrings.Category_Output)]
         [System.ComponentModel.DisplayName(ActivityStrings.Field_Count)]
-        public string Prop_Count { get => _propCount; set { _propCount = value; InvokePropertyChanged(this, "Prop_Count"); } }
+        public string Prop_Count { get => _propCount; set { _propCount = value; InvokePropertyChanged(this, nameof(Prop_Count)); } }
 
         private string _propArity;
         /// <summary>Арность кортежей в переданном списке (определяется по первому элементу).</summary>
@@ -85,7 +85,7 @@ namespace Primo.MIA
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
         [System.ComponentModel.Category(ActivityStrings.Category_Output)]
         [System.ComponentModel.DisplayName(ActivityStrings.Field_TupleArity)]
-        public string Prop_Arity { get => _propArity; set { _propArity = value; InvokePropertyChanged(this, "Prop_Arity"); } }
+        public string Prop_Arity { get => _propArity; set { _propArity = value; InvokePropertyChanged(this, nameof(Prop_Arity)); } }
 
         // ── КОНСТРУКТОР ────────────────────────────────────────────────────────
 
@@ -171,6 +171,14 @@ namespace Primo.MIA
                     IsSuccess = true,
                     SuccessMessage = $"Unzip: {items.Count} кортежей → {(arity >= 3 ? "3 списка" : "2 списка")}"
                 };
+            }
+            catch (ArgumentException ex)
+            {
+                return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Неверный аргумент: {ex.Message}" };
+            }
+            catch (InvalidOperationException ex)
+            {
+                return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Недопустимая операция: {ex.Message}" };
             }
             catch (Exception ex)
             {
