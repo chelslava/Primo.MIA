@@ -155,6 +155,61 @@ namespace Primo.MIA
 
 
         //---------------------------------------------------------------------
+        //  ОЧИСТКА
+        //---------------------------------------------------------------------
+
+        /// <summary>
+        /// Очищает пользовательские данные из всех словарей, сохраняя системные значения
+        /// PathDict (пути) и RegexDict (pre-compiled regex).
+        /// Вызывайте в конце сценария или между независимыми запусками,
+        /// чтобы избежать утечек данных между запусками.
+        /// </summary>
+        /// <example>
+        /// // В конце сценария:
+        /// RepoDict.Clear();
+        ///
+        /// // Или в начале нового сценария:
+        /// RepoDict.Clear();
+        /// </example>
+        public static void Clear()
+        {
+            StringDict.Clear();
+            BoolDict.Clear();
+            IntDict.Clear();
+            DoubleDict.Clear();
+
+            foreach (var sec in SecDict.Values)
+                sec?.Dispose();
+            SecDict.Clear();
+
+            foreach (var cred in CredDict.Values)
+                cred.password?.Dispose();
+            CredDict.Clear();
+
+            TableDict.Clear();
+            StringListDict.Clear();
+            ObjectDict.Clear();
+            JsonDict.Clear();
+
+            // Восстанавливаем дату инициализации для нового запуска
+            InitializeDates();
+
+            // PathDict и RegexDict не очищаются — они системные
+        }
+
+        /// <summary>
+        /// Полностью сбрасывает ВСЕ словари (включая PathDict и RegexDict) к начальным значениям.
+        /// Используйте ClearAll() когда нужна полная реинициализация,
+        /// например после изменения рабочей директории.
+        /// </summary>
+        public static void ClearAll()
+        {
+            Clear();
+            InitializePaths();
+            InitializeRegex();
+        }
+
+        //---------------------------------------------------------------------
         //  ИНИЦИАЛИЗАЦИЯ
         //---------------------------------------------------------------------
 

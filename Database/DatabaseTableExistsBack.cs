@@ -62,7 +62,20 @@ namespace Primo.MIA
         public DatabaseTableExistsBack(IWFContainer container) : base(container)
         {
             sdkComponentName = ActivityStrings.Activity_DatabaseTableExists;
-            sdkComponentHelp = "Проверяет существование таблицы или view в БД через schema metadata.";
+            sdkComponentHelp = @"Компонент ""Database: Таблица существует""
+Проверяет наличие таблицы или представления в базе данных через ADO.NET schema metadata. Возвращает Boolean без генерации исключений при отсутствии объекта.
+
+Основные:
+Провайдер*: [String] Инвариантное имя ADO.NET провайдера (например, System.Data.SqlClient).
+Строка подключения*: [String] Строка подключения к базе данных.
+Имя таблицы*: [String] Имя проверяемой таблицы или представления.
+
+Дополнительные:
+Схема: [String] Имя схемы для фильтрации (например, dbo). Если не задана, поиск ведётся во всех схемах.
+Включать представления: [Boolean] Если True, в проверку включаются VIEW наряду с TABLE. По умолчанию False.
+
+Выходные данные:
+Существует: [Boolean] True, если объект найден в базе данных; False — если отсутствует.";
             sdkComponentIcon = ActivityIcons.Base;
             sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {

@@ -265,7 +265,7 @@ namespace Primo.MIA
                 PropertyBuilder.Script<string>("Prop_AdditionalFields", "Дополнительные поля формы (JSON)"),
                 PropertyBuilder.Script<string>("Prop_Headers", "Заголовки запроса в формате JSON"),
                 PropertyBuilder.Script<int>("Prop_Timeout", "Таймаут загрузки в секундах"),
-                PropertyBuilder.BooleanObject("Prop_IgnoreSslErrors", "Игнорировать ошибки SSL"),
+                PropertyBuilder.BooleanObject("Prop_IgnoreSslErrors", "Игнорировать ошибки SSL (только для тест-сред!)"),
                 PropertyBuilder.BooleanObject("Prop_UseCertificate", "Использовать клиентский сертификат"),
                 PropertyBuilder.FileSelector("Prop_CertPath", "Путь к файлу сертификата (.pfx)"),
                 PropertyBuilder.Script<string>("Prop_CertPassword", "Пароль к файлу сертификата"),

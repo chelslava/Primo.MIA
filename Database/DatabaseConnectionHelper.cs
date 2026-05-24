@@ -1,7 +1,6 @@
 using Primo.MIA.Common;
 using System;
 using System.Data.Common;
-using System.Data.SqlClient;
 
 namespace Primo.MIA
 {
@@ -42,10 +41,7 @@ namespace Primo.MIA
 
         public static string GetProviderInvariantName(DbConnection connection)
         {
-            if (connection is SqlConnection)
-                return DatabaseHelper.DefaultProviderInvariantName;
-
-            return connection != null ? connection.GetType().Namespace : DatabaseHelper.DefaultProviderInvariantName;
+            return connection?.GetType().Namespace ?? DatabaseHelper.DefaultProviderInvariantName;
         }
     }
 }

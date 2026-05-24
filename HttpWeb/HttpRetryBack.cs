@@ -349,7 +349,7 @@ namespace Primo.MIA
                 PropertyBuilder.Script<int>("Prop_DelayMs", "Базовая задержка (мс)"),
                 PropertyBuilder.Enum<HttpRetryDelayStrategy>("Prop_DelayStrategy", "Стратегия задержки"),
                 PropertyBuilder.Script<string>("Prop_RetryStatusCodes", "Коды HTTP для повтора"),
-                PropertyBuilder.BooleanObject("Prop_IgnoreSslErrors", "Игнорировать ошибки SSL"),
+                PropertyBuilder.BooleanObject("Prop_IgnoreSslErrors", "Игнорировать ошибки SSL (только для тест-сред!)"),
                 PropertyBuilder.BooleanObject("Prop_UseCertificate", "Использовать сертификат"),
                 PropertyBuilder.FileSelector("Prop_CertPath", "Путь к сертификату (.pfx)"),
                 PropertyBuilder.Script<string>("Prop_CertPassword", "Пароль сертификата"),

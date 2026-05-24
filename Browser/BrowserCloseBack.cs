@@ -53,13 +53,11 @@ namespace Primo.MIA
         public BrowserCloseBack(IWFContainer container) : base(container)
         {
             sdkComponentName = ActivityStrings.Activity_BrowserClose;
-            sdkComponentHelp =
-                "Закрывает браузер и освобождает ресурсы.\n" +
-                "\n" +
-                "── Основные параметры ────────────────────────\n" +
-                "ID сессии — идентификатор сессии из BrowserOpen\n" +
-                "\n" +
-                "ВАЖНО: После закрытия сессия становится недействительной.";
+            sdkComponentHelp = @"Компонент ""Закрыть браузер""
+Закрывает сессию браузера и освобождает все связанные ресурсы. После выполнения идентификатор сессии становится недействительным.
+
+Основные:
+ID сессии*: [String] Идентификатор сессии, полученный из активности «Открыть браузер». Если не задан явно, используется ambient-контекст текущей сессии.";
 
             sdkComponentIcon = ActivityIcons.Browser;
 

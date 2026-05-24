@@ -46,7 +46,7 @@ namespace Primo.MIA
                     if (string.IsNullOrEmpty(regexPattern))
                         throw new ArgumentException("Regex паттерн обязателен для режима ByRegexGroup");
 
-                    var regex = new Regex(regexPattern);
+                    var regex = new Regex(regexPattern, RegexOptions.Compiled);
                     return source
                         .Where(value => !string.IsNullOrEmpty(value))
                         .Select(value => new { Original = value, Match = regex.Match(value) })

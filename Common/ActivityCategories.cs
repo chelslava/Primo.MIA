@@ -39,5 +39,11 @@ namespace Primo.MIA.Common
 
         /// <summary>Категория "MIA → База данных"</summary>
         public const string Database = Prefix + "База данных";
+
+        /// <summary>Категория "MIA → MongoDB"</summary>
+        public const string MongoDB = Prefix + "MongoDB";
+
+        /// <summary>Категория "MIA → Redis"</summary>
+        public const string Redis = Prefix + "Redis";
     }
 }

@@ -330,7 +330,7 @@ namespace Primo.MIA
                 PropertyBuilder.Script<string>("Prop_Password", "Password (для Password Grant)"),
                 PropertyBuilder.Script<string>("Prop_AuthorizationCode", "Code (для Authorization Code)"),
                 PropertyBuilder.Script<string>("Prop_RedirectUri", "Redirect URI"),
-                PropertyBuilder.BooleanObject("Prop_IgnoreSslErrors", "Игнорировать ошибки SSL"),
+                PropertyBuilder.BooleanObject("Prop_IgnoreSslErrors", "Игнорировать ошибки SSL (только для тест-сред!)"),
                 PropertyBuilder.Variable<string>("Prop_AccessToken", "Access Token"),
                 PropertyBuilder.Variable<string>("Prop_RefreshToken", "Refresh Token"),
                 PropertyBuilder.Variable<int>("Prop_ExpiresIn", "Время жизни (сек)"),

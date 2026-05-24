@@ -195,7 +195,7 @@ namespace Primo.MIA
                 PropertyBuilder.Int("Prop_MaxParallel", "Макс. параллельных"),
                 PropertyBuilder.BooleanObject("Prop_StopOnError", "Остановить при ошибке"),
                 PropertyBuilder.Int("Prop_TimeoutSeconds", "Таймаут (сек)"),
-                PropertyBuilder.BooleanObject("Prop_IgnoreSslErrors", "Игнорировать ошибки SSL"),
+                PropertyBuilder.BooleanObject("Prop_IgnoreSslErrors", "Игнорировать ошибки SSL (только для тест-сред!)"),
                 PropertyBuilder.Variable<DataTable>("Prop_ResultsTable", "Таблица результатов"),
                 PropertyBuilder.Variable<int>("Prop_SuccessCount", "Успешных"),
                 PropertyBuilder.Variable<int>("Prop_ErrorCount", "Ошибок")

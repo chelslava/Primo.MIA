@@ -62,7 +62,20 @@ namespace Primo.MIA
         public DatabaseListColumnsBack(IWFContainer container) : base(container)
         {
             sdkComponentName = ActivityStrings.Activity_DatabaseListColumns;
-            sdkComponentHelp = "Возвращает список колонок таблицы по schema metadata.";
+            sdkComponentHelp = @"Компонент ""Database: Список колонок""
+Возвращает список имён колонок указанной таблицы через ADO.NET schema metadata. Полезно для динамического формирования запросов без hardcode имён полей.
+
+Основные:
+Провайдер*: [String] Инвариантное имя ADO.NET провайдера (например, System.Data.SqlClient).
+Строка подключения*: [String] Строка подключения к базе данных.
+Имя таблицы*: [String] Имя таблицы, для которой запрашивается список колонок.
+
+Дополнительные:
+Схема: [String] Имя схемы для уточнения таблицы (например, dbo). Если не задана, используется схема по умолчанию.
+
+Выходные данные:
+Список колонок: [List<String>] Имена колонок указанной таблицы.
+Количество: [Int32] Количество колонок в таблице.";
             sdkComponentIcon = ActivityIcons.Base;
             sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {

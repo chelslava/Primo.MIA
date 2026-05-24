@@ -173,9 +173,29 @@ namespace Primo.MIA
         public DatabaseStoredProcedureBack(IWFContainer container) : base(container)
         {
             sdkComponentName = ActivityStrings.Activity_DatabaseStoredProcedure;
-            sdkComponentHelp =
-                "Вызывает stored procedure через ADO.NET.\n" +
-                "Поддерживает input-параметры, output-параметры и получение return value.";
+            sdkComponentHelp = @"Компонент ""Database: Хранимая процедура""
+Вызывает хранимую процедуру через ADO.NET с поддержкой input-, output-, inputoutput-параметров и return value. Работает в рамках активной транзакции или создаёт прямое соединение.
+
+Основные:
+Провайдер*: [String] Инвариантное имя ADO.NET провайдера (например, System.Data.SqlClient).
+Строка подключения: [String] Строка подключения к БД. Обязательна, если не задан ID транзакции.
+ID транзакции: [String] Идентификатор активной транзакции. Если задан, подключение и провайдер игнорируются.
+Имя процедуры*: [String] Имя хранимой процедуры для вызова (например, dbo.MyProcedure).
+
+Параметры:
+Входные параметры: [Dictionary<String, String>] Словарь input-параметров процедуры (имя → значение).
+Имена output-параметров: [List<String>] Список имён output-параметров, значения которых нужно получить.
+InputOutput параметры: [Dictionary<String, String>] Словарь параметров типа InputOutput (имя → начальное значение).
+Получать return value: [Boolean] Если True, получает return value процедуры. По умолчанию True.
+
+Настройки:
+Размер output-параметра: [Int32] Максимальный размер в символах для строковых output/inputoutput параметров. По умолчанию 4000.
+Таймаут: [Int32] Таймаут выполнения процедуры в секундах. По умолчанию 30.
+
+Выходные данные:
+Выходные параметры: [Dictionary<String, String>] Значения output-параметров, возвращённых процедурой.
+Return value: [String] Return value хранимой процедуры в виде строки.
+Затронуто строк: [Int32] Количество строк, затронутых выполнением процедуры.";
             sdkComponentIcon = ActivityIcons.Base;
             sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {

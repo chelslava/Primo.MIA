@@ -47,9 +47,12 @@
   <ItemGroup>
     <!-- NuGet packages -->
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
-    <PackageReference Include="Selenium.WebDriver" Version="4.41.0" />
-    <PackageReference Include="Selenium.Support" Version="4.41.0" />
+    <PackageReference Include="Selenium.WebDriver" Version="4.44.0" />
+    <PackageReference Include="Selenium.Support" Version="4.44.0" />
     <PackageReference Include="Tomlyn" Version="2.4.0" />
+    <PackageReference Include="MongoDB.Driver" Version="2.30.0" />
+    <PackageReference Include="StackExchange.Redis" Version="2.8.41" />
+    <PackageReference Include="Npgsql" Version="7.0.8" />
   </ItemGroup>
 
   <!-- Local Primo SDK references (not available via NuGet) -->

@@ -385,7 +385,7 @@ namespace Primo.MIA
             using (var connection = OpenConnection(providerInvariantName, connectionString))
             using (var transaction = connection.BeginTransaction())
             {
-                var result = ExecuteUpsertCore(
+                var result = DatabaseUpsertHelper.ExecuteUpsertCore(
                     connection,
                     transaction,
                     providerInvariantName,
@@ -410,7 +410,7 @@ namespace Primo.MIA
             int commandTimeoutSeconds = 60)
         {
             EnsureTransactionHandle(transactionHandle);
-            return ExecuteUpsertCore(
+            return DatabaseUpsertHelper.ExecuteUpsertCore(
                 transactionHandle.Connection,
                 transactionHandle.Transaction,
                 transactionHandle.ProviderInvariantName,
@@ -450,7 +450,7 @@ namespace Primo.MIA
 
             if (string.Equals(provider, DefaultProviderInvariantName, StringComparison.OrdinalIgnoreCase))
             {
-                return ExecuteSqlServerBulkInsert(
+                return DatabaseBulkInsertHelper.ExecuteSqlServerBulkInsert(
                     connectionString,
                     dataTable,
                     destinationTableName,
@@ -462,7 +462,17 @@ namespace Primo.MIA
                     columnMappings);
             }
 
-            return ExecuteBatchedInsert(
+            if (provider.IndexOf("Npgsql", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                return DatabaseBulkInsertHelper.ExecutePostgreSqlBulkInsert(
+                    connectionString,
+                    dataTable,
+                    destinationTableName,
+                    preloadMode,
+                    columnMappings);
+            }
+
+            return DatabaseBulkInsertHelper.ExecuteBatchedInsert(
                 provider,
                 connectionString,
                 dataTable,
@@ -495,10 +505,15 @@ namespace Primo.MIA
 
             if (string.Equals(transactionHandle.ProviderInvariantName, DefaultProviderInvariantName, StringComparison.OrdinalIgnoreCase))
             {
-                return ExecuteSqlServerBulkInsert(transactionHandle, dataTable, destinationTableName, batchSize, bulkCopyTimeoutSeconds, useTableLock, keepIdentity, preloadMode, columnMappings);
+                return DatabaseBulkInsertHelper.ExecuteSqlServerBulkInsert(transactionHandle, dataTable, destinationTableName, batchSize, bulkCopyTimeoutSeconds, useTableLock, keepIdentity, preloadMode, columnMappings);
             }
 
-            return ExecuteBatchedInsert(transactionHandle, dataTable, destinationTableName, batchSize, bulkCopyTimeoutSeconds, preloadMode, columnMappings);
+            if (transactionHandle.ProviderInvariantName.IndexOf("Npgsql", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                return DatabaseBulkInsertHelper.ExecutePostgreSqlBulkInsert(transactionHandle, dataTable, destinationTableName, preloadMode, columnMappings);
+            }
+
+            return DatabaseBulkInsertHelper.ExecuteBatchedInsert(transactionHandle, dataTable, destinationTableName, batchSize, bulkCopyTimeoutSeconds, preloadMode, columnMappings);
         }
 
         // --- Schema ---
@@ -642,7 +657,7 @@ namespace Primo.MIA
             {
                 foreach (var pair in columnMappings)
                 {
-                    EnsureColumnExists(dataTable, pair.Key);
+                    DatabaseBulkInsertHelper.EnsureColumnExists(dataTable, pair.Key);
                     bulkCopy.ColumnMappings.Add(pair.Key, pair.Value);
                 }
 
@@ -660,508 +675,9 @@ namespace Primo.MIA
         private static void EnsureTransactionHandle(DatabaseTransactionHandle transactionHandle)
             => DatabaseTransactionHelper.EnsureTransactionHandle(transactionHandle);
 
-        private static void EnsureColumnExists(DataTable dataTable, string columnName)
-        {
-            if (string.IsNullOrWhiteSpace(columnName))
-                throw new ArgumentException("Имя колонки не может быть пустым.", nameof(columnName));
 
-            if (!dataTable.Columns.Contains(columnName))
-                throw new InvalidOperationException($"Колонка '{columnName}' отсутствует в DataTable.");
-        }
 
-        private static List<BulkInsertColumnMapping> BuildMappings(
-            DataTable dataTable,
-            Dictionary<string, string> columnMappings)
-        {
-            if (columnMappings != null && columnMappings.Count > 0)
-            {
-                return System.Linq.Enumerable.ToList(System.Linq.Enumerable.Select(columnMappings, pair =>
-                {
-                    EnsureColumnExists(dataTable, pair.Key);
-                    return new BulkInsertColumnMapping
-                    {
-                        SourceColumn = pair.Key,
-                        DestinationColumn = pair.Value
-                    };
-                }));
-            }
 
-            return System.Linq.Enumerable.ToList(System.Linq.Enumerable.Select(
-                System.Linq.Enumerable.Cast<DataColumn>(dataTable.Columns),
-                column => new BulkInsertColumnMapping
-                {
-                    SourceColumn = column.ColumnName,
-                    DestinationColumn = column.ColumnName
-                }));
-        }
-
-        private static string BuildInsertCommandText(
-            string providerInvariantName,
-            string destinationTableName,
-            List<BulkInsertColumnMapping> mappings)
-        {
-            var safeTableName = QuoteQualifiedIdentifier(providerInvariantName, destinationTableName);
-            var columnList = string.Join(", ", System.Linq.Enumerable.Select(mappings, m => QuoteIdentifier(providerInvariantName, m.DestinationColumn)));
-            var valuesList = string.Join(", ", System.Linq.Enumerable.Select(mappings, (m, index) => DatabaseCommandHelper.GetParameterPlaceholder(providerInvariantName, index)));
-            return $"INSERT INTO {safeTableName} ({columnList}) VALUES ({valuesList})";
-        }
-
-        private static void CreateInsertParameters(
-            DbCommand command,
-            string providerInvariantName,
-            List<BulkInsertColumnMapping> mappings)
-        {
-            command.Parameters.Clear();
-
-            for (int i = 0; i < mappings.Count; i++)
-            {
-                var parameter = command.CreateParameter();
-                parameter.ParameterName = DatabaseCommandHelper.GetParameterName(providerInvariantName, i);
-                command.Parameters.Add(parameter);
-            }
-        }
-
-        private static void AssignInsertParameterValues(
-            DbCommand command,
-            DataRow row,
-            List<BulkInsertColumnMapping> mappings)
-        {
-            for (int i = 0; i < mappings.Count; i++)
-            {
-                var value = row[mappings[i].SourceColumn];
-                command.Parameters[i].Value = value ?? DBNull.Value;
-            }
-        }
-
-        private static void ExecutePreloadCommand(
-            DbConnection connection,
-            DbTransaction transaction,
-            string destinationTableName,
-            DatabaseBulkPreloadMode preloadMode)
-        {
-            var preloadCommandText = BuildPreloadCommandText(DatabaseConnectionHelper.GetProviderInvariantName(connection), destinationTableName, preloadMode);
-            if (string.IsNullOrWhiteSpace(preloadCommandText))
-                return;
-
-            using (var preloadCommand = connection.CreateCommand())
-            {
-                preloadCommand.Transaction = transaction;
-                preloadCommand.CommandType = CommandType.Text;
-                preloadCommand.CommandText = preloadCommandText;
-                preloadCommand.ExecuteNonQuery();
-            }
-        }
-
-        private static string BuildBulkInsertModeName(string baseMode, DatabaseBulkPreloadMode preloadMode)
-        {
-            return preloadMode == DatabaseBulkPreloadMode.None
-                ? baseMode
-                : baseMode + "+" + preloadMode;
-        }
-
-        private static BulkInsertResult ExecuteSqlServerBulkInsert(
-            string connectionString,
-            DataTable dataTable,
-            string destinationTableName,
-            int batchSize,
-            int bulkCopyTimeoutSeconds,
-            bool useTableLock,
-            bool keepIdentity,
-            DatabaseBulkPreloadMode preloadMode,
-            Dictionary<string, string> columnMappings)
-        {
-            var options = SqlBulkCopyOptions.CheckConstraints;
-            if (useTableLock)
-                options |= SqlBulkCopyOptions.TableLock;
-            if (keepIdentity)
-                options |= SqlBulkCopyOptions.KeepIdentity;
-
-            using (var connection = new SqlConnection(connectionString))
-            using (var bulkCopy = new SqlBulkCopy(connection, options, null))
-            {
-                connection.Open();
-                ExecutePreloadCommand(connection, null, destinationTableName, preloadMode);
-
-                bulkCopy.DestinationTableName = destinationTableName;
-                bulkCopy.BatchSize = batchSize > 0 ? batchSize : 1000;
-                bulkCopy.BulkCopyTimeout = bulkCopyTimeoutSeconds > 0 ? bulkCopyTimeoutSeconds : 60;
-
-                ApplyBulkCopyMappings(bulkCopy, dataTable, columnMappings);
-                bulkCopy.WriteToServer(dataTable);
-            }
-
-            return new BulkInsertResult
-            {
-                RowsWritten = dataTable.Rows.Count,
-                Mode = BuildBulkInsertModeName("SqlBulkCopy", preloadMode)
-            };
-        }
-
-        private static BulkInsertResult ExecuteSqlServerBulkInsert(
-            DatabaseTransactionHandle transactionHandle,
-            DataTable dataTable,
-            string destinationTableName,
-            int batchSize,
-            int bulkCopyTimeoutSeconds,
-            bool useTableLock,
-            bool keepIdentity,
-            DatabaseBulkPreloadMode preloadMode,
-            Dictionary<string, string> columnMappings)
-        {
-            EnsureTransactionHandle(transactionHandle);
-
-            var sqlConnection = transactionHandle.Connection as SqlConnection;
-            var sqlTransaction = transactionHandle.Transaction as SqlTransaction;
-            if (sqlConnection == null || sqlTransaction == null)
-                throw new InvalidOperationException("Для SqlBulkCopy внутри транзакции требуется SqlConnection/SqlTransaction.");
-
-            var options = SqlBulkCopyOptions.CheckConstraints;
-            if (useTableLock)
-                options |= SqlBulkCopyOptions.TableLock;
-            if (keepIdentity)
-                options |= SqlBulkCopyOptions.KeepIdentity;
-
-            using (var bulkCopy = new SqlBulkCopy(sqlConnection, options, sqlTransaction))
-            {
-                ExecutePreloadCommand(sqlConnection, sqlTransaction, destinationTableName, preloadMode);
-                bulkCopy.DestinationTableName = destinationTableName;
-                bulkCopy.BatchSize = batchSize > 0 ? batchSize : 1000;
-                bulkCopy.BulkCopyTimeout = bulkCopyTimeoutSeconds > 0 ? bulkCopyTimeoutSeconds : 60;
-                ApplyBulkCopyMappings(bulkCopy, dataTable, columnMappings);
-                bulkCopy.WriteToServer(dataTable);
-            }
-
-            return new BulkInsertResult
-            {
-                RowsWritten = dataTable.Rows.Count,
-                Mode = BuildBulkInsertModeName("SqlBulkCopy", preloadMode)
-            };
-        }
-
-        private static BulkInsertResult ExecuteBatchedInsert(
-            string providerInvariantName,
-            string connectionString,
-            DataTable dataTable,
-            string destinationTableName,
-            int batchSize,
-            int commandTimeoutSeconds,
-            DatabaseBulkPreloadMode preloadMode,
-            Dictionary<string, string> columnMappings)
-        {
-            var mappings = BuildMappings(dataTable, columnMappings);
-            var effectiveBatchSize = batchSize > 0 ? batchSize : 1000;
-
-            using (var connection = OpenConnection(providerInvariantName, connectionString))
-            using (var transaction = connection.BeginTransaction())
-            using (var command = connection.CreateCommand())
-            {
-                ExecutePreloadCommand(connection, transaction, destinationTableName, preloadMode);
-                command.Transaction = transaction;
-                command.CommandType = CommandType.Text;
-                command.CommandTimeout = commandTimeoutSeconds > 0 ? commandTimeoutSeconds : 60;
-                command.CommandText = BuildInsertCommandText(providerInvariantName, destinationTableName, mappings);
-
-                CreateInsertParameters(command, providerInvariantName, mappings);
-                DatabaseCommandHelper.TryPrepareCommand(command);
-
-                var rowsWritten = 0;
-
-                foreach (DataRow row in dataTable.Rows)
-                {
-                    AssignInsertParameterValues(command, row, mappings);
-                    command.ExecuteNonQuery();
-                    rowsWritten++;
-
-                    if (rowsWritten % effectiveBatchSize == 0)
-                    {
-                        // Граница пачки оставлена как явный маркер: при необходимости
-                        // сюда можно добавить логирование/чекпоинты без перестройки API.
-                    }
-                }
-
-                transaction.Commit();
-
-                return new BulkInsertResult
-                {
-                    RowsWritten = rowsWritten,
-                    Mode = BuildBulkInsertModeName("BatchedInsert", preloadMode)
-                };
-            }
-        }
-
-        private static BulkInsertResult ExecuteBatchedInsert(
-            DatabaseTransactionHandle transactionHandle,
-            DataTable dataTable,
-            string destinationTableName,
-            int batchSize,
-            int commandTimeoutSeconds,
-            DatabaseBulkPreloadMode preloadMode,
-            Dictionary<string, string> columnMappings)
-        {
-            EnsureTransactionHandle(transactionHandle);
-
-            var mappings = BuildMappings(dataTable, columnMappings);
-            var effectiveBatchSize = batchSize > 0 ? batchSize : 1000;
-
-            using (var command = transactionHandle.Connection.CreateCommand())
-            {
-                ExecutePreloadCommand(transactionHandle.Connection, transactionHandle.Transaction, destinationTableName, preloadMode);
-                command.Transaction = transactionHandle.Transaction;
-                command.CommandType = CommandType.Text;
-                command.CommandTimeout = commandTimeoutSeconds > 0 ? commandTimeoutSeconds : 60;
-                command.CommandText = BuildInsertCommandText(transactionHandle.ProviderInvariantName, destinationTableName, mappings);
-
-                CreateInsertParameters(command, transactionHandle.ProviderInvariantName, mappings);
-                DatabaseCommandHelper.TryPrepareCommand(command);
-
-                var rowsWritten = 0;
-                foreach (DataRow row in dataTable.Rows)
-                {
-                    AssignInsertParameterValues(command, row, mappings);
-                    command.ExecuteNonQuery();
-                    rowsWritten++;
-
-                    if (rowsWritten % effectiveBatchSize == 0)
-                    {
-                    }
-                }
-
-                return new BulkInsertResult
-                {
-                    RowsWritten = rowsWritten,
-                    Mode = BuildBulkInsertModeName("BatchedInsert", preloadMode)
-                };
-            }
-        }
-
-        private static UpsertResult ExecuteUpsertCore(
-            DbConnection connection,
-            DbTransaction transaction,
-            string providerInvariantName,
-            DataTable dataTable,
-            string destinationTableName,
-            List<string> keyColumns,
-            List<string> updateColumns,
-            Dictionary<string, string> columnMappings,
-            int commandTimeoutSeconds)
-        {
-            if (dataTable == null)
-                throw new ArgumentNullException(nameof(dataTable), "Исходная таблица данных не указана.");
-            if (string.IsNullOrWhiteSpace(destinationTableName))
-                throw new ArgumentException("Имя таблицы-приёмника не может быть пустым.", nameof(destinationTableName));
-            if (keyColumns == null || keyColumns.Count == 0)
-                throw new ArgumentException("Список ключевых колонок не может быть пустым.", nameof(keyColumns));
-
-            var allMappings = BuildMappings(dataTable, columnMappings);
-            var keyMappings = ResolveMappings(allMappings, keyColumns);
-            var updateMappings = updateColumns != null && updateColumns.Count > 0
-                ? ResolveMappings(allMappings, updateColumns)
-                : System.Linq.Enumerable.ToList(System.Linq.Enumerable.Where(allMappings, m => System.Linq.Enumerable.All(keyMappings, k => !string.Equals(k.SourceColumn, m.SourceColumn, StringComparison.OrdinalIgnoreCase))));
-
-            using (var updateCommand = CreateUpsertUpdateCommand(connection, transaction, providerInvariantName, destinationTableName, keyMappings, updateMappings, commandTimeoutSeconds))
-            using (var insertCommand = CreateUpsertInsertCommand(connection, transaction, providerInvariantName, destinationTableName, allMappings, commandTimeoutSeconds))
-            using (var existsCommand = updateMappings.Count == 0
-                ? CreateUpsertExistsCommand(connection, transaction, providerInvariantName, destinationTableName, keyMappings, commandTimeoutSeconds)
-                : null)
-            {
-                var insertedCount = 0;
-                var updatedCount = 0;
-
-                foreach (DataRow row in dataTable.Rows)
-                {
-                    var wasUpdated = false;
-
-                    if (updateMappings.Count > 0)
-                    {
-                        AssignUpsertUpdateParameterValues(updateCommand, row, updateMappings, keyMappings);
-                        wasUpdated = updateCommand.ExecuteNonQuery() > 0;
-                    }
-                    else
-                    {
-                        AssignUpsertExistsParameterValues(existsCommand, row, keyMappings);
-                        wasUpdated = (ConvertScalarToInt32(existsCommand.ExecuteScalar()) ?? 0) > 0;
-                    }
-
-                    if (wasUpdated)
-                    {
-                        updatedCount++;
-                        continue;
-                    }
-
-                    AssignInsertParameterValues(insertCommand, row, allMappings);
-                    insertCommand.ExecuteNonQuery();
-                    insertedCount++;
-                }
-
-                return new UpsertResult
-                {
-                    InsertedCount = insertedCount,
-                    UpdatedCount = updatedCount
-                };
-            }
-        }
-
-        private static List<BulkInsertColumnMapping> ResolveMappings(
-            List<BulkInsertColumnMapping> mappings,
-            List<string> names)
-        {
-            return System.Linq.Enumerable.ToList(System.Linq.Enumerable.Select(
-                System.Linq.Enumerable.Where(names, name => !string.IsNullOrWhiteSpace(name)),
-                name =>
-                {
-                    var mapping = System.Linq.Enumerable.FirstOrDefault(mappings, m =>
-                        string.Equals(m.SourceColumn, name, StringComparison.OrdinalIgnoreCase) ||
-                        string.Equals(m.DestinationColumn, name, StringComparison.OrdinalIgnoreCase));
-
-                    if (mapping == null)
-                        throw new InvalidOperationException($"Колонка '{name}' не найдена в DataTable или маппинге.");
-
-                    return mapping;
-                }));
-        }
-
-        private static DbCommand CreateUpsertUpdateCommand(
-            DbConnection connection,
-            DbTransaction transaction,
-            string providerInvariantName,
-            string destinationTableName,
-            List<BulkInsertColumnMapping> keyMappings,
-            List<BulkInsertColumnMapping> updateMappings,
-            int commandTimeoutSeconds)
-        {
-            var command = connection.CreateCommand();
-            command.Transaction = transaction;
-            command.CommandType = CommandType.Text;
-            command.CommandTimeout = commandTimeoutSeconds > 0 ? commandTimeoutSeconds : 60;
-            command.CommandText = BuildUpdateCommandText(providerInvariantName, destinationTableName, keyMappings, updateMappings);
-            CreateUpsertUpdateParameters(command, providerInvariantName, updateMappings, keyMappings);
-            DatabaseCommandHelper.TryPrepareCommand(command);
-            return command;
-        }
-
-        private static DbCommand CreateUpsertInsertCommand(
-            DbConnection connection,
-            DbTransaction transaction,
-            string providerInvariantName,
-            string destinationTableName,
-            List<BulkInsertColumnMapping> mappings,
-            int commandTimeoutSeconds)
-        {
-            var command = connection.CreateCommand();
-            command.Transaction = transaction;
-            command.CommandType = CommandType.Text;
-            command.CommandTimeout = commandTimeoutSeconds > 0 ? commandTimeoutSeconds : 60;
-            command.CommandText = BuildInsertCommandText(providerInvariantName, destinationTableName, mappings);
-            CreateInsertParameters(command, providerInvariantName, mappings);
-            DatabaseCommandHelper.TryPrepareCommand(command);
-            return command;
-        }
-
-        private static DbCommand CreateUpsertExistsCommand(
-            DbConnection connection,
-            DbTransaction transaction,
-            string providerInvariantName,
-            string destinationTableName,
-            List<BulkInsertColumnMapping> keyMappings,
-            int commandTimeoutSeconds)
-        {
-            var command = connection.CreateCommand();
-            command.Transaction = transaction;
-            command.CommandType = CommandType.Text;
-            command.CommandTimeout = commandTimeoutSeconds > 0 ? commandTimeoutSeconds : 60;
-            command.CommandText = BuildExistsCommandText(providerInvariantName, destinationTableName, keyMappings);
-            CreateUpsertExistsParameters(command, providerInvariantName, keyMappings);
-            DatabaseCommandHelper.TryPrepareCommand(command);
-            return command;
-        }
-
-        private static string BuildUpdateCommandText(
-            string providerInvariantName,
-            string destinationTableName,
-            List<BulkInsertColumnMapping> keyMappings,
-            List<BulkInsertColumnMapping> updateMappings)
-        {
-            if (updateMappings == null || updateMappings.Count == 0)
-                throw new ArgumentException("Список колонок обновления не может быть пустым.", nameof(updateMappings));
-
-            var safeTableName = QuoteQualifiedIdentifier(providerInvariantName, destinationTableName);
-            var setClause = string.Join(", ", System.Linq.Enumerable.Select(updateMappings, (m, index) =>
-                QuoteIdentifier(providerInvariantName, m.DestinationColumn) + " = " + DatabaseCommandHelper.GetParameterPlaceholder(providerInvariantName, index)));
-            var whereClause = string.Join(" AND ", System.Linq.Enumerable.Select(keyMappings, (m, index) =>
-                QuoteIdentifier(providerInvariantName, m.DestinationColumn) + " = " + DatabaseCommandHelper.GetParameterPlaceholder(providerInvariantName, updateMappings.Count + index)));
-            return $"UPDATE {safeTableName} SET {setClause} WHERE {whereClause}";
-        }
-
-        private static string BuildExistsCommandText(
-            string providerInvariantName,
-            string destinationTableName,
-            List<BulkInsertColumnMapping> keyMappings)
-        {
-            var safeTableName = QuoteQualifiedIdentifier(providerInvariantName, destinationTableName);
-            var whereClause = string.Join(" AND ", System.Linq.Enumerable.Select(keyMappings, (m, index) =>
-                QuoteIdentifier(providerInvariantName, m.DestinationColumn) + " = " + DatabaseCommandHelper.GetParameterPlaceholder(providerInvariantName, index)));
-            return $"SELECT COUNT(1) FROM {safeTableName} WHERE {whereClause}";
-        }
-
-        private static void CreateUpsertUpdateParameters(
-            DbCommand command,
-            string providerInvariantName,
-            List<BulkInsertColumnMapping> updateMappings,
-            List<BulkInsertColumnMapping> keyMappings)
-        {
-            command.Parameters.Clear();
-
-            for (int i = 0; i < updateMappings.Count + keyMappings.Count; i++)
-            {
-                var parameter = command.CreateParameter();
-                parameter.ParameterName = DatabaseCommandHelper.GetParameterName(providerInvariantName, i);
-                command.Parameters.Add(parameter);
-            }
-        }
-
-        private static void CreateUpsertExistsParameters(
-            DbCommand command,
-            string providerInvariantName,
-            List<BulkInsertColumnMapping> keyMappings)
-        {
-            command.Parameters.Clear();
-
-            for (int i = 0; i < keyMappings.Count; i++)
-            {
-                var parameter = command.CreateParameter();
-                parameter.ParameterName = DatabaseCommandHelper.GetParameterName(providerInvariantName, i);
-                command.Parameters.Add(parameter);
-            }
-        }
-
-        private static void AssignUpsertUpdateParameterValues(
-            DbCommand command,
-            DataRow row,
-            List<BulkInsertColumnMapping> updateMappings,
-            List<BulkInsertColumnMapping> keyMappings)
-        {
-            var index = 0;
-            foreach (var updateMapping in updateMappings)
-            {
-                command.Parameters[index++].Value = row[updateMapping.SourceColumn] ?? DBNull.Value;
-            }
-
-            foreach (var keyMapping in keyMappings)
-            {
-                command.Parameters[index++].Value = row[keyMapping.SourceColumn] ?? DBNull.Value;
-            }
-        }
-
-        private static void AssignUpsertExistsParameterValues(
-            DbCommand command,
-            DataRow row,
-            List<BulkInsertColumnMapping> keyMappings)
-        {
-            for (int i = 0; i < keyMappings.Count; i++)
-            {
-                command.Parameters[i].Value = row[keyMappings[i].SourceColumn] ?? DBNull.Value;
-            }
-        }
 
         private static DbCommand CreateStoredProcedureCommand(
             DbConnection connection,

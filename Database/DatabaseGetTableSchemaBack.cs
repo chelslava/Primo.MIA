@@ -56,7 +56,19 @@ namespace Primo.MIA
         public DatabaseGetTableSchemaBack(IWFContainer container) : base(container)
         {
             sdkComponentName = ActivityStrings.Activity_DatabaseGetTableSchema;
-            sdkComponentHelp = "Возвращает schema metadata по колонкам выбранной таблицы.";
+            sdkComponentHelp = @"Компонент ""Database: Схема таблицы""
+Возвращает DataTable с метаданными колонок указанной таблицы: имя, тип данных, допустимость NULL, максимальная длина и другие атрибуты. Использует ADO.NET schema metadata.
+
+Основные:
+Провайдер*: [String] Инвариантное имя ADO.NET провайдера (например, System.Data.SqlClient).
+Строка подключения*: [String] Строка подключения к базе данных.
+Имя таблицы*: [String] Имя таблицы, для которой запрашиваются метаданные колонок.
+
+Дополнительные:
+Схема: [String] Имя схемы для уточнения таблицы (например, dbo). Если не задана, используется схема по умолчанию.
+
+Выходные данные:
+Схема таблицы: [DataTable] Таблица с метаданными колонок. Каждая строка описывает одну колонку: имя, тип, длина, допустимость NULL.";
             sdkComponentIcon = ActivityIcons.Base;
             sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {

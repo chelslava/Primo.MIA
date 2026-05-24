@@ -57,13 +57,15 @@ namespace Primo.MIA
         public DictionaryContainsKeyBack(IWFContainer container) : base(container)
         {
             sdkComponentName = "Словарь: Проверить ключ";
-            sdkComponentHelp =
-                "Проверяет наличие ключа в Dictionary<string, string>.\n\n" +
-                "Входные параметры:\n" +
-                "  Словарь* — Dictionary<string, string>\n" +
-                "  Ключ*    — проверяемый ключ\n\n" +
-                "Выходные параметры:\n" +
-                "  Ключ существует — true если ключ есть в словаре";
+            sdkComponentHelp = @"Компонент ""Словарь: Проверить ключ""
+Проверяет наличие заданного ключа в словаре Dictionary<string, string>. Не изменяет содержимое словаря.
+
+Основные:
+Словарь*: [Dictionary<String, String>] Исходный словарь, в котором выполняется поиск ключа.
+Ключ*: [String] Искомый ключ. Регистр символов учитывается.
+
+Выходные данные:
+Ключ существует: [Boolean] True, если ключ найден в словаре; False — если отсутствует.";
 
             sdkComponentIcon = ActivityIcons.Dictionary;
 

@@ -153,9 +153,29 @@ namespace Primo.MIA
         public DatabaseUpsertBack(IWFContainer container) : base(container)
         {
             sdkComponentName = ActivityStrings.Activity_DatabaseUpsert;
-            sdkComponentHelp =
-                "Выполняет key-based upsert из DataTable.\n" +
-                "Сначала пытается UPDATE по ключевым колонкам, если строка не найдена — выполняет INSERT.";
+            sdkComponentHelp = @"Компонент ""Database: Upsert по ключу""
+Для каждой строки DataTable выполняет UPDATE по ключевым колонкам, а если строка не найдена — INSERT. Работает построчно с поддержкой транзакций и маппинга колонок.
+
+Основные:
+DataTable*: [DataTable] Исходная таблица данных, строки которой обрабатываются операцией upsert.
+Провайдер*: [String] Инвариантное имя ADO.NET провайдера (например, System.Data.SqlClient).
+Строка подключения: [String] Строка подключения к БД. Обязательна, если не задан ID транзакции.
+ID транзакции: [String] Идентификатор активной транзакции.
+Таблица-приёмник*: [String] Имя целевой таблицы в базе данных.
+Ключевые колонки*: [List<String>] Список колонок, по которым определяется существование строки (условие WHERE в UPDATE).
+
+Дополнительные:
+Колонки для обновления: [List<String>] Список колонок, обновляемых при UPDATE. Если не задан, обновляются все не-ключевые колонки.
+
+Параметры:
+Маппинг колонок: [Dictionary<String, String>] Соответствие колонок DataTable колонкам таблицы БД (SourceColumn → DestinationColumn).
+
+Настройки:
+Таймаут: [Int32] Таймаут выполнения каждой команды в секундах. По умолчанию 60.
+
+Выходные данные:
+Вставлено строк: [Int32] Количество строк, добавленных операцией INSERT.
+Обновлено строк: [Int32] Количество строк, изменённых операцией UPDATE.";
             sdkComponentIcon = ActivityIcons.Base;
             sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {

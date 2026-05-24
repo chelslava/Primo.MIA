@@ -217,7 +217,8 @@ namespace Primo.MIA
         /// <summary>Игнорировать ошибки SSL. Только для тестовых сред!</summary>
         [StoringProperty]
         [System.ComponentModel.Category(ActivityStrings.Category_Settings),
-         System.ComponentModel.DisplayName("Игнорировать ошибки SSL")]
+         System.ComponentModel.DisplayName("Игнорировать ошибки SSL"),
+         System.ComponentModel.Description("ВНИМАНИЕ: Отключает проверку SSL-сертификата сервера. Используйте ТОЛЬКО в тестовых средах — никогда в production!")]
         public bool Prop_IgnoreSslErrors
         {
             get => _propIgnoreSslErrors;

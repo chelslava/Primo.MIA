@@ -269,7 +269,7 @@ namespace Primo.MIA
                 PropertyBuilder.Script<int>("Prop_Timeout", "Таймаут загрузки в секундах"),
                 PropertyBuilder.BooleanObject("Prop_Overwrite", "Перезаписать существующий файл"),
                 PropertyBuilder.Script<int>("Prop_BufferSize", "Размер буфера в байтах"),
-                PropertyBuilder.BooleanObject("Prop_IgnoreSslErrors", "Игнорировать ошибки SSL"),
+                PropertyBuilder.BooleanObject("Prop_IgnoreSslErrors", "Игнорировать ошибки SSL (только для тест-сред!)"),
                 PropertyBuilder.BooleanObject("Prop_UseCertificate", "Использовать клиентский сертификат"),
                 PropertyBuilder.FileSelector("Prop_CertPath", "Путь к файлу сертификата (.pfx)"),
                 PropertyBuilder.Script<string>("Prop_CertPassword", "Пароль к файлу сертификата"),

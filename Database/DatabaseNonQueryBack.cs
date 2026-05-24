@@ -171,9 +171,29 @@ namespace Primo.MIA
         public DatabaseNonQueryBack(IWFContainer container) : base(container)
         {
             sdkComponentName = ActivityStrings.Activity_DatabaseNonQuery;
-            sdkComponentHelp =
-                "Выполняет INSERT/UPDATE/DELETE или stored procedure без табличного результата.\n" +
-                "Возвращает количество затронутых строк.";
+            sdkComponentHelp = @"Компонент ""Database: Выполнить команду""
+Выполняет INSERT, UPDATE, DELETE или хранимую процедуру без возврата табличного результата. Поддерживает разбивку SQL-скриптов по GO-разделителям и получение last inserted identity.
+
+Основные:
+Провайдер*: [String] Инвариантное имя ADO.NET провайдера (например, System.Data.SqlClient).
+Строка подключения: [String] Строка подключения к БД. Обязательна, если не задан ID транзакции.
+ID транзакции: [String] Идентификатор активной транзакции.
+Тип команды*: [DatabaseCommandType] Text — SQL-команда; StoredProcedure — хранимая процедура.
+Текст команды*: [String] SQL-команда или имя хранимой процедуры.
+
+Параметры:
+Параметры: [Dictionary<String, String>] Словарь параметров команды (имя → значение).
+
+Настройки:
+Таймаут: [Int32] Таймаут выполнения команды в секундах. По умолчанию 30.
+Разбивать по GO: [Boolean] Если True, SQL-текст разбивается по batch-разделителю GO перед выполнением.
+Получать identity: [Boolean] Если True, возвращает значение последнего вставленного идентификатора.
+
+Выходные данные:
+Затронуто строк: [Int32] Количество строк, затронутых командой.
+Есть затронутые строки: [Boolean] True, если затронута хотя бы одна строка.
+Количество batch: [Int32] Количество выполненных GO-batch блоков (при включённом разбиении).
+Identity: [String] Значение последнего вставленного идентификатора (при включённом Получать identity).";
             sdkComponentIcon = ActivityIcons.Base;
             sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {

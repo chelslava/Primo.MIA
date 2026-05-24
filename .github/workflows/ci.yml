@@ -97,46 +97,98 @@ jobs:
         echo "| Activities (*Back.cs) | $back_count |" >> $GITHUB_STEP_SUMMARY
         echo "| Logic classes (*Logic.cs) | $logic_count |" >> $GITHUB_STEP_SUMMARY
 
+  build-and-test:
+    name: Build & Test (Self-hosted)
+    runs-on: [self-hosted, primo-studio]
+    needs: [validate, code-quality]
+    # Запускается только если настроен self-hosted runner с меткой 'primo-studio'
+    # Настройка: Settings → Actions → Runners → New self-hosted runner
+    # Требования: Windows, Visual Studio 2022, Primo Studio Community x64
+    if: ${{ vars.PRIMO_SELFHOSTED_RUNNER == 'true' }}
+
+    steps:
+    - uses: actions/checkout@v4
+      name: Checkout code
+
+    - name: Restore NuGet packages
+      shell: cmd
+      run: nuget restore Primo.MIA.slnx
+
+    - name: Build main project (Release)
+      shell: cmd
+      run: msbuild Primo.MIA.csproj /p:Configuration=Release /p:Platform="Any CPU" /v:minimal /nologo
+
+    - name: Build test project (Debug)
+      shell: cmd
+      run: msbuild Primo.MIA.Tests\Primo.MIA.Tests.csproj /p:Configuration=Debug /p:Platform="Any CPU" /v:minimal /nologo
+
+    - name: Run tests with vstest
+      shell: cmd
+      run: |
+        vstest.console.exe "Primo.MIA.Tests\bin\Debug\Primo.MIA.Tests.dll" /Logger:trx /ResultsDirectory:TestResults /InIsolation
+      continue-on-error: false
+
+    - name: Upload test results
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-results-${{ github.run_number }}
+        path: TestResults/*.trx
+        retention-days: 30
+
+    - name: Test summary
+      if: always()
+      shell: pwsh
+      run: |
+        $trxFiles = Get-ChildItem TestResults -Filter "*.trx" -ErrorAction SilentlyContinue
+        if ($trxFiles) {
+          $xml = [xml](Get-Content $trxFiles[0].FullName)
+          $counters = $xml.TestRun.ResultSummary.Counters
+          $total   = $counters.total
+          $passed  = $counters.passed
+          $failed  = $counters.failed
+          $skipped = $counters.skipped
+          echo "## Test Results" >> $env:GITHUB_STEP_SUMMARY
+          echo "| Status | Count |" >> $env:GITHUB_STEP_SUMMARY
+          echo "|--------|-------|" >> $env:GITHUB_STEP_SUMMARY
+          echo "| Passed  | $passed |" >> $env:GITHUB_STEP_SUMMARY
+          echo "| Failed  | $failed |" >> $env:GITHUB_STEP_SUMMARY
+          echo "| Skipped | $skipped |" >> $env:GITHUB_STEP_SUMMARY
+          echo "| **Total** | **$total** |" >> $env:GITHUB_STEP_SUMMARY
+        }
+
   note-about-primo-sdk:
-    name: ℹ️ Primo SDK Note
+    name: Setup Self-hosted Runner
     runs-on: ubuntu-latest
     needs: [validate, code-quality]
-    
+    if: ${{ vars.PRIMO_SELFHOSTED_RUNNER != 'true' }}
+
     steps:
-    - name: Information Message
+    - name: How to enable full build and tests
       run: |
         echo "================================================"
-        echo " ℹ️  ПРИМЕЧАНИЕ О СБОРКЕ И ТЕСТАХ"
+        echo " ПОЛНАЯ СБОРКА И ТЕСТЫ: нужен self-hosted runner"
         echo "================================================"
         echo ""
-        echo "Полная сборка и запуск тестов НЕВОЗМОЖНЫ в "
-        echo "GitHub Actions, потому что проект зависит от:"
+        echo "Для активации job 'Build & Test':"
         echo ""
-        echo "   LTools.Common.dll"
-        echo "   LTools.SDK.dll"
-        echo "   LTools.Scripting.dll"
-        echo "   ... и другие DLL от Primo Studio"
+        echo "1. Настройте self-hosted runner:"
+        echo "   GitHub Repo → Settings → Actions → Runners"
+        echo "   → New self-hosted runner → Windows x64"
+        echo "   Добавьте метку: primo-studio"
         echo ""
-        echo "Эти DLL устанавливаются вместе с Primo Studio по пути:"
-        echo "   C:\Program Files\Primo\Primo Studio Community x64\"
+        echo "2. На машине runner установите:"
+        echo "   - Visual Studio 2022 (компонент .NET desktop)"
+        echo "   - Primo Studio Community x64"
+        echo "   - nuget.exe (в PATH)"
         echo ""
-        echo "Они НЕДОСТУПНЫ через NuGet или в открытом доступе."
+        echo "3. Включите job в настройках репозитория:"
+        echo "   Settings → Variables → New repository variable"
+        echo "   Name:  PRIMO_SELFHOSTED_RUNNER"
+        echo "   Value: true"
         echo ""
-        echo "================================================"
-        echo " ДЛЯ ПОЛНОЙ СБОРКИ И ТЕСТОВ:"
-        echo "================================================"
-        echo ""
-        echo "1. Используйте локальную машину с установленным:"
-        echo "   - Visual Studio 2022"
-        echo "   - Primo Studio Community"
-        echo ""
-        echo "2. Или настройте self-hosted runner с:"
-        echo "   - Windows OS"
-        echo "   - Visual Studio Build Tools"
-        echo "   - Primo Studio"
-        echo ""
-        echo "3. Команды для локальной сборки:"
+        echo "4. Локальная сборка и тесты:"
         echo "   msbuild Primo.MIA.csproj /p:Configuration=Release"
         echo "   msbuild Primo.MIA.Tests\Primo.MIA.Tests.csproj /p:Configuration=Debug"
-        echo ""
+        echo "   vstest.console.exe Primo.MIA.Tests\bin\Debug\Primo.MIA.Tests.dll"
         echo "================================================"

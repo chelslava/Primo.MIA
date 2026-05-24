@@ -1039,6 +1039,91 @@ namespace Primo.MIA.Common
         // JSON: DATATABLE КОНВЕРТЕР
         // ═══════════════════════════════════════════════════════════════════════
 
+        // ═══════════════════════════════════════════════════════════════════════
+        // MONGODB
+        // ═══════════════════════════════════════════════════════════════════════
+
+        public const string Activity_MongoQuery     = "MongoDB: Запрос";
+        public const string Activity_MongoInsert    = "MongoDB: Вставить документ";
+        public const string Activity_MongoUpdate    = "MongoDB: Обновить документы";
+        public const string Activity_MongoDelete    = "MongoDB: Удалить документы";
+        public const string Activity_MongoCount     = "MongoDB: Количество документов";
+        public const string Activity_MongoAggregate = "MongoDB: Агрегация";
+
+        public const string Field_MongoConnectionString  = "Строка подключения";
+        public const string Field_MongoDatabase          = "База данных";
+        public const string Field_MongoCollection        = "Коллекция";
+        public const string Field_MongoFilter            = "Фильтр (JSON)";
+        public const string Field_MongoProjection        = "Проекция (JSON)";
+        public const string Field_MongoSort              = "Сортировка (JSON)";
+        public const string Field_MongoLimit             = "Макс. документов";
+        public const string Field_MongoDocument          = "Документ (JSON)";
+        public const string Field_MongoUpdate            = "Обновление (JSON)";
+        public const string Field_MongoPipeline          = "Pipeline (JSON)";
+        public const string Field_MongoUpdateMany        = "Обновить все совпадения";
+        public const string Field_MongoDeleteMany        = "Удалить все совпадения";
+        public const string Field_MongoResultJson        = "Результат (JSON)";
+        public const string Field_MongoInsertedCount     = "Вставлено документов";
+        public const string Field_MongoInsertedIds       = "ID вставленных документов";
+        public const string Field_MongoMatchedCount      = "Совпало документов";
+        public const string Field_MongoModifiedCount     = "Обновлено документов";
+        public const string Field_MongoDeletedCount      = "Удалено документов";
+        public const string Field_MongoDocumentCount     = "Количество документов";
+        public const string Field_MongoHasDocuments      = "Есть документы";
+        public const string Field_MongoTimeoutSeconds    = "Таймаут (сек)";
+
+        public const string Error_MongoDatabaseRequired   = "Имя базы данных обязательно";
+        public const string Error_MongoCollectionRequired = "Имя коллекции обязательно";
+        public const string Error_MongoDocumentRequired   = "Документ для вставки обязателен";
+        public const string Error_MongoUpdateRequired     = "Обновление (JSON) обязательно";
+        public const string Error_MongoPipelineRequired   = "Pipeline (JSON) обязателен";
+
+        // ═══════════════════════════════════════════════════════════════════════
+        // REDIS
+        // ═══════════════════════════════════════════════════════════════════════
+
+        public const string Activity_RedisGet       = "Redis: Получить значение";
+        public const string Activity_RedisSet       = "Redis: Установить значение";
+        public const string Activity_RedisDelete    = "Redis: Удалить ключ";
+        public const string Activity_RedisExists    = "Redis: Проверить ключ";
+        public const string Activity_RedisHashGet   = "Redis: Получить поле хэша";
+        public const string Activity_RedisHashSet   = "Redis: Установить поле хэша";
+        public const string Activity_RedisListPush  = "Redis: Добавить в список";
+        public const string Activity_RedisListRange = "Redis: Получить диапазон списка";
+        public const string Activity_RedisIncr      = "Redis: Инкремент";
+
+        public const string Field_RedisConnectionString = "Строка подключения";
+        public const string Field_RedisKey              = "Ключ";
+        public const string Field_RedisKeys             = "Ключи (List<string>)";
+        public const string Field_RedisValue            = "Значение";
+        public const string Field_RedisValues           = "Значения";
+        public const string Field_RedisField            = "Поле хэша";
+        public const string Field_RedisFields           = "Поля хэша (Dictionary)";
+        public const string Field_RedisExpiry           = "Срок хранения (сек, 0 = бессрочно)";
+        public const string Field_RedisExpirySet        = "Установить срок хранения";
+        public const string Field_RedisDirection        = "Направление (Left/Right)";
+        public const string Field_RedisStart            = "Начало диапазона";
+        public const string Field_RedisStop             = "Конец диапазона (-1 = до конца)";
+        public const string Field_RedisIncrement        = "Шаг инкремента";
+        public const string Field_RedisDatabaseIndex    = "Индекс БД (0–15)";
+        public const string Field_RedisExists           = "Ключ существует";
+        public const string Field_RedisExistsCount      = "Найдено ключей";
+        public const string Field_RedisDeletedCount     = "Удалено ключей";
+        public const string Field_RedisListLength       = "Длина списка";
+        public const string Field_RedisNewValue         = "Новое значение";
+        public const string Field_RedisHashResult       = "Значение поля";
+        public const string Field_RedisAllFields        = "Все поля (Dictionary)";
+        public const string Field_RedisConnectTimeout   = "Таймаут подключения (сек)";
+
+        public const string Error_RedisKeyRequired        = "Ключ обязателен";
+        public const string Error_RedisValueRequired      = "Значение обязательно";
+        public const string Error_RedisFieldRequired      = "Поле хэша обязательно";
+        public const string Error_RedisConnectionRequired = "Строка подключения к Redis обязательна";
+
+        // ═══════════════════════════════════════════════════════════════════════
+        // JSON: DATATABLE КОНВЕРТЕР
+        // ═══════════════════════════════════════════════════════════════════════
+
         public const string Activity_JsonDataTable = "JSON: DataTable конвертер";
         public const string Field_JsonDirection = "Направление";
         public const string Field_JsonInputTable = "DataTable (входная)";

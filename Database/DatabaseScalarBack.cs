@@ -206,9 +206,34 @@ namespace Primo.MIA
         public DatabaseScalarBack(IWFContainer container) : base(container)
         {
             sdkComponentName = ActivityStrings.Activity_DatabaseScalar;
-            sdkComponentHelp =
-                "Выполняет SQL-запрос, возвращающий одно значение.\n" +
-                "Результат сохраняется как строка в invariant-культуре.";
+            sdkComponentHelp = @"Компонент ""Database: Скалярный запрос""
+Выполняет SQL-запрос или вызов процедуры, возвращающий одно значение. Результат автоматически конвертируется в строку, Int32, Decimal, Boolean и DateTime для удобного использования.
+
+Основные:
+Провайдер*: [String] Инвариантное имя ADO.NET провайдера (например, System.Data.SqlClient).
+Строка подключения: [String] Строка подключения к БД. Обязательна, если не задан ID транзакции.
+ID транзакции: [String] Идентификатор активной транзакции.
+Тип команды*: [DatabaseCommandType] Text — SQL-запрос; StoredProcedure — хранимая процедура.
+Текст команды*: [String] SQL-запрос или имя хранимой процедуры.
+
+Параметры:
+Параметры: [Dictionary<String, String>] Словарь параметров команды (имя → значение).
+
+Настройки:
+Таймаут: [Int32] Таймаут выполнения команды в секундах. По умолчанию 30.
+
+Дополнительные:
+Значение по умолчанию: [String] Подставляется, если запрос вернул null или DBNull.
+
+Выходные данные:
+Значение: [String] Скалярный результат в виде строки (invariant culture).
+Есть значение: [Boolean] True, если запрос вернул не null и не DBNull.
+Тип значения: [String] Полное .NET имя типа фактически возвращённого значения.
+Использовано значение по умолчанию: [Boolean] True, если было подставлено значение по умолчанию.
+Значение Int32: [Int32] Результат, приведённый к Int32.
+Значение Decimal: [Decimal] Результат, приведённый к Decimal.
+Значение Boolean: [Boolean] Результат, приведённый к Boolean.
+Значение DateTime: [DateTime] Результат, приведённый к DateTime.";
             sdkComponentIcon = ActivityIcons.Base;
             sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {

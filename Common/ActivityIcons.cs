@@ -65,5 +65,11 @@ namespace Primo.MIA.Common
         /// <summary>Иконка для активностей работы с базой данных</summary>
         public const string Base = BasePath + "bd.png";
 
+        /// <summary>Иконка для активностей MongoDB</summary>
+        public const string MongoDB = BasePath + "bd.png";
+
+        /// <summary>Иконка для активностей Redis</summary>
+        public const string Redis = BasePath + "bd.png";
+
     }
 }

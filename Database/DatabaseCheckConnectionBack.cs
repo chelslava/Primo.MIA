@@ -109,9 +109,21 @@ namespace Primo.MIA
         public DatabaseCheckConnectionBack(IWFContainer container) : base(container)
         {
             sdkComponentName = ActivityStrings.Activity_DatabaseCheckConnection;
-            sdkComponentHelp =
-                "Проверяет доступность БД через ADO.NET provider.\n\n" +
-                "Открывает подключение, читает ServerVersion и сразу закрывает его.";
+            sdkComponentHelp = @"Компонент ""Database: Проверить подключение""
+Открывает соединение с базой данных через ADO.NET провайдер, читает версию сервера и немедленно закрывает соединение. Используется для проверки доступности БД без выполнения запросов.
+
+Основные:
+Провайдер*: [String] Инвариантное имя ADO.NET провайдера (например, System.Data.SqlClient, Npgsql).
+Строка подключения*: [String] Строка подключения к базе данных.
+
+Настройки:
+Таймаут: [Int32] Таймаут попытки подключения в секундах. По умолчанию 30.
+
+Выходные данные:
+Доступна: [Boolean] True, если соединение успешно установлено.
+Версия сервера: [String] Версия сервера БД, полученная при подключении.
+Время проверки (мс): [Int32] Длительность операции проверки в миллисекундах.
+Текст ошибки: [String] Сообщение об ошибке при неуспешном подключении; пустая строка при успехе.";
             sdkComponentIcon = ActivityIcons.Base;
             sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {

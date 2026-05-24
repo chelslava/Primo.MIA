@@ -164,9 +164,28 @@ namespace Primo.MIA
         public DatabaseQueryBack(IWFContainer container) : base(container)
         {
             sdkComponentName = ActivityStrings.Activity_DatabaseQuery;
-            sdkComponentHelp =
-                "Выполняет SQL-запрос или stored procedure и возвращает результат в DataTable.\n" +
-                "Параметры передаются через Dictionary<string, string>.";
+            sdkComponentHelp = @"Компонент ""Database: Запрос данных""
+Выполняет SQL-запрос SELECT или хранимую процедуру и возвращает все строки результата в DataTable. Параметры передаются через Dictionary<string, string> и автоматически конвертируются в типы ADO.NET.
+
+Основные:
+Провайдер*: [String] Инвариантное имя ADO.NET провайдера (например, System.Data.SqlClient).
+Строка подключения: [String] Строка подключения к БД. Обязательна, если не задан ID транзакции.
+ID транзакции: [String] Идентификатор активной транзакции.
+Тип команды*: [DatabaseCommandType] Text — SQL-запрос; StoredProcedure — хранимая процедура.
+Текст команды*: [String] SQL-запрос или имя хранимой процедуры.
+
+Параметры:
+Параметры: [Dictionary<String, String>] Словарь параметров команды (имя → значение).
+
+Настройки:
+Таймаут: [Int32] Таймаут выполнения команды в секундах. По умолчанию 30.
+
+Выходные данные:
+Таблица результатов: [DataTable] Результат запроса в виде DataTable.
+Количество строк: [Int32] Количество строк в результирующей таблице.
+Количество столбцов: [Int32] Количество столбцов в результирующей таблице.
+Имена столбцов: [List<String>] Список имён столбцов результата.
+Есть строки: [Boolean] True, если таблица содержит хотя бы одну строку.";
             sdkComponentIcon = ActivityIcons.Base;
             sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {

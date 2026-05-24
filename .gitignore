@@ -387,3 +387,4 @@ coveragereport/
 # OpenCode working files
 .omc/
 /.claude
+/.sisyphus/run-continuation

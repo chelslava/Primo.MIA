@@ -79,9 +79,17 @@ namespace Primo.MIA
         public DatabaseTransactionBeginBack(IWFContainer container) : base(container)
         {
             sdkComponentName = ActivityStrings.Activity_DatabaseTransactionBegin;
-            sdkComponentHelp =
-                "Открывает соединение, начинает транзакцию и сохраняет её в ambient-контекст DB-модуля.\n" +
-                "Следующие DB-активности могут использовать её без явной передачи transactionId.";
+            sdkComponentHelp = @"Компонент ""Database: Начать транзакцию""
+Открывает соединение с базой данных, начинает транзакцию с заданным уровнем изоляции и сохраняет её в ambient-контекст DB-модуля. Последующие активности могут использовать транзакцию без явной передачи ID.
+
+Основные:
+Провайдер*: [String] Инвариантное имя ADO.NET провайдера (например, System.Data.SqlClient, Npgsql).
+Строка подключения*: [String] Строка подключения к базе данных.
+Уровень изоляции*: [DatabaseIsolationLevel] Уровень изоляции транзакции: ReadUncommitted, ReadCommitted, RepeatableRead, Serializable. По умолчанию ReadCommitted.
+
+Выходные данные:
+ID транзакции: [String] Уникальный идентификатор открытой транзакции для передачи в другие активности.
+Время начала (UTC): [String] Метка времени начала транзакции в формате ISO 8601 UTC.";
             sdkComponentIcon = ActivityIcons.Base;
             sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {

@@ -36,7 +36,11 @@ namespace Primo.MIA
         public DatabaseTransactionCommitBack(IWFContainer container) : base(container)
         {
             sdkComponentName = ActivityStrings.Activity_DatabaseTransactionCommit;
-            sdkComponentHelp = "Подтверждает транзакцию по явному transactionId или по текущему ambient-контексту.";
+            sdkComponentHelp = @"Компонент ""Database: Подтвердить транзакцию""
+Фиксирует все изменения, накопленные в транзакции, и закрывает её. Работает с явно переданным transactionId или с текущим ambient-контекстом модуля.
+
+Основные:
+ID транзакции: [String] Идентификатор транзакции из активности «Database: Начать транзакцию». Если не задан, используется ambient-контекст текущей транзакции DB-модуля.";
             sdkComponentIcon = ActivityIcons.Base;
             sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {

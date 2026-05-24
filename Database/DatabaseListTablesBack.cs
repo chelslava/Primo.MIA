@@ -61,7 +61,20 @@ namespace Primo.MIA
         public DatabaseListTablesBack(IWFContainer container) : base(container)
         {
             sdkComponentName = ActivityStrings.Activity_DatabaseListTables;
-            sdkComponentHelp = "Возвращает список таблиц БД по schema metadata.";
+            sdkComponentHelp = @"Компонент ""Database: Список таблиц""
+Возвращает список имён таблиц и/или представлений базы данных через ADO.NET schema metadata. Не требует прав на SELECT из таблиц — достаточно прав на чтение метаданных.
+
+Основные:
+Провайдер*: [String] Инвариантное имя ADO.NET провайдера (например, System.Data.SqlClient, Npgsql, System.Data.SQLite).
+Строка подключения*: [String] Строка подключения к базе данных.
+
+Дополнительные:
+Схема: [String] Имя схемы для фильтрации (например, dbo). Если не задана, возвращаются таблицы из всех схем.
+Включать представления: [Boolean] Если True, в список включаются VIEW наряду с TABLE. По умолчанию False.
+
+Выходные данные:
+Список таблиц: [List<String>] Имена найденных таблиц и/или представлений.
+Количество: [Int32] Количество элементов в списке.";
             sdkComponentIcon = ActivityIcons.Base;
             sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
