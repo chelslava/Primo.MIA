@@ -32,7 +32,7 @@ jobs:
         nuget-version: '6.x'
         
     - name: Restore NuGet Packages
-      run: nuget restore Primo.MIA.slnx
+      run: nuget restore Primo.MIA.sln
       
     - name: Validate Release Files
       run: |
@@ -160,7 +160,7 @@ jobs:
         echo "   cd C:\Path\To\Primo.MIA"
         echo ""
         echo "   # Восстановить NuGet пакеты"
-        echo "   nuget restore Primo.MIA.slnx"
+        echo "   nuget restore Primo.MIA.sln"
         echo ""
         echo "   # Собрать в Release конфигурации"
         echo "   msbuild Primo.MIA.csproj /p:Configuration=Release"

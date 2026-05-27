@@ -21,7 +21,7 @@ jobs:
         nuget-version: '6.x'
         
     - name: Restore NuGet Packages
-      run: nuget restore Primo.MIA.slnx
+      run: nuget restore Primo.MIA.sln
       
     - name: Check Project Files Exist
       run: |
@@ -112,7 +112,7 @@ jobs:
 
     - name: Restore NuGet packages
       shell: cmd
-      run: nuget restore Primo.MIA.slnx
+      run: nuget restore Primo.MIA.sln
 
     - name: Build main project (Release)
       shell: cmd
