@@ -115,7 +115,7 @@ jobs:
       run: nuget push ./nupkg/*.nupkg -Source https://api.nuget.org/v3/index.json -ApiKey ${{ secrets.NUGET_API_KEY }}
 
     - name: Upload artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v4.16.0
       with:
         name: nuget-package-${{ steps.version.outputs.version }}
         path: ./nupkg/*.nupkg

@@ -130,11 +130,12 @@ jobs:
 
     - name: Upload test results
       if: always()
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v4.16.0
       with:
         name: test-results-${{ github.run_number }}
         path: TestResults/*.trx
         retention-days: 30
+        overwrite: true
 
     - name: Test summary
       if: always()
