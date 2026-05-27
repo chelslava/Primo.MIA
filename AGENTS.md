@@ -6,7 +6,7 @@
 
 ## OVERVIEW
 
-Primo.MIA — .NET Framework 4.6.1 class library (WPF/XAML) for the Primo RPA platform. Provides ~90 reusable automation activities (Browser, Database, HTTP, Collections, Text, Calendar, Files, Utilities). Distributed as a NuGet package.
+Primo.MIA — .NET Framework 4.8.1 class library (WPF/XAML) for the Primo RPA platform. Provides ~90 reusable automation activities (Browser, Database, HTTP, Collections, Text, Calendar, Files, Utilities). Distributed as a NuGet package.
 
 ## STRUCTURE
 

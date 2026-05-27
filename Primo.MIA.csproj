@@ -14,6 +14,9 @@
     <LangVersion>latest</LangVersion>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 
+    <!-- Отключить автоматическое создание bindingRedirects (используем явные в app.config) -->
+    <AutoGenerateBindingRedirects>False</AutoGenerateBindingRedirects>
+
     <!-- NuGet packaging -->
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageId>Primo.MIA</PackageId>
