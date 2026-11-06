@@ -1,4 +1,4 @@
-<!--
+﻿<!--
     ElementDragDrop.xaml
     Визуальный интерфейс активности "Перетаскивание элемента".
 
@@ -23,13 +23,6 @@
                 <ResourceDictionary Source="/Primo.MIA;component/Common/Styles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
-            <ObjectDataProvider x:Key="LocatorTypeValues"
-                                MethodName="GetValues"
-                                ObjectType="{x:Type system:Enum}">
-                <ObjectDataProvider.MethodParameters>
-                    <x:Type TypeName="local:ElementLocatorType"/>
-                </ObjectDataProvider.MethodParameters>
-            </ObjectDataProvider>
         </ResourceDictionary>
     </UserControl.Resources>
 
@@ -56,8 +49,7 @@
                        Style="{StaticResource SectionHeader}"/>
 
             <TextBlock Text="Тип локатора:" Style="{StaticResource FieldLabel}"/>
-            <ComboBox ItemsSource="{Binding Source={StaticResource LocatorTypeValues}}"
-                      SelectedItem="{Binding Prop_SourceLocatorType}"
+            <ComboBox ItemsSource="{local:EnumValues local:ElementLocatorType}" SelectedValue="{Binding Prop_SourceLocatorType}" SelectedValuePath="Key" DisplayMemberPath="Display" 
                       Style="{StaticResource FieldComboBox}"
                       ToolTip="Тип локатора для поиска исходного элемента"/>
 
@@ -71,8 +63,7 @@
                        Style="{StaticResource SectionHeader}"/>
 
             <TextBlock Text="Тип локатора:" Style="{StaticResource FieldLabel}"/>
-            <ComboBox ItemsSource="{Binding Source={StaticResource LocatorTypeValues}}"
-                      SelectedItem="{Binding Prop_TargetLocatorType}"
+            <ComboBox ItemsSource="{local:EnumValues local:ElementLocatorType}" SelectedValue="{Binding Prop_TargetLocatorType}" SelectedValuePath="Key" DisplayMemberPath="Display" 
                       Style="{StaticResource FieldComboBox}"
                       ToolTip="Тип локатора для поиска целевого элемента"/>
 

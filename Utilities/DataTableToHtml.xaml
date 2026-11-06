@@ -1,4 +1,4 @@
-<!--
+﻿<!--
     DataTableToHtml.xaml
     Визуальный интерфейс активности "DataTable в HTML".
     
@@ -24,21 +24,7 @@
                 <ResourceDictionary Source="/Primo.MIA;component/Common/Styles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
             
-            <ObjectDataProvider x:Key="ThemeValues"
-                                MethodName="GetValues"
-                                ObjectType="{x:Type system:Enum}">
-                <ObjectDataProvider.MethodParameters>
-                    <x:Type TypeName="local:HtmlTableTheme"/>
-                </ObjectDataProvider.MethodParameters>
-            </ObjectDataProvider>
             
-            <ObjectDataProvider x:Key="OutputModeValues"
-                                MethodName="GetValues"
-                                ObjectType="{x:Type system:Enum}">
-                <ObjectDataProvider.MethodParameters>
-                    <x:Type TypeName="local:HtmlOutputMode"/>
-                </ObjectDataProvider.MethodParameters>
-            </ObjectDataProvider>
         </ResourceDictionary>
     </UserControl.Resources>
 
@@ -59,7 +45,7 @@
 
             <TextBlock Style="{StaticResource ActivityHeader}">
                 <Run Text="DataTable в HTML ["/>
-                <Run Text="{Binding Prop_Theme, Mode=OneWay}"/>
+                <Run Text="{Binding Prop_Theme, Mode=OneWay, Converter={StaticResource EnumDisplayNameConverter}}"/>
                 <Run Text="]"/>
             </TextBlock>
 
@@ -71,16 +57,14 @@
                 
                 <StackPanel Grid.Column="0" Margin="0,0,4,0">
                     <TextBlock Text="Тема:" Style="{StaticResource FieldLabel}"/>
-                    <ComboBox ItemsSource="{Binding Source={StaticResource ThemeValues}}"
-                              SelectedItem="{Binding Prop_Theme}"
+                    <ComboBox ItemsSource="{local:EnumValues local:HtmlTableTheme}" SelectedValue="{Binding Prop_Theme}" SelectedValuePath="Key" DisplayMemberPath="Display" 
                               Style="{StaticResource FieldComboBox}"
                               ToolTip="Предустановленная тема оформления таблицы"/>
                 </StackPanel>
                 
                 <StackPanel Grid.Column="1" Margin="4,0,0,0">
                     <TextBlock Text="Режим вывода:" Style="{StaticResource FieldLabel}"/>
-                    <ComboBox ItemsSource="{Binding Source={StaticResource OutputModeValues}}"
-                              SelectedItem="{Binding Prop_OutputMode}"
+                    <ComboBox ItemsSource="{local:EnumValues local:HtmlOutputMode}" SelectedValue="{Binding Prop_OutputMode}" SelectedValuePath="Key" DisplayMemberPath="Display" 
                               Style="{StaticResource FieldComboBox}"
                               ToolTip="Только таблица или полный HTML-документ"/>
                 </StackPanel>

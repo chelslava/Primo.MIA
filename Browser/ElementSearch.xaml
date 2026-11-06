@@ -1,4 +1,4 @@
-<!--
+﻿<!--
     ElementSearch.xaml
     Визуальный интерфейс активности "Поиск и проверка элементов".
 
@@ -24,21 +24,7 @@
                 <ResourceDictionary Source="/Primo.MIA;component/Common/Styles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
-            <ObjectDataProvider x:Key="LocatorTypeValues"
-                                MethodName="GetValues"
-                                ObjectType="{x:Type system:Enum}">
-                <ObjectDataProvider.MethodParameters>
-                    <x:Type TypeName="local:ElementLocatorType"/>
-                </ObjectDataProvider.MethodParameters>
-            </ObjectDataProvider>
 
-            <ObjectDataProvider x:Key="SearchModeValues"
-                                MethodName="GetValues"
-                                ObjectType="{x:Type system:Enum}">
-                <ObjectDataProvider.MethodParameters>
-                    <x:Type TypeName="local:ElementSearchMode"/>
-                </ObjectDataProvider.MethodParameters>
-            </ObjectDataProvider>
 
             <local:EnumToVisibilityConverter x:Key="EnumToVisConverter"/>
         </ResourceDictionary>
@@ -61,19 +47,17 @@
 
             <TextBlock Style="{StaticResource ActivityHeader}">
                 <Run Text="Поиск элементов ["/>
-                <Run Text="{Binding Path=Prop_SearchMode, Mode=OneWay}" Foreground="#FF1565C0"/>
+                <Run Text="{Binding Path=Prop_SearchMode, Mode=OneWay, Converter={StaticResource EnumDisplayNameConverter}}" Foreground="#FF1565C0"/>
                 <Run Text="]"/>
             </TextBlock>
 
             <TextBlock Text="Режим поиска:" Style="{StaticResource FieldLabel}"/>
-            <ComboBox ItemsSource="{Binding Source={StaticResource SearchModeValues}}"
-                      SelectedItem="{Binding Prop_SearchMode}"
+            <ComboBox ItemsSource="{local:EnumValues local:ElementSearchMode}" SelectedValue="{Binding Prop_SearchMode}" SelectedValuePath="Key" DisplayMemberPath="Display" 
                       Style="{StaticResource FieldComboBox}"
                       ToolTip="Выберите режим: найти элемент, проверить существование или видимость"/>
 
             <TextBlock Text="Тип локатора:" Style="{StaticResource FieldLabel}"/>
-            <ComboBox ItemsSource="{Binding Source={StaticResource LocatorTypeValues}}"
-                      SelectedItem="{Binding Prop_LocatorType}"
+            <ComboBox ItemsSource="{local:EnumValues local:ElementLocatorType}" SelectedValue="{Binding Prop_LocatorType}" SelectedValuePath="Key" DisplayMemberPath="Display" 
                       Style="{StaticResource FieldComboBox}"
                       ToolTip="Тип локатора для поиска элемента (CSS, XPath, ID и т.д.)"/>
 

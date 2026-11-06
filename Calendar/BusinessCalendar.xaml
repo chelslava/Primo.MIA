@@ -1,4 +1,4 @@
-<!--
+﻿<!--
     BusinessCalendar.xaml
     Визуальный интерфейс активности "Работа с производственным календарём".
 
@@ -34,13 +34,6 @@
             </ResourceDictionary.MergedDictionaries>
 
             <!-- Все значения BusinessCalendarMode (включая новые CountWorkdays, NextWorkday, PrevWorkday) -->
-            <ObjectDataProvider x:Key="ModeValues"
-                                MethodName="GetValues"
-                                ObjectType="{x:Type system:Enum}">
-                <ObjectDataProvider.MethodParameters>
-                    <x:Type TypeName="local:BusinessCalendarMode"/>
-                </ObjectDataProvider.MethodParameters>
-            </ObjectDataProvider>
 
             <!--
                 Конвертер: скрывает/показывает блок по одному значению enum.
@@ -77,7 +70,7 @@
             <!-- Заголовок с отображением текущего режима -->
             <TextBlock Style="{StaticResource ActivityHeader}">
                 <Run Text="Календарь: Операции [" Foreground="#FF0E0E0E"/>
-                <Run Text="{Binding Prop_OperationMode, Mode=OneWay}" Foreground="#FF1565C0"/>
+                <Run Text="{Binding Prop_OperationMode, Mode=OneWay, Converter={StaticResource EnumDisplayNameConverter}}" Foreground="#FF1565C0"/>
                 <Run Text="]" Foreground="#FF0E0E0E"/>
             </TextBlock>
 
@@ -89,8 +82,7 @@
 
             <!-- Режим операции -->
             <TextBlock Text="Режим операции:" Style="{StaticResource FieldLabel}"/>
-            <ComboBox ItemsSource="{Binding Source={StaticResource ModeValues}}"
-                      SelectedItem="{Binding Prop_OperationMode}"
+            <ComboBox ItemsSource="{local:EnumValues local:BusinessCalendarMode}" SelectedValue="{Binding Prop_OperationMode}" SelectedValuePath="Key" DisplayMemberPath="Display" 
                       Style="{StaticResource FieldComboBox}"
                       ToolTip="Выберите операцию с производственным календарём"/>
 

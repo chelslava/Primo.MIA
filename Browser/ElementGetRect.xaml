@@ -1,4 +1,4 @@
-<UserControl
+﻿<UserControl
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -15,13 +15,6 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/Primo.MIA;component/Common/Styles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
-            <ObjectDataProvider x:Key="LocatorTypeValues"
-                                MethodName="GetValues"
-                                ObjectType="{x:Type system:Enum}">
-                <ObjectDataProvider.MethodParameters>
-                    <x:Type TypeName="local:ElementLocatorType"/>
-                </ObjectDataProvider.MethodParameters>
-            </ObjectDataProvider>
         </ResourceDictionary>
     </UserControl.Resources>
 
@@ -43,8 +36,7 @@
             <TextBlock Style="{StaticResource ActivityHeader}"
                        Text="Получение размеров элемента"/>
 
-            <ComboBox ItemsSource="{Binding Source={StaticResource LocatorTypeValues}}"
-                      SelectedItem="{Binding Prop_LocatorType}"
+            <ComboBox ItemsSource="{local:EnumValues local:ElementLocatorType}" SelectedValue="{Binding Prop_LocatorType}" SelectedValuePath="Key" DisplayMemberPath="Display" 
                       Style="{StaticResource FieldComboBox}"/>
 
             <TextBox Text="{Binding Prop_LocatorValue}"

@@ -1,4 +1,4 @@
-<!--
+﻿<!--
     BrowserWaitFor.xaml
     Визуальный интерфейс активности "Ожидание условия браузера".
 
@@ -32,21 +32,7 @@
                 <ResourceDictionary Source="/Primo.MIA;component/Common/Styles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
-            <ObjectDataProvider x:Key="ConditionTypeValues"
-                                MethodName="GetValues"
-                                ObjectType="{x:Type system:Enum}">
-                <ObjectDataProvider.MethodParameters>
-                    <x:Type TypeName="local:WaitConditionType"/>
-                </ObjectDataProvider.MethodParameters>
-            </ObjectDataProvider>
 
-            <ObjectDataProvider x:Key="LocatorTypeValues"
-                                MethodName="GetValues"
-                                ObjectType="{x:Type system:Enum}">
-                <ObjectDataProvider.MethodParameters>
-                    <x:Type TypeName="local:ElementLocatorType"/>
-                </ObjectDataProvider.MethodParameters>
-            </ObjectDataProvider>
 
             <!-- Конвертеры для условной видимости -->
             <local:EnumToVisibilityConverter x:Key="EnumToVisConverter"/>
@@ -71,13 +57,12 @@
 
             <TextBlock Style="{StaticResource ActivityHeader}">
                 <Run Text="Ожидание условия ["/>
-                <Run Text="{Binding Path=Prop_Condition, Mode=OneWay}" Foreground="#FF1565C0"/>
+                <Run Text="{Binding Path=Prop_Condition, Mode=OneWay, Converter={StaticResource EnumDisplayNameConverter}}" Foreground="#FF1565C0"/>
                 <Run Text="]"/>
             </TextBlock>
 
             <TextBlock Text="Условие ожидания:" Style="{StaticResource FieldLabel}"/>
-            <ComboBox ItemsSource="{Binding Source={StaticResource ConditionTypeValues}}"
-                      SelectedItem="{Binding Prop_Condition}"
+            <ComboBox ItemsSource="{local:EnumValues local:WaitConditionType}" SelectedValue="{Binding Prop_Condition}" SelectedValuePath="Key" DisplayMemberPath="Display" 
                       Style="{StaticResource FieldComboBox}"
                       ToolTip="Выберите условие для ожидания"/>
 
@@ -94,8 +79,7 @@
             <!-- Блок для условий с элементом: ElementExists, ElementVisible, ElementClickable, ElementHidden -->
             <StackPanel Visibility="{Binding Path=Prop_Condition, Converter={StaticResource MultiEnumToVisConverter}, ConverterParameter=ElementExists|ElementVisible|ElementClickable|ElementHidden}">
                 <TextBlock Text="Тип локатора:" Style="{StaticResource FieldLabel}"/>
-                <ComboBox ItemsSource="{Binding Source={StaticResource LocatorTypeValues}}"
-                          SelectedItem="{Binding Prop_LocatorType}"
+                <ComboBox ItemsSource="{local:EnumValues local:ElementLocatorType}" SelectedValue="{Binding Prop_LocatorType}" SelectedValuePath="Key" DisplayMemberPath="Display" 
                           Style="{StaticResource FieldComboBox}"
                           ToolTip="Тип локатора для поиска элемента"/>
 

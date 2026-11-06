@@ -23,6 +23,7 @@
     <common:BoolToVisibilityConverter x:Key="BoolToVis"/>
     <common:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
     <common:InverseBoolConverter x:Key="InverseBool"/>
+    <common:EnumDisplayNameConverter x:Key="EnumDisplayNameConverter"/>
 
     <!-- ═══════════════════════════════════════════════════════════════════
          СТИЛИ ЗАГОЛОВКОВ

@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="clr-namespace:Primo.MIA"
              mc:Ignorable="d"
              d:DesignHeight="80"
              Margin="0,0,0,5">
@@ -29,38 +30,65 @@
             <TextBlock Text="БД: Stored procedure" Style="{StaticResource ActivityHeader}"/>
 
             <TextBlock Text="Поставщик (invariant name):" Style="{StaticResource FieldLabel}"/>
-            <TextBox Text="{Binding Prop_ProviderInvariantName, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            <TextBox Text="{Binding Prop_ProviderInvariantName, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                     ToolTip="Поставщик ADO.NET (invariant name): System.Data.SqlClient (по умолчанию), Npgsql, MySql.Data.MySqlClient и т.п."/>
 
             <TextBlock Text="Строка подключения:" Style="{StaticResource FieldLabel}"/>
-            <TextBox Text="{Binding Prop_ConnectionString, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            <TextBox Text="{Binding Prop_ConnectionString, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                     ToolTip="Строка подключения ADO.NET (формат зависит от провайдера)"/>
 
             <TextBlock Text="TransactionId (необязательно):" Style="{StaticResource FieldLabel}"/>
-            <TextBox Text="{Binding Prop_TransactionId, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            <TextBox Text="{Binding Prop_TransactionId, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                     ToolTip="Идентификатор транзакции из «БД: Начать транзакцию»; пусто — выполнить вне транзакции"/>
 
             <TextBlock Text="Имя stored procedure:" Style="{StaticResource FieldLabel}"/>
-            <TextBox Text="{Binding Prop_ProcedureName, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            <TextBox Text="{Binding Prop_ProcedureName, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                     ToolTip="Имя хранимой процедуры без скобок, например usp_GetClient"/>
 
             <TextBlock Text="Входные параметры (Dictionary&lt;string,string&gt;):" Style="{StaticResource FieldLabel}"/>
-            <TextBox Text="{Binding Prop_InputParameters, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            <TextBox Text="{Binding Prop_InputParameters, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                     ToolTip="Входные параметры (Input): имя (@param) → значение"/>
 
             <TextBlock Text="Входные/выходные параметры (Dictionary&lt;string,string&gt;):" Style="{StaticResource FieldLabel}"/>
-            <TextBox Text="{Binding Prop_InputOutputParameters, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            <TextBox Text="{Binding Prop_InputOutputParameters, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                     ToolTip="Параметры InputOutput: имя (@param) → входное значение, результат вернётся в выходной словарь"/>
 
             <TextBlock Text="Выходные параметры (List&lt;string&gt;):" Style="{StaticResource FieldLabel}"/>
-            <TextBox Text="{Binding Prop_OutputParameterNames, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            <TextBox Text="{Binding Prop_OutputParameterNames, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                     ToolTip="Имена выходных параметров (Output) через список: @total, @status"/>
 
             <CheckBox Content="Получать возвращаемое значение (return value)"
                       IsChecked="{Binding Prop_IncludeReturnValue}"
-                      Margin="0,6,0,0"/>
+                      Margin="0,6,0,0"
+                      ToolTip="Добавить параметр @RETURN_VALUE — возвращаемое значение процедуры"/>
 
             <TextBlock Text="Размер выходных параметров (output/input-output):" Style="{StaticResource FieldLabel}"/>
-            <TextBox Text="{Binding Prop_OutputParameterSize, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            <TextBox Style="{StaticResource ValidatingFieldBox}"
+                     ToolTip="Размер output/input-output параметров (по умолчанию 4000)">
+                <TextBox.Text>
+                    <Binding Path="Prop_OutputParameterSize" UpdateSourceTrigger="PropertyChanged">
+                        <Binding.ValidationRules>
+                            <local:NumericValidationRule/>
+                        </Binding.ValidationRules>
+                    </Binding>
+                </TextBox.Text>
+            </TextBox>
 
             <TextBlock Text="Таймаут (сек):" Style="{StaticResource FieldLabel}"/>
-            <TextBox Text="{Binding Prop_CommandTimeoutSeconds, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            <TextBox Style="{StaticResource ValidatingFieldBox}"
+                     ToolTip="Таймаут выполнения процедуры, сек (0 или пусто — 30 по умолчанию)">
+                <TextBox.Text>
+                    <Binding Path="Prop_CommandTimeoutSeconds" UpdateSourceTrigger="PropertyChanged">
+                        <Binding.ValidationRules>
+                            <local:NumericValidationRule/>
+                        </Binding.ValidationRules>
+                    </Binding>
+                </TextBox.Text>
+            </TextBox>
 
             <TextBlock Text="Выходные параметры (output parameters):" Style="{StaticResource FieldLabel}"/>
-            <TextBox Text="{Binding Prop_OutputParameters, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            <TextBox Text="{Binding Prop_OutputParameters, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                     ToolTip="Переменная (словарь) со значениями выходных параметров по итогам вызова"/>
         </StackPanel>
     </Grid>
 </UserControl>

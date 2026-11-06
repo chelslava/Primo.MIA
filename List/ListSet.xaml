@@ -25,13 +25,6 @@
                 <ResourceDictionary Source="/Primo.MIA;component/Common/Styles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
             
-            <ObjectDataProvider x:Key="OperationValues"
-                                MethodName="GetValues"
-                                ObjectType="{x:Type system:Enum}">
-                <ObjectDataProvider.MethodParameters>
-                    <x:Type TypeName="local:ListSetOperation"/>
-                </ObjectDataProvider.MethodParameters>
-            </ObjectDataProvider>
         </ResourceDictionary>
     </UserControl.Resources>
 
@@ -56,8 +49,7 @@
                 <Run Text="]"/>
             </TextBlock>
 
-            <ComboBox ItemsSource="{Binding Source={StaticResource OperationValues}}"
-                      SelectedItem="{Binding Operation}"
+            <ComboBox ItemsSource="{local:EnumValues local:ListSetOperation}" SelectedValue="{Binding Operation}" SelectedValuePath="Key" DisplayMemberPath="Display" 
                       Style="{StaticResource FieldComboBox}"
                       ToolTip="Операция: Union, Intersect, Except, SymmetricExcept"/>
 

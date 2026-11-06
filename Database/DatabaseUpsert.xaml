@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="clr-namespace:Primo.MIA"
              mc:Ignorable="d"
              d:DesignHeight="80"
              Margin="0,0,0,5">
@@ -29,31 +30,48 @@
             <TextBlock Text="БД: Upsert из DataTable" Style="{StaticResource ActivityHeader}"/>
 
             <TextBlock Text="Таблица данных (DataTable):" Style="{StaticResource FieldLabel}"/>
-            <TextBox Text="{Binding Prop_DataTable, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            <TextBox Text="{Binding Prop_DataTable, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                     ToolTip="Переменная (DataTable) с данными для вставки/обновления"/>
 
             <TextBlock Text="Поставщик (invariant name):" Style="{StaticResource FieldLabel}"/>
-            <TextBox Text="{Binding Prop_ProviderInvariantName, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            <TextBox Text="{Binding Prop_ProviderInvariantName, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                     ToolTip="Поставщик ADO.NET (invariant name): System.Data.SqlClient (по умолчанию), Npgsql, MySql.Data.MySqlClient и т.п."/>
 
             <TextBlock Text="Строка подключения:" Style="{StaticResource FieldLabel}"/>
-            <TextBox Text="{Binding Prop_ConnectionString, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            <TextBox Text="{Binding Prop_ConnectionString, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                     ToolTip="Строка подключения ADO.NET (формат зависит от провайдера)"/>
 
             <TextBlock Text="TransactionId (необязательно):" Style="{StaticResource FieldLabel}"/>
-            <TextBox Text="{Binding Prop_TransactionId, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            <TextBox Text="{Binding Prop_TransactionId, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                     ToolTip="Идентификатор транзакции из «БД: Начать транзакцию»; пусто — выполнить вне транзакции"/>
 
             <TextBlock Text="Таблица-приёмник:" Style="{StaticResource FieldLabel}"/>
-            <TextBox Text="{Binding Prop_DestinationTable, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            <TextBox Text="{Binding Prop_DestinationTable, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                     ToolTip="Имя целевой таблицы БД для вставки/обновления строк"/>
 
             <TextBlock Text="Ключевые колонки (List&lt;string&gt;):" Style="{StaticResource FieldLabel}"/>
-            <TextBox Text="{Binding Prop_KeyColumns, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            <TextBox Text="{Binding Prop_KeyColumns, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                     ToolTip="Ключевые колонки для поиска существующих строк (условие WHERE)"/>
 
             <TextBlock Text="Обновляемые колонки (List&lt;string&gt;):" Style="{StaticResource FieldLabel}"/>
-            <TextBox Text="{Binding Prop_UpdateColumns, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            <TextBox Text="{Binding Prop_UpdateColumns, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                     ToolTip="Колонки секции SET при обновлении; пусто — все неключевые колонки"/>
 
             <TextBlock Text="Соответствие колонок (Dictionary&lt;string,string&gt;):" Style="{StaticResource FieldLabel}"/>
-            <TextBox Text="{Binding Prop_ColumnMappings, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            <TextBox Text="{Binding Prop_ColumnMappings, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                     ToolTip="Соответствие «колонка DataTable → колонка таблицы БД»; пусто — сопоставление по именам"/>
 
             <TextBlock Text="Таймаут (сек):" Style="{StaticResource FieldLabel}"/>
-            <TextBox Text="{Binding Prop_CommandTimeoutSeconds, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            <TextBox Style="{StaticResource ValidatingFieldBox}"
+                     ToolTip="Таймаут каждой команды, сек (0 или пусто — 60 по умолчанию)">
+                <TextBox.Text>
+                    <Binding Path="Prop_CommandTimeoutSeconds" UpdateSourceTrigger="PropertyChanged">
+                        <Binding.ValidationRules>
+                            <local:NumericValidationRule/>
+                        </Binding.ValidationRules>
+                    </Binding>
+                </TextBox.Text>
+            </TextBox>
         </StackPanel>
     </Grid>
 </UserControl>

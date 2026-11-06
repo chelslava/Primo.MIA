@@ -1,4 +1,4 @@
-<!--
+﻿<!--
     ElementClick.xaml
     Визуальный интерфейс активности "Клик по элементу".
 
@@ -30,21 +30,7 @@
                 <ResourceDictionary Source="/Primo.MIA;component/Common/Styles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
-            <ObjectDataProvider x:Key="LocatorTypeValues"
-                                MethodName="GetValues"
-                                ObjectType="{x:Type system:Enum}">
-                <ObjectDataProvider.MethodParameters>
-                    <x:Type TypeName="local:ElementLocatorType"/>
-                </ObjectDataProvider.MethodParameters>
-            </ObjectDataProvider>
 
-            <ObjectDataProvider x:Key="ClickModeValues"
-                                MethodName="GetValues"
-                                ObjectType="{x:Type system:Enum}">
-                <ObjectDataProvider.MethodParameters>
-                    <x:Type TypeName="local:ClickMode"/>
-                </ObjectDataProvider.MethodParameters>
-            </ObjectDataProvider>
 
             <!-- Конвертеры для условной видимости -->
             <local:EnumToVisibilityConverter x:Key="EnumToVisConverter"/>
@@ -69,19 +55,17 @@
 
             <TextBlock Style="{StaticResource ActivityHeader}">
                 <Run Text="Клик по элементу ["/>
-                <Run Text="{Binding Path=Prop_ClickMode, Mode=OneWay}" Foreground="#FF1565C0"/>
+                <Run Text="{Binding Path=Prop_ClickMode, Mode=OneWay, Converter={StaticResource EnumDisplayNameConverter}}" Foreground="#FF1565C0"/>
                 <Run Text="]"/>
             </TextBlock>
 
             <TextBlock Text="Режим клика:" Style="{StaticResource FieldLabel}"/>
-            <ComboBox ItemsSource="{Binding Source={StaticResource ClickModeValues}}"
-                      SelectedItem="{Binding Prop_ClickMode}"
+            <ComboBox ItemsSource="{local:EnumValues local:ClickMode}" SelectedValue="{Binding Prop_ClickMode}" SelectedValuePath="Key" DisplayMemberPath="Display" 
                       Style="{StaticResource FieldComboBox}"
                       ToolTip="Выберите тип клика: обычный, двойной, правый или с удержанием"/>
 
             <TextBlock Text="Тип локатора:" Style="{StaticResource FieldLabel}"/>
-            <ComboBox ItemsSource="{Binding Source={StaticResource LocatorTypeValues}}"
-                      SelectedItem="{Binding Prop_LocatorType}"
+            <ComboBox ItemsSource="{local:EnumValues local:ElementLocatorType}" SelectedValue="{Binding Prop_LocatorType}" SelectedValuePath="Key" DisplayMemberPath="Display" 
                       Style="{StaticResource FieldComboBox}"
                       ToolTip="Тип локатора для поиска элемента (CSS, XPath, ID и т.д.)"/>
 

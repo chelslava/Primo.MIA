@@ -1,4 +1,4 @@
-<!--
+﻿<!--
     BrowserGetInfo.xaml
     Визуальный интерфейс активности "Получение информации о браузере".
 
@@ -24,13 +24,6 @@
                 <ResourceDictionary Source="/Primo.MIA;component/Common/Styles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
-            <ObjectDataProvider x:Key="InfoTypeValues"
-                                MethodName="GetValues"
-                                ObjectType="{x:Type system:Enum}">
-                <ObjectDataProvider.MethodParameters>
-                    <x:Type TypeName="local:BrowserInfoType"/>
-                </ObjectDataProvider.MethodParameters>
-            </ObjectDataProvider>
         </ResourceDictionary>
     </UserControl.Resources>
 
@@ -51,13 +44,12 @@
 
             <TextBlock Style="{StaticResource ActivityHeader}">
                 <Run Text="Браузер: Получить информацию ["/>
-                <Run Text="{Binding Path=Prop_InfoType, Mode=OneWay}" Foreground="#FF1565C0"/>
+                <Run Text="{Binding Path=Prop_InfoType, Mode=OneWay, Converter={StaticResource EnumDisplayNameConverter}}" Foreground="#FF1565C0"/>
                 <Run Text="]"/>
             </TextBlock>
 
             <TextBlock Text="Тип информации:" Style="{StaticResource FieldLabel}"/>
-            <ComboBox ItemsSource="{Binding Source={StaticResource InfoTypeValues}}"
-                      SelectedItem="{Binding Prop_InfoType}"
+            <ComboBox ItemsSource="{local:EnumValues local:BrowserInfoType}" SelectedValue="{Binding Prop_InfoType}" SelectedValuePath="Key" DisplayMemberPath="Display" 
                       Style="{StaticResource FieldComboBox}"
                       ToolTip="Выберите тип информации для получения"/>
 

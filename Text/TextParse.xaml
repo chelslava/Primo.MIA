@@ -1,4 +1,4 @@
-<!--
+﻿<!--
     TextParse.xaml
     Визуальный интерфейс активности «Текст: Разбор по шаблону».
 
@@ -23,13 +23,6 @@
             </ResourceDictionary.MergedDictionaries>
 
             <!-- Значения синтаксиса плейсхолдеров -->
-            <ObjectDataProvider x:Key="SyntaxValues"
-                                MethodName="GetValues"
-                                ObjectType="{x:Type system:Enum}">
-                <ObjectDataProvider.MethodParameters>
-                    <x:Type TypeName="local:TemplateSyntax"/>
-                </ObjectDataProvider.MethodParameters>
-            </ObjectDataProvider>
 
             <!-- Конвертер для показа блока «Все результаты» только при AllMatches=true -->
             <BooleanToVisibilityConverter x:Key="BoolToVis"/>
@@ -57,7 +50,7 @@
             <!-- Заголовок с синтаксисом -->
             <TextBlock Style="{StaticResource ActivityHeader}">
                 <Run Text="Текст: Разбор по шаблону [" Foreground="#FF0E0E0E"/>
-                <Run Text="{Binding Prop_MaskSyntax, Mode=OneWay}" Foreground="#FF1565C0"/>
+                <Run Text="{Binding Prop_MaskSyntax, Mode=OneWay, Converter={StaticResource EnumDisplayNameConverter}}" Foreground="#FF1565C0"/>
                 <Run Text="]" Foreground="#FF0E0E0E"/>
             </TextBlock>
 
@@ -82,8 +75,7 @@
 
                 <StackPanel Grid.Column="0" Margin="0,0,4,0">
                     <TextBlock Text="Синтаксис:" Style="{StaticResource FieldLabel}"/>
-                    <ComboBox ItemsSource="{Binding Source={StaticResource SyntaxValues}}"
-                              SelectedItem="{Binding Prop_MaskSyntax}"
+                    <ComboBox ItemsSource="{local:EnumValues local:TemplateSyntax}" SelectedValue="{Binding Prop_MaskSyntax}" SelectedValuePath="Key" DisplayMemberPath="Display" 
                               Style="{StaticResource FieldComboBox}"
                               ToolTip="Синтаксис плейсхолдеров в маске"/>
                 </StackPanel>

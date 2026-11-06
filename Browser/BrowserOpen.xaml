@@ -1,4 +1,4 @@
-<!--
+﻿<!--
     BrowserOpen.xaml
     Визуальный интерфейс активности "Открытие браузера".
 
@@ -25,13 +25,6 @@
                 <ResourceDictionary Source="/Primo.MIA;component/Common/Styles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
-            <ObjectDataProvider x:Key="BrowserTypeValues"
-                                MethodName="GetValues"
-                                ObjectType="{x:Type system:Enum}">
-                <ObjectDataProvider.MethodParameters>
-                    <x:Type TypeName="local:BrowserType"/>
-                </ObjectDataProvider.MethodParameters>
-            </ObjectDataProvider>
         </ResourceDictionary>
     </UserControl.Resources>
 
@@ -47,9 +40,7 @@
                    Style="{StaticResource FieldLabel}"
                    Margin="5,4,0,0"/>
 
-        <ComboBox Grid.Row="1" 
-                  ItemsSource="{Binding Source={StaticResource BrowserTypeValues}}"
-                  SelectedItem="{Binding Prop_BrowserType}"
+        <ComboBox ItemsSource="{local:EnumValues local:BrowserType}" SelectedValue="{Binding Prop_BrowserType}" SelectedValuePath="Key" DisplayMemberPath="Display" Grid.Row="1"
                   Style="{StaticResource FieldComboBox}"
                   Margin="5,0,5,4"
                   ToolTip="Выберите тип браузера для запуска (Chrome, Firefox, Edge, Safari)"/>

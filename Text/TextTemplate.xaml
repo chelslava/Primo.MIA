@@ -1,4 +1,4 @@
-<!--
+﻿<!--
     TextTemplate.xaml
     Визуальный интерфейс активности «Текст: Шаблонизатор».
 
@@ -24,22 +24,8 @@
             </ResourceDictionary.MergedDictionaries>
 
             <!-- Значения синтаксиса плейсхолдеров -->
-            <ObjectDataProvider x:Key="SyntaxValues"
-                                MethodName="GetValues"
-                                ObjectType="{x:Type system:Enum}">
-                <ObjectDataProvider.MethodParameters>
-                    <x:Type TypeName="local:TemplateSyntax"/>
-                </ObjectDataProvider.MethodParameters>
-            </ObjectDataProvider>
 
             <!-- Значения поведения при пропущенном ключе -->
-            <ObjectDataProvider x:Key="MissingKeyValues"
-                                MethodName="GetValues"
-                                ObjectType="{x:Type system:Enum}">
-                <ObjectDataProvider.MethodParameters>
-                    <x:Type TypeName="local:MissingKeyBehavior"/>
-                </ObjectDataProvider.MethodParameters>
-            </ObjectDataProvider>
 
         </ResourceDictionary>
     </UserControl.Resources>
@@ -64,7 +50,7 @@
             <!-- Заголовок -->
             <TextBlock Style="{StaticResource ActivityHeader}">
                 <Run Text="Текст: Шаблонизатор [" Foreground="#FF0E0E0E"/>
-                <Run Text="{Binding Prop_Syntax, Mode=OneWay}" Foreground="#FF1565C0"/>
+                <Run Text="{Binding Prop_Syntax, Mode=OneWay, Converter={StaticResource EnumDisplayNameConverter}}" Foreground="#FF1565C0"/>
                 <Run Text="]" Foreground="#FF0E0E0E"/>
             </TextBlock>
 
@@ -93,16 +79,14 @@
 
                 <StackPanel Grid.Column="0" Margin="0,0,4,0">
                     <TextBlock Text="Синтаксис:" Style="{StaticResource FieldLabel}"/>
-                    <ComboBox ItemsSource="{Binding Source={StaticResource SyntaxValues}}"
-                              SelectedItem="{Binding Prop_Syntax}"
+                    <ComboBox ItemsSource="{local:EnumValues local:TemplateSyntax}" SelectedValue="{Binding Prop_Syntax}" SelectedValuePath="Key" DisplayMemberPath="Display" 
                               Style="{StaticResource FieldComboBox}"
                               ToolTip="DoubleBrace={{ключ}}, SingleBrace={ключ}, Percent=%ключ%"/>
                 </StackPanel>
 
                 <StackPanel Grid.Column="1">
                     <TextBlock Text="При отсутствии ключа:" Style="{StaticResource FieldLabel}"/>
-                    <ComboBox ItemsSource="{Binding Source={StaticResource MissingKeyValues}}"
-                              SelectedItem="{Binding Prop_MissingKeyBehavior}"
+                    <ComboBox ItemsSource="{local:EnumValues local:MissingKeyBehavior}" SelectedValue="{Binding Prop_MissingKeyBehavior}" SelectedValuePath="Key" DisplayMemberPath="Display" 
                               Style="{StaticResource FieldComboBox}"
                               ToolTip="LeaveAsIs — оставить плейсхолдер, ReplaceWithEmpty — очистить, ThrowError — ошибка"/>
                 </StackPanel>

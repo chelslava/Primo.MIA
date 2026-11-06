@@ -22,19 +22,25 @@
         <StackPanel Grid.Column="1" Margin="5,0,5,5">
             <TextBlock Text="RabbitMQ: Отправить сообщение" Style="{StaticResource ActivityHeader}"/>
             <TextBlock Text="Хост:" Style="{StaticResource FieldLabel}"/>
-            <TextBox Text="{Binding Prop_Host, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            <TextBox Text="{Binding Prop_Host, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                     ToolTip="Хост RabbitMQ (порт, VirtualHost и TLS — в панели свойств; порт по умолчанию 5672, TLS — 5671)"/>
             <TextBlock Text="Пользователь:" Style="{StaticResource FieldLabel}"/>
-            <TextBox Text="{Binding Prop_UserName, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            <TextBox Text="{Binding Prop_UserName, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                     ToolTip="Имя пользователя для подключения к RabbitMQ"/>
             <TextBlock Text="Пароль:" Style="{StaticResource FieldLabel}"/>
             <PasswordBox common:PasswordBoxHelper.BindPassword="True"
                          common:PasswordBoxHelper.BoundPassword="{Binding Prop_Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                         Style="{StaticResource FieldPasswordBox}"/>
+                         Style="{StaticResource FieldPasswordBox}"
+                         ToolTip="Пароль пользователя RabbitMQ"/>
             <TextBlock Text="Exchange:" Style="{StaticResource FieldLabel}"/>
-            <TextBox Text="{Binding Prop_Exchange, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            <TextBox Text="{Binding Prop_Exchange, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                     ToolTip="Имя exchange для публикации; пусто — exchange по умолчанию"/>
             <TextBlock Text="Routing Key:" Style="{StaticResource FieldLabel}"/>
-            <TextBox Text="{Binding Prop_RoutingKey, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            <TextBox Text="{Binding Prop_RoutingKey, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                     ToolTip="Routing key — ключ маршрутизации сообщения к очереди"/>
             <TextBlock Text="Тело сообщения:" Style="{StaticResource FieldLabel}"/>
-            <TextBox Text="{Binding Prop_Body, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            <TextBox Text="{Binding Prop_Body, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                     ToolTip="Текст публикуемого сообщения (persistent-доставка — в панели свойств)"/>
         </StackPanel>
     </Grid>
 </UserControl>

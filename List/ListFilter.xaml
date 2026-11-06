@@ -28,13 +28,6 @@
                 <ResourceDictionary Source="/Primo.MIA;component/Common/Styles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
             
-            <ObjectDataProvider x:Key="ModeValues"
-                                MethodName="GetValues"
-                                ObjectType="{x:Type system:Enum}">
-                <ObjectDataProvider.MethodParameters>
-                    <x:Type TypeName="local:ListFilterMode"/>
-                </ObjectDataProvider.MethodParameters>
-            </ObjectDataProvider>
 
             <!-- Конвертеры для условной видимости -->
             <local:EnumToVisibilityConverter x:Key="EnumToVisConverter"/>
@@ -64,8 +57,7 @@
             </TextBlock>
 
             <TextBlock Text="Режим фильтрации:" Style="{StaticResource FieldLabel}"/>
-            <ComboBox ItemsSource="{Binding Source={StaticResource ModeValues}}"
-                      SelectedItem="{Binding Mode}"
+            <ComboBox ItemsSource="{local:EnumValues local:ListFilterMode}" SelectedValue="{Binding Mode}" SelectedValuePath="Key" DisplayMemberPath="Display" 
                       Style="{StaticResource FieldComboBox}"
                       ToolTip="Выберите условие фильтрации"/>
 

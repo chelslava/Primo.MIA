@@ -1,4 +1,4 @@
-<!--
+﻿<!--
     ReadTomlConfig.xaml
     Визуальный интерфейс активности "Чтение TOML конфигурации".
 
@@ -31,13 +31,6 @@
             </ResourceDictionary.MergedDictionaries>
 
             <!-- Источник данных для ComboBox режима чтения -->
-            <ObjectDataProvider x:Key="ModeValues"
-                                MethodName="GetValues"
-                                ObjectType="{x:Type system:Enum}">
-                <ObjectDataProvider.MethodParameters>
-                    <x:Type TypeName="local:TomlReadMode"/>
-                </ObjectDataProvider.MethodParameters>
-            </ObjectDataProvider>
 
             <!-- Универсальный конвертер enum → Visibility -->
             <local:EnumToVisibilityConverter x:Key="EnumToVisConverter"/>
@@ -72,8 +65,7 @@
 
             <!-- ── Режим чтения ── -->
             <TextBlock Text="Режим чтения:" Style="{StaticResource FieldLabel}"/>
-            <ComboBox ItemsSource="{Binding Source={StaticResource ModeValues}}"
-                      SelectedItem="{Binding ReadMode}"
+            <ComboBox ItemsSource="{local:EnumValues local:TomlReadMode}" SelectedValue="{Binding ReadMode}" SelectedValuePath="Key" DisplayMemberPath="Display" 
                       Style="{StaticResource FieldComboBox}"/>
 
             <!-- ── Путь к файлу (всегда виден) + кнопка обзора ── -->

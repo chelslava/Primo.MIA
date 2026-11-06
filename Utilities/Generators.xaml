@@ -25,13 +25,6 @@
                 <ResourceDictionary Source="/Primo.MIA;component/Common/Styles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
             
-            <ObjectDataProvider x:Key="TypeValues"
-                                MethodName="GetValues"
-                                ObjectType="{x:Type system:Enum}">
-                <ObjectDataProvider.MethodParameters>
-                    <x:Type TypeName="local:GeneratorType"/>
-                </ObjectDataProvider.MethodParameters>
-            </ObjectDataProvider>
         </ResourceDictionary>
     </UserControl.Resources>
 
@@ -56,8 +49,7 @@
                 <Run Text="]"/>
             </TextBlock>
 
-            <ComboBox ItemsSource="{Binding Source={StaticResource TypeValues}}"
-                      SelectedItem="{Binding Type}"
+            <ComboBox ItemsSource="{local:EnumValues local:GeneratorType}" SelectedValue="{Binding Type}" SelectedValuePath="Key" DisplayMemberPath="Display" 
                       Style="{StaticResource FieldComboBox}"
                       ToolTip="Тип генератора: Guid, Random, Timestamp, UniqueId"/>
 

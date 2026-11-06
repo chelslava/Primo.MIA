@@ -56,9 +56,16 @@
 
             <!-- Таймаут ожидания -->
             <TextBlock Text="Таймаут ожидания (сек):" Style="{StaticResource FieldLabel}"/>
-            <TextBox Text="{Binding Prop_TimeoutSeconds, UpdateSourceTrigger=PropertyChanged}"
-                     Style="{StaticResource FieldBox}"
-                     ToolTip="Максимальное время ожидания входящего запроса. По умолчанию 120 сек.&#xA;При истечении: IsTimeout = true, активность завершается без ошибки."/>
+            <TextBox Style="{StaticResource ValidatingFieldBox}"
+                     ToolTip="Максимальное время ожидания входящего запроса. По умолчанию 120 сек.&#xA;При истечении: IsTimeout = true, активность завершается без ошибки.">
+                <TextBox.Text>
+                    <Binding Path="Prop_TimeoutSeconds" UpdateSourceTrigger="PropertyChanged">
+                        <Binding.ValidationRules>
+                            <local:NumericValidationRule/>
+                        </Binding.ValidationRules>
+                    </Binding>
+                </TextBox.Text>
+            </TextBox>
 
             <!-- Разрешённые методы и токен в одной строке -->
             <Grid Margin="0,2,0,0">
@@ -91,9 +98,16 @@
 
                 <StackPanel Grid.Column="0" Margin="0,0,4,0">
                     <TextBlock Text="Код ответа:" Style="{StaticResource FieldLabel}"/>
-                    <TextBox Text="{Binding Prop_ResponseCode, UpdateSourceTrigger=PropertyChanged}"
-                             Style="{StaticResource FieldBox}"
-                             ToolTip="HTTP-код ответа отправителю. 200 (OK) или 202 (Accepted) для async."/>
+                    <TextBox Style="{StaticResource ValidatingFieldBox}"
+                             ToolTip="HTTP-код ответа отправителю. 200 (OK) или 202 (Accepted) для async.">
+                        <TextBox.Text>
+                            <Binding Path="Prop_ResponseCode" UpdateSourceTrigger="PropertyChanged">
+                                <Binding.ValidationRules>
+                                    <local:NumericValidationRule/>
+                                </Binding.ValidationRules>
+                            </Binding>
+                        </TextBox.Text>
+                    </TextBox>
                 </StackPanel>
 
                 <StackPanel Grid.Column="1">

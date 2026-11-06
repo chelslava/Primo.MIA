@@ -1,4 +1,4 @@
-<!--
+﻿<!--
     CalendarLoad.xaml
     Визуальный интерфейс активности "Загрузка производственного календаря".
 
@@ -25,21 +25,7 @@
                 <ResourceDictionary Source="/Primo.MIA;component/Common/Styles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
-            <ObjectDataProvider x:Key="FormatValues"
-                                MethodName="GetValues"
-                                ObjectType="{x:Type system:Enum}">
-                <ObjectDataProvider.MethodParameters>
-                    <x:Type TypeName="local:CalendarFormat"/>
-                </ObjectDataProvider.MethodParameters>
-            </ObjectDataProvider>
 
-            <ObjectDataProvider x:Key="RegionValues"
-                                MethodName="GetValues"
-                                ObjectType="{x:Type system:Enum}">
-                <ObjectDataProvider.MethodParameters>
-                    <x:Type TypeName="local:CalendarRegion"/>
-                </ObjectDataProvider.MethodParameters>
-            </ObjectDataProvider>
 
             <!-- Конвертер bool→Visibility для скрытия блока настроек скачивания -->
             <BooleanToVisibilityConverter x:Key="BoolToVis"/>
@@ -87,24 +73,29 @@
 
                 <StackPanel Grid.Column="0" Margin="0,0,6,0">
                     <TextBlock Text="Формат файла:" Style="{StaticResource FieldLabel}"/>
-                    <ComboBox ItemsSource="{Binding Source={StaticResource FormatValues}}"
-                              SelectedItem="{Binding Prop_Format}"
+                    <ComboBox ItemsSource="{local:EnumValues local:CalendarFormat}" SelectedValue="{Binding Prop_Format}" SelectedValuePath="Key" DisplayMemberPath="Display" 
                               Style="{StaticResource FieldComboBox}"
                               ToolTip="Формат файла календаря: XML, JSON, CSV или TXT"/>
                 </StackPanel>
 
                 <StackPanel Grid.Column="1">
                     <TextBlock Text="Год:" Style="{StaticResource FieldLabel}"/>
-                    <TextBox Text="{Binding Prop_Year, UpdateSourceTrigger=PropertyChanged}"
-                             Style="{StaticResource FieldBox}"
-                             ToolTip="Год календаря (fallback если не найден в файле)"/>
+                    <TextBox Style="{StaticResource ValidatingFieldBox}"
+                             ToolTip="Год календаря (fallback если не найден в файле)">
+                        <TextBox.Text>
+                            <Binding Path="Prop_Year" UpdateSourceTrigger="PropertyChanged">
+                                <Binding.ValidationRules>
+                                    <local:NumericValidationRule/>
+                                </Binding.ValidationRules>
+                            </Binding>
+                        </TextBox.Text>
+                    </TextBox>
                 </StackPanel>
             </Grid>
 
             <!-- Регион -->
             <TextBlock Text="Регион:" Style="{StaticResource FieldLabel}"/>
-            <ComboBox ItemsSource="{Binding Source={StaticResource RegionValues}}"
-                      SelectedItem="{Binding Prop_Region}"
+            <ComboBox ItemsSource="{local:EnumValues local:CalendarRegion}" SelectedValue="{Binding Prop_Region}" SelectedValuePath="Key" DisplayMemberPath="Display" 
                       Style="{StaticResource FieldComboBox}"
                       ToolTip="Регион: Россия, Казахстан, Беларусь, Узбекистан"/>
 
@@ -138,18 +129,32 @@
                 <StackPanel Grid.Column="0" Margin="0,0,4,0">
                     <TextBlock Text="Срок кэша (дней):" Style="{StaticResource FieldLabel}"
                                ToolTip="Не скачивать если файл свежее N дней. 0 = всегда скачивать."/>
-                    <TextBox Text="{Binding Prop_CacheAgeDays, UpdateSourceTrigger=PropertyChanged}"
-                             Style="{StaticResource FieldBox}"
-                             ToolTip="0 = всегда скачивать при включённом DownloadIfMissing"/>
+                    <TextBox Style="{StaticResource ValidatingFieldBox}"
+                             ToolTip="0 = всегда скачивать при включённом DownloadIfMissing">
+                        <TextBox.Text>
+                            <Binding Path="Prop_CacheAgeDays" UpdateSourceTrigger="PropertyChanged">
+                                <Binding.ValidationRules>
+                                    <local:NumericValidationRule/>
+                                </Binding.ValidationRules>
+                            </Binding>
+                        </TextBox.Text>
+                    </TextBox>
                 </StackPanel>
 
                 <!-- [П6] Таймаут скачивания -->
                 <StackPanel Grid.Column="1">
                     <TextBlock Text="Таймаут (сек):" Style="{StaticResource FieldLabel}"
                                ToolTip="Таймаут HTTP-запроса при скачивании в секундах"/>
-                    <TextBox Text="{Binding Prop_DownloadTimeoutSeconds, UpdateSourceTrigger=PropertyChanged}"
-                             Style="{StaticResource FieldBox}"
-                             ToolTip="По умолчанию 30 секунд"/>
+                    <TextBox Style="{StaticResource ValidatingFieldBox}"
+                             ToolTip="По умолчанию 30 секунд">
+                        <TextBox.Text>
+                            <Binding Path="Prop_DownloadTimeoutSeconds" UpdateSourceTrigger="PropertyChanged">
+                                <Binding.ValidationRules>
+                                    <local:NumericValidationRule/>
+                                </Binding.ValidationRules>
+                            </Binding>
+                        </TextBox.Text>
+                    </TextBox>
                 </StackPanel>
             </Grid>
 

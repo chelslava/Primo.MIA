@@ -1,4 +1,4 @@
-<!--
+﻿<!--
     CalendarNextDayOfWeek.xaml
     Визуальный интерфейс активности «Календарь: Следующий день недели».
 
@@ -23,31 +23,10 @@
             </ResourceDictionary.MergedDictionaries>
 
             <!-- Значения TargetDayOfWeek для ComboBox дня недели -->
-            <ObjectDataProvider x:Key="TargetDayValues"
-                                MethodName="GetValues"
-                                ObjectType="{x:Type system:Enum}">
-                <ObjectDataProvider.MethodParameters>
-                    <x:Type TypeName="local:TargetDayOfWeek"/>
-                </ObjectDataProvider.MethodParameters>
-            </ObjectDataProvider>
 
             <!-- Значения DayOfWeekSearchMode для ComboBox режима -->
-            <ObjectDataProvider x:Key="SearchModeValues"
-                                MethodName="GetValues"
-                                ObjectType="{x:Type system:Enum}">
-                <ObjectDataProvider.MethodParameters>
-                    <x:Type TypeName="local:DayOfWeekSearchMode"/>
-                </ObjectDataProvider.MethodParameters>
-            </ObjectDataProvider>
 
             <!-- Значения DeadlineWeekendBehavior для ComboBox «При выходном» -->
-            <ObjectDataProvider x:Key="WeekendBehaviorValues"
-                                MethodName="GetValues"
-                                ObjectType="{x:Type system:Enum}">
-                <ObjectDataProvider.MethodParameters>
-                    <x:Type TypeName="local:DeadlineWeekendBehavior"/>
-                </ObjectDataProvider.MethodParameters>
-            </ObjectDataProvider>
 
             <!--
                 EnumToVisibilityConverter — показывает блок «При выходном»
@@ -78,9 +57,9 @@
             <!-- Заголовок с отображением дня недели и режима -->
             <TextBlock Style="{StaticResource ActivityHeader}">
                 <Run Text="Календарь: следующий " Foreground="#FF0E0E0E"/>
-                <Run Text="{Binding Prop_TargetDayOfWeek, Mode=OneWay}" Foreground="#FF1565C0"/>
+                <Run Text="{Binding Prop_TargetDayOfWeek, Mode=OneWay, Converter={StaticResource EnumDisplayNameConverter}}" Foreground="#FF1565C0"/>
                 <Run Text=" [" Foreground="#FF0E0E0E"/>
-                <Run Text="{Binding Prop_Mode, Mode=OneWay}" Foreground="#FF1565C0"/>
+                <Run Text="{Binding Prop_Mode, Mode=OneWay, Converter={StaticResource EnumDisplayNameConverter}}" Foreground="#FF1565C0"/>
                 <Run Text="]" Foreground="#FF0E0E0E"/>
             </TextBlock>
 
@@ -105,16 +84,14 @@
 
                 <StackPanel Grid.Column="0" Margin="0,0,4,0">
                     <TextBlock Text="День недели:" Style="{StaticResource FieldLabel}"/>
-                    <ComboBox ItemsSource="{Binding Source={StaticResource TargetDayValues}}"
-                              SelectedItem="{Binding Prop_TargetDayOfWeek}"
+                    <ComboBox ItemsSource="{local:EnumValues local:TargetDayOfWeek}" SelectedValue="{Binding Prop_TargetDayOfWeek}" SelectedValuePath="Key" DisplayMemberPath="Display" 
                               Style="{StaticResource FieldComboBox}"
                               ToolTip="Искомый день недели"/>
                 </StackPanel>
 
                 <StackPanel Grid.Column="1">
                     <TextBlock Text="Режим поиска:" Style="{StaticResource FieldLabel}"/>
-                    <ComboBox ItemsSource="{Binding Source={StaticResource SearchModeValues}}"
-                              SelectedItem="{Binding Prop_Mode}"
+                    <ComboBox ItemsSource="{local:EnumValues local:DayOfWeekSearchMode}" SelectedValue="{Binding Prop_Mode}" SelectedValuePath="Key" DisplayMemberPath="Display" 
                               Style="{StaticResource FieldComboBox}"
                               ToolTip="NextOccurrence / NextWorkingOccurrence / NearestWorkday"/>
                 </StackPanel>
@@ -128,8 +105,7 @@
                                     Converter={StaticResource EnumToVisConverter},
                                     ConverterParameter=NearestWorkday}">
                 <TextBlock Text="При выходном:" Style="{StaticResource FieldLabel}"/>
-                <ComboBox ItemsSource="{Binding Source={StaticResource WeekendBehaviorValues}}"
-                          SelectedItem="{Binding Prop_IfWeekend}"
+                <ComboBox ItemsSource="{local:EnumValues local:DeadlineWeekendBehavior}" SelectedValue="{Binding Prop_IfWeekend}" SelectedValuePath="Key" DisplayMemberPath="Display" 
                           Style="{StaticResource FieldComboBox}"
                           ToolTip="Что делать если найденный день выходной: сдвинуть вперёд, назад или оставить"/>
             </StackPanel>

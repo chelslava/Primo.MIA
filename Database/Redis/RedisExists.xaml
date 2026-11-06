@@ -21,11 +21,14 @@
         <StackPanel Grid.Column="1" Margin="5,0,5,5">
             <TextBlock Text="Redis: Проверить ключ" Style="{StaticResource FieldLabel}"/>
             <TextBlock Text="Строка подключения:" Style="{StaticResource FieldLabel}"/>
-            <TextBox Text="{Binding Prop_ConnectionString, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            <TextBox Text="{Binding Prop_ConnectionString, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                     ToolTip="Строка подключения StackExchange.Redis (например localhost:6379)"/>
             <TextBlock Text="Ключ:" Style="{StaticResource FieldLabel}"/>
-            <TextBox Text="{Binding Prop_Key, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            <TextBox Text="{Binding Prop_Key, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                     ToolTip="Проверяемый ключ Redis (EXISTS)"/>
             <TextBlock Text="Ключ существует:" Style="{StaticResource FieldLabel}"/>
-            <TextBox Text="{Binding Prop_Exists, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            <TextBox Text="{Binding Prop_Exists, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                     ToolTip="Переменная (Boolean): ключ существует в Redis"/>
         </StackPanel>
     </Grid>
 </UserControl>

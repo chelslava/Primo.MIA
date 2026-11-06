@@ -1,4 +1,4 @@
-<!--
+﻿<!--
     ElementInput.xaml
     Визуальный интерфейс активности "Ввод в элемент".
 
@@ -23,29 +23,8 @@
                 <ResourceDictionary Source="/Primo.MIA;component/Common/Styles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
-            <ObjectDataProvider x:Key="LocatorTypeValues"
-                                MethodName="GetValues"
-                                ObjectType="{x:Type system:Enum}">
-                <ObjectDataProvider.MethodParameters>
-                    <x:Type TypeName="local:ElementLocatorType"/>
-                </ObjectDataProvider.MethodParameters>
-            </ObjectDataProvider>
 
-            <ObjectDataProvider x:Key="InputModeValues"
-                                MethodName="GetValues"
-                                ObjectType="{x:Type system:Enum}">
-                <ObjectDataProvider.MethodParameters>
-                    <x:Type TypeName="local:InputMode"/>
-                </ObjectDataProvider.MethodParameters>
-            </ObjectDataProvider>
 
-            <ObjectDataProvider x:Key="SpecialKeyValues"
-                                MethodName="GetValues"
-                                ObjectType="{x:Type system:Enum}">
-                <ObjectDataProvider.MethodParameters>
-                    <x:Type TypeName="local:SpecialKeyType"/>
-                </ObjectDataProvider.MethodParameters>
-            </ObjectDataProvider>
 
             <local:EnumToVisibilityConverter x:Key="EnumToVisConverter"/>
         </ResourceDictionary>
@@ -68,19 +47,17 @@
 
             <TextBlock Style="{StaticResource ActivityHeader}">
                 <Run Text="Элемент: Ввод ["/>
-                <Run Text="{Binding Path=Prop_InputMode, Mode=OneWay}" Foreground="#FF1565C0"/>
+                <Run Text="{Binding Path=Prop_InputMode, Mode=OneWay, Converter={StaticResource EnumDisplayNameConverter}}" Foreground="#FF1565C0"/>
                 <Run Text="]"/>
             </TextBlock>
 
             <TextBlock Text="Режим ввода:" Style="{StaticResource FieldLabel}"/>
-            <ComboBox ItemsSource="{Binding Source={StaticResource InputModeValues}}"
-                      SelectedItem="{Binding Prop_InputMode}"
+            <ComboBox ItemsSource="{local:EnumValues local:InputMode}" SelectedValue="{Binding Prop_InputMode}" SelectedValuePath="Key" DisplayMemberPath="Display" 
                       Style="{StaticResource FieldComboBox}"
                       ToolTip="Выберите режим: ввод текста или специальная клавиша"/>
 
             <TextBlock Text="Тип локатора:" Style="{StaticResource FieldLabel}"/>
-            <ComboBox ItemsSource="{Binding Source={StaticResource LocatorTypeValues}}"
-                      SelectedItem="{Binding Prop_LocatorType}"
+            <ComboBox ItemsSource="{local:EnumValues local:ElementLocatorType}" SelectedValue="{Binding Prop_LocatorType}" SelectedValuePath="Key" DisplayMemberPath="Display" 
                       Style="{StaticResource FieldComboBox}"
                       ToolTip="Тип локатора для поиска элемента (CSS, XPath, ID и т.д.)"/>
 
@@ -104,8 +81,7 @@
                                     Converter={StaticResource EnumToVisConverter},
                                     ConverterParameter=SpecialKey}">
                 <TextBlock Text="Специальная клавиша:" Style="{StaticResource FieldLabel}"/>
-                <ComboBox ItemsSource="{Binding Source={StaticResource SpecialKeyValues}}"
-                          SelectedItem="{Binding Prop_SpecialKey}"
+                <ComboBox ItemsSource="{local:EnumValues local:SpecialKeyType}" SelectedValue="{Binding Prop_SpecialKey}" SelectedValuePath="Key" DisplayMemberPath="Display" 
                           Style="{StaticResource FieldComboBox}"
                           ToolTip="Выберите специальную клавишу (Enter, Tab, Escape и т.д.)"/>
             </StackPanel>

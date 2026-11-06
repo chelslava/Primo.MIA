@@ -22,17 +22,22 @@
         <StackPanel Grid.Column="1" Margin="5,0,5,5">
             <TextBlock Text="RabbitMQ: Получить сообщение" Style="{StaticResource ActivityHeader}"/>
             <TextBlock Text="Хост:" Style="{StaticResource FieldLabel}"/>
-            <TextBox Text="{Binding Prop_Host, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            <TextBox Text="{Binding Prop_Host, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                     ToolTip="Хост RabbitMQ (порт, VirtualHost и TLS — в панели свойств; порт по умолчанию 5672, TLS — 5671)"/>
             <TextBlock Text="Пользователь:" Style="{StaticResource FieldLabel}"/>
-            <TextBox Text="{Binding Prop_UserName, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            <TextBox Text="{Binding Prop_UserName, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                     ToolTip="Имя пользователя для подключения к RabbitMQ"/>
             <TextBlock Text="Пароль:" Style="{StaticResource FieldLabel}"/>
             <PasswordBox common:PasswordBoxHelper.BindPassword="True"
                          common:PasswordBoxHelper.BoundPassword="{Binding Prop_Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                         Style="{StaticResource FieldPasswordBox}"/>
+                         Style="{StaticResource FieldPasswordBox}"
+                         ToolTip="Пароль пользователя RabbitMQ"/>
             <TextBlock Text="Очередь:" Style="{StaticResource FieldLabel}"/>
-            <TextBox Text="{Binding Prop_Queue, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            <TextBox Text="{Binding Prop_Queue, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                     ToolTip="Имя очереди, из которой читается сообщение"/>
             <TextBlock Text="Тело сообщения:" Style="{StaticResource FieldLabel}"/>
-            <TextBox Text="{Binding Prop_MessageBody, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            <TextBox Text="{Binding Prop_MessageBody, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                     ToolTip="Переменная (String) для тела полученного сообщения"/>
         </StackPanel>
     </Grid>
 </UserControl>

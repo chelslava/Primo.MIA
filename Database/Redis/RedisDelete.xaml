@@ -21,11 +21,14 @@
         <StackPanel Grid.Column="1" Margin="5,0,5,5">
             <TextBlock Text="Redis: Удалить ключ" Style="{StaticResource FieldLabel}"/>
             <TextBlock Text="Строка подключения:" Style="{StaticResource FieldLabel}"/>
-            <TextBox Text="{Binding Prop_ConnectionString, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            <TextBox Text="{Binding Prop_ConnectionString, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                     ToolTip="Строка подключения StackExchange.Redis (например localhost:6379)"/>
             <TextBlock Text="Ключи (List&lt;string&gt;):" Style="{StaticResource FieldLabel}"/>
-            <TextBox Text="{Binding Prop_Keys, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            <TextBox Text="{Binding Prop_Keys, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                     ToolTip="Переменная (список строк) с ключами Redis для удаления (DEL)"/>
             <TextBlock Text="Удалено ключей:" Style="{StaticResource FieldLabel}"/>
-            <TextBox Text="{Binding Prop_DeletedCount, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            <TextBox Text="{Binding Prop_DeletedCount, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                     ToolTip="Переменная (Int64) для количества удалённых ключей"/>
         </StackPanel>
     </Grid>
 </UserControl>

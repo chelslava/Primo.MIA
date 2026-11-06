@@ -112,23 +112,44 @@
 
                 <StackPanel Grid.Column="0" Margin="0,0,4,0">
                     <TextBlock Text="Таймаут (сек):" Style="{StaticResource FieldLabel}"/>
-                    <TextBox Text="{Binding Prop_TimeoutSeconds, UpdateSourceTrigger=PropertyChanged}"
-                             Style="{StaticResource FieldBox}"
-                             ToolTip="Таймаут одной попытки. По умолчанию 30 сек."/>
+                    <TextBox Style="{StaticResource ValidatingFieldBox}"
+                             ToolTip="Таймаут одной попытки. По умолчанию 30 сек.">
+                        <TextBox.Text>
+                            <Binding Path="Prop_TimeoutSeconds" UpdateSourceTrigger="PropertyChanged">
+                                <Binding.ValidationRules>
+                                    <local:NumericValidationRule/>
+                                </Binding.ValidationRules>
+                            </Binding>
+                        </TextBox.Text>
+                    </TextBox>
                 </StackPanel>
 
                 <StackPanel Grid.Column="1" Margin="0,0,4,0">
                     <TextBlock Text="Повторных попыток:" Style="{StaticResource FieldLabel}"/>
-                    <TextBox Text="{Binding Prop_RetryCount, UpdateSourceTrigger=PropertyChanged}"
-                             Style="{StaticResource FieldBox}"
-                             ToolTip="0 = только одна попытка. Повтор при ошибке сети или ответе 5xx."/>
+                    <TextBox Style="{StaticResource ValidatingFieldBox}"
+                             ToolTip="0 = только одна попытка. Повтор при ошибке сети или ответе 5xx.">
+                        <TextBox.Text>
+                            <Binding Path="Prop_RetryCount" UpdateSourceTrigger="PropertyChanged">
+                                <Binding.ValidationRules>
+                                    <local:NumericValidationRule/>
+                                </Binding.ValidationRules>
+                            </Binding>
+                        </TextBox.Text>
+                    </TextBox>
                 </StackPanel>
 
                 <StackPanel Grid.Column="2">
                     <TextBlock Text="Пауза (мс):" Style="{StaticResource FieldLabel}"/>
-                    <TextBox Text="{Binding Prop_RetryDelayMs, UpdateSourceTrigger=PropertyChanged}"
-                             Style="{StaticResource FieldBox}"
-                             ToolTip="Пауза между попытками в миллисекундах. По умолчанию 1000."/>
+                    <TextBox Style="{StaticResource ValidatingFieldBox}"
+                             ToolTip="Пауза между попытками в миллисекундах. По умолчанию 1000.">
+                        <TextBox.Text>
+                            <Binding Path="Prop_RetryDelayMs" UpdateSourceTrigger="PropertyChanged">
+                                <Binding.ValidationRules>
+                                    <local:NumericValidationRule/>
+                                </Binding.ValidationRules>
+                            </Binding>
+                        </TextBox.Text>
+                    </TextBox>
                 </StackPanel>
             </Grid>
 

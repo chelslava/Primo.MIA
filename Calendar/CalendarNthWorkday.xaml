@@ -1,4 +1,4 @@
-<!--
+﻿<!--
     CalendarNthWorkday.xaml
     Визуальный интерфейс активности «Календарь: Nth рабочий день».
 
@@ -28,22 +28,8 @@
             </ResourceDictionary.MergedDictionaries>
 
             <!-- Значения NthWorkdayPeriod для ComboBox периода -->
-            <ObjectDataProvider x:Key="PeriodValues"
-                                MethodName="GetValues"
-                                ObjectType="{x:Type system:Enum}">
-                <ObjectDataProvider.MethodParameters>
-                    <x:Type TypeName="local:NthWorkdayPeriod"/>
-                </ObjectDataProvider.MethodParameters>
-            </ObjectDataProvider>
 
             <!-- Значения DayOfWeekFilter для ComboBox фильтра -->
-            <ObjectDataProvider x:Key="DayOfWeekFilterValues"
-                                MethodName="GetValues"
-                                ObjectType="{x:Type system:Enum}">
-                <ObjectDataProvider.MethodParameters>
-                    <x:Type TypeName="local:DayOfWeekFilter"/>
-                </ObjectDataProvider.MethodParameters>
-            </ObjectDataProvider>
 
             <!--
                 Конвертеры для управления видимостью полей в зависимости от периода
@@ -75,9 +61,9 @@
             <!-- Заголовок с отображением периода -->
             <TextBlock Style="{StaticResource ActivityHeader}">
                 <Run Text="Календарь: " Foreground="#FF0E0E0E"/>
-                <Run Text="{Binding Prop_N, Mode=OneWay}" Foreground="#FF1565C0"/>
+                <Run Text="{Binding Prop_N, Mode=OneWay, Converter={StaticResource EnumDisplayNameConverter}}" Foreground="#FF1565C0"/>
                 <Run Text="-й рабочий день [" Foreground="#FF0E0E0E"/>
-                <Run Text="{Binding Prop_Period, Mode=OneWay}" Foreground="#FF1565C0"/>
+                <Run Text="{Binding Prop_Period, Mode=OneWay, Converter={StaticResource EnumDisplayNameConverter}}" Foreground="#FF1565C0"/>
                 <Run Text="]" Foreground="#FF0E0E0E"/>
             </TextBlock>
 
@@ -104,8 +90,7 @@
 
                 <StackPanel Grid.Column="1">
                     <TextBlock Text="Период:" Style="{StaticResource FieldLabel}"/>
-                    <ComboBox ItemsSource="{Binding Source={StaticResource PeriodValues}}"
-                              SelectedItem="{Binding Prop_Period}"
+                    <ComboBox ItemsSource="{local:EnumValues local:NthWorkdayPeriod}" SelectedValue="{Binding Prop_Period}" SelectedValuePath="Key" DisplayMemberPath="Display" 
                               Style="{StaticResource FieldComboBox}"
                               ToolTip="Month / Quarter / HalfYear / Year"/>
                 </StackPanel>
@@ -150,8 +135,7 @@
 
             <!-- Фильтр по дням недели -->
             <TextBlock Text="Фильтр дней недели:" Style="{StaticResource FieldLabel}"/>
-            <ComboBox ItemsSource="{Binding Source={StaticResource DayOfWeekFilterValues}}"
-                      SelectedItem="{Binding Prop_DayOfWeekFilter}"
+            <ComboBox ItemsSource="{local:EnumValues local:DayOfWeekFilter}" SelectedValue="{Binding Prop_DayOfWeekFilter}" SelectedValuePath="Key" DisplayMemberPath="Display" 
                       Style="{StaticResource FieldComboBox}"
                       ToolTip="Искать только среди указанных дней (All = без фильтра)"/>
 

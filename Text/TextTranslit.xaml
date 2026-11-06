@@ -1,4 +1,4 @@
-<!--
+﻿<!--
     TextTranslit.xaml
     Визуальный интерфейс активности «Текст: Транслитерация».
 
@@ -24,22 +24,8 @@
             </ResourceDictionary.MergedDictionaries>
 
             <!-- Значения направления транслитерации -->
-            <ObjectDataProvider x:Key="DirectionValues"
-                                MethodName="GetValues"
-                                ObjectType="{x:Type system:Enum}">
-                <ObjectDataProvider.MethodParameters>
-                    <x:Type TypeName="local:TranslitDirection"/>
-                </ObjectDataProvider.MethodParameters>
-            </ObjectDataProvider>
 
             <!-- Значения схемы транслитерации -->
-            <ObjectDataProvider x:Key="SchemeValues"
-                                MethodName="GetValues"
-                                ObjectType="{x:Type system:Enum}">
-                <ObjectDataProvider.MethodParameters>
-                    <x:Type TypeName="local:TranslitScheme"/>
-                </ObjectDataProvider.MethodParameters>
-            </ObjectDataProvider>
 
         </ResourceDictionary>
     </UserControl.Resources>
@@ -64,7 +50,7 @@
             <!-- Заголовок с направлением и схемой -->
             <TextBlock Style="{StaticResource ActivityHeader}">
                 <Run Text="Текст: Транслитерация [" Foreground="#FF0E0E0E"/>
-                <Run Text="{Binding Prop_Scheme, Mode=OneWay}" Foreground="#FF1565C0"/>
+                <Run Text="{Binding Prop_Scheme, Mode=OneWay, Converter={StaticResource EnumDisplayNameConverter}}" Foreground="#FF1565C0"/>
                 <Run Text="]" Foreground="#FF0E0E0E"/>
             </TextBlock>
 
@@ -83,16 +69,14 @@
 
                 <StackPanel Grid.Column="0" Margin="0,0,4,0">
                     <TextBlock Text="Направление:" Style="{StaticResource FieldLabel}"/>
-                    <ComboBox ItemsSource="{Binding Source={StaticResource DirectionValues}}"
-                              SelectedItem="{Binding Prop_Direction}"
+                    <ComboBox ItemsSource="{local:EnumValues local:TranslitDirection}" SelectedValue="{Binding Prop_Direction}" SelectedValuePath="Key" DisplayMemberPath="Display" 
                               Style="{StaticResource FieldComboBox}"
                               ToolTip="CyrillicToLatin / LatinToCyrillic / AutoDetect"/>
                 </StackPanel>
 
                 <StackPanel Grid.Column="1">
                     <TextBlock Text="Схема:" Style="{StaticResource FieldLabel}"/>
-                    <ComboBox ItemsSource="{Binding Source={StaticResource SchemeValues}}"
-                              SelectedItem="{Binding Prop_Scheme}"
+                    <ComboBox ItemsSource="{local:EnumValues local:TranslitScheme}" SelectedValue="{Binding Prop_Scheme}" SelectedValuePath="Key" DisplayMemberPath="Display" 
                               Style="{StaticResource FieldComboBox}"
                               ToolTip="Simplified / Passport2013 / GOST7792000 / ISO9 / BGN_PCGN / ICAO"/>
                 </StackPanel>

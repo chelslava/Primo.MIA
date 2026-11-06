@@ -21,15 +21,20 @@
         <StackPanel Grid.Column="1" Margin="5,0,5,5">
             <TextBlock Text="MongoDB: Вставить документ" Style="{StaticResource FieldLabel}"/>
             <TextBlock Text="Строка подключения:" Style="{StaticResource FieldLabel}"/>
-            <TextBox Text="{Binding Prop_ConnectionString, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            <TextBox Text="{Binding Prop_ConnectionString, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                     ToolTip="Строка подключения MongoDB (например mongodb://localhost:27017)"/>
             <TextBlock Text="База данных:" Style="{StaticResource FieldLabel}"/>
-            <TextBox Text="{Binding Prop_Database, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            <TextBox Text="{Binding Prop_Database, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                     ToolTip="Имя базы данных MongoDB"/>
             <TextBlock Text="Коллекция:" Style="{StaticResource FieldLabel}"/>
-            <TextBox Text="{Binding Prop_Collection, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            <TextBox Text="{Binding Prop_Collection, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                     ToolTip="Имя коллекции для вставки документа"/>
             <TextBlock Text="Документ (JSON):" Style="{StaticResource FieldLabel}"/>
-            <TextBox Text="{Binding Prop_Document, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            <TextBox Text="{Binding Prop_Document, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                     ToolTip="Вставляемый документ в формате JSON, например {&quot;name&quot;: &quot;Иван&quot;, &quot;age&quot;: 30}"/>
             <TextBlock Text="Вставлено документов:" Style="{StaticResource FieldLabel}"/>
-            <TextBox Text="{Binding Prop_InsertedCount, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            <TextBox Text="{Binding Prop_InsertedCount, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                     ToolTip="Переменная (Int64) для количества вставленных документов"/>
         </StackPanel>
     </Grid>
 </UserControl>

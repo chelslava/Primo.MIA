@@ -23,29 +23,8 @@
                 <ResourceDictionary Source="/Primo.MIA;component/Common/Styles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
-            <ObjectDataProvider x:Key="HashSourceValues"
-                                MethodName="GetValues"
-                                ObjectType="{x:Type system:Enum}">
-                <ObjectDataProvider.MethodParameters>
-                    <x:Type TypeName="local:CryptoHashSource"/>
-                </ObjectDataProvider.MethodParameters>
-            </ObjectDataProvider>
 
-            <ObjectDataProvider x:Key="HashAlgorithmValues"
-                                MethodName="GetValues"
-                                ObjectType="{x:Type system:Enum}">
-                <ObjectDataProvider.MethodParameters>
-                    <x:Type TypeName="local:CryptoHashAlgorithm"/>
-                </ObjectDataProvider.MethodParameters>
-            </ObjectDataProvider>
 
-            <ObjectDataProvider x:Key="HashFormatValues"
-                                MethodName="GetValues"
-                                ObjectType="{x:Type system:Enum}">
-                <ObjectDataProvider.MethodParameters>
-                    <x:Type TypeName="local:CryptoHashOutputFormat"/>
-                </ObjectDataProvider.MethodParameters>
-            </ObjectDataProvider>
         </ResourceDictionary>
     </UserControl.Resources>
 
@@ -68,8 +47,7 @@
                        Text="Крипто: Хэширование"/>
 
             <TextBlock Text="Источник:" Style="{StaticResource FieldLabel}"/>
-            <ComboBox ItemsSource="{Binding Source={StaticResource HashSourceValues}}"
-                      SelectedItem="{Binding Prop_HashSource}"
+            <ComboBox ItemsSource="{local:EnumValues local:CryptoHashSource}" SelectedValue="{Binding Prop_HashSource}" SelectedValuePath="Key" DisplayMemberPath="Display" 
                       Style="{StaticResource FieldComboBox}"
                       ToolTip="Хэшировать строку или содержимое файла"/>
 
@@ -84,14 +62,12 @@
                      ToolTip="Путь к файлу (режим Файл)"/>
 
             <TextBlock Text="Алгоритм:" Style="{StaticResource FieldLabel}"/>
-            <ComboBox ItemsSource="{Binding Source={StaticResource HashAlgorithmValues}}"
-                      SelectedItem="{Binding Prop_HashAlgorithm}"
+            <ComboBox ItemsSource="{local:EnumValues local:CryptoHashAlgorithm}" SelectedValue="{Binding Prop_HashAlgorithm}" SelectedValuePath="Key" DisplayMemberPath="Display" 
                       Style="{StaticResource FieldComboBox}"
                       ToolTip="MD5, SHA1, SHA256, SHA384, SHA512"/>
 
             <TextBlock Text="Формат вывода:" Style="{StaticResource FieldLabel}"/>
-            <ComboBox ItemsSource="{Binding Source={StaticResource HashFormatValues}}"
-                      SelectedItem="{Binding Prop_HashFormat}"
+            <ComboBox ItemsSource="{local:EnumValues local:CryptoHashOutputFormat}" SelectedValue="{Binding Prop_HashFormat}" SelectedValuePath="Key" DisplayMemberPath="Display" 
                       Style="{StaticResource FieldComboBox}"
                       ToolTip="Hex (нижний/верхний регистр) или Base64"/>
 

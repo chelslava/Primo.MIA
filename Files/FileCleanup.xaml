@@ -1,4 +1,4 @@
-<!--
+﻿<!--
     FileCleanup.xaml
     Визуальный интерфейс активности «Файл: Очистка по времени».
 
@@ -24,21 +24,7 @@
                 <ResourceDictionary Source="/Primo.MIA;component/Common/Styles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
-            <ObjectDataProvider x:Key="TimeAttrValues"
-                                MethodName="GetValues"
-                                ObjectType="{x:Type system:Enum}">
-                <ObjectDataProvider.MethodParameters>
-                    <x:Type TypeName="local:FileTimeAttribute"/>
-                </ObjectDataProvider.MethodParameters>
-            </ObjectDataProvider>
 
-            <ObjectDataProvider x:Key="ThresholdModeValues"
-                                MethodName="GetValues"
-                                ObjectType="{x:Type system:Enum}">
-                <ObjectDataProvider.MethodParameters>
-                    <x:Type TypeName="local:CleanupThresholdMode"/>
-                </ObjectDataProvider.MethodParameters>
-            </ObjectDataProvider>
 
             <!-- Показывает поле при нескольких значениях enum -->
             <local:MultiEnumToVisibilityConverter x:Key="MultiEnumToVis"/>
@@ -148,16 +134,14 @@
 
                 <StackPanel Grid.Column="0" Margin="0,0,4,0">
                     <TextBlock Text="Атрибут времени:" Style="{StaticResource FieldLabel}"/>
-                    <ComboBox ItemsSource="{Binding Source={StaticResource TimeAttrValues}}"
-                              SelectedItem="{Binding Prop_TimeAttribute}"
+                    <ComboBox ItemsSource="{local:EnumValues local:FileTimeAttribute}" SelectedValue="{Binding Prop_TimeAttribute}" SelectedValuePath="Key" DisplayMemberPath="Display" 
                               Style="{StaticResource FieldComboBox}"
                               ToolTip="CreationTime — дата создания&#xA;LastWriteTime — дата изменения&#xA;LastAccessTime — дата доступа"/>
                 </StackPanel>
 
                 <StackPanel Grid.Column="1">
                     <TextBlock Text="Режим порога:" Style="{StaticResource FieldLabel}"/>
-                    <ComboBox ItemsSource="{Binding Source={StaticResource ThresholdModeValues}}"
-                              SelectedItem="{Binding Prop_ThresholdMode}"
+                    <ComboBox ItemsSource="{local:EnumValues local:CleanupThresholdMode}" SelectedValue="{Binding Prop_ThresholdMode}" SelectedValuePath="Key" DisplayMemberPath="Display" 
                               Style="{StaticResource FieldComboBox}"
                               ToolTip="OlderThanDays — старше N дней&#xA;BeforeDate — раньше даты&#xA;Both — оба условия одновременно"/>
                 </StackPanel>
@@ -168,9 +152,16 @@
                                     Converter={StaticResource MultiEnumToVis},
                                     ConverterParameter=OlderThanDays|Both}">
                 <TextBlock Text="Старше чем (дней):" Style="{StaticResource FieldLabel}"/>
-                <TextBox Text="{Binding Prop_OlderThanDays, UpdateSourceTrigger=PropertyChanged}"
-                         Style="{StaticResource FieldBox}"
-                         ToolTip="Удалять объекты старше N дней. Порог = сейчас − N дней."/>
+                <TextBox Style="{StaticResource ValidatingFieldBox}"
+                         ToolTip="Удалять объекты старше N дней. Порог = сейчас − N дней.">
+                    <TextBox.Text>
+                        <Binding Path="Prop_OlderThanDays" UpdateSourceTrigger="PropertyChanged">
+                            <Binding.ValidationRules>
+                                <local:NumericValidationRule/>
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </TextBox.Text>
+                </TextBox>
             </StackPanel>
 
             <!-- Раньше даты — для BeforeDate и Both -->

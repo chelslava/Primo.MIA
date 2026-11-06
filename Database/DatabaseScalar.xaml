@@ -1,4 +1,4 @@
-<UserControl x:Class="Primo.MIA.DatabaseScalar"
+﻿<UserControl x:Class="Primo.MIA.DatabaseScalar"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -14,13 +14,6 @@
                 <ResourceDictionary Source="/Primo.MIA;component/Common/Styles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
-            <ObjectDataProvider x:Key="CommandTypeValues"
-                                MethodName="GetValues"
-                                ObjectType="{x:Type system:Enum}">
-                <ObjectDataProvider.MethodParameters>
-                    <x:Type TypeName="local:DatabaseCommandType"/>
-                </ObjectDataProvider.MethodParameters>
-            </ObjectDataProvider>
         </ResourceDictionary>
     </UserControl.Resources>
 
@@ -39,33 +32,49 @@
             <TextBlock Text="БД: Скалярное значение" Style="{StaticResource ActivityHeader}"/>
 
             <TextBlock Text="Поставщик (invariant name):" Style="{StaticResource FieldLabel}"/>
-            <TextBox Text="{Binding Prop_ProviderInvariantName, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            <TextBox Text="{Binding Prop_ProviderInvariantName, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                     ToolTip="Поставщик ADO.NET (invariant name): System.Data.SqlClient (по умолчанию), Npgsql, MySql.Data.MySqlClient и т.п."/>
 
             <TextBlock Text="Строка подключения:" Style="{StaticResource FieldLabel}"/>
-            <TextBox Text="{Binding Prop_ConnectionString, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            <TextBox Text="{Binding Prop_ConnectionString, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                     ToolTip="Строка подключения ADO.NET (формат зависит от провайдера)"/>
 
             <TextBlock Text="TransactionId (необязательно):" Style="{StaticResource FieldLabel}"/>
-            <TextBox Text="{Binding Prop_TransactionId, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            <TextBox Text="{Binding Prop_TransactionId, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                     ToolTip="Идентификатор транзакции из «БД: Начать транзакцию»; пусто — выполнить вне транзакции"/>
 
             <TextBlock Text="Тип команды:" Style="{StaticResource FieldLabel}"/>
-            <ComboBox ItemsSource="{Binding Source={StaticResource CommandTypeValues}}"
-                      SelectedItem="{Binding Prop_CommandType}"
-                      Style="{StaticResource FieldComboBox}"/>
+            <ComboBox ItemsSource="{local:EnumValues local:DatabaseCommandType}" SelectedValue="{Binding Prop_CommandType}" SelectedValuePath="Key" DisplayMemberPath="Display"
+                      Style="{StaticResource FieldComboBox}"
+                      ToolTip="SQL-текст или хранимая процедура"/>
 
             <TextBlock Text="SQL / имя процедуры:" Style="{StaticResource FieldLabel}"/>
-            <TextBox Text="{Binding Prop_CommandText, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            <TextBox Text="{Binding Prop_CommandText, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                     ToolTip="SQL-запрос, возвращающий одно значение (SELECT COUNT(*) …), или имя хранимой процедуры"/>
 
             <TextBlock Text="Параметры (Dictionary&lt;string,string&gt;):" Style="{StaticResource FieldLabel}"/>
-            <TextBox Text="{Binding Prop_Parameters, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            <TextBox Text="{Binding Prop_Parameters, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                     ToolTip="Именованные параметры команды: имя (@param) → значение"/>
 
             <TextBlock Text="Таймаут (сек):" Style="{StaticResource FieldLabel}"/>
-            <TextBox Text="{Binding Prop_CommandTimeoutSeconds, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            <TextBox Style="{StaticResource ValidatingFieldBox}"
+                     ToolTip="Таймаут команды, сек (0 или пусто — 30 по умолчанию)">
+                <TextBox.Text>
+                    <Binding Path="Prop_CommandTimeoutSeconds" UpdateSourceTrigger="PropertyChanged">
+                        <Binding.ValidationRules>
+                            <local:NumericValidationRule/>
+                        </Binding.ValidationRules>
+                    </Binding>
+                </TextBox.Text>
+            </TextBox>
 
             <TextBlock Text="Значение по умолчанию (если result = null):" Style="{StaticResource FieldLabel}"/>
-            <TextBox Text="{Binding Prop_DefaultValue, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            <TextBox Text="{Binding Prop_DefaultValue, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                     ToolTip="Возвращается, если запрос не вернул значения (NULL)"/>
 
             <TextBlock Text="Переменная результата:" Style="{StaticResource FieldLabel}"/>
-            <TextBox Text="{Binding Prop_Value, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            <TextBox Text="{Binding Prop_Value, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                     ToolTip="Переменная для скалярного результата запроса"/>
         </StackPanel>
     </Grid>
 </UserControl>

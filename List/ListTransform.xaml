@@ -24,13 +24,6 @@
                 <ResourceDictionary Source="/Primo.MIA;component/Common/Styles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
             
-            <ObjectDataProvider x:Key="ModeValues"
-                                MethodName="GetValues"
-                                ObjectType="{x:Type system:Enum}">
-                <ObjectDataProvider.MethodParameters>
-                    <x:Type TypeName="local:ListTransformMode"/>
-                </ObjectDataProvider.MethodParameters>
-            </ObjectDataProvider>
         </ResourceDictionary>
     </UserControl.Resources>
 
@@ -55,8 +48,7 @@
                 <Run Text="]"/>
             </TextBlock>
 
-            <ComboBox ItemsSource="{Binding Source={StaticResource ModeValues}}"
-                      SelectedItem="{Binding Mode}"
+            <ComboBox ItemsSource="{local:EnumValues local:ListTransformMode}" SelectedValue="{Binding Mode}" SelectedValuePath="Key" DisplayMemberPath="Display" 
                       Style="{StaticResource FieldComboBox}"
                       ToolTip="Режим преобразования: Map, FlatMap, Cast"/>
 

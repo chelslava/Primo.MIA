@@ -1,4 +1,4 @@
-<UserControl x:Class="Primo.MIA.DatabaseBulkInsert"
+﻿<UserControl x:Class="Primo.MIA.DatabaseBulkInsert"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -14,13 +14,6 @@
                 <ResourceDictionary Source="/Primo.MIA;component/Common/Styles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
-            <ObjectDataProvider x:Key="PreloadModeValues"
-                                MethodName="GetValues"
-                                ObjectType="{x:Type system:Enum}">
-                <ObjectDataProvider.MethodParameters>
-                    <x:Type TypeName="local:DatabaseBulkPreloadMode"/>
-                </ObjectDataProvider.MethodParameters>
-            </ObjectDataProvider>
         </ResourceDictionary>
     </UserControl.Resources>
 
@@ -39,41 +32,67 @@
             <TextBlock Text="БД: Массовая запись из DataTable" Style="{StaticResource ActivityHeader}"/>
 
             <TextBlock Text="Таблица данных (DataTable):" Style="{StaticResource FieldLabel}"/>
-            <TextBox Text="{Binding Prop_DataTable, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            <TextBox Text="{Binding Prop_DataTable, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                     ToolTip="Переменная (DataTable) с данными для записи в БД"/>
 
             <TextBlock Text="Поставщик (invariant name):" Style="{StaticResource FieldLabel}"/>
-            <TextBox Text="{Binding Prop_ProviderInvariantName, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            <TextBox Text="{Binding Prop_ProviderInvariantName, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                     ToolTip="Поставщик ADO.NET (invariant name): System.Data.SqlClient (по умолчанию), Npgsql, MySql.Data.MySqlClient и т.п."/>
 
             <TextBlock Text="Строка подключения:" Style="{StaticResource FieldLabel}"/>
-            <TextBox Text="{Binding Prop_ConnectionString, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            <TextBox Text="{Binding Prop_ConnectionString, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                     ToolTip="Строка подключения ADO.NET (формат зависит от провайдера)"/>
 
             <TextBlock Text="TransactionId (необязательно):" Style="{StaticResource FieldLabel}"/>
-            <TextBox Text="{Binding Prop_TransactionId, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            <TextBox Text="{Binding Prop_TransactionId, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                     ToolTip="Идентификатор транзакции из «БД: Начать транзакцию»; пусто — выполнить вне транзакции"/>
 
             <TextBlock Text="Таблица-приёмник:" Style="{StaticResource FieldLabel}"/>
-            <TextBox Text="{Binding Prop_DestinationTable, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            <TextBox Text="{Binding Prop_DestinationTable, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                     ToolTip="Имя целевой таблицы БД для массовой записи"/>
 
             <TextBlock Text="Соответствие колонок (Dictionary&lt;string,string&gt;):" Style="{StaticResource FieldLabel}"/>
-            <TextBox Text="{Binding Prop_ColumnMappings, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            <TextBox Text="{Binding Prop_ColumnMappings, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                     ToolTip="Соответствие «колонка DataTable → колонка таблицы БД»; пусто — сопоставление по именам"/>
 
             <TextBlock Text="Размер пакета:" Style="{StaticResource FieldLabel}"/>
-            <TextBox Text="{Binding Prop_BatchSize, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            <TextBox Style="{StaticResource ValidatingFieldBox}"
+                     ToolTip="Размер пакета массовой записи, строк (по умолчанию 1000)">
+                <TextBox.Text>
+                    <Binding Path="Prop_BatchSize" UpdateSourceTrigger="PropertyChanged">
+                        <Binding.ValidationRules>
+                            <local:NumericValidationRule/>
+                        </Binding.ValidationRules>
+                    </Binding>
+                </TextBox.Text>
+            </TextBox>
 
             <TextBlock Text="Таймаут (сек):" Style="{StaticResource FieldLabel}"/>
-            <TextBox Text="{Binding Prop_BulkCopyTimeoutSeconds, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            <TextBox Style="{StaticResource ValidatingFieldBox}"
+                     ToolTip="Таймаут массовой записи, сек (0 или пусто — 60 по умолчанию)">
+                <TextBox.Text>
+                    <Binding Path="Prop_BulkCopyTimeoutSeconds" UpdateSourceTrigger="PropertyChanged">
+                        <Binding.ValidationRules>
+                            <local:NumericValidationRule/>
+                        </Binding.ValidationRules>
+                    </Binding>
+                </TextBox.Text>
+            </TextBox>
 
             <CheckBox Content="Использовать блокировку таблицы (SQL Server, TableLock)"
                       IsChecked="{Binding Prop_UseTableLock}"
-                      Margin="0,6,0,0"/>
+                      Margin="0,6,0,0"
+                      ToolTip="SqlBulkCopyOptions.TableLock — блокировка таблицы на время загрузки (только SQL Server)"/>
 
             <CheckBox Content="Сохранять identity (SQL Server, KeepIdentity)"
                       IsChecked="{Binding Prop_KeepIdentity}"
-                      Margin="0,4,0,0"/>
+                      Margin="0,4,0,0"
+                      ToolTip="SqlBulkCopyOptions.KeepIdentity — переносить значения identity из DataTable (только SQL Server)"/>
 
             <TextBlock Text="Очистка перед загрузкой:" Style="{StaticResource FieldLabel}"/>
-            <ComboBox ItemsSource="{Binding Source={StaticResource PreloadModeValues}}"
-                      SelectedItem="{Binding Prop_PreloadMode}"
-                      Style="{StaticResource FieldComboBox}"/>
+            <ComboBox ItemsSource="{local:EnumValues local:DatabaseBulkPreloadMode}" SelectedValue="{Binding Prop_PreloadMode}" SelectedValuePath="Key" DisplayMemberPath="Display"
+                      Style="{StaticResource FieldComboBox}"
+                      ToolTip="Без очистки / Удалить все строки (DELETE) / TRUNCATE перед загрузкой"/>
         </StackPanel>
     </Grid>
 </UserControl>

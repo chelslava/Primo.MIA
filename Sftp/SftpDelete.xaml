@@ -22,17 +22,22 @@
         <StackPanel Grid.Column="1" Margin="5,0,5,5">
             <TextBlock Text="SFTP: Удалить" Style="{StaticResource ActivityHeader}"/>
             <TextBlock Text="Хост:" Style="{StaticResource FieldLabel}"/>
-            <TextBox Text="{Binding Prop_Host, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            <TextBox Text="{Binding Prop_Host, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                     ToolTip="Хост SFTP-сервера, например sftp.example.com (порт — в панели свойств, по умолчанию 22)"/>
             <TextBlock Text="Пользователь:" Style="{StaticResource FieldLabel}"/>
-            <TextBox Text="{Binding Prop_UserName, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            <TextBox Text="{Binding Prop_UserName, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                     ToolTip="Имя пользователя для SFTP-подключения"/>
             <TextBlock Text="Пароль:" Style="{StaticResource FieldLabel}"/>
             <PasswordBox common:PasswordBoxHelper.BindPassword="True"
                          common:PasswordBoxHelper.BoundPassword="{Binding Prop_Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                         Style="{StaticResource FieldPasswordBox}"/>
+                         Style="{StaticResource FieldPasswordBox}"
+                         ToolTip="Пароль SFTP (для подключения по ключу — приватный ключ и passphrase в панели свойств)"/>
             <TextBlock Text="Удалённый путь:" Style="{StaticResource FieldLabel}"/>
-            <TextBox Text="{Binding Prop_RemotePath, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            <TextBox Text="{Binding Prop_RemotePath, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                     ToolTip="Путь к файлу или папке на сервере для удаления"/>
             <TextBlock Text="Рекурсивно:" Style="{StaticResource FieldLabel}"/>
-            <TextBox Text="{Binding Prop_Recursive, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            <TextBox Text="{Binding Prop_Recursive, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                     ToolTip="Рекурсивное удаление каталога (True/False)"/>
         </StackPanel>
     </Grid>
 </UserControl>

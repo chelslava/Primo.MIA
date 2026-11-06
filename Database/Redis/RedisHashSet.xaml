@@ -21,13 +21,17 @@
         <StackPanel Grid.Column="1" Margin="5,0,5,5">
             <TextBlock Text="Redis: Установить поле хэша" Style="{StaticResource FieldLabel}"/>
             <TextBlock Text="Строка подключения:" Style="{StaticResource FieldLabel}"/>
-            <TextBox Text="{Binding Prop_ConnectionString, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            <TextBox Text="{Binding Prop_ConnectionString, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                     ToolTip="Строка подключения StackExchange.Redis (например localhost:6379)"/>
             <TextBlock Text="Ключ:" Style="{StaticResource FieldLabel}"/>
-            <TextBox Text="{Binding Prop_Key, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            <TextBox Text="{Binding Prop_Key, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                     ToolTip="Ключ хэша Redis (HSET)"/>
             <TextBlock Text="Поле хэша:" Style="{StaticResource FieldLabel}"/>
-            <TextBox Text="{Binding Prop_Field, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            <TextBox Text="{Binding Prop_Field, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                     ToolTip="Имя поля хэша для записи"/>
             <TextBlock Text="Значение:" Style="{StaticResource FieldLabel}"/>
-            <TextBox Text="{Binding Prop_Value, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            <TextBox Text="{Binding Prop_Value, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                     ToolTip="Записываемое значение поля (String)"/>
         </StackPanel>
     </Grid>
 </UserControl>

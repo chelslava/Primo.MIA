@@ -1,4 +1,4 @@
-<!--
+﻿<!--
     CalendarWorkdaysList.xaml
     Визуальный интерфейс активности «Календарь: Рабочие дни списком».
 
@@ -23,13 +23,6 @@
             </ResourceDictionary.MergedDictionaries>
 
             <!-- Значения фильтра по дням недели для ComboBox -->
-            <ObjectDataProvider x:Key="DayOfWeekFilterValues"
-                                MethodName="GetValues"
-                                ObjectType="{x:Type system:Enum}">
-                <ObjectDataProvider.MethodParameters>
-                    <x:Type TypeName="local:DayOfWeekFilter"/>
-                </ObjectDataProvider.MethodParameters>
-            </ObjectDataProvider>
 
             <!-- Конвертер: показывает блок «Маска» только при CustomMask -->
             <local:EnumToVisibilityConverter x:Key="EnumToVisConverter"/>
@@ -96,8 +89,7 @@
 
             <!-- Фильтр по дням недели -->
             <TextBlock Text="Фильтр дней недели:" Style="{StaticResource FieldLabel}"/>
-            <ComboBox ItemsSource="{Binding Source={StaticResource DayOfWeekFilterValues}}"
-                      SelectedItem="{Binding Prop_DayOfWeekFilter}"
+            <ComboBox ItemsSource="{local:EnumValues local:DayOfWeekFilter}" SelectedValue="{Binding Prop_DayOfWeekFilter}" SelectedValuePath="Key" DisplayMemberPath="Display" 
                       Style="{StaticResource FieldComboBox}"
                       ToolTip="Ограничить выборку конкретными днями недели"/>
 

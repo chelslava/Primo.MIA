@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="clr-namespace:Primo.MIA"
              mc:Ignorable="d"
              d:DesignHeight="80"
              Margin="0,0,0,5">
@@ -29,34 +30,68 @@
             <TextBlock Text="БД: Постраничный запрос" Style="{StaticResource ActivityHeader}"/>
 
             <TextBlock Text="Поставщик (invariant name):" Style="{StaticResource FieldLabel}"/>
-            <TextBox Text="{Binding Prop_ProviderInvariantName, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            <TextBox Text="{Binding Prop_ProviderInvariantName, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                     ToolTip="Поставщик ADO.NET (invariant name): System.Data.SqlClient (по умолчанию), Npgsql, MySql.Data.MySqlClient и т.п."/>
 
             <TextBlock Text="Строка подключения:" Style="{StaticResource FieldLabel}"/>
-            <TextBox Text="{Binding Prop_ConnectionString, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            <TextBox Text="{Binding Prop_ConnectionString, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                     ToolTip="Строка подключения ADO.NET (формат зависит от провайдера)"/>
 
             <TextBlock Text="TransactionId (необязательно):" Style="{StaticResource FieldLabel}"/>
-            <TextBox Text="{Binding Prop_TransactionId, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            <TextBox Text="{Binding Prop_TransactionId, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                     ToolTip="Идентификатор транзакции из «БД: Начать транзакцию»; пусто — выполнить вне транзакции"/>
 
             <TextBlock Text="Исходный SQL:" Style="{StaticResource FieldLabel}"/>
-            <TextBox Text="{Binding Prop_CommandText, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            <TextBox Text="{Binding Prop_CommandText, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                     ToolTip="SQL-запрос SELECT без ORDER BY/OFFSET — сортировка и постраничность добавляются автоматически"/>
 
             <TextBlock Text="Сортировка (Order by):" Style="{StaticResource FieldLabel}"/>
-            <TextBox Text="{Binding Prop_OrderByExpression, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            <TextBox Text="{Binding Prop_OrderByExpression, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                     ToolTip="Выражение сортировки без ключевого слова ORDER BY, например: Name DESC, Age"/>
 
             <TextBlock Text="Номер страницы:" Style="{StaticResource FieldLabel}"/>
-            <TextBox Text="{Binding Prop_PageNumber, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            <TextBox Style="{StaticResource ValidatingFieldBox}"
+                     ToolTip="Номер страницы, начиная с 1 (по умолчанию 1)">
+                <TextBox.Text>
+                    <Binding Path="Prop_PageNumber" UpdateSourceTrigger="PropertyChanged">
+                        <Binding.ValidationRules>
+                            <local:NumericValidationRule/>
+                        </Binding.ValidationRules>
+                    </Binding>
+                </TextBox.Text>
+            </TextBox>
 
             <TextBlock Text="Размер страницы:" Style="{StaticResource FieldLabel}"/>
-            <TextBox Text="{Binding Prop_PageSize, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            <TextBox Style="{StaticResource ValidatingFieldBox}"
+                     ToolTip="Размер страницы — макс. строк на странице (по умолчанию 100)">
+                <TextBox.Text>
+                    <Binding Path="Prop_PageSize" UpdateSourceTrigger="PropertyChanged">
+                        <Binding.ValidationRules>
+                            <local:NumericValidationRule/>
+                        </Binding.ValidationRules>
+                    </Binding>
+                </TextBox.Text>
+            </TextBox>
 
             <TextBlock Text="Параметры (Dictionary&lt;string,string&gt;):" Style="{StaticResource FieldLabel}"/>
-            <TextBox Text="{Binding Prop_Parameters, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            <TextBox Text="{Binding Prop_Parameters, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                     ToolTip="Именованные параметры запроса: имя (@param) → значение"/>
 
             <TextBlock Text="Таймаут (сек):" Style="{StaticResource FieldLabel}"/>
-            <TextBox Text="{Binding Prop_CommandTimeoutSeconds, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            <TextBox Style="{StaticResource ValidatingFieldBox}"
+                     ToolTip="Таймаут команды, сек (0 или пусто — 30 по умолчанию)">
+                <TextBox.Text>
+                    <Binding Path="Prop_CommandTimeoutSeconds" UpdateSourceTrigger="PropertyChanged">
+                        <Binding.ValidationRules>
+                            <local:NumericValidationRule/>
+                        </Binding.ValidationRules>
+                    </Binding>
+                </TextBox.Text>
+            </TextBox>
 
             <TextBlock Text="Результат (DataTable):" Style="{StaticResource FieldLabel}"/>
-            <TextBox Text="{Binding Prop_ResultTable, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            <TextBox Text="{Binding Prop_ResultTable, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                     ToolTip="Переменная (DataTable) со строками запрошенной страницы"/>
         </StackPanel>
     </Grid>
 </UserControl>

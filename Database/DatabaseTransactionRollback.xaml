@@ -23,7 +23,8 @@
         <StackPanel Grid.Column="1" Margin="5,0,5,5">
             <TextBlock Text="БД: Откатить транзакцию" Style="{StaticResource ActivityHeader}"/>
             <TextBlock Text="TransactionId (необязательно):" Style="{StaticResource FieldLabel}"/>
-            <TextBox Text="{Binding Prop_TransactionId, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            <TextBox Text="{Binding Prop_TransactionId, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                     ToolTip="Идентификатор транзакции из «БД: Начать транзакцию»; пусто — откатить единственную открытую"/>
         </StackPanel>
     </Grid>
 </UserControl>

@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:Primo.MIA"
              mc:Ignorable="d"
              d:DesignHeight="120" Margin="0,0,0,5">
 
@@ -67,12 +68,20 @@
                           VerticalAlignment="Center" Foreground="#FF0E0E0E"/>
                 <TextBlock Text=" | " FontSize="10" VerticalAlignment="Center" Foreground="Gray"/>
                 <TextBlock Text="Таймаут (сек):" FontSize="10" VerticalAlignment="Center" Foreground="#FF0E0E0E"/>
-                <TextBox Text="{Binding Prop_Timeout, UpdateSourceTrigger=PropertyChanged}"
-                         Width="40"
+                <TextBox Width="40"
                          Height="16"
                          FontSize="10"
                          VerticalAlignment="Center"
-                         BorderThickness="0"/>
+                         Margin="0"
+                         Style="{StaticResource ValidatingFieldBox}">
+                    <TextBox.Text>
+                        <Binding Path="Prop_Timeout" UpdateSourceTrigger="PropertyChanged">
+                            <Binding.ValidationRules>
+                                <local:NumericValidationRule/>
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </TextBox.Text>
+                </TextBox>
             </StackPanel>
 
         </StackPanel>

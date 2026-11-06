@@ -1,4 +1,4 @@
-<!--
+﻿<!--
     JsonDataTable.xaml
     Визуальный интерфейс активности «JSON: DataTable конвертер».
 
@@ -25,29 +25,8 @@
                 <ResourceDictionary Source="/Primo.MIA;component/Common/Styles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
-            <ObjectDataProvider x:Key="DirectionValues"
-                                MethodName="GetValues"
-                                ObjectType="{x:Type system:Enum}">
-                <ObjectDataProvider.MethodParameters>
-                    <x:Type TypeName="local:JsonConvertDirection"/>
-                </ObjectDataProvider.MethodParameters>
-            </ObjectDataProvider>
 
-            <ObjectDataProvider x:Key="FormatValues"
-                                MethodName="GetValues"
-                                ObjectType="{x:Type system:Enum}">
-                <ObjectDataProvider.MethodParameters>
-                    <x:Type TypeName="local:JsonTableFormat"/>
-                </ObjectDataProvider.MethodParameters>
-            </ObjectDataProvider>
 
-            <ObjectDataProvider x:Key="NullModeValues"
-                                MethodName="GetValues"
-                                ObjectType="{x:Type system:Enum}">
-                <ObjectDataProvider.MethodParameters>
-                    <x:Type TypeName="local:JsonNullMode"/>
-                </ObjectDataProvider.MethodParameters>
-            </ObjectDataProvider>
 
             <!--
                 Конвертер: блок DataTable виден если Direction = DataTableToJson (=0)
@@ -78,13 +57,12 @@
             <!-- Заголовок с направлением -->
             <TextBlock Style="{StaticResource ActivityHeader}">
                 <Run Text="JSON: " Foreground="#FF0E0E0E"/>
-                <Run Text="{Binding Prop_Direction, Mode=OneWay}" Foreground="#FF1565C0"/>
+                <Run Text="{Binding Prop_Direction, Mode=OneWay, Converter={StaticResource EnumDisplayNameConverter}}" Foreground="#FF1565C0"/>
             </TextBlock>
 
             <!-- Направление -->
             <TextBlock Text="Направление:" Style="{StaticResource FieldLabel}"/>
-            <ComboBox ItemsSource="{Binding Source={StaticResource DirectionValues}}"
-                      SelectedItem="{Binding Prop_Direction}"
+            <ComboBox ItemsSource="{local:EnumValues local:JsonConvertDirection}" SelectedValue="{Binding Prop_Direction}" SelectedValuePath="Key" DisplayMemberPath="Display" 
                       Style="{StaticResource FieldComboBox}"
                       ToolTip="DataTableToJson — таблица в JSON&#xA;JsonToDataTable — JSON в таблицу"/>
 
@@ -146,16 +124,14 @@
 
                     <StackPanel Grid.Column="0" Margin="0,0,4,0">
                         <TextBlock Text="Формат JSON:" Style="{StaticResource FieldLabel}"/>
-                        <ComboBox ItemsSource="{Binding Source={StaticResource FormatValues}}"
-                                  SelectedItem="{Binding Prop_Format}"
+                        <ComboBox ItemsSource="{local:EnumValues local:JsonTableFormat}" SelectedValue="{Binding Prop_Format}" SelectedValuePath="Key" DisplayMemberPath="Display" 
                                   Style="{StaticResource FieldComboBox}"
                                   ToolTip="ArrayOfObjects — [{...},{...}]&#xA;ArrayOfArrays  — [[...],[...]]&#xA;WithHeaders    — {columns:[...],rows:[[...]]}"/>
                     </StackPanel>
 
                     <StackPanel Grid.Column="1">
                         <TextBlock Text="NULL как:" Style="{StaticResource FieldLabel}"/>
-                        <ComboBox ItemsSource="{Binding Source={StaticResource NullModeValues}}"
-                                  SelectedItem="{Binding Prop_NullMode}"
+                        <ComboBox ItemsSource="{local:EnumValues local:JsonNullMode}" SelectedValue="{Binding Prop_NullMode}" SelectedValuePath="Key" DisplayMemberPath="Display" 
                                   Style="{StaticResource FieldComboBox}"
                                   ToolTip="JsonNull — null&#xA;EmptyString — &quot;&quot;&#xA;Zero — &quot;0&quot;&#xA;Skip — пропустить поле"/>
                     </StackPanel>

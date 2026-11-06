@@ -1,4 +1,4 @@
-<!--
+﻿<!--
     BrowserNavigate.xaml
     Визуальный интерфейс активности "Навигация браузера".
 
@@ -25,13 +25,6 @@
                 <ResourceDictionary Source="/Primo.MIA;component/Common/Styles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
-            <ObjectDataProvider x:Key="NavigateModeValues"
-                                MethodName="GetValues"
-                                ObjectType="{x:Type system:Enum}">
-                <ObjectDataProvider.MethodParameters>
-                    <x:Type TypeName="local:NavigateMode"/>
-                </ObjectDataProvider.MethodParameters>
-            </ObjectDataProvider>
 
             <local:EnumToVisibilityConverter x:Key="EnumToVisConverter"/>
         </ResourceDictionary>
@@ -54,13 +47,12 @@
 
             <TextBlock Style="{StaticResource ActivityHeader}">
                 <Run Text="Навигация ["/>
-                <Run Text="{Binding Path=Prop_Mode, Mode=OneWay}" Foreground="#FF1565C0"/>
+                <Run Text="{Binding Path=Prop_Mode, Mode=OneWay, Converter={StaticResource EnumDisplayNameConverter}}" Foreground="#FF1565C0"/>
                 <Run Text="]"/>
             </TextBlock>
 
             <TextBlock Text="Режим навигации:" Style="{StaticResource FieldLabel}"/>
-            <ComboBox ItemsSource="{Binding Source={StaticResource NavigateModeValues}}"
-                      SelectedItem="{Binding Prop_Mode}"
+            <ComboBox ItemsSource="{local:EnumValues local:NavigateMode}" SelectedValue="{Binding Prop_Mode}" SelectedValuePath="Key" DisplayMemberPath="Display" 
                       Style="{StaticResource FieldComboBox}"
                       ToolTip="Выберите действие навигации"/>
 

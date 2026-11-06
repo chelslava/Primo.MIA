@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="clr-namespace:Primo.MIA"
              mc:Ignorable="d" d:DesignHeight="250" Margin="0,0,0,5">
     <UserControl.Resources>
         <ResourceDictionary>
@@ -21,15 +22,36 @@
         <StackPanel Grid.Column="1" Margin="5,0,5,5">
             <TextBlock Text="Redis: Получить диапазон списка" Style="{StaticResource FieldLabel}"/>
             <TextBlock Text="Строка подключения:" Style="{StaticResource FieldLabel}"/>
-            <TextBox Text="{Binding Prop_ConnectionString, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            <TextBox Text="{Binding Prop_ConnectionString, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                     ToolTip="Строка подключения StackExchange.Redis (например localhost:6379)"/>
             <TextBlock Text="Ключ:" Style="{StaticResource FieldLabel}"/>
-            <TextBox Text="{Binding Prop_Key, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            <TextBox Text="{Binding Prop_Key, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                     ToolTip="Ключ списка Redis (LRANGE)"/>
             <TextBlock Text="Начало (0 = первый):" Style="{StaticResource FieldLabel}"/>
-            <TextBox Text="{Binding Prop_Start, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            <TextBox Style="{StaticResource ValidatingFieldBox}"
+                     ToolTip="Начальный индекс диапазона (0 = первый; отрицательный — отсчёт с конца)">
+                <TextBox.Text>
+                    <Binding Path="Prop_Start" UpdateSourceTrigger="PropertyChanged">
+                        <Binding.ValidationRules>
+                            <local:NumericValidationRule AllowNegative="True"/>
+                        </Binding.ValidationRules>
+                    </Binding>
+                </TextBox.Text>
+            </TextBox>
             <TextBlock Text="Конец (-1 = последний):" Style="{StaticResource FieldLabel}"/>
-            <TextBox Text="{Binding Prop_Stop, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            <TextBox Style="{StaticResource ValidatingFieldBox}"
+                     ToolTip="Конечный индекс диапазона (-1 = последний; по умолчанию -1)">
+                <TextBox.Text>
+                    <Binding Path="Prop_Stop" UpdateSourceTrigger="PropertyChanged">
+                        <Binding.ValidationRules>
+                            <local:NumericValidationRule AllowNegative="True"/>
+                        </Binding.ValidationRules>
+                    </Binding>
+                </TextBox.Text>
+            </TextBox>
             <TextBlock Text="Значения (List&lt;string&gt;):" Style="{StaticResource FieldLabel}"/>
-            <TextBox Text="{Binding Prop_Values, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            <TextBox Text="{Binding Prop_Values, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                     ToolTip="Переменная (список строк) с элементами диапазона"/>
         </StackPanel>
     </Grid>
 </UserControl>

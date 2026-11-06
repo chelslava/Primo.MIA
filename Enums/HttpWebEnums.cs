@@ -6,14 +6,19 @@
     public enum HttpMethodType
     {
         /// <summary>GET — получение данных</summary>
+        [RuName("GET")]
         GET,
         /// <summary>POST — отправка данных</summary>
+        [RuName("POST")]
         POST,
         /// <summary>PUT — обновление ресурса</summary>
+        [RuName("PUT")]
         PUT,
         /// <summary>DELETE — удаление ресурса</summary>
+        [RuName("DELETE")]
         DELETE,
         /// <summary>PATCH — частичное обновление</summary>
+        [RuName("PATCH")]
         PATCH
     }
 
@@ -28,6 +33,7 @@
         /// Каждая попытка ждёт одинаковое время.
         /// Пример: задержка 1000мс → попытка 1, 1000мс, попытка 2, 1000мс, попытка 3.
         /// </summary>
+        [RuName("Фиксированная")]
         Fixed,
 
         /// <summary>
@@ -35,6 +41,7 @@
         /// Задержка умножается на номер попытки.
         /// Пример: задержка 1000мс → попытка 1, 1000мс, попытка 2, 2000мс, попытка 3, 3000мс.
         /// </summary>
+        [RuName("Линейная")]
         Linear,
 
         /// <summary>
@@ -43,6 +50,7 @@
         /// Пример: задержка 1000мс → попытка 1, 1000мс, попытка 2, 2000мс, попытка 3, 4000мс.
         /// Рекомендуется для распределённых систем и API.
         /// </summary>
+        [RuName("Экспоненциальная")]
         Exponential
     }
 
@@ -57,6 +65,7 @@
         /// Использует client_id и client_secret без участия пользователя.
         /// Подходит для server-to-server интеграций.
         /// </summary>
+        [RuName("Client credentials")]
         ClientCredentials,
 
         /// <summary>
@@ -64,6 +73,7 @@
         /// Использует username, password, client_id, client_secret.
         /// Не рекомендуется для новых проектов (deprecated в OAuth 2.1).
         /// </summary>
+        [RuName("Password")]
         Password,
 
         /// <summary>
@@ -71,6 +81,7 @@
         /// Требует предварительного получения code через redirect.
         /// Наиболее безопасный способ для пользовательских приложений.
         /// </summary>
+        [RuName("Authorization code")]
         AuthorizationCode
     }
 
@@ -84,24 +95,28 @@
         /// Массивы становятся List&lt;object&gt;.
         /// Подходит для большинства сценариев работы с API.
         /// </summary>
+        [RuName("В словарь")]
         ToDictionary,
 
         /// <summary>
         /// Преобразовать JSON-массив в List&lt;object&gt;.
         /// Каждый элемент массива парсится рекурсивно.
         /// </summary>
+        [RuName("В список")]
         ToList,
 
         /// <summary>
         /// Только валидация JSON без разбора.
         /// Возвращает признак валидности и список ошибок.
         /// </summary>
+        [RuName("Валидация")]
         Validate,
 
         /// <summary>
         /// Форматирование JSON (pretty print).
         /// Преобразует в читаемый вид с отступами.
         /// </summary>
+        [RuName("Форматирование")]
         Format
     }
 
@@ -114,16 +129,19 @@
         /// Преобразовать XML в структуру Dictionary.
         /// Атрибуты записываются с префиксом @.
         /// </summary>
+        [RuName("В структуру")]
         ToStructure,
 
         /// <summary>
         /// Валидация XML — проверка корректности синтаксиса.
         /// </summary>
+        [RuName("Валидация")]
         Validate,
 
         /// <summary>
         /// Форматирование XML с отступами (pretty print).
         /// </summary>
+        [RuName("Форматирование")]
         Format
     }
 
@@ -135,16 +153,19 @@
         /// <summary>
         /// Вернуть одно значение (первое совпадение).
         /// </summary>
+        [RuName("Одно значение")]
         SingleValue,
 
         /// <summary>
         /// Вернуть список всех совпадений.
         /// </summary>
+        [RuName("Список")]
         List,
 
         /// <summary>
         /// Вернуть количество совпадений.
         /// </summary>
+        [RuName("Количество")]
         Count
     }
 
@@ -156,16 +177,19 @@
         /// <summary>
         /// Вернуть одно значение (первое совпадение).
         /// </summary>
+        [RuName("Одно значение")]
         SingleValue,
 
         /// <summary>
         /// Вернуть список всех совпадений.
         /// </summary>
+        [RuName("Список")]
         List,
 
         /// <summary>
         /// Вернуть количество совпадений.
         /// </summary>
+        [RuName("Количество")]
         Count
     }
 
@@ -175,9 +199,11 @@
     public enum JsonConvertDirection
     {
         /// <summary>DataTable → JSON-строка.</summary>
+        [RuName("DataTable → JSON")]
         DataTableToJson,
 
         /// <summary>JSON-строка → DataTable.</summary>
+        [RuName("JSON → DataTable")]
         JsonToDataTable
     }
 
@@ -191,6 +217,7 @@
         /// [{"Id":1,"Name":"Иван"},{"Id":2,"Name":"Пётр"}]
         /// Наиболее читаемый формат, совместим с большинством API.
         /// </summary>
+        [RuName("Массив объектов")]
         ArrayOfObjects,
 
         /// <summary>
@@ -198,6 +225,7 @@
         /// [[1,"Иван"],[2,"Пётр"]]
         /// Компактный формат, используется в Chart.js, Google Charts и т.п.
         /// </summary>
+        [RuName("Массив массивов")]
         ArrayOfArrays,
 
         /// <summary>
@@ -205,6 +233,7 @@
         /// {"columns":["Id","Name"],"rows":[[1,"Иван"],[2,"Пётр"]]}
         /// Удобен для десериализации без потери информации о структуре.
         /// </summary>
+        [RuName("Columns + rows")]
         WithHeaders
     }
 
@@ -214,15 +243,19 @@
     public enum JsonNullMode
     {
         /// <summary>NULL → null (JSON null). Стандартное поведение.</summary>
+        [RuName("null (JSON null)")]
         JsonNull,
 
         /// <summary>NULL → "" (пустая строка). Удобно для систем не поддерживающих null.</summary>
+        [RuName("Пустая строка")]
         EmptyString,
 
         /// <summary>NULL → "0" (ноль как строка). Для числовых полей.</summary>
+        [RuName("Ноль (\"0\")")]
         Zero,
 
         /// <summary>Строки с NULL-значением пропускаются при сериализации.</summary>
+        [RuName("Пропускать")]
         Skip
     }
 }

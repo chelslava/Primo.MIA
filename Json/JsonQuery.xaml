@@ -45,7 +45,7 @@
                 <TextBox Grid.Column="1"
                          Text="{Binding Prop_JsonPath, UpdateSourceTrigger=PropertyChanged}"
                          Style="{StaticResource FieldBox}"
-                          />
+                         ToolTip="JSONPath-выражение, например $.store.book[0].title или $..author"/>
             </Grid>
 
             <!-- Опции -->
@@ -53,7 +53,8 @@
                 <CheckBox Content="Только первое совпадение"
                           IsChecked="{Binding Prop_ReturnFirst}"
                           FontSize="10"
-                          VerticalAlignment="Center" Foreground="#FF0E0E0E"/>
+                          VerticalAlignment="Center" Foreground="#FF0E0E0E"
+                          ToolTip="Вернуть первое совпадение вместо списка всех совпадений"/>
             </StackPanel>
 
         </StackPanel>
