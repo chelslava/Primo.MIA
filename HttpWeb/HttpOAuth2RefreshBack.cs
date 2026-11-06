@@ -198,7 +198,7 @@ namespace Primo.MIA
             // Значения по умолчанию
             this.Prop_TokenUrl = "\"https://oauth.example.com/token\"";
             this.Prop_ClientId = "\"client_id\"";
-            this.Prop_ClientSecret = "\"client_secret\"";
+            this.Prop_ClientSecret = "\"\"";
             this.Prop_RefreshToken = "\"refresh_token\"";
         }
 
@@ -220,6 +220,15 @@ namespace Primo.MIA
                 string refreshToken = GetPropertyValue<string>(this.Prop_RefreshToken, nameof(Prop_RefreshToken), sd);
                 Guard.NotNullOrWhiteSpace(refreshToken, nameof(Prop_RefreshToken));
 
+                // issue #11: незамещённый плейсхолдер уйдёт в запрос как реальный секрет
+                if (HttpHelper.IsOAuth2PlaceholderSecret(clientSecret))
+                    return new ExecutionResult
+                    {
+                        IsSuccess = false,
+                        ErrorMessage = "[HTTP: OAuth2 обновление токена] Client Secret не заполнен: осталось " +
+                                       "значение-плейсхолдер \"client_secret\". Укажите реальный секрет клиента или очистите поле."
+                    };
+
                 // ── Создание HttpClient ───────────────────────────────────
                 using (var client = CreateHttpClient(sd, 60))
                 {
@@ -237,11 +246,11 @@ namespace Primo.MIA
 
                     // ── Выполнение запроса ─────────────────────────────────
                     var content = new FormUrlEncodedContent(parameters);
-                    var response = client.PostAsync(tokenUrl, content).Result;
+                    var response = client.PostAsync(tokenUrl, content).ConfigureAwait(false).GetAwaiter().GetResult();
 
                     if (!response.IsSuccessStatusCode)
                     {
-                        string errorContent = response.Content.ReadAsStringAsync().Result;
+                        string errorContent = response.Content.ReadAsStringAsync().ConfigureAwait(false).GetAwaiter().GetResult();
                         return new ExecutionResult
                         {
                             IsSuccess = false,
@@ -250,7 +259,7 @@ namespace Primo.MIA
                     }
 
                     // ── Парсинг ответа ────────────────────────────────────
-                    string responseContent = response.Content.ReadAsStringAsync().Result;
+                    string responseContent = response.Content.ReadAsStringAsync().ConfigureAwait(false).GetAwaiter().GetResult();
                     var tokenResponse = ParseTokenResponse(responseContent);
 
                     // ── Запись выходных параметров ────────────────────────

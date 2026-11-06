@@ -401,8 +401,15 @@ namespace Primo.MIA
 
                 var handler = new System.Net.Http.HttpClientHandler();
                 if (this.Prop_IgnoreSslErrors)
+                {
+                    // issue #11: факт обхода TLS-валидации должен быть виден в логе робота
+                    Common.ActivityFileLogger.Warning(
+                        nameof(WebhookBack),
+                        "Проверка TLS-сертификата сервера ОТКЛЮЧЕНА (IgnoreSslErrors=true). " +
+                        "Используйте только в тестовых средах.");
                     handler.ServerCertificateCustomValidationCallback =
                         (msg, cert, chain, errors) => true;
+                }
 
                 int    statusCode   = 0;
                 string responseBody = string.Empty;

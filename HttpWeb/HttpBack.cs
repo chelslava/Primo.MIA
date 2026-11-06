@@ -344,11 +344,11 @@ namespace Primo.MIA
                                     .ForEach(h => client.DefaultRequestHeaders.TryAddWithoutValidation(h.Key, h.Value));
 
                     // ── Выполнение запроса ─────────────────────────────────
-                    var response = ExecuteRequest(client, url, body, sd).Result;
+                    var response = ExecuteRequest(client, url, body, sd).ConfigureAwait(false).GetAwaiter().GetResult();
 
                     // ── Обработка ответа ───────────────────────────────────
                     int statusCode = (int)response.StatusCode;
-                    string responseContent = response.Content.ReadAsStringAsync().Result;
+                    string responseContent = response.Content.ReadAsStringAsync().ConfigureAwait(false).GetAwaiter().GetResult();
                     string responseHeaders = HttpLogic.SerializeResponseHeaders(response.Headers, response.Content.Headers);
 
                     // Запись результатов в выходные переменные

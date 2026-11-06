@@ -459,7 +459,7 @@ namespace Primo.MIA
                 using (var http = HttpClientPool.CreateClient(TimeSpan.FromSeconds(timeout)))
                 {
                     http.DefaultRequestHeaders.UserAgent.ParseAdd("Primo.MIA/1.0");
-                    content = http.GetStringAsync(url).GetAwaiter().GetResult();
+                    content = http.GetStringAsync(url).ConfigureAwait(false).GetAwaiter().GetResult();
                 }
                 File.WriteAllText(actualFilePath, content, System.Text.Encoding.UTF8);
             }

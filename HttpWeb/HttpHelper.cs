@@ -17,6 +17,8 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Primo.MIA
 {
@@ -104,6 +106,19 @@ namespace Primo.MIA
         }
 
         // ── Валидация ─────────────────────────────────────────────────────
+
+        /// <summary>
+        /// Определяет, является ли Client Secret незамещённым плейсхолдером.
+        /// issue #11: старое значение по умолчанию — строка «client_secret» — если её
+        /// не заменить, литерал уйдёт в запрос токена как реальный секрет.
+        /// </summary>
+        /// <param name="clientSecret">Разрешённое значение свойства Prop_ClientSecret.</param>
+        /// <returns>true, если значение — плейсхолдер «client_secret».</returns>
+        public static bool IsOAuth2PlaceholderSecret(string clientSecret)
+        {
+            return clientSecret != null
+                && clientSecret.Trim().Equals("client_secret", StringComparison.OrdinalIgnoreCase);
+        }
 
         /// <summary>
         /// Валидирует URL на корректность формата.
@@ -220,6 +235,101 @@ namespace Primo.MIA
                 retryCodes = DefaultRetryStatusCodes;
 
             return retryCodes.Contains(statusCode);
+        }
+
+        /// <summary>
+        /// Выполняет HTTP-запрос с повторами: попытка → проверка успеха/ShouldRetry →
+        /// задержка → повтор. Итоговый ответ (успех или код, не входящий в список
+        /// повтора) возвращается вызывающему; исключение последней попытки
+        /// пробрасывается наружу.
+        /// </summary>
+        /// <param name="client">HttpClient для выполнения запросов.</param>
+        /// <param name="requestFactory">
+        /// Фабрика запросов: создаёт НОВЫЙ HttpRequestMessage на каждую попытку —
+        /// переиспользовать HttpRequestMessage нельзя (после отправки он недействителен).
+        /// </param>
+        /// <param name="maxAttempts">Максимальное число попыток (минимум 1).</param>
+        /// <param name="retryCodes">Коды состояния, при которых запрос повторяется (см. <see cref="ShouldRetry"/>).</param>
+        /// <param name="delay">
+        /// Функция задержки: получает номер завершившейся попытки (начиная с 1) и возвращает Task паузы.
+        /// null — повтор без паузы. Через замыкание реализуются стратегии Fixed/Linear/Exponential
+        /// (см. <see cref="CalculateRetryDelay"/>).
+        /// </param>
+        /// <param name="onAttempt">
+        /// Необязательный колбэк побочных эффектов после каждой попытки:
+        /// (номер попытки, код состояния при успехе доставки, исключение при неудаче).
+        /// Используется для логирования попыток и подсчёта их количества.
+        /// </param>
+        /// <param name="cancellationToken">Токен отмены (по умолчанию не используется).</param>
+        /// <returns>HttpResponseMessage последней попытки (успешный ответ либо код, не входящий в список повтора).</returns>
+        /// <exception cref="ArgumentNullException">client или requestFactory равны null.</exception>
+        /// <remarks>
+        /// Ответ предыдущей попытки освобождается перед каждой новой попыткой
+        /// (предотвращение утечки соединений); итоговый ответ возвращается неосвобождённым.
+        /// </remarks>
+        public static async Task<HttpResponseMessage> SendWithRetryAsync(
+            HttpClient client,
+            Func<HttpRequestMessage> requestFactory,
+            int maxAttempts,
+            int[] retryCodes,
+            Func<int, Task> delay = null,
+            Action<int, int?, Exception> onAttempt = null,
+            CancellationToken cancellationToken = default)
+        {
+            if (client == null)
+                throw new ArgumentNullException(nameof(client));
+            if (requestFactory == null)
+                throw new ArgumentNullException(nameof(requestFactory));
+            if (maxAttempts < 1)
+                maxAttempts = 1;
+
+            HttpResponseMessage response = null;
+
+            for (int attempt = 1; attempt <= maxAttempts; attempt++)
+            {
+                // Ответ предыдущей попытки больше не нужен — освобождаем до нового запроса.
+                response?.Dispose();
+                response = null;
+
+                bool needRetry = false;
+
+                try
+                {
+                    // HttpRequestMessage нельзя переиспользовать — фабрика создаёт новый на каждую попытку.
+                    using (var request = requestFactory())
+                    {
+                        response = await client.SendAsync(request, cancellationToken).ConfigureAwait(false);
+                    }
+
+                    int statusCode = (int)response.StatusCode;
+
+                    // Побочные эффекты: логирование попытки, счётчик попыток и т.п.
+                    onAttempt?.Invoke(attempt, statusCode, null);
+
+                    // Успех или код, не входящий в список повтора, — итоговый ответ наружу.
+                    if (response.IsSuccessStatusCode || !ShouldRetry(statusCode, retryCodes))
+                        return response;
+
+                    needRetry = true;
+                }
+                catch (Exception ex)
+                {
+                    onAttempt?.Invoke(attempt, null, ex);
+
+                    // Последняя попытка — исключение наружу (как в исходных retry-циклах активностей).
+                    if (attempt >= maxAttempts)
+                        throw;
+
+                    needRetry = true;
+                }
+
+                // Пауза между попытками — только если будет следующая попытка.
+                if (needRetry && attempt < maxAttempts && delay != null)
+                    await delay(attempt).ConfigureAwait(false);
+            }
+
+            // Сюда попадаем, только если последняя попытка вернула код из списка повтора.
+            return response;
         }
 
         // ── Работа с файлами ──────────────────────────────────────────────

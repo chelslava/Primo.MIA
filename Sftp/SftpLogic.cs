@@ -145,7 +145,15 @@ namespace Primo.MIA
 
             var expected = NormalizeFingerprint(settings.ExpectedFingerprint);
             if (string.IsNullOrEmpty(expected))
-                return; // отпечаток не задан — поведение SSH.NET по умолчанию (отказ неизвестным)
+            {
+                // issue #11: fail-closed. Без подписчика HostKeyReceived SSH.NET принимает
+                // ЛЮБОЙ host key (CanTrust по умолчанию true) — пустой отпечаток не должен
+                // молча включать такой режим.
+                throw new SftpException(
+                    "Отпечаток host key не задан (ExpectedFingerprint пуст) — соединение запрещено. " +
+                    "Укажите отпечаток сервера (ssh-keygen -lf /etc/ssh/ssh_host_*_key.pub) " +
+                    "или явно разрешите любой ключ (AllowAnyHostKey) для тестовых сред.");
+            }
 
             client.HostKeyReceived += (sender, e) =>
             {

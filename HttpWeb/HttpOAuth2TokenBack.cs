@@ -343,7 +343,7 @@ namespace Primo.MIA
             this.Prop_TokenUrl = "\"https://oauth.example.com/token\"";
             this.Prop_GrantType = OAuth2GrantType.ClientCredentials;
             this.Prop_ClientId = "\"client_id\"";
-            this.Prop_ClientSecret = "\"client_secret\"";
+            this.Prop_ClientSecret = "\"\"";
             this.Prop_Scope = "\"\"";
             this.Prop_Username = "\"\"";
             this.Prop_Password = "\"\"";
@@ -367,6 +367,15 @@ namespace Primo.MIA
                 string clientId = GetPropertyValue<string>(this.Prop_ClientId, nameof(Prop_ClientId), sd);
                 string clientSecret = GetPropertyValue<string>(this.Prop_ClientSecret, nameof(Prop_ClientSecret), sd);
                 string scope = GetPropertyValue<string>(this.Prop_Scope, nameof(Prop_Scope), sd);
+
+                // issue #11: незамещённый плейсхолдер уйдёт в запрос как реальный секрет
+                if (HttpHelper.IsOAuth2PlaceholderSecret(clientSecret))
+                    return new ExecutionResult
+                    {
+                        IsSuccess = false,
+                        ErrorMessage = "[HTTP: OAuth2 токен] Client Secret не заполнен: осталось значение-плейсхолдер " +
+                                       "\"client_secret\". Укажите реальный секрет клиента или очистите поле."
+                    };
 
                 // ── Создание HttpClient ───────────────────────────────────
                 using (var client = CreateHttpClient(sd, 60))

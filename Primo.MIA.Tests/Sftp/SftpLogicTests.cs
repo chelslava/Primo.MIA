@@ -169,6 +169,8 @@ namespace Primo.MIA.Tests.Sftp
             var settings = new SftpConnectionSettings
             {
                 Host = "srv", UserName = "user", Password = "pass",
+                // issue #11: без отпечатка/AllowAnyHostKey теперь fail-closed
+                ExpectedFingerprint = "sha256:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
                 ConnectionTimeoutSeconds = 5, OperationTimeoutSeconds = 7
             };
             using (var client = _logic.CreateClient(settings))

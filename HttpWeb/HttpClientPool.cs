@@ -78,6 +78,24 @@ namespace Primo.MIA
             // Выносим отработанные handler'ы, у которых истёк grace-период
             PurgeRetired();
 
+            // issue #11: handler с обходом TLS-валидации НЕ кэшируется (scoped).
+            // Иначе одна активность с «Игнорировать ошибки SSL» «заражает» пул
+            // для всех активностей с тем же ключом на всё время жизни handler'а.
+            // Обход — только для тестовых сред, поэтому потеря переиспользования
+            // соединений там допустима.
+            if (ignoreSslErrors)
+            {
+                Common.ActivityFileLogger.Warning(
+                    "HttpClientPool",
+                    "Проверка TLS-сертификата сервера ОТКЛЮЧЕНА (ignoreSslErrors=true). " +
+                    "Используйте только в тестовых средах; handler не кэшируется.");
+                var scopedHandler = CreateHandler(useCertificate, certPath, certPassword, ignoreSslErrors, null);
+                return new HttpClient(scopedHandler, disposeHandler: true)
+                {
+                    Timeout = timeout
+                };
+            }
+
             var key = BuildKey(useCertificate, certPath, certPassword, ignoreSslErrors);
 
             if (!Handlers.TryGetValue(key, out var entry) || IsStale(entry))
@@ -117,8 +135,29 @@ namespace Primo.MIA
         private static PoolEntry CreateEntry(
             bool useCertificate, string certPath, string certPassword, bool ignoreSslErrors)
         {
-            var handler = new HttpClientHandler();
+            // Сертификаты собираются в список для детерминированного dispose
+            // при выводе handler'а из пула (DisposeEntry).
             var certificates = new List<X509Certificate2>();
+            var handler = CreateHandler(useCertificate, certPath, certPassword, ignoreSslErrors, certificates);
+            return new PoolEntry
+            {
+                Handler = handler,
+                Certificates = certificates,
+                CreatedUtc = DateTime.UtcNow
+            };
+        }
+
+        /// <summary>
+        /// Создаёт HttpClientHandler по конфигурации. Используется и пулом (без bypass),
+        /// и scoped-путём с обходом TLS-валидации (issue #11). Для пулового пути
+        /// <paramref name="certificates"/> наполняется созданными сертификатами;
+        /// для scoped-пути можно передать null (сертификат освобождается вместе с handler'ом).
+        /// </summary>
+        private static HttpClientHandler CreateHandler(
+            bool useCertificate, string certPath, string certPassword, bool ignoreSslErrors,
+            List<X509Certificate2> certificates)
+        {
+            var handler = new HttpClientHandler();
 
             if (useCertificate)
             {
@@ -130,7 +169,7 @@ namespace Primo.MIA
 
                 var certificate = new X509Certificate2(certPath, certPassword ?? string.Empty);
                 handler.ClientCertificates.Add(certificate);
-                certificates.Add(certificate);
+                certificates?.Add(certificate);
             }
 
             if (ignoreSslErrors)
@@ -139,12 +178,7 @@ namespace Primo.MIA
                     (sender, cert, chain, sslPolicyErrors) => true;
             }
 
-            return new PoolEntry
-            {
-                Handler = handler,
-                Certificates = certificates,
-                CreatedUtc = DateTime.UtcNow
-            };
+            return handler;
         }
 
         private static bool IsStale(PoolEntry entry)
