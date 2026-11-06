@@ -1,4 +1,4 @@
-// =============================================================================
+﻿// =============================================================================
 // JsonDataTableLogicTests.cs — тесты чистой логики JSON → DataTable.
 //
 // Покрывает:
@@ -60,12 +60,12 @@ namespace Primo.MIA.Tests.Utilities
             JsonDataTableLogic.InferType(Parse("false")).Should().Be(typeof(bool));
         }
 
-        [Theory(DisplayName = "InferType: строки")]
+        [Theory(DisplayName = "InferType: строки (даты — инвариантный формат ISO)")]
         [InlineData("\"2024-01-15\"", "System.DateTime")]
-        [InlineData("\"15.03.2024\"", "System.DateTime")]
         [InlineData("\"Иван\"", "System.String")]
         [InlineData("\"42\"", "System.String")]
         [InlineData("\"\"", "System.String")]
+        [InlineData("\"15.03.2024\"", "System.String")]
         public void InferType_Strings_ReturnsDateTimeOrString(string json, string expectedTypeName)
         {
             // Arrange

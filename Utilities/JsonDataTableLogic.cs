@@ -6,6 +6,7 @@
 
 using System;
 using System.Data;
+using System.Globalization;
 using System.Text.Json;
 
 namespace Primo.MIA
@@ -35,7 +36,11 @@ namespace Primo.MIA
 
                 case JsonValueKind.String:
                     string s = elem.GetString() ?? string.Empty;
-                    if (DateTime.TryParse(s, out _)) return typeof(DateTime);
+                    // Только инвариантная культура: типы колонок не должны
+                    // зависеть от локали машины, на которой выполняется процесс
+                    if (DateTime.TryParse(s, CultureInfo.InvariantCulture,
+                            DateTimeStyles.None, out _))
+                        return typeof(DateTime);
                     return typeof(string);
 
                 default:
@@ -68,7 +73,14 @@ namespace Primo.MIA
                     string sv = elem.ValueKind == JsonValueKind.String
                         ? elem.GetString()
                         : elem.ToString();
-                    return DateTime.TryParse(sv, out DateTime dt) ? dt : (object)DBNull.Value;
+                    // Инвариантная культура, затем культура машины
+                    // (совместимо с CalendarDateHelper)
+                    if (DateTime.TryParse(sv, CultureInfo.InvariantCulture,
+                            DateTimeStyles.None, out DateTime dt) ||
+                        DateTime.TryParse(sv, CultureInfo.CurrentCulture,
+                            DateTimeStyles.None, out dt))
+                        return dt;
+                    return DBNull.Value;
                 }
                 // string и всё остальное
                 return elem.ValueKind == JsonValueKind.String
