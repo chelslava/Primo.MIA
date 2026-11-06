@@ -21,6 +21,8 @@
     <PackageReference Include="SSH.NET" Version="2026.0.0" />
     <!-- Прямая ссылка: тесты RabbitMqLogic используют тип ConnectionFactory из сигнатур API -->
     <PackageReference Include="RabbitMQ.Client" Version="6.8.1" />
+    <!-- Прямая ссылка: тесты KafkaLogic используют IConsumer/Partition из сигнатур API -->
+    <PackageReference Include="Confluent.Kafka" Version="2.12.0" />
     <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.1.2" />
     <PackageReference Include="System.Text.Json" Version="10.0.2" />
     <PackageReference Include="xunit.extensibility.core" Version="2.9.3" />

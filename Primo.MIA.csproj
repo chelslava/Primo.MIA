@@ -23,7 +23,7 @@
          содержит SHA коммита (SourceRevisionId). -->
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageId>Primo.MIA</PackageId>
-    <Version>1.5.0</Version>
+    <Version>1.6.0</Version>
     <AssemblyVersion>$(Version.Split('-')[0])</AssemblyVersion>
     <FileVersion>$(Version.Split('-')[0])</FileVersion>
     <Authors>Chelslava</Authors>
@@ -64,6 +64,9 @@
          («тип ValueTuple существует в двух сборках»). -->
     <PackageReference Include="System.ValueTuple" Version="4.6.2" ExcludeAssets="all" />
     <PackageReference Include="RabbitMQ.Client" Version="6.8.1" />
+    <!-- Kafka (issue #19): Confluent.Kafka 2.x — net472+/netstandard2.0;
+         нативный librdkafka.redist подтягивается транзитивно -->
+    <PackageReference Include="Confluent.Kafka" Version="2.12.0" />
   </ItemGroup>
 
   <!-- Local Primo SDK references (not available via NuGet).

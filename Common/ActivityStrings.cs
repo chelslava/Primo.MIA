@@ -1254,6 +1254,40 @@ namespace Primo.MIA.Common
         public const string Error_MqHostRequired = "Хост не может быть пустым";
         public const string Error_MqQueueRequired = "Очередь не может быть пустой";
         public const string Error_MqBodyRequired = "Тело сообщения не может быть пустым";
+
+        // ═══════════════════════════════════════════════════════════════════
+        // ОЧЕРЕДИ СООБЩЕНИЙ (Kafka, issue #19)
+        // ═══════════════════════════════════════════════════════════════════
+
+        public const string Activity_KafkaPublish = "Kafka: Отправить сообщение";
+        public const string Activity_KafkaConsume = "Kafka: Получить сообщение";
+
+        public const string Field_KafkaBootstrapServers = "Bootstrap-серверы";
+        public const string Field_KafkaSecurityProtocol = "Протокол безопасности";
+        public const string Field_KafkaSaslMechanism = "SASL-механизм";
+        public const string Field_KafkaSaslUsername = "SASL: имя пользователя";
+        public const string Field_KafkaSaslPassword = "SASL: пароль";
+        public const string Field_KafkaConnectionTimeoutSeconds = "Таймаут подключения (сек)";
+        public const string Field_KafkaTopic = "Топик";
+        public const string Field_KafkaKey = "Ключ";
+        public const string Field_KafkaMessage = "Сообщение";
+        public const string Field_KafkaMessageFormat = "Формат сообщения";
+        public const string Field_KafkaGroupId = "Group ID";
+        public const string Field_KafkaAutoOffsetReset = "Начальное смещение";
+        public const string Field_KafkaAutoCommit = "Auto Commit";
+        public const string Field_KafkaOutputPartition = "Партиция";
+        public const string Field_KafkaOutputOffset = "Offset";
+        public const string Field_KafkaMessageBody = "Тело полученного сообщения";
+        public const string Field_KafkaMessageKey = "Ключ сообщения";
+        public const string Field_KafkaMessageOffset = "Offset сообщения";
+
+        public const string Kafka_Category_Publish = "Публикация";
+        public const string Kafka_Category_Consume = "Получение";
+
+        public const string Error_KafkaBootstrapRequired = "Bootstrap-серверы не могут быть пустыми";
+        public const string Error_KafkaTopicRequired = "Топик не может быть пустым";
+        public const string Error_KafkaGroupIdRequired = "Group ID не может быть пустым";
+        public const string Error_KafkaMessageRequired = "Сообщение не может быть пустым";
     }
 
 }
