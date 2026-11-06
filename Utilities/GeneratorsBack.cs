@@ -613,17 +613,7 @@ namespace Primo.MIA
         /// </summary>
         private string GenerateGuid()
         {
-            var guid = Guid.NewGuid();
-
-            switch (this.Prop_GuidFormat)
-            {
-                case GuidFormat.N: return guid.ToString("N"); // 32 цифры без дефисов
-                case GuidFormat.B: return guid.ToString("B"); // {с фигурными скобками}
-                case GuidFormat.P: return guid.ToString("P"); // (с круглыми скобками)
-                case GuidFormat.X: return guid.ToString("X"); // {0x...,0x...,{0x...}}
-                case GuidFormat.D:
-                default: return guid.ToString("D"); // стандарт с дефисами
-            }
+            return GeneratorsLogic.FormatGuid(Guid.NewGuid(), this.Prop_GuidFormat);
         }
 
         /// <summary>
@@ -637,14 +627,8 @@ namespace Primo.MIA
             string baseName = GetPropertyValue<string>(this.Prop_BaseName, "Prop_BaseName", sd) ?? "file";
             string ext = GetPropertyValue<string>(this.Prop_Extension, "Prop_Extension", sd) ?? ".txt";
 
-            // Нормализуем расширение: добавляем точку если отсутствует
-            if (!string.IsNullOrEmpty(ext) && !ext.StartsWith("."))
-                ext = "." + ext;
-
-            // Если директория не указана — работаем только с именем файла
-            string fullPath = string.IsNullOrEmpty(dir)
-                ? baseName + ext
-                : Path.Combine(dir, baseName + ext);
+            // Сборка пути с нормализацией расширения — в GeneratorsLogic
+            string fullPath = GeneratorsLogic.BuildFilePath(dir, baseName, ext);
 
             return FileHelper.GenerateUniqueFilePath(
     Path.GetDirectoryName(fullPath),
@@ -661,12 +645,8 @@ namespace Primo.MIA
             string minStr = GetPropertyValue<string>(this.Prop_MinValue, "Prop_MinValue", sd) ?? "0";
             string maxStr = GetPropertyValue<string>(this.Prop_MaxValue, "Prop_MaxValue", sd) ?? "100";
 
-            // При ошибке парсинга используем значения по умолчанию
-            if (!int.TryParse(minStr, out int min)) min = 0;
-            if (!int.TryParse(maxStr, out int max)) max = 100;
-
-            if (min > max)
-                throw new ArgumentException($"Минимальное ({min}) не может быть больше максимального ({max})");
+            // Разбор диапазона с дефолтами и валидацией — в GeneratorsLogic
+            GeneratorsLogic.ParseRange(minStr, maxStr, out int min, out int max);
 
             // Каждый вызов создаёт новый Random — достаточно для большинства сценариев.
             // Для криптографической случайности используйте режим HashId с GUID.
@@ -680,71 +660,12 @@ namespace Primo.MIA
         /// </summary>
         private string GenerateTimestamp(ScriptingData sd)
         {
-            DateTime now = DateTime.Now;
+            // Кастомный формат читаем только в режиме Custom (как и раньше)
+            string customFmt = this.Prop_TimestampFormat == TimestampFormat.Custom
+                ? (GetPropertyValue<string>(this.Prop_CustomTimestampFormat, "Prop_CustomTimestampFormat", sd) ?? "yyyy-MM-dd")
+                : null;
 
-            switch (this.Prop_TimestampFormat)
-            {
-                // ── Компактные (для имён файлов) ──────────────────────────────────
-                case TimestampFormat.yyyyMMdd_HHmmss: return now.ToString("yyyyMMdd_HHmmss");
-                case TimestampFormat.yyyyMMdd_HHmm: return now.ToString("yyyyMMdd_HHmm");
-                case TimestampFormat.yyyyMMdd: return now.ToString("yyyyMMdd");
-                case TimestampFormat.yyyyMM: return now.ToString("yyyyMM");
-                case TimestampFormat.yyyyMMddHHmmssfff: return now.ToString("yyyyMMddHHmmssfff");
-
-                // ── ISO 8601 (для БД и API) ────────────────────────────────────────
-                case TimestampFormat.yyyy_MM_dd: return now.ToString("yyyy-MM-dd");
-                case TimestampFormat.yyyy_MM_dd_HH_mm_ss: return now.ToString("yyyy-MM-dd HH:mm:ss");
-                case TimestampFormat.ISO8601: return now.ToString("yyyy-MM-ddTHH:mm:ss");
-                case TimestampFormat.ISO8601_ms: return now.ToString("yyyy-MM-ddTHH:mm:ss.fff");
-
-                // ── Российские (для отчётов) ───────────────────────────────────────
-                case TimestampFormat.dd_MM_yyyy: return now.ToString("dd.MM.yyyy");
-                case TimestampFormat.dd_MM_yyyy_HH_mm_ss: return now.ToString("dd.MM.yyyy HH:mm:ss");
-                case TimestampFormat.dd_MM_yyyy_HH_mm: return now.ToString("dd.MM.yyyy HH:mm");
-                case TimestampFormat.dd_MM_yyyy_slash: return now.ToString("dd/MM/yyyy");
-
-                // ── Американские ──────────────────────────────────────────────────
-                case TimestampFormat.MM_dd_yyyy: return now.ToString("MM/dd/yyyy");
-                case TimestampFormat.MM_dd_yyyy_HH_mm_ss: return now.ToString("MM/dd/yyyy HH:mm:ss");
-
-                // ── Только время ──────────────────────────────────────────────────
-                case TimestampFormat.HHmmss: return now.ToString("HH:mm:ss");
-                case TimestampFormat.HHmm: return now.ToString("HH:mm");
-                case TimestampFormat.HHmmss_fff: return now.ToString("HH:mm:ss.fff");
-
-                // ── Специальные ───────────────────────────────────────────────────
-                case TimestampFormat.FullDate:
-                    // Полная дата с днём недели — зависит от культуры системы
-                    return now.ToString("D");
-
-                case TimestampFormat.Quarter:
-                    // Q1-2025, Q2-2025, Q3-2025, Q4-2025
-                    int quarter = (now.Month - 1) / 3 + 1;
-                    return $"Q{quarter}-{now.Year}";
-
-                case TimestampFormat.WeekNumber:
-                    // W07-2025 — номер недели по ISO 8601 (понедельник = начало недели)
-                    int weekNum = System.Globalization.CultureInfo.CurrentCulture.Calendar
-                        .GetWeekOfYear(now,
-                            System.Globalization.CalendarWeekRule.FirstFourDayWeek,
-                            DayOfWeek.Monday);
-                    return $"W{weekNum:D2}-{now.Year}";
-
-                case TimestampFormat.UnixTimestamp:
-                    // Секунды с 01.01.1970 00:00:00 UTC
-                    long unixSeconds = (long)(DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds;
-                    return unixSeconds.ToString();
-
-                case TimestampFormat.Custom:
-                    string customFmt = GetPropertyValue<string>(
-                        this.Prop_CustomTimestampFormat, "Prop_CustomTimestampFormat", sd) ?? "yyyy-MM-dd";
-                    if (string.IsNullOrWhiteSpace(customFmt))
-                        throw new ArgumentException("Кастомный формат даты не может быть пустым при выборе Custom");
-                    return now.ToString(customFmt);
-
-                default:
-                    return now.ToString("yyyyMMdd_HHmmss");
-            }
+            return GeneratorsLogic.FormatTimestamp(DateTime.Now, this.Prop_TimestampFormat, customFmt);
         }
 
         /// <summary>

@@ -1,4 +1,4 @@
-// =============================================================================
+﻿// =============================================================================
 // CalendarLoadTests.cs — тесты активности CalendarLoadBack.
 //
 // Проверяет загрузку производственного календаря:
@@ -195,11 +195,8 @@ namespace Primo.MIA.Tests.Calendar
         {
             // Arrange
             string filePath = Path.Combine(_testDataPath, "calendar.xml");
-            if (!File.Exists(filePath))
-            {
-                // Skip test if file not found
-                return;
-            }
+            File.Exists(filePath).Should().BeTrue(
+                "тестовая фикстура {0} не найдена — проверьте копирование calendar/ в output", filePath);
 
             string content = File.ReadAllText(filePath);
             var parser = new Primo.MIA.Calendar.Parsers.XmlCalendarParser();
@@ -218,10 +215,8 @@ namespace Primo.MIA.Tests.Calendar
         {
             // Arrange
             string filePath = Path.Combine(_testDataPath, "calendar.json");
-            if (!File.Exists(filePath))
-            {
-                return;
-            }
+            File.Exists(filePath).Should().BeTrue(
+                "тестовая фикстура {0} не найдена — проверьте копирование calendar/ в output", filePath);
 
             string content = File.ReadAllText(filePath);
             var parser = new Primo.MIA.Calendar.Parsers.JsonCalendarParser();
@@ -240,10 +235,8 @@ namespace Primo.MIA.Tests.Calendar
         {
             // Arrange
             string filePath = Path.Combine(_testDataPath, "calendar.csv");
-            if (!File.Exists(filePath))
-            {
-                return;
-            }
+            File.Exists(filePath).Should().BeTrue(
+                "тестовая фикстура {0} не найдена — проверьте копирование calendar/ в output", filePath);
 
             string content = File.ReadAllText(filePath);
             var parser = new Primo.MIA.Calendar.Parsers.CsvCalendarParser();
@@ -262,10 +255,8 @@ namespace Primo.MIA.Tests.Calendar
         {
             // Arrange
             string filePath = Path.Combine(_testDataPath, "calendar.txt");
-            if (!File.Exists(filePath))
-            {
-                return;
-            }
+            File.Exists(filePath).Should().BeTrue(
+                "тестовая фикстура {0} не найдена — проверьте копирование calendar/ в output", filePath);
 
             string content = File.ReadAllText(filePath);
             var parser = new Primo.MIA.Calendar.Parsers.TxtCalendarParser();
