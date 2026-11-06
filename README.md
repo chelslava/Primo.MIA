@@ -2,6 +2,7 @@
 
 **Библиотека расширенных активностей для платформы Primo RPA**
 
+[![CI](https://github.com/chelslava/Primo.MIA/actions/workflows/ci.yml/badge.svg)](https://github.com/chelslava/Primo.MIA/actions/workflows/ci.yml)
 [![.NET Framework](https://img.shields.io/badge/.NET%20Framework-4.8.1-blue.svg)](https://dotnet.microsoft.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 

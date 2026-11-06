@@ -1,6 +1,7 @@
 param(
     [string]$Configuration = "Debug",
-    [string]$TestFilter
+    [string]$TestFilter,
+    [string]$ResultsPath   # опционально: полный путь к .trx с результатами тестов (для CI)
 )
 
 $ErrorActionPreference = "Stop"
@@ -31,7 +32,7 @@ if (-not (Test-Path $vstest)) {
 }
 
 Write-Host "Building tests with MSBuild..."
-& $msbuild $testProject /t:Build /p:Configuration=$Configuration /m
+& $msbuild $testProject /t:Restore,Build /p:Configuration=$Configuration /m
 if ($LASTEXITCODE -ne 0) {
     throw "MSBuild завершился с кодом $LASTEXITCODE"
 }
@@ -44,6 +45,13 @@ Write-Host "Running tests with VSTest..."
 $vstestArgs = @($testAssembly)
 if ($TestFilter) {
     $vstestArgs += "/TestCaseFilter:$TestFilter"
+}
+if ($ResultsPath) {
+    $resultsDir = Split-Path -Parent $ResultsPath
+    if (-not (Test-Path $resultsDir)) {
+        New-Item -ItemType Directory -Force -Path $resultsDir | Out-Null
+    }
+    $vstestArgs += "/logger:trx;LogFileName=$ResultsPath"
 }
 
 & $vstest @vstestArgs

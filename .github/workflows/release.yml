@@ -111,8 +111,15 @@ jobs:
       run: nuget pack Primo.MIA.nuspec -Version ${{ steps.version.outputs.version }} -OutputDirectory ./nupkg
 
     - name: Publish to NuGet.org
-      if: ${{ secrets.NUGET_API_KEY != '' }}
-      run: nuget push ./nupkg/*.nupkg -Source https://api.nuget.org/v3/index.json -ApiKey ${{ secrets.NUGET_API_KEY }}
+      shell: bash
+      env:
+        NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+      run: |
+        if [ -z "$NUGET_API_KEY" ]; then
+          echo "NUGET_API_KEY не задан — публикация в nuget.org пропущена"
+          exit 0
+        fi
+        nuget push ./nupkg/*.nupkg -Source https://api.nuget.org/v3/index.json -ApiKey "$NUGET_API_KEY"
 
     - name: Upload artifact
       uses: actions/upload-artifact@v4.16.0
