@@ -115,11 +115,11 @@ namespace Primo.MIA.Tests.Files
         [InlineData(0, "0 байт")]
         [InlineData(100, "100 байт")]
         [InlineData(1023, "1023 байт")]
-        [InlineData(1024, "1,0 КБ")]
-        [InlineData(1536, "1,5 КБ")]
-        [InlineData(1048576, "1,0 МБ")]
-        [InlineData(1572864, "1,5 МБ")]
-        [InlineData(1073741824, "1,0 ГБ")]
+        [InlineData(1024, "1.0 КБ")]
+        [InlineData(1536, "1.5 КБ")]
+        [InlineData(1048576, "1.0 МБ")]
+        [InlineData(1572864, "1.5 МБ")]
+        [InlineData(1073741824, "1.0 ГБ")]
         public void FormatBytes_VariousSizes_ReturnsCorrectFormat(long bytes, string expected)
         {
             // Act

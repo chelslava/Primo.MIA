@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -144,10 +145,11 @@ namespace Primo.MIA
                 { 1024L, "КБ" }
             };
 
+            // Инвариантная культура: разделитель всегда точка, независимо от локали ОС
             foreach (var kv in thresholds)
             {
                 if (bytes >= kv.Key)
-                    return $"{bytes / (double)kv.Key:F1} {kv.Value}";
+                    return $"{(bytes / (double)kv.Key).ToString("F1", CultureInfo.InvariantCulture)} {kv.Value}";
             }
 
             return $"{bytes} байт";
