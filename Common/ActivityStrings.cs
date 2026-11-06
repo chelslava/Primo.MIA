@@ -1184,6 +1184,42 @@ namespace Primo.MIA.Common
         public const string Error_CryptoInputRequired = "Входная строка не может быть пустой";
         public const string Error_CryptoDecryptFailed = "Не удалось расшифровать данные (неверный пароль или повреждённые данные)";
         public const string Error_CryptoBase64Invalid = "Строка не является корректным Base64";
+
+        // ═══════════════════════════════════════════════════════════════════════
+        // SFTP
+        // ═══════════════════════════════════════════════════════════════════════
+
+        public const string Activity_SftpUpload = "SFTP: Загрузить файл";
+        public const string Activity_SftpDownload = "SFTP: Скачать файл";
+        public const string Activity_SftpList = "SFTP: Список файлов";
+        public const string Activity_SftpDelete = "SFTP: Удалить";
+        public const string Activity_SftpCreateFolder = "SFTP: Создать папку";
+
+        public const string Field_SftpHost = "Хост";
+        public const string Field_SftpPort = "Порт";
+        public const string Field_SftpUserName = "Пользователь";
+        public const string Field_SftpPassword = "Пароль";
+        public const string Field_SftpPrivateKeyPath = "Приватный ключ (путь)";
+        public const string Field_SftpKeyPassphrase = "Парольная фраза ключа";
+        public const string Field_SftpConnectionTimeoutSeconds = "Таймаут подключения (сек)";
+        public const string Field_SftpOperationTimeoutSeconds = "Таймаут операции (сек)";
+        public const string Field_SftpExpectedFingerprint = "Ожидаемый отпечаток (SHA256)";
+        public const string Field_SftpAllowAnyHostKey = "Не проверять host key";
+        public const string Sftp_Category_Output = "Выходные данные";
+
+        public const string Field_SftpLocalPath = "Локальный путь";
+        public const string Field_SftpRemotePath = "Удалённый путь";
+        public const string Field_SftpOverwrite = "Перезаписать при существовании";
+        public const string Field_SftpEntries = "Записи (DataTable)";
+        public const string Field_SftpNames = "Имена (List<string>)";
+        public const string Field_SftpCount = "Количество записей";
+        public const string Field_SftpFileExists = "Объект существует";
+        public const string Field_SftpRecursive = "Рекурсивно";
+
+        public const string Error_SftpConnectFailed = "Не удалось подключиться к SFTP-серверу";
+        public const string Error_SftpHostRequired = "Хост не может быть пустым";
+        public const string Error_SftpRemotePathRequired = "Удалённый путь не может быть пустым";
+        public const string Error_SftpLocalPathRequired = "Локальный путь не может быть пустым";
     }
 
 }

@@ -48,5 +48,8 @@ namespace Primo.MIA.Common
 
         /// <summary>Категория "MIA → Криптография"</summary>
         public const string Crypto = Prefix + "Криптография";
+
+        /// <summary>Категория "MIA → SFTP"</summary>
+        public const string Sftp = Prefix + "SFTP";
     }
 }

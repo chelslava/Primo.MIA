@@ -74,5 +74,8 @@
         /// <summary>Иконка для активностей криптографии</summary>
         public const string Crypto = BasePath + "sharp.png";
 
+        /// <summary>Иконка для активностей SFTP</summary>
+        public const string Sftp = BasePath + "folder.png";
+
     }
 }
