@@ -1153,6 +1153,37 @@ namespace Primo.MIA.Common
         public const string Field_JsonTypeInference = "Определять типы колонок";
         public const string Field_JsonResultJson = "Результат (JSON)";
         public const string Field_JsonResultTable = "Результат (DataTable)";
+
+        // ═══════════════════════════════════════════════════════════════════════
+        // КРИПТОГРАФИЯ
+        // ═══════════════════════════════════════════════════════════════════════
+
+        public const string Activity_HashCalculate = "Крипто: Хэширование";
+        public const string Activity_EncryptString = "Крипто: Шифрование строки (AES)";
+        public const string Activity_DecryptString = "Крипто: Дешифрование строки (AES)";
+        public const string Activity_Base64Encode = "Крипто: Base64 Кодировать";
+        public const string Activity_Base64Decode = "Крипто: Base64 Декодировать";
+
+        public const string Crypto_Category_Input = "Входные данные";
+        public const string Crypto_Category_Settings = "Настройки";
+        public const string Crypto_Category_Output = "Выходные данные";
+
+        public const string Field_CryptoInputString = "Строка (входная)";
+        public const string Field_CryptoInputFile = "Путь к файлу";
+        public const string Field_CryptoHashSource = "Источник";
+        public const string Field_CryptoHashAlgorithm = "Алгоритм";
+        public const string Field_CryptoHashFormat = "Формат вывода";
+        public const string Field_CryptoPassword = "Пароль";
+        public const string Field_CryptoHashResult = "Хэш";
+        public const string Field_CryptoEncryptResult = "Зашифрованная строка (Base64)";
+        public const string Field_CryptoDecryptResult = "Расшифрованная строка";
+        public const string Field_CryptoBase64Result = "Результат";
+
+        public const string Error_CryptoFileNotFound = "Файл не найден";
+        public const string Error_CryptoPasswordRequired = "Пароль не может быть пустым";
+        public const string Error_CryptoInputRequired = "Входная строка не может быть пустой";
+        public const string Error_CryptoDecryptFailed = "Не удалось расшифровать данные (неверный пароль или повреждённые данные)";
+        public const string Error_CryptoBase64Invalid = "Строка не является корректным Base64";
     }
 
 }

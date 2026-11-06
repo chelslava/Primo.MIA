@@ -45,5 +45,8 @@ namespace Primo.MIA.Common
 
         /// <summary>Категория "MIA → Redis"</summary>
         public const string Redis = Prefix + "Redis";
+
+        /// <summary>Категория "MIA → Криптография"</summary>
+        public const string Crypto = Prefix + "Криптография";
     }
 }

@@ -1,0 +1,53 @@
+﻿<!--
+    DecryptString.xaml
+    Визуальный интерфейс активности "Крипто: Дешифрование строки (AES)".
+-->
+<UserControl x:Class="Primo.MIA.DecryptString"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="clr-namespace:Primo.MIA"
+             mc:Ignorable="d"
+             d:DesignHeight="50"
+             Margin="0,0,0,5">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Primo.MIA;component/Common/Styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid Background="{DynamicResource {x:Static SystemColors.ScrollBarBrushKey}}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <Image Grid.Column="0"
+               Width="32" Height="32" Margin="5"
+               VerticalAlignment="Center"
+               Source="pack://application:,,,/Primo.MIA;component/images/sharp.png"/>
+
+        <StackPanel Grid.Column="1"
+                    VerticalAlignment="Top"
+                    Margin="5,0,5,5">
+
+            <TextBlock Style="{StaticResource ActivityHeader}"
+                       Text="Крипто: Дешифрование строки (AES)"/>
+
+            <TextBlock Text="Зашифрованная строка:" Style="{StaticResource FieldLabel}"/>
+            <TextBox Text="{Binding Prop_EncryptedString, UpdateSourceTrigger=PropertyChanged}"
+                     Style="{StaticResource FieldBox}"
+                     ToolTip="Base64([соль][IV][шифртекст]) — вывод активности шифрования"/>
+
+            <TextBlock Text="Пароль:" Style="{StaticResource FieldLabel}"/>
+            <TextBox Text="{Binding Prop_Password, UpdateSourceTrigger=PropertyChanged}"
+                     Style="{StaticResource FieldBox}"
+                     ToolTip="Пароль, использованный при шифровании"/>
+
+        </StackPanel>
+    </Grid>
+</UserControl>

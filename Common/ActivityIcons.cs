@@ -71,5 +71,8 @@
         /// <summary>Иконка для активностей Redis</summary>
         public const string Redis = BasePath + "bd.png";
 
+        /// <summary>Иконка для активностей криптографии</summary>
+        public const string Crypto = BasePath + "sharp.png";
+
     }
 }
