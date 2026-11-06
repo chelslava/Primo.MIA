@@ -15,7 +15,11 @@ namespace Primo.MIA
     {
         public override string GroupName { get => ActivityCategories.MongoDB; protected set { } }
 
-        protected override int sdkTimeOut { get => 60000; set { } }
+        protected override int sdkTimeOut
+        {
+            get { int s; return int.TryParse(Prop_TimeoutSeconds, out s) && s > 0 ? s * 1000 : 60000; }
+            set { }
+        }
 
         private string _propConnectionString;
         [LTools.Common.Model.Serialization.StoringProperty]
@@ -53,6 +57,12 @@ namespace Primo.MIA
         [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_MongoDocumentCount)]
         public string Prop_Count { get => _propCount; set { _propCount = value; InvokePropertyChanged(this, nameof(Prop_Count)); } }
 
+        private string _propTimeoutSeconds = "60";
+        [LTools.Common.Model.Serialization.StoringProperty]
+        [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
+        [System.ComponentModel.Category(ActivityStrings.Category_Settings), System.ComponentModel.DisplayName(ActivityStrings.Field_MongoTimeoutSeconds)]
+        public string Prop_TimeoutSeconds { get => _propTimeoutSeconds; set { _propTimeoutSeconds = value; InvokePropertyChanged(this, nameof(Prop_TimeoutSeconds)); } }
+
         public MongoAggregateBack(IWFContainer container) : base(container)
         {
             sdkComponentName = ActivityStrings.Activity_MongoAggregate;
@@ -75,6 +85,7 @@ Pipeline (JSON)*: [String] JSON-массив стадий агрегации (н
                 PropertyBuilder.String("Prop_Database", "Имя базы данных"),
                 PropertyBuilder.String("Prop_Collection", "Имя коллекции"),
                 PropertyBuilder.String("Prop_Pipeline", "JSON-массив стадий агрегации"),
+                PropertyBuilder.Int("Prop_TimeoutSeconds", "Таймаут в секундах"),
                 PropertyBuilder.Variable<string>("Prop_ResultJson", "Результат агрегации в виде JSON массива"),
                 PropertyBuilder.Variable<int>("Prop_Count", "Количество документов в результате")
             };
@@ -89,13 +100,15 @@ Pipeline (JSON)*: [String] JSON-массив стадий агрегации (н
                 var database = GetPropertyValue<string>(Prop_Database, nameof(Prop_Database), sd);
                 var collection = GetPropertyValue<string>(Prop_Collection, nameof(Prop_Collection), sd);
                 var pipelineJson = GetPropertyValue<string>(Prop_Pipeline, nameof(Prop_Pipeline), sd);
+                int timeout; int.TryParse(GetPropertyValue<string>(Prop_TimeoutSeconds, nameof(Prop_TimeoutSeconds), sd), out timeout);
+                if (timeout <= 0) timeout = 60;
 
                 var col = MongoDbHelper.GetCollection(connectionString, database, collection);
                 var pipelineArray = BsonSerializer.Deserialize<BsonArray>(pipelineJson);
                 var stages = pipelineArray.Select(v => v.AsBsonDocument).ToList();
                 var pipeline = PipelineDefinition<BsonDocument, BsonDocument>.Create(stages);
 
-                var docs = col.Aggregate(pipeline).ToList();
+                var docs = col.Aggregate(pipeline, new AggregateOptions { MaxTime = TimeSpan.FromSeconds(timeout) }).ToList();
                 var resultJson = MongoDbHelper.DocumentsToJson(docs);
 
                 SetVariableValue(Prop_ResultJson, resultJson, sd);

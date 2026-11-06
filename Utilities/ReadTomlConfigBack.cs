@@ -429,8 +429,10 @@ ReadProfile         — мёрж [default] + [production/staging/...]
                                     .OrderBy(key => key)
                                     .ToList();
                             }
-                            catch
+                            catch (Exception)
                             {
+                                // Профили не извлечь (файл повреждён/недоступен) —
+                                // режим "ключ не найден" корректно продолжит работу с пустым списком
                                 availableProfiles = new List<string>();
                             }
 
@@ -450,6 +452,8 @@ ReadProfile         — мёрж [default] + [production/staging/...]
                                 }
                                 catch (KeyNotFoundException)
                                 {
+                                    // Секция профиля по умолчанию отсутствует — это не ошибка:
+                                    // возвращаем пустой fallback без генерации исключения
                                 }
                             }
 
@@ -581,8 +585,15 @@ ReadProfile         — мёрж [default] + [production/staging/...]
         /// </summary>
         private Encoding ResolveEncoding(string encodingName)
         {
-            try { return Encoding.GetEncoding(encodingName); }
-            catch { return Encoding.UTF8; }
+            try
+            {
+                return Encoding.GetEncoding(encodingName);
+            }
+            catch (ArgumentException)
+            {
+                // Неизвестное имя кодировки — документированный fallback на UTF-8
+                return Encoding.UTF8;
+            }
         }
 
         // =========================================================================

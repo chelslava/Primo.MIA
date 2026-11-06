@@ -12,11 +12,13 @@
 // =============================================================================
 
 using System;
+using Primo.MIA.Common;
 
 namespace Primo.MIA
 {
     /// <summary>
     /// Логгер для активностей с структурированным форматом.
+    /// Пишет в консоль и (при включённом ActivityFileLogger.Enabled) в файл лога.
     /// </summary>
     public class ActivityLogger : IActivityLogger
     {
@@ -25,8 +27,7 @@ namespace Primo.MIA
         /// </summary>
         public void LogInfo(string activityName, string message, params object[] args)
         {
-            var formattedMessage = FormatMessage(activityName, message, args);
-            Console.WriteLine($"[INFO] {formattedMessage}");
+            ActivityFileLogger.Info(activityName, FormatMessage(activityName, message, args));
         }
 
         /// <summary>
@@ -34,8 +35,7 @@ namespace Primo.MIA
         /// </summary>
         public void LogWarning(string activityName, string message, params object[] args)
         {
-            var formattedMessage = FormatMessage(activityName, message, args);
-            Console.WriteLine($"[WARN] {formattedMessage}");
+            ActivityFileLogger.Warning(activityName, FormatMessage(activityName, message, args));
         }
 
         /// <summary>
@@ -55,7 +55,7 @@ namespace Primo.MIA
                 }
             }
 
-            Console.WriteLine($"[ERROR] {formattedMessage}");
+            ActivityFileLogger.Error(activityName, formattedMessage);
         }
 
         /// <summary>
@@ -63,8 +63,7 @@ namespace Primo.MIA
         /// </summary>
         public void LogDebug(string activityName, string message, params object[] args)
         {
-            var formattedMessage = FormatMessage(activityName, message, args);
-            Console.WriteLine($"[DEBUG] {formattedMessage}");
+            ActivityFileLogger.Debug(activityName, FormatMessage(activityName, message, args));
         }
 
         /// <summary>

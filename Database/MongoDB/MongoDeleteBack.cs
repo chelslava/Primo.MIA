@@ -12,7 +12,11 @@ namespace Primo.MIA
     {
         public override string GroupName { get => ActivityCategories.MongoDB; protected set { } }
 
-        protected override int sdkTimeOut { get => 30000; set { } }
+        protected override int sdkTimeOut
+        {
+            get { int s; return int.TryParse(Prop_TimeoutSeconds, out s) && s > 0 ? s * 1000 : 30000; }
+            set { }
+        }
 
         private string _propConnectionString;
         [LTools.Common.Model.Serialization.StoringProperty]
@@ -49,6 +53,12 @@ namespace Primo.MIA
         [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_MongoDeletedCount)]
         public string Prop_DeletedCount { get => _propDeletedCount; set { _propDeletedCount = value; InvokePropertyChanged(this, nameof(Prop_DeletedCount)); } }
 
+        private string _propTimeoutSeconds = "30";
+        [LTools.Common.Model.Serialization.StoringProperty]
+        [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
+        [System.ComponentModel.Category(ActivityStrings.Category_Settings), System.ComponentModel.DisplayName(ActivityStrings.Field_MongoTimeoutSeconds)]
+        public string Prop_TimeoutSeconds { get => _propTimeoutSeconds; set { _propTimeoutSeconds = value; InvokePropertyChanged(this, nameof(Prop_TimeoutSeconds)); } }
+
         public MongoDeleteBack(IWFContainer container) : base(container)
         {
             sdkComponentName = ActivityStrings.Activity_MongoDelete;
@@ -74,6 +84,7 @@ namespace Primo.MIA
                 PropertyBuilder.String("Prop_Collection", "Имя коллекции"),
                 PropertyBuilder.String("Prop_Filter", "JSON фильтр"),
                 PropertyBuilder.BooleanObject("Prop_DeleteMany", "True = DeleteMany, False = DeleteOne"),
+                PropertyBuilder.Int("Prop_TimeoutSeconds", "Таймаут в секундах"),
                 PropertyBuilder.Variable<int>("Prop_DeletedCount", "Количество удалённых документов")
             };
             InitClass(container);
@@ -91,6 +102,8 @@ namespace Primo.MIA
                 var col = MongoDbHelper.GetCollection(connectionString, database, collection);
                 var filter = MongoDbHelper.ParseFilter(filterJson);
 
+                // Таймаут управляет watchdog'ом активности (sdkTimeOut):
+                // у операций записи в драйвере 2.x нет per-op MaxTime
                 long deleted;
                 if (Prop_DeleteMany)
                     deleted = col.DeleteMany(filter).DeletedCount;

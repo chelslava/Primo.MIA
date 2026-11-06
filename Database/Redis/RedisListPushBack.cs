@@ -11,7 +11,11 @@ namespace Primo.MIA
     {
         public override string GroupName { get => ActivityCategories.Redis; protected set { } }
 
-        protected override int sdkTimeOut { get => 30000; set { } }
+        protected override int sdkTimeOut
+        {
+            get { int s; return int.TryParse(Prop_OperationTimeoutSeconds, out s) && s > 0 ? s * 1000 : 30000; }
+            set { }
+        }
 
         private string _propConnectionString;
         [LTools.Common.Model.Serialization.StoringProperty]
@@ -41,6 +45,11 @@ namespace Primo.MIA
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
         [System.ComponentModel.Category(ActivityStrings.Category_Settings), System.ComponentModel.DisplayName(ActivityStrings.Field_RedisDatabaseIndex)]
         public string Prop_DatabaseIndex { get => _propDatabaseIndex; set { _propDatabaseIndex = value; InvokePropertyChanged(this, nameof(Prop_DatabaseIndex)); } }
+        private string _propOperationTimeoutSeconds = "0";
+        [LTools.Common.Model.Serialization.StoringProperty]
+        [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
+        [System.ComponentModel.Category(ActivityStrings.Category_Settings), System.ComponentModel.DisplayName(ActivityStrings.Field_RedisOperationTimeoutSeconds)]
+        public string Prop_OperationTimeoutSeconds { get => _propOperationTimeoutSeconds; set { _propOperationTimeoutSeconds = value; InvokePropertyChanged(this, nameof(Prop_OperationTimeoutSeconds)); } }
 
         private string _propListLength;
         [LTools.Common.Model.Serialization.StoringProperty]
@@ -73,6 +82,7 @@ namespace Primo.MIA
                 PropertyBuilder.String("Prop_Value", "Добавляемое значение"),
                 PropertyBuilder.BooleanObject("Prop_PushLeft", "LPUSH (в начало), иначе RPUSH (в конец)"),
                 PropertyBuilder.Int("Prop_DatabaseIndex", "Индекс базы данных (0–15)"),
+                PropertyBuilder.Int("Prop_OperationTimeoutSeconds", "Таймаут операции (сек, 0 = из строки подключения)"),
                 PropertyBuilder.Variable<long>("Prop_ListLength", "Новая длина списка")
             };
             InitClass(container);
@@ -87,7 +97,9 @@ namespace Primo.MIA
                 var value = GetPropertyValue<string>(Prop_Value, nameof(Prop_Value), sd);
                 int dbIndex; int.TryParse(GetPropertyValue<string>(Prop_DatabaseIndex, nameof(Prop_DatabaseIndex), sd), out dbIndex);
 
-                var db = RedisHelper.GetDatabase(connectionString, dbIndex);
+                int opTimeout; int.TryParse(GetPropertyValue<string>(Prop_OperationTimeoutSeconds, nameof(Prop_OperationTimeoutSeconds), sd), out opTimeout);
+
+                var db = RedisHelper.GetDatabase(connectionString, dbIndex, opTimeout);
                 var length = Prop_PushLeft
                     ? db.ListLeftPush(key, value)
                     : db.ListRightPush(key, value);

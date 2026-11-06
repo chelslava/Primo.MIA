@@ -455,23 +455,24 @@ namespace Primo.MIA
             {
                 // [П6] Настраиваемый таймаут; минимум 1 секунда для защиты от нуля
                 int timeout = Math.Max(this.Prop_DownloadTimeoutSeconds, 1);
-                using (var http = new HttpClient())
+                // Клиент из пула (HttpClientPool) — dispose не закрывает пул соединений
+                using (var http = HttpClientPool.CreateClient(TimeSpan.FromSeconds(timeout)))
                 {
-                    http.Timeout = TimeSpan.FromSeconds(timeout);
-                    http.DefaultRequestHeaders.Add("User-Agent", "Primo.MIA/1.0");
+                    http.DefaultRequestHeaders.UserAgent.ParseAdd("Primo.MIA/1.0");
                     content = http.GetStringAsync(url).GetAwaiter().GetResult();
                 }
                 File.WriteAllText(actualFilePath, content, System.Text.Encoding.UTF8);
             }
             catch (TaskCanceledException)
             {
-                throw new Exception(
+                throw new CalendarParseException(
                     $"{ActivityStrings.Error_CalendarDownloadFailed}: " +
                     $"Превышено время ожидания ({this.Prop_DownloadTimeoutSeconds} с)");
             }
             catch (HttpRequestException ex)
             {
-                throw new Exception($"{ActivityStrings.Error_CalendarDownloadFailed}: {ex.Message}");
+                throw new CalendarParseException(
+                    $"{ActivityStrings.Error_CalendarDownloadFailed}: {ex.Message}");
             }
 
             ProductionCalendar calendar = GetParser().Parse(content);

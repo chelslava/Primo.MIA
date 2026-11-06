@@ -13,7 +13,11 @@ namespace Primo.MIA
     {
         public override string GroupName { get => ActivityCategories.Redis; protected set { } }
 
-        protected override int sdkTimeOut { get => 30000; set { } }
+        protected override int sdkTimeOut
+        {
+            get { int s; return int.TryParse(Prop_OperationTimeoutSeconds, out s) && s > 0 ? s * 1000 : 30000; }
+            set { }
+        }
 
         private string _propConnectionString;
         [LTools.Common.Model.Serialization.StoringProperty]
@@ -32,6 +36,11 @@ namespace Primo.MIA
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
         [System.ComponentModel.Category(ActivityStrings.Category_Settings), System.ComponentModel.DisplayName(ActivityStrings.Field_RedisDatabaseIndex)]
         public string Prop_DatabaseIndex { get => _propDatabaseIndex; set { _propDatabaseIndex = value; InvokePropertyChanged(this, nameof(Prop_DatabaseIndex)); } }
+        private string _propOperationTimeoutSeconds = "0";
+        [LTools.Common.Model.Serialization.StoringProperty]
+        [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
+        [System.ComponentModel.Category(ActivityStrings.Category_Settings), System.ComponentModel.DisplayName(ActivityStrings.Field_RedisOperationTimeoutSeconds)]
+        public string Prop_OperationTimeoutSeconds { get => _propOperationTimeoutSeconds; set { _propOperationTimeoutSeconds = value; InvokePropertyChanged(this, nameof(Prop_OperationTimeoutSeconds)); } }
 
         private string _propDeletedCount;
         [LTools.Common.Model.Serialization.StoringProperty]
@@ -60,6 +69,7 @@ namespace Primo.MIA
                 PropertyBuilder.String("Prop_ConnectionString", "Redis connection string"),
                 PropertyBuilder.Script<List<string>>("Prop_Keys", "Список ключей для удаления"),
                 PropertyBuilder.Int("Prop_DatabaseIndex", "Индекс базы данных (0–15)"),
+                PropertyBuilder.Int("Prop_OperationTimeoutSeconds", "Таймаут операции (сек, 0 = из строки подключения)"),
                 PropertyBuilder.Variable<int>("Prop_DeletedCount", "Количество удалённых ключей")
             };
             InitClass(container);
@@ -76,7 +86,9 @@ namespace Primo.MIA
                 if (keys == null || keys.Count == 0)
                     throw new InvalidOperationException("Список ключей не может быть пустым.");
 
-                var db = RedisHelper.GetDatabase(connectionString, dbIndex);
+                int opTimeout; int.TryParse(GetPropertyValue<string>(Prop_OperationTimeoutSeconds, nameof(Prop_OperationTimeoutSeconds), sd), out opTimeout);
+
+                var db = RedisHelper.GetDatabase(connectionString, dbIndex, opTimeout);
                 var redisKeys = keys.Select(k => (RedisKey)k).ToArray();
                 var deleted = db.KeyDelete(redisKeys);
 

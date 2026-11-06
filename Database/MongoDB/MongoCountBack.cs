@@ -12,7 +12,11 @@ namespace Primo.MIA
     {
         public override string GroupName { get => ActivityCategories.MongoDB; protected set { } }
 
-        protected override int sdkTimeOut { get => 30000; set { } }
+        protected override int sdkTimeOut
+        {
+            get { int s; return int.TryParse(Prop_TimeoutSeconds, out s) && s > 0 ? s * 1000 : 30000; }
+            set { }
+        }
 
         private string _propConnectionString;
         [LTools.Common.Model.Serialization.StoringProperty]
@@ -37,6 +41,12 @@ namespace Primo.MIA
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
         [System.ComponentModel.Category(ActivityStrings.Category_Main), System.ComponentModel.DisplayName(ActivityStrings.Field_MongoFilter)]
         public string Prop_Filter { get => _propFilter; set { _propFilter = value; InvokePropertyChanged(this, nameof(Prop_Filter)); } }
+
+        private string _propTimeoutSeconds = "30";
+        [LTools.Common.Model.Serialization.StoringProperty]
+        [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
+        [System.ComponentModel.Category(ActivityStrings.Category_Settings), System.ComponentModel.DisplayName(ActivityStrings.Field_MongoTimeoutSeconds)]
+        public string Prop_TimeoutSeconds { get => _propTimeoutSeconds; set { _propTimeoutSeconds = value; InvokePropertyChanged(this, nameof(Prop_TimeoutSeconds)); } }
 
         private string _propCount;
         [LTools.Common.Model.Serialization.StoringProperty]
@@ -65,6 +75,7 @@ namespace Primo.MIA
                 PropertyBuilder.String("Prop_Database", "Имя базы данных"),
                 PropertyBuilder.String("Prop_Collection", "Имя коллекции"),
                 PropertyBuilder.String("Prop_Filter", "JSON фильтр ({} = все документы)"),
+                PropertyBuilder.Int("Prop_TimeoutSeconds", "Таймаут в секундах"),
                 PropertyBuilder.Variable<int>("Prop_Count", "Количество документов")
             };
             InitClass(container);
@@ -78,10 +89,12 @@ namespace Primo.MIA
                 var database = GetPropertyValue<string>(Prop_Database, nameof(Prop_Database), sd);
                 var collection = GetPropertyValue<string>(Prop_Collection, nameof(Prop_Collection), sd);
                 var filterJson = GetPropertyValue<string>(Prop_Filter, nameof(Prop_Filter), sd);
+                int timeout; int.TryParse(GetPropertyValue<string>(Prop_TimeoutSeconds, nameof(Prop_TimeoutSeconds), sd), out timeout);
+                if (timeout <= 0) timeout = 30;
 
                 var col = MongoDbHelper.GetCollection(connectionString, database, collection);
                 var filter = MongoDbHelper.ParseFilter(filterJson);
-                var count = col.CountDocuments(filter);
+                var count = col.CountDocuments(filter, new CountOptions { MaxTime = TimeSpan.FromSeconds(timeout) });
 
                 SetVariableValue(Prop_Count, (int)count, sd);
 

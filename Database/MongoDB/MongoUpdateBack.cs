@@ -13,7 +13,11 @@ namespace Primo.MIA
     {
         public override string GroupName { get => ActivityCategories.MongoDB; protected set { } }
 
-        protected override int sdkTimeOut { get => 30000; set { } }
+        protected override int sdkTimeOut
+        {
+            get { int s; return int.TryParse(Prop_TimeoutSeconds, out s) && s > 0 ? s * 1000 : 30000; }
+            set { }
+        }
 
         private string _propConnectionString;
         [LTools.Common.Model.Serialization.StoringProperty]
@@ -62,6 +66,12 @@ namespace Primo.MIA
         [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_MongoModifiedCount)]
         public string Prop_ModifiedCount { get => _propModifiedCount; set { _propModifiedCount = value; InvokePropertyChanged(this, nameof(Prop_ModifiedCount)); } }
 
+        private string _propTimeoutSeconds = "30";
+        [LTools.Common.Model.Serialization.StoringProperty]
+        [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
+        [System.ComponentModel.Category(ActivityStrings.Category_Settings), System.ComponentModel.DisplayName(ActivityStrings.Field_MongoTimeoutSeconds)]
+        public string Prop_TimeoutSeconds { get => _propTimeoutSeconds; set { _propTimeoutSeconds = value; InvokePropertyChanged(this, nameof(Prop_TimeoutSeconds)); } }
+
         public MongoUpdateBack(IWFContainer container) : base(container)
         {
             sdkComponentName = ActivityStrings.Activity_MongoUpdate;
@@ -90,6 +100,7 @@ namespace Primo.MIA
                 PropertyBuilder.String("Prop_Filter", "JSON фильтр"),
                 PropertyBuilder.String("Prop_Update", "JSON выражение обновления ($set, $inc, ...)"),
                 PropertyBuilder.BooleanObject("Prop_UpdateMany", "True = UpdateMany, False = UpdateOne"),
+                PropertyBuilder.Int("Prop_TimeoutSeconds", "Таймаут в секундах"),
                 PropertyBuilder.Variable<int>("Prop_MatchedCount", "Совпало документов"),
                 PropertyBuilder.Variable<int>("Prop_ModifiedCount", "Обновлено документов")
             };
@@ -110,6 +121,8 @@ namespace Primo.MIA
                 var filter = MongoDbHelper.ParseFilter(filterJson);
                 var update = BsonDocument.Parse(updateJson);
 
+                // Таймаут управляет watchdog'ом активности (sdkTimeOut):
+                // у операций записи в драйвере 2.x нет per-op MaxTime
                 long matched, modified;
                 if (Prop_UpdateMany)
                 {

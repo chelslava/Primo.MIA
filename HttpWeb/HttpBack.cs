@@ -398,44 +398,28 @@ namespace Primo.MIA
 
         /// <summary>
         /// Создаёт настроенный HttpClient с поддержкой сертификатов и SSL.
-        /// Применяет таймаут, загружает клиентский сертификат (если указан),
-        /// настраивает игнорирование SSL-ошибок (если включено).
+        /// Handler берётся из пула (HttpClientPool) — переиспользуется между
+        /// активностями; dispose клиента не закрывает пул соединений.
         /// </summary>
         private HttpClient CreateHttpClient(ScriptingData sd, int timeout)
         {
-            var handler = new HttpClientHandler();
-            var certificates = new List<X509Certificate2>();
+            string certPath = null;
+            string certPassword = null;
 
-            // ── Настройка клиентского сертификата ──────────────────────
             if (this.Prop_UseCertificate)
             {
-                string certPath = GetPropertyValue<string>(this.Prop_CertPath, "Prop_CertPath", sd);
-                string certPassword = GetPropertyValue<string>(this.Prop_CertPassword, "Prop_CertPassword", sd) ?? string.Empty;
+                certPath = GetPropertyValue<string>(this.Prop_CertPath, "Prop_CertPath", sd);
+                certPassword = GetPropertyValue<string>(this.Prop_CertPassword, "Prop_CertPassword", sd) ?? string.Empty;
 
                 Guard.NotNullOrWhiteSpace(certPath, nameof(Prop_CertPath));
-
-                if (!System.IO.File.Exists(certPath))
-                    throw new System.IO.FileNotFoundException($"Файл сертификата не найден: {certPath}");
-
-                var certificate = new X509Certificate2(certPath, certPassword);
-                handler.ClientCertificates.Add(certificate);
-                certificates.Add(certificate);
             }
 
-            // ── Игнорирование SSL-ошибок (только для тестовых сред) ────
-            if (this.Prop_IgnoreSslErrors)
-            {
-                handler.ServerCertificateCustomValidationCallback =
-                    (sender, cert, chain, sslPolicyErrors) => true;
-            }
-
-            // Обёртка диспозирует сертификаты вместе с клиентом (native-ресурсы X509)
-            var client = new HttpClientWithCertificates(handler, certificates)
-            {
-                Timeout = TimeSpan.FromSeconds(timeout)
-            };
-
-            return client;
+            return HttpClientPool.CreateClient(
+                this.Prop_UseCertificate,
+                certPath,
+                certPassword,
+                this.Prop_IgnoreSslErrors,
+                TimeSpan.FromSeconds(timeout));
         }
 
 

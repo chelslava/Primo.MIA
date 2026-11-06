@@ -15,7 +15,11 @@ namespace Primo.MIA
     {
         public override string GroupName { get => ActivityCategories.MongoDB; protected set { } }
 
-        protected override int sdkTimeOut { get => 30000; set { } }
+        protected override int sdkTimeOut
+        {
+            get { int s; return int.TryParse(Prop_TimeoutSeconds, out s) && s > 0 ? s * 1000 : 30000; }
+            set { }
+        }
 
         private string _propConnectionString;
         [LTools.Common.Model.Serialization.StoringProperty]
@@ -53,6 +57,12 @@ namespace Primo.MIA
         [System.ComponentModel.Category(ActivityStrings.Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_MongoInsertedIds)]
         public string Prop_InsertedIds { get => _propInsertedIds; set { _propInsertedIds = value; InvokePropertyChanged(this, nameof(Prop_InsertedIds)); } }
 
+        private string _propTimeoutSeconds = "30";
+        [LTools.Common.Model.Serialization.StoringProperty]
+        [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
+        [System.ComponentModel.Category(ActivityStrings.Category_Settings), System.ComponentModel.DisplayName(ActivityStrings.Field_MongoTimeoutSeconds)]
+        public string Prop_TimeoutSeconds { get => _propTimeoutSeconds; set { _propTimeoutSeconds = value; InvokePropertyChanged(this, nameof(Prop_TimeoutSeconds)); } }
+
         public MongoInsertBack(IWFContainer container) : base(container)
         {
             sdkComponentName = ActivityStrings.Activity_MongoInsert;
@@ -75,6 +85,7 @@ ID вставленных документов: [List<String>] Список _id 
                 PropertyBuilder.String("Prop_Database", "Имя базы данных"),
                 PropertyBuilder.String("Prop_Collection", "Имя коллекции"),
                 PropertyBuilder.String("Prop_Document", "JSON-объект или JSON-массив для вставки"),
+                PropertyBuilder.Int("Prop_TimeoutSeconds", "Таймаут в секундах"),
                 PropertyBuilder.Variable<int>("Prop_InsertedCount", "Количество вставленных документов"),
                 PropertyBuilder.Variable<List<string>>("Prop_InsertedIds", "ID вставленных документов")
             };
@@ -97,6 +108,8 @@ ID вставленных документов: [List<String>] Список _id 
                 var trimmed = documentJson.TrimStart();
                 var insertedIds = new List<string>();
 
+                // Таймаут управляет watchdog'ом активности (sdkTimeOut):
+                // у операций записи в драйвере 2.x нет per-op MaxTime
                 if (trimmed.StartsWith("["))
                 {
                     var array = BsonSerializer.Deserialize<BsonArray>(documentJson);

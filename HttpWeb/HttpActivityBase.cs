@@ -156,67 +156,31 @@ namespace Primo.MIA
 
         /// <summary>
         /// Создаёт настроенный HttpClient с поддержкой сертификатов и SSL.
+        /// Handler берётся из пула (HttpClientPool) — переиспользуется между
+        /// активностями; dispose клиента не закрывает пул соединений.
         /// </summary>
         /// <param name="sd">Данные скрипта для получения значений свойств.</param>
         /// <param name="timeoutSeconds">Таймаут запроса в секундах.</param>
         /// <returns>Настроенный HttpClient.</returns>
         protected HttpClient CreateHttpClient(ScriptingData sd, int timeoutSeconds)
         {
-            var handler = new HttpClientHandler();
-            var certificates = new List<X509Certificate2>();
+            string certPath = null;
+            string certPassword = null;
 
-            // Настройка клиентского сертификата
             if (this.Prop_UseCertificate)
             {
-                string certPath = GetPropertyValue<string>(this.Prop_CertPath, nameof(Prop_CertPath), sd);
-                string certPassword = GetPropertyValue<string>(this.Prop_CertPassword, nameof(Prop_CertPassword), sd) ?? string.Empty;
+                certPath = GetPropertyValue<string>(this.Prop_CertPath, nameof(Prop_CertPath), sd);
+                certPassword = GetPropertyValue<string>(this.Prop_CertPassword, nameof(Prop_CertPassword), sd) ?? string.Empty;
 
                 Guard.NotNullOrWhiteSpace(certPath, nameof(Prop_CertPath));
-
-                if (!File.Exists(certPath))
-                    throw new FileNotFoundException($"Файл сертификата не найден: {certPath}");
-
-                var certificate = new X509Certificate2(certPath, certPassword);
-                handler.ClientCertificates.Add(certificate);
-                certificates.Add(certificate);
             }
 
-            // Игнорирование SSL-ошибок (только для тестовых сред)
-            if (this.Prop_IgnoreSslErrors)
-            {
-                handler.ServerCertificateCustomValidationCallback =
-                    (sender, cert, chain, sslPolicyErrors) => true;
-            }
-
-            // Обёртка диспозирует сертификаты вместе с клиентом (native-ресурсы X509)
-            var client = new HttpClientWithCertificates(handler, certificates)
-            {
-                Timeout = TimeSpan.FromSeconds(timeoutSeconds)
-            };
-
-            return client;
-        }
-
-        /// <summary>
-        /// Создаёт HttpClient с кастомным handler.
-        /// Используется для специфичных сценариев (прокси, custom validation).
-        /// </summary>
-        /// <param name="handler">Кастомный HttpClientHandler.</param>
-        /// <param name="timeoutSeconds">Таймаут запроса в секундах.</param>
-        /// <returns>Настроенный HttpClient.</returns>
-        protected HttpClient CreateHttpClient(HttpClientHandler handler, int timeoutSeconds)
-        {
-            // Применяем SSL-настройки из свойств
-            if (this.Prop_IgnoreSslErrors)
-            {
-                handler.ServerCertificateCustomValidationCallback =
-                    (sender, cert, chain, sslPolicyErrors) => true;
-            }
-
-            return new HttpClient(handler)
-            {
-                Timeout = TimeSpan.FromSeconds(timeoutSeconds)
-            };
+            return HttpClientPool.CreateClient(
+                this.Prop_UseCertificate,
+                certPath,
+                certPassword,
+                this.Prop_IgnoreSslErrors,
+                TimeSpan.FromSeconds(timeoutSeconds));
         }
 
         // ── Вспомогательные методы ────────────────────────────────────────
@@ -257,34 +221,6 @@ namespace Primo.MIA
         protected string ActivityLabel(string activityName)
         {
             return $"[{activityName}]";
-        }
-    }
-
-    /// <summary>
-    /// HttpClient, который при освобождении также диспозит загруженные
-    /// X509Certificate2 (native-ресурсы не собираются финализатором promptly).
-    /// </summary>
-    internal sealed class HttpClientWithCertificates : HttpClient
-    {
-        private readonly List<X509Certificate2> _certificates;
-
-        public HttpClientWithCertificates(HttpClientHandler handler, List<X509Certificate2> certificates)
-            : base(handler)
-        {
-            _certificates = certificates ?? new List<X509Certificate2>();
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                foreach (var certificate in _certificates)
-                {
-                    certificate.Dispose();
-                }
-                _certificates.Clear();
-            }
-            base.Dispose(disposing);
         }
     }
 }

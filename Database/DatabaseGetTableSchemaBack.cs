@@ -16,7 +16,12 @@ namespace Primo.MIA
     public class DatabaseGetTableSchemaBack : PrimoComponentTO<DatabaseGetTableSchema>
     {
         public override string GroupName { get => ActivityCategories.Database; protected set { } }
-        protected override int sdkTimeOut { get => 30000; set { } }
+
+        protected override int sdkTimeOut
+        {
+            get { int s; return int.TryParse(Prop_CommandTimeoutSeconds, out s) && s > 0 ? s * 1000 : 30000; }
+            set { }
+        }
 
         private string _propProviderInvariantName = "\"" + DatabaseHelper.DefaultProviderInvariantName + "\"";
         [LTools.Common.Model.Serialization.StoringProperty]
@@ -53,6 +58,13 @@ namespace Primo.MIA
         /// <summary>DataTable с описанием колонок таблицы: имя, тип данных, допустимость null и другие атрибуты.</summary>
         public string Prop_SchemaTable { get => _propSchemaTable; set { _propSchemaTable = value; InvokePropertyChanged(this, nameof(Prop_SchemaTable)); } }
 
+        private string _propCommandTimeoutSeconds = "30";
+        [LTools.Common.Model.Serialization.StoringProperty]
+        [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
+        [System.ComponentModel.Category(ActivityStrings.Category_Settings), System.ComponentModel.DisplayName(ActivityStrings.Field_CommandTimeoutSeconds)]
+        /// <summary>Таймаут операции в секундах.</summary>
+        public string Prop_CommandTimeoutSeconds { get => _propCommandTimeoutSeconds; set { _propCommandTimeoutSeconds = value; InvokePropertyChanged(this, nameof(Prop_CommandTimeoutSeconds)); } }
+
         public DatabaseGetTableSchemaBack(IWFContainer container) : base(container)
         {
             sdkComponentName = ActivityStrings.Activity_DatabaseGetTableSchema;
@@ -76,6 +88,7 @@ namespace Primo.MIA
                 PropertyBuilder.String("Prop_ConnectionString", "Строка подключения к БД"),
                 PropertyBuilder.String("Prop_TableName", "Имя таблицы"),
                 PropertyBuilder.String("Prop_SchemaName", "Имя схемы (опционально)"),
+                PropertyBuilder.Int("Prop_CommandTimeoutSeconds", "Таймаут операции в секундах"),
                 PropertyBuilder.Variable<DataTable>("Prop_SchemaTable", "Таблица со схемой колонок")
             };
             InitClass(container);

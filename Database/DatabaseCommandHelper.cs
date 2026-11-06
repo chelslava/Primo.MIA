@@ -253,8 +253,17 @@ namespace Primo.MIA
                 {
                     return Convert.ToInt32(value, CultureInfo.InvariantCulture);
                 }
-                catch
+                catch (FormatException)
                 {
+                    // Конвертация не удалась — ниже fallback на разбор строки
+                }
+                catch (InvalidCastException)
+                {
+                    // Конвертация не удалась — ниже fallback на разбор строки
+                }
+                catch (OverflowException)
+                {
+                    // Вне диапазона Int32 — ниже fallback на разбор строки
                 }
             }
 
@@ -278,8 +287,17 @@ namespace Primo.MIA
                 {
                     return Convert.ToDecimal(value, CultureInfo.InvariantCulture);
                 }
-                catch
+                catch (FormatException)
                 {
+                    // Конвертация не удалась — ниже fallback на разбор строки
+                }
+                catch (InvalidCastException)
+                {
+                    // Конвертация не удалась — ниже fallback на разбор строки
+                }
+                catch (OverflowException)
+                {
+                    // Вне диапазона Decimal — ниже fallback на разбор строки
                 }
             }
 
@@ -303,8 +321,13 @@ namespace Primo.MIA
                 {
                     return Convert.ToBoolean(value, CultureInfo.InvariantCulture);
                 }
-                catch
+                catch (FormatException)
                 {
+                    // Конвертация не удалась — ниже fallback на разбор строки
+                }
+                catch (InvalidCastException)
+                {
+                    // Конвертация не удалась — ниже fallback на разбор строки
                 }
             }
 
@@ -341,8 +364,13 @@ namespace Primo.MIA
                 {
                     return Convert.ToDateTime(value, CultureInfo.InvariantCulture);
                 }
-                catch
+                catch (FormatException)
                 {
+                    // Конвертация не удалась — ниже fallback на разбор строки
+                }
+                catch (InvalidCastException)
+                {
+                    // Конвертация не удалась — ниже fallback на разбор строки
                 }
             }
 

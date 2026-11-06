@@ -15,7 +15,7 @@
 // =============================================================================
 
 using System;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 
 namespace Primo.MIA.Common
 {
@@ -23,6 +23,7 @@ namespace Primo.MIA.Common
     /// Статический ambient-контекст, хранящий стек ID сессий браузера в RepoDict.
     /// Позволяет активностям внутри контейнера получить sessionId
     /// без явной передачи через свойство Prop_SessionId.
+    /// Стек конкурентный (ConcurrentStack) — Push/Pop безопасны из параллельных веток робота.
     /// </summary>
     public static class BrowserSessionContext
     {
@@ -38,17 +39,14 @@ namespace Primo.MIA.Common
             get
             {
                 var stack = GetStack();
-                if (stack == null || stack.Count == 0)
-                    return null;
-
-                return stack.Peek();
+                return stack != null && stack.TryPeek(out var current) ? current : null;
             }
         }
 
         /// <summary>
         /// Помещает ID сессии в стек контекста.
         /// Вызывается контейнером BrowserOpenBack перед выполнением дочерних активностей.
-        /// 
+        ///
         /// ВАЖНО: При каждом вызове Push() из BrowserOpen автоматически вызывается Pop()
         /// для предыдущей сессии, что обеспечивает корректную работу вложенных контейнеров
         /// и автоматическую очистку при выходе из контейнера.
@@ -62,13 +60,11 @@ namespace Primo.MIA.Common
                 throw new ArgumentNullException(nameof(sessionId),
                     "ID сессии не может быть пустым при регистрации контекста");
 
-            var stack = GetStack();
-            if (stack == null)
-            {
-                stack = new Stack<string>();
-                RepoDict.Set(SESSION_STACK_KEY, stack);
-            }
-
+            // AddOrUpdate атомарен: две ветки не создадут два разных стека
+            var stack = (ConcurrentStack<string>)RepoDict.ObjectDict.AddOrUpdate(
+                SESSION_STACK_KEY,
+                _ => new ConcurrentStack<string>(),
+                (_, existing) => existing as ConcurrentStack<string> ?? new ConcurrentStack<string>());
             stack.Push(sessionId);
         }
 
@@ -79,16 +75,15 @@ namespace Primo.MIA.Common
         public static void Pop()
         {
             var stack = GetStack();
-            if (stack != null && stack.Count > 0)
-                stack.Pop();
+            stack?.TryPop(out _);
         }
 
         /// <summary>
         /// Получает стек сессий из RepoDict.
         /// </summary>
-        private static Stack<string> GetStack()
+        private static ConcurrentStack<string> GetStack()
         {
-            return RepoDict.Get<Stack<string>>(SESSION_STACK_KEY);
+            return RepoDict.Get<ConcurrentStack<string>>(SESSION_STACK_KEY);
         }
     }
 }

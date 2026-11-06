@@ -358,32 +358,28 @@ namespace Primo.MIA
         #endregion
 
         /// <summary>
-        /// Логирует информационное сообщение в консоль робота.
+        /// Логирует информационное сообщение (консоль + файловый лог при включённом).
         /// Используется в том числе как делегат для BrowserElementHelper.
         /// </summary>
         protected void LogInfo(string message)
         {
-            Console.WriteLine($"[INFO] {GetType().Name}: {message}");
+            ActivityFileLogger.Info(GetType().Name, message);
         }
 
         /// <summary>
-        /// Логирует предупреждение в консоль робота.
+        /// Логирует предупреждение (консоль + файловый лог при включённом).
         /// </summary>
         protected void LogWarning(string message)
         {
-            Console.WriteLine($"[WARN] {GetType().Name}: {message}");
+            ActivityFileLogger.Warning(GetType().Name, message);
         }
 
         /// <summary>
-        /// Логирует ошибку в консоль робота.
+        /// Логирует ошибку (консоль + файловый лог при включённом).
         /// </summary>
         protected void LogError(string message, Exception ex = null)
         {
-            string logMessage = ex != null
-                ? $"[ERROR] {GetType().Name}: {message} - {ex.Message}"
-                : $"[ERROR] {GetType().Name}: {message}";
-
-            Console.WriteLine(logMessage);
+            ActivityFileLogger.Error(GetType().Name, ex != null ? $"{message} - {ex.Message}" : message);
         }
 
         #region Shadow DOM Support

@@ -15,7 +15,12 @@ namespace Primo.MIA
     public class DatabaseListColumnsBack : PrimoComponentTO<DatabaseListColumns>
     {
         public override string GroupName { get => ActivityCategories.Database; protected set { } }
-        protected override int sdkTimeOut { get => 30000; set { } }
+
+        protected override int sdkTimeOut
+        {
+            get { int s; return int.TryParse(Prop_CommandTimeoutSeconds, out s) && s > 0 ? s * 1000 : 30000; }
+            set { }
+        }
 
         private string _propProviderInvariantName = "\"" + DatabaseHelper.DefaultProviderInvariantName + "\"";
         [LTools.Common.Model.Serialization.StoringProperty]
@@ -59,6 +64,13 @@ namespace Primo.MIA
         /// <summary>Количество колонок в указанной таблице.</summary>
         public string Prop_Count { get => _propCount; set { _propCount = value; InvokePropertyChanged(this, nameof(Prop_Count)); } }
 
+        private string _propCommandTimeoutSeconds = "30";
+        [LTools.Common.Model.Serialization.StoringProperty]
+        [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
+        [System.ComponentModel.Category(ActivityStrings.Category_Settings), System.ComponentModel.DisplayName(ActivityStrings.Field_CommandTimeoutSeconds)]
+        /// <summary>Таймаут операции в секундах.</summary>
+        public string Prop_CommandTimeoutSeconds { get => _propCommandTimeoutSeconds; set { _propCommandTimeoutSeconds = value; InvokePropertyChanged(this, nameof(Prop_CommandTimeoutSeconds)); } }
+
         public DatabaseListColumnsBack(IWFContainer container) : base(container)
         {
             sdkComponentName = ActivityStrings.Activity_DatabaseListColumns;
@@ -83,6 +95,7 @@ namespace Primo.MIA
                 PropertyBuilder.String("Prop_ConnectionString", "Строка подключения к БД"),
                 PropertyBuilder.String("Prop_TableName", "Имя таблицы"),
                 PropertyBuilder.String("Prop_SchemaName", "Имя схемы (опционально)"),
+                PropertyBuilder.Int("Prop_CommandTimeoutSeconds", "Таймаут операции в секундах"),
                 PropertyBuilder.Variable<List<string>>("Prop_ColumnNames", "Список колонок"),
                 PropertyBuilder.Variable<int>("Prop_Count", "Количество колонок")
             };

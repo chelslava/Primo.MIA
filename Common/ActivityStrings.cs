@@ -1122,6 +1122,7 @@ namespace Primo.MIA.Common
         public const string Field_RedisStop             = "Конец диапазона (-1 = до конца)";
         public const string Field_RedisIncrement        = "Шаг инкремента";
         public const string Field_RedisDatabaseIndex    = "Индекс БД (0–15)";
+        public const string Field_RedisOperationTimeoutSeconds = "Таймаут операции (сек, 0 = из строки подключения)";
         public const string Field_RedisExists           = "Ключ существует";
         public const string Field_RedisExistsCount      = "Найдено ключей";
         public const string Field_RedisDeletedCount     = "Удалено ключей";
