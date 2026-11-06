@@ -64,6 +64,7 @@
     <PackageReference Include="StackExchange.Redis" Version="2.8.41" />
     <PackageReference Include="Npgsql" Version="7.0.8" />
     <PackageReference Include="SSH.NET" Version="2024.2.0" />
+    <PackageReference Include="RabbitMQ.Client" Version="6.8.1" />
   </ItemGroup>
 
   <!-- Local Primo SDK references (not available via NuGet) -->

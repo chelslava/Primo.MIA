@@ -18,6 +18,8 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <!-- Прямая ссылка: тесты SftpLogic используют тип SftpClient из сигнатур API -->
     <PackageReference Include="SSH.NET" Version="2024.2.0" />
+    <!-- Прямая ссылка: тесты RabbitMqLogic используют тип ConnectionFactory из сигнатур API -->
+    <PackageReference Include="RabbitMQ.Client" Version="6.8.1" />
     <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.1.2" />
     <PackageReference Include="System.Text.Json" Version="10.0.2" />
     <PackageReference Include="xunit.extensibility.core" Version="2.9.3" />

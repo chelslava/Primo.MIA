@@ -77,5 +77,8 @@
         /// <summary>Иконка для активностей SFTP</summary>
         public const string Sftp = BasePath + "folder.png";
 
+        /// <summary>Иконка для активностей очередей сообщений</summary>
+        public const string MessageQueue = BasePath + "http.png";
+
     }
 }

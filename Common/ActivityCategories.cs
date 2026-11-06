@@ -51,5 +51,8 @@ namespace Primo.MIA.Common
 
         /// <summary>Категория "MIA → SFTP"</summary>
         public const string Sftp = Prefix + "SFTP";
+
+        /// <summary>Категория "MIA → Очереди сообщений"</summary>
+        public const string MessageQueues = Prefix + "Очереди сообщений";
     }
 }

@@ -1220,6 +1220,40 @@ namespace Primo.MIA.Common
         public const string Error_SftpHostRequired = "Хост не может быть пустым";
         public const string Error_SftpRemotePathRequired = "Удалённый путь не может быть пустым";
         public const string Error_SftpLocalPathRequired = "Локальный путь не может быть пустым";
+
+        // ═══════════════════════════════════════════════════════════════════════
+        // ОЧЕРЕДИ СООБЩЕНИЙ (RabbitMQ)
+        // ═══════════════════════════════════════════════════════════════════════
+
+        public const string Activity_RabbitMqPublish = "RabbitMQ: Отправить сообщение";
+        public const string Activity_RabbitMqConsume = "RabbitMQ: Получить сообщение";
+
+        public const string Field_MqHost = "Хост";
+        public const string Field_MqPort = "Порт";
+        public const string Field_MqUserName = "Пользователь";
+        public const string Field_MqPassword = "Пароль";
+        public const string Field_MqVirtualHost = "VirtualHost";
+        public const string Field_MqUseTls = "Использовать TLS";
+        public const string Field_MqConnectionTimeoutSeconds = "Таймаут подключения (сек)";
+        public const string Mq_Category_Publish = "Публикация";
+        public const string Mq_Category_Consume = "Получение";
+        public const string Mq_Category_Output = "Выходные данные";
+
+        public const string Field_MqExchange = "Exchange";
+        public const string Field_MqRoutingKey = "Routing Key";
+        public const string Field_MqBody = "Тело сообщения";
+        public const string Field_MqPersistent = "Persistent доставка";
+        public const string Field_MqQueue = "Очередь";
+        public const string Field_MqAutoAck = "Auto Ack";
+        public const string Field_MqTimeoutSeconds = "Таймаут ожидания (сек)";
+        public const string Field_MqMessageBody = "Тело полученного сообщения";
+        public const string Field_MqMessageRoutingKey = "Routing Key сообщения";
+        public const string Field_MqDeliveryTag = "Delivery Tag";
+        public const string Field_MqHasMessage = "Сообщение получено";
+
+        public const string Error_MqHostRequired = "Хост не может быть пустым";
+        public const string Error_MqQueueRequired = "Очередь не может быть пустой";
+        public const string Error_MqBodyRequired = "Тело сообщения не может быть пустым";
     }
 
 }
