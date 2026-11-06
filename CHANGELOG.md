@@ -1,5 +1,58 @@
 # Primo.MIA - Selenium Browser Activities
 
+## Что нового в версии 1.3.0
+
+### ✨ Новый модуль: SFTP (5 активностей) — SSH.NET 2024.2.0
+
+- **SftpUpload / SftpDownload / SftpList / SftpDelete / SftpCreateFolder**
+- Аутентификация: пароль **или** приватный ключ (OpenSSH/PEM) + парольная фраза
+- Проверка host key по SHA256-отпечатку (`ssh-keygen -lf`) либо отключение для тестовых сред
+- Таймауты подключения/операции, рекурсивное удаление каталогов
+- Закрывает пробел официальной экосистемы: FTP-элемент Primo SSH не поддерживает
+
+### ✨ Новый модуль: Криптография (5 активностей) — без новых зависимостей
+
+- **HashCalculate** — MD5/SHA1/SHA256/SHA384/SHA512, строка или файл (потоково), hex/Base64
+- **EncryptString / DecryptString** — AES-256-CBC, ключ из пароля через PBKDF2-SHA256
+  (100 000 итераций), случайная соль; формат Base64([salt][IV][ciphertext])
+- **Base64Encode / Base64Decode**
+
+### ✨ Новый модуль: Очереди сообщений — RabbitMQ (2 активности)
+
+- **RabbitMqPublish** — exchange/routing key, persistent-доставка, TLS, vhost
+- **RabbitMqConsume** — ожидание одного сообщения с таймаутом; по таймауту
+  `HasMessage=False` без исключения (удобно для опроса в цикле);
+  AutoAck=False = режим «прочитать без удаления»
+
+### 🔧 Надёжность и качество
+
+- **Пул HttpClient**: HttpClientHandler кэшируется по конфигурации с TTL-ротацией
+  10 мин и grace-периодом для in-flight запросов — устранён антипаттерн
+  «HttpClient на каждый запрос» (исчерпание сокетов под нагрузкой)
+- **Потокобезопасность ambient-контекстов**: `BrowserSessionContext` и
+  `DatabaseTransactionContext` переведены на ConcurrentStack — Push/Pop безопасны
+  из параллельных веток робота
+- **Таймауты**: настраиваемые таймауты в 4 Database-активностях метаданных
+  (ListTables/ListColumns/TableExists/GetTableSchema), 5 MongoDB-активностях
+  и 9 Redis-активностях
+- **Файловый логгер** `ActivityFileLogger`: лог активностей в файл с ротацией 10 МБ
+  (включение `PRIMO_MIA_LOG_FILE=1`); Console.WriteLine больше не единственный sink
+- Гигиена исключений: сужены пустые catch, голые `throw new Exception` заменены
+  на `CalendarParseException`
+
+### 🧪 Тесты
+
+- 71 новый тест: крипто (23, эталонные векторы), SFTP (21), RabbitMQ (12),
+  конкурентность ambient-контекстов (4), Browser Wait/Interaction (11), файловый
+  логгер (5+) — итог: **1131 тест**
+
+### 📦 Версионирование
+
+- Единый источник версии в csproj: `AssemblyVersion`/`FileVersion` наследуются
+  от `<Version>`, prerelease-суффиксы тегов отсекаются автоматически
+- CI проверяет отсутствие хардкода версий и наличие секции CHANGELOG;
+  релиз по тегу блокируется без записи в CHANGELOG
+
 ## Что нового в версии 1.2.0
 
 ### ✨ Новая активность: DataTable: Фильтрация (DataTableFilter)

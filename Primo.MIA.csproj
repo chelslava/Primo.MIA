@@ -23,11 +23,11 @@
          содержит SHA коммита (SourceRevisionId). -->
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageId>Primo.MIA</PackageId>
-    <Version>1.2.0</Version>
+    <Version>1.3.0</Version>
     <AssemblyVersion>$(Version.Split('-')[0])</AssemblyVersion>
     <FileVersion>$(Version.Split('-')[0])</FileVersion>
     <Authors>Chelslava</Authors>
-    <Description>Библиотека расширенных активностей для платформы Primo RPA (~120 активностей: Browser, Database, HTTP, Collections, Files, Calendar, Text, и другие)</Description>
+    <Description>Библиотека расширенных активностей для платформы Primo RPA (~130 активностей: Browser, Database, HTTP, SFTP, RabbitMQ, Crypto, Collections, Files, Calendar, Text, и другие)</Description>
     <PackageProjectUrl>https://github.com/chelslava/Primo.MIA</PackageProjectUrl>
     <RepositoryUrl>https://github.com/chelslava/Primo.MIA</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
