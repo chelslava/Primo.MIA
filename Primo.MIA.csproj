@@ -65,8 +65,12 @@
     <PackageReference Include="System.ValueTuple" Version="4.6.2" ExcludeAssets="all" />
     <PackageReference Include="RabbitMQ.Client" Version="6.8.1" />
     <!-- Kafka (issue #19): Confluent.Kafka 2.x — net472+/netstandard2.0;
-         нативный librdkafka.redist подтягивается транзитивно -->
+         нативный librdkafka.redist подтягивается транзитивно.
+         Явная ссылка с ExcludeAssets/PrivateAssets=all: без неё content-ассеты
+         redist (нативные librdkafka/VC-редистрибутивы, ~11 МБ) дублируются в
+         наш nupkg; у потребителя они приходят транзитивно через Confluent.Kafka -->
     <PackageReference Include="Confluent.Kafka" Version="2.12.0" />
+    <PackageReference Include="librdkafka.redist" Version="2.12.0" ExcludeAssets="all" PrivateAssets="all" />
   </ItemGroup>
 
   <!-- Local Primo SDK references (not available via NuGet).
