@@ -382,7 +382,7 @@ coveragereport/
 .coverage/
 *.trx
 /Primo.MIA.Tests/.vscode
-/Primo.MIA.Tests/Common
+
 
 # OpenCode working files
 .omc/

@@ -31,8 +31,17 @@ if (-not (Test-Path $vstest)) {
     throw "vstest.console.exe не найден: $vstest"
 }
 
+Write-Host "Restoring NuGet packages..."
+# Restore отдельным вызовом: при объединённом -t:Restore,Build MSBuild строит
+# проект по оценке ДО записи .nuget.g.props — импорты из NuGet (props пакетов,
+# свойства $(Pkg...)) тогда недоступны, и адаптер xUnit не копируется в output
+& $msbuild $testProject /t:Restore /p:Configuration=$Configuration /m
+if ($LASTEXITCODE -ne 0) {
+    throw "MSBuild restore завершился с кодом $LASTEXITCODE"
+}
+
 Write-Host "Building tests with MSBuild..."
-& $msbuild $testProject /t:Restore,Build /p:Configuration=$Configuration /m
+& $msbuild $testProject /t:Build /p:Configuration=$Configuration /m
 if ($LASTEXITCODE -ne 0) {
     throw "MSBuild завершился с кодом $LASTEXITCODE"
 }

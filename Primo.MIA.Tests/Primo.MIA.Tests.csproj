@@ -19,7 +19,7 @@
     <PackageReference Include="System.Text.Json" Version="10.0.2" />
     <PackageReference Include="xunit.extensibility.core" Version="2.9.3" />
     <PackageReference Include="xunit" Version="2.9.3" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="3.0.0">
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.0.0" GeneratePathProperty="true">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
@@ -77,6 +77,21 @@
   <Target Name="CopyUnsafeDll" AfterTargets="CopyMainProjectOutput">
     <Copy SourceFiles="C:\Program Files\Microsoft Visual Studio\18\Enterprise\Common7\IDE\PublicAssemblies\System.Runtime.CompilerServices.Unsafe.dll"
           DestinationFolder="$(OutputPath)" SkipUnchangedFiles="true" />
+  </Target>
+  <!--
+    Явное копирование адаптера xUnit для vstest.
+    При MSBuild -t:Restore,Build None-элементы из props пакета
+    xunit.runner.visualstudio НЕ копируются в output (только при Rebuild),
+    из-за чего vstest на CI не находил тесты ("No test is available").
+    Путь к папке пакета — через свойство $(Pkg...), генерируемое NuGet.
+  -->
+  <Target Name="CopyXunitTestAdapter" AfterTargets="Build">
+    <ItemGroup>
+      <_XunitTestAdapterNetFx Include="$(Pkgxunit_runner_visualstudio)\build\net472\xunit.runner.visualstudio.testadapter.dll" />
+      <_XunitAbstractionsNetFx Include="$(Pkgxunit_runner_visualstudio)\build\net472\xunit.abstractions.dll" />
+    </ItemGroup>
+    <Copy SourceFiles="@(_XunitTestAdapterNetFx)" DestinationFolder="$(OutputPath)" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(_XunitAbstractionsNetFx)" DestinationFolder="$(OutputPath)" SkipUnchangedFiles="true" />
   </Target>
 
   <ItemGroup>
