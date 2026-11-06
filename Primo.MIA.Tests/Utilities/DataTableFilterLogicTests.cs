@@ -1,4 +1,4 @@
-// =============================================================================
+﻿// =============================================================================
 // DataTableFilterLogicTests.cs — тесты логики фильтрации DataTable.
 //
 // Покрывает:
@@ -25,6 +25,7 @@ using Join = Primo.MIA.DataTableConditionJoin;
 namespace Primo.MIA.Tests.Utilities
 {
     /// <summary>Тесты логики фильтрации DataTable.</summary>
+        [Trait("Category", "Fast")]
     public class DataTableFilterLogicTests
     {
         // =====================================================================

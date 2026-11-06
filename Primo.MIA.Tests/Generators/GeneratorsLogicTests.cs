@@ -1,4 +1,4 @@
-// =============================================================================
+﻿// =============================================================================
 // GeneratorsLogicTests.cs — тесты чистой логики генераторов (GeneratorsLogic).
 //
 // Покрывает:
@@ -21,6 +21,7 @@ using Xunit;
 namespace Primo.MIA.Tests.Generators
 {
     /// <summary>Тесты чистой логики генераторов данных.</summary>
+        [Trait("Category", "Fast")]
     public class GeneratorsLogicTests
     {
         /// <summary>Фиксированный GUID для точных проверок форматов.</summary>

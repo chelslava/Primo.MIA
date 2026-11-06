@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using FluentAssertions;
 using Primo.MIA;
@@ -9,6 +9,7 @@ namespace Primo.MIA.Tests.Dictionary
     /// <summary>
     /// Тесты для бизнес-логики операций с ключами и значениями словаря.
     /// </summary>
+        [Trait("Category", "Fast")]
     public class DictionaryKeyValueLogicTests
     {
         private readonly DictionaryKeyValueLogic _logic;

@@ -1,4 +1,4 @@
-// =============================================================================
+﻿// =============================================================================
 // JsonDataTableBack.cs — активность «JSON: DataTable конвертер».
 //
 // Конвертирует DataTable в JSON и обратно без сторонних библиотек.
@@ -611,7 +611,7 @@ namespace Primo.MIA
                 foreach (string colName in allCols)
                 {
                     Type colType = this.Prop_TypeInference
-                        ? InferType(elements[0].GetProperty(colName))
+                        ? JsonDataTableLogic.InferType(elements[0].GetProperty(colName))
                         : typeof(string);
                     dt.Columns.Add(colName, colType);
                 }
@@ -623,7 +623,7 @@ namespace Primo.MIA
                     foreach (string colName in allCols)
                     {
                         if (elem.TryGetProperty(colName, out JsonElement val))
-                            row[colName] = ParseJsonValue(val, dt.Columns[colName].DataType, dateFormat);
+                            row[colName] = JsonDataTableLogic.ParseJsonValue(val, dt.Columns[colName].DataType, dateFormat);
                         else
                             row[colName] = DBNull.Value;
                     }
@@ -643,7 +643,7 @@ namespace Primo.MIA
                     {
                         string name = $"Col{i}";
                         Type type = this.Prop_TypeInference
-                            ? InferType(elements[0][i])
+                            ? JsonDataTableLogic.InferType(elements[0][i])
                             : typeof(string);
                         dt.Columns.Add(name, type);
                     });
@@ -654,7 +654,7 @@ namespace Primo.MIA
                     DataRow row = dt.NewRow();
                     var vals = elem.EnumerateArray().ToList();
                     for (int i = 0; i < Math.Min(vals.Count, dt.Columns.Count); i++)
-                        row[i] = ParseJsonValue(vals[i], dt.Columns[i].DataType, dateFormat);
+                        row[i] = JsonDataTableLogic.ParseJsonValue(vals[i], dt.Columns[i].DataType, dateFormat);
                     dt.Rows.Add(row);
                 }
             }
@@ -696,7 +696,7 @@ namespace Primo.MIA
                         .ToList();
                     int idx = origCols.IndexOf(colName);
                     Type type = idx >= 0 && idx < firstRow.Count
-                        ? InferType(firstRow[idx])
+                        ? JsonDataTableLogic.InferType(firstRow[idx])
                         : typeof(string);
                     dt.Columns.Add(colName, type);
                 });
@@ -725,7 +725,7 @@ namespace Primo.MIA
                 {
                     int idx = colIndexMap[colName];
                     if (idx >= 0 && idx < vals.Count)
-                        row[colName] = ParseJsonValue(vals[idx], dt.Columns[colName].DataType, dateFormat);
+                        row[colName] = JsonDataTableLogic.ParseJsonValue(vals[idx], dt.Columns[colName].DataType, dateFormat);
                     else
                         row[colName] = DBNull.Value;
                 }
@@ -739,74 +739,9 @@ namespace Primo.MIA
         // Вспомогательные методы
         // =====================================================================
 
-        /// <summary>
-        /// Определяет тип C# по значению JsonElement.
-        /// Приоритет: int → long → double → bool → DateTime → string.
-        /// </summary>
-        private static Type InferType(JsonElement elem)
-        {
-            switch (elem.ValueKind)
-            {
-                case JsonValueKind.Number:
-                    if (elem.TryGetInt32(out _)) return typeof(int);
-                    if (elem.TryGetInt64(out _)) return typeof(long);
-                    if (elem.TryGetDouble(out _)) return typeof(double);
-                    return typeof(decimal);
+        // InferType и ParseJsonValue вынесены в Utilities/JsonDataTableLogic.cs
+        // (чистая логика без SDK — тестируется в Primo.MIA.Tests/Utilities/JsonDataTableLogicTests.cs)
 
-                case JsonValueKind.True:
-                case JsonValueKind.False:
-                    return typeof(bool);
-
-                case JsonValueKind.String:
-                    string s = elem.GetString() ?? string.Empty;
-                    if (DateTime.TryParse(s, out _)) return typeof(DateTime);
-                    return typeof(string);
-
-                default:
-                    return typeof(string);
-            }
-        }
-
-        /// <summary>
-        /// Конвертирует JsonElement в значение указанного типа C#.
-        /// DBNull при JsonValueKind.Null.
-        /// </summary>
-        private static object ParseJsonValue(
-            JsonElement elem, Type targetType, string dateFormat)
-        {
-            if (elem.ValueKind == JsonValueKind.Null)
-                return DBNull.Value;
-
-            try
-            {
-                if (targetType == typeof(int)) return elem.GetInt32();
-                if (targetType == typeof(long)) return elem.GetInt64();
-                if (targetType == typeof(double)) return elem.GetDouble();
-                if (targetType == typeof(decimal)) return elem.GetDecimal();
-                if (targetType == typeof(bool))
-                    return elem.ValueKind == JsonValueKind.True ||
-                           (elem.ValueKind == JsonValueKind.String &&
-                            bool.TryParse(elem.GetString(), out bool b) && b);
-                if (targetType == typeof(DateTime))
-                {
-                    string sv = elem.ValueKind == JsonValueKind.String
-                        ? elem.GetString()
-                        : elem.ToString();
-                    return DateTime.TryParse(sv, out DateTime dt) ? dt : (object)DBNull.Value;
-                }
-                // string и всё остальное
-                return elem.ValueKind == JsonValueKind.String
-                    ? elem.GetString()
-                    : elem.ToString();
-            }
-            catch
-            {
-                // Fallback — возвращаем как строку
-                return elem.ValueKind == JsonValueKind.String
-                    ? elem.GetString()
-                    : elem.ToString();
-            }
-        }
 
         // =====================================================================
         // Валидация

@@ -1,4 +1,4 @@
-using Primo.MIA.Common;
+﻿using Primo.MIA.Common;
 using System;
 using System.Data.Common;
 

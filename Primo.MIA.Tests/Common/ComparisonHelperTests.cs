@@ -1,10 +1,11 @@
-using System;
+﻿using System;
 using FluentAssertions;
 using Primo.MIA.Common;
 using Xunit;
 
 namespace Primo.MIA.Tests.Common
 {
+        [Trait("Category", "Fast")]
     public class ComparisonHelperTests
     {
         [Fact(DisplayName = "GetStringComparison: case sensitive returns Ordinal")]

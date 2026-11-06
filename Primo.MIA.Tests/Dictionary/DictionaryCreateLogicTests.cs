@@ -9,6 +9,7 @@ namespace Primo.MIA.Tests.Dictionary
     /// <summary>
     /// Тесты для бизнес-логики создания словарей.
     /// </summary>
+        [Trait("Category", "Fast")]
     public class DictionaryCreateLogicTests
     {
         private readonly DictionaryCreateLogic _logic;

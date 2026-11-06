@@ -36,13 +36,13 @@ namespace Primo.MIA.Tests.Calendar
         {
             // Путь к тестовым данным
             string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
-            _testDataPath = Path.Combine(baseDirectory, "calendar");
+            _testDataPath = Path.Combine(baseDirectory, "Calendar");
 
             // Если папка не найдена, пробуем путь относительно проекта
             if (!Directory.Exists(_testDataPath))
             {
                 string projectPath = Path.GetFullPath(Path.Combine(baseDirectory, @"..\..\..\..\Primo.MIA.Tests"));
-                _testDataPath = Path.Combine(projectPath, "calendar");
+                _testDataPath = Path.Combine(projectPath, "Calendar");
             }
         }
 
@@ -196,7 +196,7 @@ namespace Primo.MIA.Tests.Calendar
             // Arrange
             string filePath = Path.Combine(_testDataPath, "calendar.xml");
             File.Exists(filePath).Should().BeTrue(
-                "тестовая фикстура {0} не найдена — проверьте копирование calendar/ в output", filePath);
+                "тестовая фикстура {0} не найдена — проверьте копирование Calendar/ в output", filePath);
 
             string content = File.ReadAllText(filePath);
             var parser = new Primo.MIA.Calendar.Parsers.XmlCalendarParser();
@@ -216,7 +216,7 @@ namespace Primo.MIA.Tests.Calendar
             // Arrange
             string filePath = Path.Combine(_testDataPath, "calendar.json");
             File.Exists(filePath).Should().BeTrue(
-                "тестовая фикстура {0} не найдена — проверьте копирование calendar/ в output", filePath);
+                "тестовая фикстура {0} не найдена — проверьте копирование Calendar/ в output", filePath);
 
             string content = File.ReadAllText(filePath);
             var parser = new Primo.MIA.Calendar.Parsers.JsonCalendarParser();
@@ -236,7 +236,7 @@ namespace Primo.MIA.Tests.Calendar
             // Arrange
             string filePath = Path.Combine(_testDataPath, "calendar.csv");
             File.Exists(filePath).Should().BeTrue(
-                "тестовая фикстура {0} не найдена — проверьте копирование calendar/ в output", filePath);
+                "тестовая фикстура {0} не найдена — проверьте копирование Calendar/ в output", filePath);
 
             string content = File.ReadAllText(filePath);
             var parser = new Primo.MIA.Calendar.Parsers.CsvCalendarParser();
@@ -256,7 +256,7 @@ namespace Primo.MIA.Tests.Calendar
             // Arrange
             string filePath = Path.Combine(_testDataPath, "calendar.txt");
             File.Exists(filePath).Should().BeTrue(
-                "тестовая фикстура {0} не найдена — проверьте копирование calendar/ в output", filePath);
+                "тестовая фикстура {0} не найдена — проверьте копирование Calendar/ в output", filePath);
 
             string content = File.ReadAllText(filePath);
             var parser = new Primo.MIA.Calendar.Parsers.TxtCalendarParser();

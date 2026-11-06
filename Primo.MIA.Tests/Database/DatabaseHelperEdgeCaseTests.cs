@@ -1,9 +1,10 @@
-using FluentAssertions;
+﻿using FluentAssertions;
 using System;
 using Xunit;
 
 namespace Primo.MIA.Tests.Database
 {
+        [Trait("Category", "Fast")]
     public class DatabaseHelperEdgeCaseTests
     {
         [Fact(DisplayName = "ConvertScalarToInt32: неконвертируемое значение -> null")]

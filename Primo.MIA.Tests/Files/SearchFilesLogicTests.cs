@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using FluentAssertions;
 using Primo.MIA;
@@ -6,6 +6,7 @@ using Xunit;
 
 namespace Primo.MIA.Tests.Files
 {
+        [Trait("Category", "Fast")]
     public class SearchFilesLogicTests : IDisposable
     {
         private readonly SearchFilesLogic _logic;

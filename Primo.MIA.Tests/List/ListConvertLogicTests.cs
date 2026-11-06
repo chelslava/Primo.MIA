@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using FluentAssertions;
@@ -7,6 +7,7 @@ using Xunit;
 
 namespace Primo.MIA.Tests.List
 {
+        [Trait("Category", "Fast")]
     public class ListConvertLogicTests
     {
         private readonly ListConvertLogic _logic;

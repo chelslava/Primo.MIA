@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using FluentAssertions;
 using Primo.MIA;
@@ -6,6 +6,7 @@ using Xunit;
 
 namespace Primo.MIA.Tests.Xml
 {
+        [Trait("Category", "Fast")]
     public class XmlQueryLogicTests
     {
         private readonly XmlQueryLogic _logic = new XmlQueryLogic();

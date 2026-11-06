@@ -1,4 +1,4 @@
-namespace Primo.MIA
+﻿namespace Primo.MIA
 {
     /// <summary>
     /// Стратегия при слиянии двух словарей с конфликтующими ключами

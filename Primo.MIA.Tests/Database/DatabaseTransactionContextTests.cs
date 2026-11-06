@@ -1,9 +1,10 @@
-using FluentAssertions;
+﻿using FluentAssertions;
 using Primo.MIA.Common;
 using Xunit;
 
 namespace Primo.MIA.Tests.Database
 {
+        [Trait("Category", "Fast")]
     public class DatabaseTransactionContextTests
     {
         [Fact(DisplayName = "DatabaseTransactionContext: Push/Pop работают как стек")]

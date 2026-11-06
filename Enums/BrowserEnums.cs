@@ -1,4 +1,4 @@
-namespace Primo.MIA
+﻿namespace Primo.MIA
 {
     /// <summary>
     /// Тип браузера для автоматизации

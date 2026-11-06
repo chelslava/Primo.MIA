@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using FluentAssertions;
@@ -10,6 +10,7 @@ namespace Primo.MIA.Tests.HttpWeb
     /// <summary>
     /// Тесты для логики HTTP активности
     /// </summary>
+        [Trait("Category", "Fast")]
     public class HttpLogicTests
     {
         #region ParseHeaders Tests

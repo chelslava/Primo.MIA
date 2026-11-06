@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -8,6 +8,7 @@ using Xunit;
 
 namespace Primo.MIA.Tests.Config
 {
+        [Trait("Category", "Fast")]
     public class ReadTomlConfigLogicTests : IDisposable
     {
         private readonly ReadTomlConfigLogic _logic;

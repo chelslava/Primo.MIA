@@ -1,4 +1,4 @@
-namespace Primo.MIA
+﻿namespace Primo.MIA
 {
     /// <summary>
     /// Режим работы активности

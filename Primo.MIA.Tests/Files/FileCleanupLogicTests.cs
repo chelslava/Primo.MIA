@@ -1,4 +1,4 @@
-// =============================================================================
+﻿// =============================================================================
 // FileCleanupLogicTests.cs — тесты логики очистки файлов.
 //
 // Покрывает:
@@ -22,6 +22,7 @@ using ThresholdMode = Primo.MIA.CleanupThresholdMode;
 namespace Primo.MIA.Tests.Files
 {
     /// <summary>Тесты логики очистки файлов.</summary>
+        [Trait("Category", "Fast")]
     public class FileCleanupLogicTests : IDisposable
     {
         private readonly string _testFolder;

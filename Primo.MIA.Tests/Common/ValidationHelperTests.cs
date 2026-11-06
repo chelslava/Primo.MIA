@@ -1,10 +1,11 @@
-using FluentAssertions;
+﻿using FluentAssertions;
 using LTools.Common.Model;
 using Primo.MIA.Common;
 using Xunit;
 
 namespace Primo.MIA.Tests.Common
 {
+        [Trait("Category", "Fast")]
     public class ValidationHelperTests
     {
         [Fact(DisplayName = "ValidateRequired: non-empty value does not add an error")]

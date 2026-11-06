@@ -9,6 +9,7 @@ namespace Primo.MIA.Tests.Common
     /// <summary>
     /// Unit-тесты для класса Guard.
     /// </summary>
+        [Trait("Category", "Fast")]
     public class GuardTests
     {
         #region NotNull Tests

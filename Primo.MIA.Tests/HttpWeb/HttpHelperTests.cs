@@ -1,4 +1,4 @@
-using FluentAssertions;
+﻿using FluentAssertions;
 using Primo.MIA;
 using System;
 using System.Collections.Generic;
@@ -11,6 +11,7 @@ using Xunit;
 
 namespace Primo.MIA.Tests.HttpWeb
 {
+        [Trait("Category", "Fast")]
     public class HttpHelperTests
     {
         #region ParseHeaders

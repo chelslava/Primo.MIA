@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using OpenQA.Selenium;
 using Primo.MIA.Models;

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using FluentAssertions;
 using Primo.MIA.Common;
 using Xunit;
@@ -10,6 +10,7 @@ namespace Primo.MIA.Tests.Browser
     /// - BrowserSessionContext (ambient context с стеком сессий в RepoDict)
     /// - SessionResolver (разрешение ID сессии с приоритетами)
     /// </summary>
+        [Trait("Category", "Fast")]
     public class SessionIdTests : IDisposable
     {
         public SessionIdTests()

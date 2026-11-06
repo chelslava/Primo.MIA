@@ -54,30 +54,22 @@
     <Reference Include="LTools.Workflow">
       <HintPath>C:\Program Files\Primo\Primo Studio Community x64\LTools.Workflow.dll</HintPath>
     </Reference>
-    <Reference Include="Primo.Orchestrator.Client.Common">
-      <HintPath>C:\Program Files\Primo\Primo Studio Community x64\Primo.Orchestrator.Client.Common.dll</HintPath>
-    </Reference>
-    <Reference Include="Primo.Orchestrator.Client.FW">
-      <HintPath>C:\Program Files\Primo\Primo Studio Community x64\Primo.Orchestrator.Client.FW.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Runtime.CompilerServices.Unsafe">
-      <HintPath>C:\Program Files\Microsoft Visual Studio\18\Enterprise\Common7\IDE\PublicAssemblies\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
-    </Reference>
+    <!--
+      Primo.Orchestrator.Client.* и System.Runtime.CompilerServices.Unsafe
+      (HintPath на папку конкретной Visual Studio) удалены: ни один .cs их
+      не использует, а версия Unsafe конфликтовала с пакетом 6.1.2 выше.
+    -->
   </ItemGroup>
 
-  <!-- Копируем все DLL основного проекта в output тестов (для dotnet test) -->
-  <!-- Исключаем System.Runtime.CompilerServices.Unsafe.dll (версия 6.0.3.0 из Visual Studio) -->
+  <!-- Копируем все DLL основного проекта в output тестов (для dotnet test).
+       System.Runtime.CompilerServices.Unsafe.dll исключаем: в тестовый output
+       попадает версия из NuGet-пакета 6.1.2 (см. PackageReference выше). -->
   <Target Name="CopyMainProjectOutput" AfterTargets="Build">
     <ItemGroup>
       <_MainProjectDlls Include="$(MSBuildProjectDirectory)\..\bin\$(Configuration)\*.dll"
                         Exclude="$(MSBuildProjectDirectory)\..\bin\$(Configuration)\System.Runtime.CompilerServices.Unsafe.dll" />
     </ItemGroup>
     <Copy SourceFiles="@(_MainProjectDlls)" DestinationFolder="$(OutputPath)" SkipUnchangedFiles="true" />
-  </Target>
-  <!-- Копируем правильную версию System.Runtime.CompilerServices.Unsafe (v6.0.3.0) -->
-  <Target Name="CopyUnsafeDll" AfterTargets="CopyMainProjectOutput">
-    <Copy SourceFiles="C:\Program Files\Microsoft Visual Studio\18\Enterprise\Common7\IDE\PublicAssemblies\System.Runtime.CompilerServices.Unsafe.dll"
-          DestinationFolder="$(OutputPath)" SkipUnchangedFiles="true" />
   </Target>
   <!--
     Явное копирование адаптера xUnit для vstest.
@@ -96,7 +88,7 @@
   </Target>
 
   <ItemGroup>
-    <None Update="calendar\**\*">
+    <None Update="Calendar\**\*">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

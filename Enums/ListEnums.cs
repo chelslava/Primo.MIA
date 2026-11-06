@@ -1,4 +1,4 @@
-namespace Primo.MIA
+﻿namespace Primo.MIA
 {
     /// <summary>Тип конвертации списка в другую структуру данных</summary>
     public enum ListConvertMode

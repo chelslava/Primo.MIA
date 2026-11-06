@@ -1,4 +1,4 @@
-namespace Primo.MIA.Common
+﻿namespace Primo.MIA.Common
 {
     /// <summary>
     /// Централизованные пути к иконкам активностей.

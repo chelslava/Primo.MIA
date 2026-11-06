@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Globalization;
 using System.Text.RegularExpressions;
 using FluentAssertions;
@@ -7,6 +7,7 @@ using Xunit;
 
 namespace Primo.MIA.Tests.Common
 {
+        [Trait("Category", "Fast")]
     public class StringHelperTests
     {
         [Theory(DisplayName = "TryParseDouble: null or whitespace returns null")]

@@ -22,6 +22,7 @@ using OutputMode = Primo.MIA.HtmlOutputMode;
 namespace Primo.MIA.Tests.Utilities
 {
     /// <summary>Тесты логики конвертации DataTable в HTML.</summary>
+        [Trait("Category", "Fast")]
     public class DataTableToHtmlLogicTests
     {
         // =====================================================================

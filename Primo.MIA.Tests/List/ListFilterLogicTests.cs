@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using FluentAssertions;
 using Primo.MIA;
@@ -6,6 +6,7 @@ using Xunit;
 
 namespace Primo.MIA.Tests.List
 {
+        [Trait("Category", "Fast")]
     public class ListFilterLogicTests
     {
         private readonly ListFilterLogic _logic;

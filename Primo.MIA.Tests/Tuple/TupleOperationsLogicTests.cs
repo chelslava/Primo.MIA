@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using FluentAssertions;
 using Primo.MIA;
@@ -6,6 +6,7 @@ using Xunit;
 
 namespace Primo.MIA.Tests.Tuple
 {
+        [Trait("Category", "Fast")]
     public class TupleOperationsLogicTests
     {
         private readonly TupleOperationsLogic _logic;

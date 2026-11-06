@@ -1,4 +1,4 @@
-// =============================================================================
+﻿// =============================================================================
 // TextTemplateLogicTests.cs — тесты логики шаблонизатора текста.
 //
 // Покрывает:
@@ -21,6 +21,7 @@ using MissingBehavior = Primo.MIA.MissingKeyBehavior;
 namespace Primo.MIA.Tests.Text
 {
     /// <summary>Тесты логики шаблонизатора текста.</summary>
+        [Trait("Category", "Fast")]
     public class TextTemplateLogicTests
     {
         // =====================================================================

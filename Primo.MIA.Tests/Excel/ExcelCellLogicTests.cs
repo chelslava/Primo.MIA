@@ -1,10 +1,11 @@
-using System;
+﻿using System;
 using FluentAssertions;
 using Primo.MIA;
 using Xunit;
 
 namespace Primo.MIA.Tests.Excel
 {
+        [Trait("Category", "Fast")]
     public class ExcelCellLogicTests
     {
         private readonly ExcelCellLogic _logic;

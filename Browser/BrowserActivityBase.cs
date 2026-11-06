@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using LTools.SDK;
 using LTools.Common.UIElements;
@@ -305,38 +305,7 @@ namespace Primo.MIA
 
         #region Logging Helpers
 
-        /// <summary>
-        /// Логирует информационное сообщение.
-        /// </summary>
-        protected void LogInfo(string message)
-        {
-            // TODO: Implement structured logging
-            System.Diagnostics.Debug.WriteLine($"[INFO] {GetType().Name}: {message}");
-        }
-
-        /// <summary>
-        /// Логирует предупреждение.
-        /// </summary>
-        protected void LogWarning(string message)
-        {
-            // TODO: Implement structured logging
-            System.Diagnostics.Debug.WriteLine($"[WARN] {GetType().Name}: {message}");
-        }
-
-        /// <summary>
-        /// Логирует ошибку.
-        /// </summary>
-        protected void LogError(string message, Exception ex = null)
-        {
-            // TODO: Implement structured logging
-            string logMessage = ex != null
-                ? $"[ERROR] {GetType().Name}: {message} - {ex.Message}"
-                : $"[ERROR] {GetType().Name}: {message}";
-
-            System.Diagnostics.Debug.WriteLine(logMessage);
-        }
-
-        #endregion
+#endregion
 
         #region Element Locator Conversion
 
@@ -387,6 +356,35 @@ namespace Primo.MIA
                 driver, locatorType, locatorValue, timeout, retryConfig, FindElement, LogInfo, LogWarning);
 
         #endregion
+
+        /// <summary>
+        /// Логирует информационное сообщение в консоль робота.
+        /// Используется в том числе как делегат для BrowserElementHelper.
+        /// </summary>
+        protected void LogInfo(string message)
+        {
+            Console.WriteLine($"[INFO] {GetType().Name}: {message}");
+        }
+
+        /// <summary>
+        /// Логирует предупреждение в консоль робота.
+        /// </summary>
+        protected void LogWarning(string message)
+        {
+            Console.WriteLine($"[WARN] {GetType().Name}: {message}");
+        }
+
+        /// <summary>
+        /// Логирует ошибку в консоль робота.
+        /// </summary>
+        protected void LogError(string message, Exception ex = null)
+        {
+            string logMessage = ex != null
+                ? $"[ERROR] {GetType().Name}: {message} - {ex.Message}"
+                : $"[ERROR] {GetType().Name}: {message}";
+
+            Console.WriteLine(logMessage);
+        }
 
         #region Shadow DOM Support
 

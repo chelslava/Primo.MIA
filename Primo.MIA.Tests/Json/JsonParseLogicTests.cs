@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using FluentAssertions;
 using Newtonsoft.Json.Linq;
@@ -7,6 +7,7 @@ using Xunit;
 
 namespace Primo.MIA.Tests.Json
 {
+        [Trait("Category", "Fast")]
     public class JsonParseLogicTests
     {
         private readonly JsonParseLogic _logic = new JsonParseLogic();

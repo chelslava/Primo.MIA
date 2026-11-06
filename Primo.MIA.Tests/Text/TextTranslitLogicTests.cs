@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using FluentAssertions;
 using Primo.MIA;
 using Xunit;
@@ -11,6 +11,7 @@ namespace Primo.MIA.Tests.Text
     /// <summary>
     /// Тесты для бизнес-логики транслитерации.
     /// </summary>
+        [Trait("Category", "Fast")]
     public class TextTranslitLogicTests
     {
         private readonly TextTranslitLogic _logic;

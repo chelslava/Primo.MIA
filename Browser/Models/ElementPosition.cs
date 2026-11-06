@@ -1,4 +1,4 @@
-namespace Primo.MIA.Models
+﻿namespace Primo.MIA.Models
 {
     /// <summary>
     /// Позиция элемента в коллекции.

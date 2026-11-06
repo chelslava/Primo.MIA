@@ -1,4 +1,4 @@
-using FluentAssertions;
+﻿using FluentAssertions;
 using System;
 using System.Data;
 using System.Collections.Generic;
@@ -6,6 +6,7 @@ using Xunit;
 
 namespace Primo.MIA.Tests.Database
 {
+        [Trait("Category", "Fast")]
     public class DatabaseHelperTests
     {
         [Fact(DisplayName = "NormalizeParameterName: добавляет @ если префикса нет")]

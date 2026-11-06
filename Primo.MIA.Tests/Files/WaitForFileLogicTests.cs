@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -8,6 +8,7 @@ using Xunit;
 
 namespace Primo.MIA.Tests.Files
 {
+        [Trait("Category", "Fast")]
     public class WaitForFileLogicTests : IDisposable
     {
         private readonly WaitForFileLogic _logic;
