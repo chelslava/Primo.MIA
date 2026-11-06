@@ -154,8 +154,8 @@ scripts\run-tests-vs.ps1
 |-------|--------|------------|
 | Newtonsoft.Json | 13.0.4 | JSON сериализация |
 | Tomlyn | 2.4.0 | Парсинг TOML конфигов |
-| Selenium.WebDriver | 4.44.0 | Браузерная автоматизация |
-| Selenium.Support | 4.44.0 | Вспомогательные классы Selenium |
+| Selenium.WebDriver | 4.52.0 | Браузерная автоматизация |
+| Selenium.Support | 4.52.0 | Вспомогательные классы Selenium |
 | MongoDB.Driver | 2.30.0 | MongoDB (NoSQL) |
 | StackExchange.Redis | 2.8.41 | Redis (кэш/очереди) |
 | Npgsql | 7.0.8 | PostgreSQL (ADO.NET) |

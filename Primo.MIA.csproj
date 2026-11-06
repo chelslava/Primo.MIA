@@ -52,8 +52,8 @@
     <!-- Reference-сборки .NET Framework 4.8.1 — позволяют собирать без установленного dev pack (CI) -->
     <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
-    <PackageReference Include="Selenium.WebDriver" Version="4.44.0" />
-    <PackageReference Include="Selenium.Support" Version="4.44.0" />
+    <PackageReference Include="Selenium.WebDriver" Version="4.52.0" />
+    <PackageReference Include="Selenium.Support" Version="4.52.0" />
     <PackageReference Include="Tomlyn" Version="2.4.0" />
     <PackageReference Include="MongoDB.Driver" Version="2.30.0" />
     <PackageReference Include="StackExchange.Redis" Version="2.8.41" />
