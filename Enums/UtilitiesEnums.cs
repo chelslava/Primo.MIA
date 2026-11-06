@@ -357,4 +357,80 @@ namespace Primo.MIA
         /// </summary>
         FullDocument
     }
+
+    /// <summary>
+    /// Режим задания условий фильтрации DataTable.
+    /// </summary>
+    public enum DataTableFilterMode
+    {
+        /// <summary>
+        /// SQL-подобное выражение (аналог WHERE):
+        /// Age &gt;= 18 AND Name LIKE 'Ив%' OR (City = 'Москва' AND Age &lt; 30)
+        /// </summary>
+        SqlQuery,
+
+        /// <summary>
+        /// Конструктор условий: строки вида «Колонка + Оператор + Значение»,
+        /// объединённые И/ИЛИ.
+        /// </summary>
+        ConditionBuilder
+    }
+
+    /// <summary>
+    /// Оператор сравнения условия в конструкторе фильтра DataTable.
+    /// </summary>
+    public enum DataTableConditionOperator
+    {
+        /// <summary>Равно (=).</summary>
+        Equal,
+
+        /// <summary>Не равно (&lt;&gt;).</summary>
+        NotEqual,
+
+        /// <summary>Больше (&gt;).</summary>
+        GreaterThan,
+
+        /// <summary>Больше или равно (&gt;=).</summary>
+        GreaterOrEqual,
+
+        /// <summary>Меньше (&lt;).</summary>
+        LessThan,
+
+        /// <summary>Меньше или равно (&lt;=).</summary>
+        LessOrEqual,
+
+        /// <summary>Строка содержит подстроку.</summary>
+        Contains,
+
+        /// <summary>Строка начинается с подстроки.</summary>
+        StartsWith,
+
+        /// <summary>Строка заканчивается подстрокой.</summary>
+        EndsWith,
+
+        /// <summary>Соответствие шаблону LIKE (% — любое число символов, _ — один символ).</summary>
+        Like,
+
+        /// <summary>Значение входит в список (значения через запятую).</summary>
+        In,
+
+        /// <summary>Значение пустое (null или DBNull).</summary>
+        IsNull,
+
+        /// <summary>Значение непустое.</summary>
+        IsNotNull
+    }
+
+    /// <summary>
+    /// Логическая связка условия с предыдущим в конструкторе фильтра DataTable.
+    /// Условия объединяются слева направо: (c1 ∨/∧ c2) ∨/∧ c3 ...
+    /// </summary>
+    public enum DataTableConditionJoin
+    {
+        /// <summary>И (AND) — с первым условием игнорируется.</summary>
+        And,
+
+        /// <summary>ИЛИ (OR) — с первым условием игнорируется.</summary>
+        Or
+    }
 }

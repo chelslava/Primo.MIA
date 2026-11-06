@@ -7,7 +7,7 @@ $ErrorActionPreference = "Stop"
 
 $repoRoot = Split-Path -Parent $PSScriptRoot
 $testProject = Join-Path $repoRoot "Primo.MIA.Tests\Primo.MIA.Tests.csproj"
-$testAssembly = Join-Path $repoRoot "Primo.MIA.Tests\bin\$Configuration\net462\Primo.MIA.Tests.dll"
+$testAssembly = Join-Path $repoRoot "Primo.MIA.Tests\bin\$Configuration\net481\Primo.MIA.Tests.dll"
 $vswhere = Join-Path ${env:ProgramFiles(x86)} "Microsoft Visual Studio\Installer\vswhere.exe"
 
 if (-not (Test-Path $vswhere)) {

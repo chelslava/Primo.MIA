@@ -595,6 +595,22 @@ namespace Primo.MIA.Common
         public const string Error_CustomThemeRequiresColors = "При выборе пользовательской темы необходимо указать хотя бы один цвет";
 
         // ═══════════════════════════════════════════════════════════════════════
+        // DATATABLE FILTER
+        // ═══════════════════════════════════════════════════════════════════════
+
+        public const string Activity_DataTableFilter = "DataTable: Фильтрация";
+        public const string Field_FilterMode = "Режим фильтрации";
+        public const string Field_SqlQuery = "SQL-выражение";
+        public const string Field_Conditions = "Условия";
+        public const string Field_FilteredTable = "Прошли фильтр (DataTable)";
+        public const string Field_RejectedTable = "Не прошли фильтр (DataTable)";
+        public const string Field_FilteredCount = "Кол-во прошедших (DataTable)";
+        public const string Error_SqlQueryRequired = "SQL-выражение не указано";
+        public const string Error_ConditionsRequired = "Не задано ни одного условия фильтрации";
+        public const string Error_SqlParse = "Ошибка в SQL-выражении";
+        public const string Error_UnknownColumn = "Колонка не найдена в таблице";
+
+        // ═══════════════════════════════════════════════════════════════════════
         // BUSINESS CALENDAR (Производственный календарь)
         // ═══════════════════════════════════════════════════════════════════════
 

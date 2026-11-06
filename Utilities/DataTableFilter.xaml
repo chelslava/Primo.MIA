@@ -1,0 +1,239 @@
+<!--
+    DataTableFilter.xaml
+    Визуальный интерфейс активности "DataTable: Фильтрация".
+
+    Функции:
+      - Фильтрация DataTable с сохранением порядка строк (LINQ)
+      - Режим SqlQuery: SQL-подобное выражение (аналог WHERE)
+      - Режим ConditionBuilder: форма «Колонка + Оператор + Значение» с И/ИЛИ
+      - Вывод: прошедшие/не прошедшие таблицы + счётчики
+-->
+<UserControl x:Class="Primo.MIA.DataTableFilter"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:system="clr-namespace:System;assembly=mscorlib"
+             xmlns:local="clr-namespace:Primo.MIA"
+             mc:Ignorable="d"
+             d:DesignHeight="260"
+             Margin="0,0,0,5">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Primo.MIA;component/Common/Styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+
+            <ObjectDataProvider x:Key="ModeValues"
+                                MethodName="GetValues"
+                                ObjectType="{x:Type system:Enum}">
+                <ObjectDataProvider.MethodParameters>
+                    <x:Type TypeName="local:DataTableFilterMode"/>
+                </ObjectDataProvider.MethodParameters>
+            </ObjectDataProvider>
+
+            <ObjectDataProvider x:Key="OperatorValues"
+                                MethodName="GetValues"
+                                ObjectType="{x:Type system:Enum}">
+                <ObjectDataProvider.MethodParameters>
+                    <x:Type TypeName="local:DataTableConditionOperator"/>
+                </ObjectDataProvider.MethodParameters>
+            </ObjectDataProvider>
+
+            <ObjectDataProvider x:Key="JoinValues"
+                                MethodName="GetValues"
+                                ObjectType="{x:Type system:Enum}">
+                <ObjectDataProvider.MethodParameters>
+                    <x:Type TypeName="local:DataTableConditionJoin"/>
+                </ObjectDataProvider.MethodParameters>
+            </ObjectDataProvider>
+
+            <local:EnumToVisibilityConverter x:Key="EnumToVisConverter"/>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid Background="{DynamicResource {x:Static SystemColors.ScrollBarBrushKey}}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <Image Grid.Column="0"
+               Width="32" Height="32" Margin="5"
+               VerticalAlignment="Center"
+               Source="pack://application:,,,/Primo.MIA;component/images/table.png"/>
+
+        <StackPanel Grid.Column="1"
+                    VerticalAlignment="Top"
+                    Margin="5,0,5,5">
+
+            <TextBlock Style="{StaticResource ActivityHeader}">
+                <Run Text="DataTable: Фильтрация ["/>
+                <Run Text="{Binding Mode, Mode=OneWay}"/>
+                <Run Text="]"/>
+            </TextBlock>
+
+            <TextBlock Text="Таблица данных:" Style="{StaticResource FieldLabel}"/>
+            <TextBox Text="{Binding Prop_DataTable, UpdateSourceTrigger=PropertyChanged}"
+                     Style="{StaticResource FieldBox}"
+                     ToolTip="Переменная с DataTable для фильтрации"/>
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Column="0"
+                           Text="Режим фильтрации:"
+                           Style="{StaticResource FieldLabel}"
+                           Margin="0,0,6,0"/>
+                <ComboBox Grid.Column="1"
+                          ItemsSource="{Binding Source={StaticResource ModeValues}}"
+                          SelectedItem="{Binding Mode}"
+                          Style="{StaticResource FieldComboBox}"
+                          ToolTip="SQL-выражение или конструктор условий"/>
+            </Grid>
+
+            <!-- ══ Режим SqlQuery: SQL-подобное выражение ══ -->
+            <StackPanel Visibility="{Binding Mode, Converter={StaticResource EnumToVisConverter}, ConverterParameter=SqlQuery}">
+                <TextBlock Text="SQL-выражение (аналог WHERE):" Style="{StaticResource FieldLabel}"/>
+                <TextBox Text="{Binding Prop_SqlQuery, UpdateSourceTrigger=PropertyChanged}"
+                         Style="{StaticResource FieldBox}"
+                         AcceptsReturn="True"
+                         TextWrapping="Wrap"
+                         VerticalScrollBarVisibility="Auto"
+                         Height="72"
+                         ToolTip="Пример: Age >= 18 AND Name LIKE 'Ив%' OR City IN ('Москва', 'Казань')"/>
+
+                <TextBlock Text="Операторы: =  &lt;&gt;  &gt;  &lt;  &gt;=  &lt;=  LIKE  IN (...)  IS NULL / IS NOT NULL   ·   Логика: AND (И)  OR (ИЛИ)  NOT (НЕ)  и скобки"
+                           FontSize="10"
+                           Foreground="Gray"
+                           TextWrapping="Wrap"
+                           Margin="0,1,0,2"/>
+            </StackPanel>
+
+            <!-- ══ Режим ConditionBuilder: форма условий ══ -->
+            <StackPanel Visibility="{Binding Mode, Converter={StaticResource EnumToVisConverter}, ConverterParameter=ConditionBuilder}">
+
+                <ItemsControl ItemsSource="{Binding ConditionRows}" Margin="0,2,0,0">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Margin="0,1,0,1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="52"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="6"/>
+                                    <ColumnDefinition Width="118"/>
+                                    <ColumnDefinition Width="6"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <ComboBox Grid.Column="0"
+                                          ItemsSource="{Binding Source={StaticResource JoinValues}}"
+                                          SelectedItem="{Binding Join}"
+                                          Style="{StaticResource FieldComboBox}"
+                                          ToolTip="Связка с предыдущим условием"/>
+
+                                <TextBox Grid.Column="1"
+                                         Text="{Binding Column, UpdateSourceTrigger=PropertyChanged}"
+                                         Style="{StaticResource FieldBox}"
+                                         ToolTip="Имя колонки таблицы"/>
+
+                                <ComboBox Grid.Column="3"
+                                          ItemsSource="{Binding Source={StaticResource OperatorValues}}"
+                                          SelectedItem="{Binding Operator}"
+                                          Style="{StaticResource FieldComboBox}"
+                                          ToolTip="Оператор сравнения"/>
+
+                                <TextBox Grid.Column="5"
+                                         Text="{Binding Value, UpdateSourceTrigger=PropertyChanged}"
+                                         ToolTip="Значение для сравнения (приводится к типу колонки)">
+                                    <TextBox.Style>
+                                        <Style TargetType="TextBox" BasedOn="{StaticResource FieldBox}">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Operator}" Value="{x:Static local:DataTableConditionOperator.IsNull}">
+                                                    <Setter Property="IsEnabled" Value="False"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding Operator}" Value="{x:Static local:DataTableConditionOperator.IsNotNull}">
+                                                    <Setter Property="IsEnabled" Value="False"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBox.Style>
+                                </TextBox>
+
+                                <Button Grid.Column="6"
+                                        Content="✕"
+                                        Style="{StaticResource IconButton}"
+                                        Margin="4,0,0,0"
+                                        Click="BtnRemoveCondition_Click"
+                                        ToolTip="Удалить условие"/>
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <Button Content="+ Добавить условие"
+                        Style="{StaticResource BrowseButton}"
+                        HorizontalAlignment="Left"
+                        Margin="0,3,0,2"
+                        Click="BtnAddCondition_Click"
+                        ToolTip="Добавить строку условия"/>
+            </StackPanel>
+
+            <CheckBox Content="Учитывать регистр"
+                      IsChecked="{Binding Prop_CaseSensitive}"
+                      VerticalContentAlignment="Center"
+                      Margin="0,4,0,2"
+                      ToolTip="Учитывать регистр при сравнении строк (по умолчанию — нет)"/>
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="8"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0">
+                    <TextBlock Text="Прошли фильтр (DataTable):" Style="{StaticResource FieldLabel}"/>
+                    <TextBox Text="{Binding Prop_Filtered, UpdateSourceTrigger=PropertyChanged}"
+                             Style="{StaticResource FieldBox}"
+                             ToolTip="Переменная (DataTable) для строк, прошедших условие"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="2">
+                    <TextBlock Text="Не прошли фильтр (DataTable):" Style="{StaticResource FieldLabel}"/>
+                    <TextBox Text="{Binding Prop_Rejected, UpdateSourceTrigger=PropertyChanged}"
+                             Style="{StaticResource FieldBox}"
+                             ToolTip="Переменная (DataTable) для остальных строк"/>
+                </StackPanel>
+            </Grid>
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="8"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0">
+                    <TextBlock Text="Кол-во прошедших:" Style="{StaticResource FieldLabel}"/>
+                    <TextBox Text="{Binding Prop_FilteredCount, UpdateSourceTrigger=PropertyChanged}"
+                             Style="{StaticResource FieldBox}"
+                             ToolTip="Переменная (Int32) для количества прошедших строк"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="2">
+                    <TextBlock Text="Кол-во отсеянных:" Style="{StaticResource FieldLabel}"/>
+                    <TextBox Text="{Binding Prop_RejectedCount, UpdateSourceTrigger=PropertyChanged}"
+                             Style="{StaticResource FieldBox}"
+                             ToolTip="Переменная (Int32) для количества отсеянных строк"/>
+                </StackPanel>
+            </Grid>
+
+        </StackPanel>
+    </Grid>
+</UserControl>
