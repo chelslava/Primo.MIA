@@ -23,7 +23,7 @@
          содержит SHA коммита (SourceRevisionId). -->
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageId>Primo.MIA</PackageId>
-    <Version>1.4.0</Version>
+    <Version>1.5.0</Version>
     <AssemblyVersion>$(Version.Split('-')[0])</AssemblyVersion>
     <FileVersion>$(Version.Split('-')[0])</FileVersion>
     <Authors>Chelslava</Authors>
@@ -33,6 +33,7 @@
     <RepositoryType>git</RepositoryType>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageIcon>icon.png</PackageIcon>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -116,6 +117,8 @@
   <ItemGroup>
     <None Include="doc\**\*" />
     <None Include="README.md" Pack="true" PackagePath="\" />
+    <!-- Иконка пакета NuGet (issue #18): браузерная иконка проекта под нейтральным именем -->
+    <None Include="images\browser.png" Pack="true" PackagePath="icon.png" />
   </ItemGroup>
 
 </Project>

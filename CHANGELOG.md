@@ -1,5 +1,72 @@
 # Primo.MIA - Selenium Browser Activities
 
+## Что нового в версии 1.5.0
+
+Реализация issues [#11–#18](https://github.com/chelslava/Primo.MIA/issues).
+
+### 🔒 Безопасность (#11)
+
+- **Обход TLS-валидации больше не «заражает» пул**: handler с
+  `IgnoreSslErrors` не кэшируется (scoped, свой пул соединений), факт обхода
+  пишется в лог робота (`HttpClientPool`, `WebhookBack`)
+- **SFTP fail-closed**: пустой `ExpectedFingerprint` без явного
+  `AllowAnyHostKey` теперь запрещает соединение (`SftpException`) — раньше
+  молча принимался любой host key (дефолт SSH.NET `CanTrust=true`)
+- **OAuth2**: убран дефолт-плейсхолдер `"client_secret"`; незамещённый
+  плейсхолдер отсекается валидацией до запроса (`HttpHelper.IsOAuth2PlaceholderSecret`)
+
+### 🐛 Исправления (#12, #13)
+
+- **Случайные числа**: `new Random()` на каждый вызов (дубли значений при
+  быстрых вызовах) → потокобезопасный `RandomHelper` (`ThreadLocal<Random>`,
+  уникальный seed на поток) — Генераторы, Перемешивание списков
+- **Sync-over-async**: `.ConfigureAwait(false)` добавлен в 6 мест
+  (CalendarLoad, Http, OAuth2 Refresh) — единый стиль с остальной кодовой базой
+
+### ✨ Русские имена режимов в UI (#14)
+
+- **92 enum-типа (459 значений) получили атрибут `[RuName]`** — комбобоксы и
+  заголовки показывают «Одиночный», «По возрастанию», «Равно» вместо
+  `Single`, `Ascending`, `Equal`
+- Новая инфраструктура: `RuNameAttribute`, `EnumValuesExtension`
+  (замена ObjectDataProvider), `EnumDisplayNameConverter`
+- **87 комбобоксов в 64 файлах мигрированы**; сериализация не изменена —
+  атрибут влияет только на отображение
+
+### 🎨 UX-доработки (#15)
+
+- **Тултипы для ~207 полей** в 41 файле: Database ×15, MongoDB ×6, Redis ×9,
+  SFTP ×5, RabbitMQ ×2, Json/Xml ×4 — раньше модули были без подсказок
+- **Валидация числовых полей**: `NumericValidationRule` + `ValidatingFieldBox`
+  на 31 поле (таймауты, размеры страниц/пакетов) — нечисловой ввод подсвечивается
+  красным до запуска робота
+- **Кнопка обзора файла** для локальных путей SFTP Download/Upload
+
+### 🔧 Рефакторинг (#17)
+
+- **`ActivityTimeoutParser`**: 33 копии парсинга таймаута заменены одним
+  хелпером (Database ×12, MongoDB ×6, Redis ×9, SFTP ×5, RabbitMQ ×1)
+- **`HttpHelper.SendWithRetryAsync`**: retry-цикл HttpRetry переведён на
+  общий хелпер (Http и Webhook оставлены: иная семантика повторов)
+- **`SafeDispose.Quiet`**: guarded-dispose блоки SFTP/RabbitMQ на одном хелпере
+- **Guard**: 16 inline-throw в 14 Browser-файлах на `Guard.AnyNullOrWhiteSpace`/`Guard.That`
+
+### 🧪 Тесты (#16)
+
+- **+131 тест**: OAuth2-парсинг токена, SQL-генерация Database (BulkInsert/
+  Upsert/Command), ExtractEntities, LogMessage-шаблоны — итого **1262 теста**
+- **Integration-гейтинг**: 7 Calendar-тестов больше не висят в вечном Skip —
+  включаются переменной окружения `PRIMO_INTEGRATION=1`
+
+### 📦 Инфраструктура (#18)
+
+- **PackageIcon**: NuGet-пакет публикуется с иконкой
+- **Вытеснение кэшей**: брошенные DB-транзакции (TTL 24 ч, rollback+close при
+  следующем Begin) и неактивные Redis-мультиплексоры (idle 30 мин, dispose
+  через grace 30 мин) больше не живут вечно
+- **ISO-неделя**: токен `{week}` в LogMessage — культуронезависимый
+  (FirstFourDayWeek+Monday, InvariantCulture), одинаковый на ru-RU и en-US
+
 ## Что нового в версии 1.4.0
 
 ### 🔒 Безопасность
