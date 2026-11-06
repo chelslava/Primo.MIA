@@ -583,7 +583,12 @@ namespace Primo.MIA
 
             var trimmed = identifier.Trim();
             if (IsAlreadyQuoted(trimmed))
+            {
+                // Уже закавыченный идентификатор возвращается как есть —
+                // проверяем содержимое на разделители SQL-операторов (инъекция)
+                ValidateQuotedIdentifier(trimmed, nameof(identifier));
                 return trimmed;
+            }
 
             var commandBuilder = TryCreateCommandBuilder(providerInvariantName);
             if (commandBuilder != null)
@@ -594,6 +599,7 @@ namespace Primo.MIA
                 }
                 catch
                 {
+                    // Билдер недоступен/не знает провайдера — ручное экранирование ниже
                 }
             }
 
@@ -972,6 +978,29 @@ namespace Primo.MIA
             return (identifier.StartsWith("[", StringComparison.Ordinal) && identifier.EndsWith("]", StringComparison.Ordinal)) ||
                    (identifier.StartsWith("\"", StringComparison.Ordinal) && identifier.EndsWith("\"", StringComparison.Ordinal)) ||
                    (identifier.StartsWith("`", StringComparison.Ordinal) && identifier.EndsWith("`", StringComparison.Ordinal));
+        }
+
+        /// <summary>
+        /// Защита от SQL-инъекций через уже закавыченные идентификаторы:
+        /// такой идентификатор возвращается в SQL как есть, без повторного
+        /// экранирования, поэтому проверяем отсутствие разделителей операторов.
+        /// </summary>
+        private static void ValidateQuotedIdentifier(string quotedIdentifier, string paramName)
+        {
+            // Снимаем внешние кавычки и разворачиваем легитимное удвоение
+            string inner = quotedIdentifier.Substring(1, quotedIdentifier.Length - 2)
+                .Replace("\"\"", "\"")
+                .Replace("]]", "]")
+                .Replace("``", "`");
+
+            if (inner.IndexOf(';') >= 0 ||
+                inner.IndexOf("--", StringComparison.Ordinal) >= 0 ||
+                inner.IndexOf("/*", StringComparison.Ordinal) >= 0)
+            {
+                throw new ArgumentException(
+                    $"Идентификатор содержит недопустимую последовательность SQL (';', '--', '/*'): {quotedIdentifier}",
+                    paramName);
+            }
         }
 
         private static DbCommandBuilder TryCreateCommandBuilder(string providerInvariantName)

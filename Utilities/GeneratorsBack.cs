@@ -789,25 +789,15 @@ namespace Primo.MIA
             if (!int.TryParse(rawStart, out int start)) start = 1;
             if (!int.TryParse(rawStep, out int step)) step = 1;
 
-            // ── Читаем текущее значение из RepoDict ───────────────────────────
+            // ── Читаем и сдвигаем счётчик атомарно (без гонки check-then-act) ──
 
-            int current;
-
-            if (RepoDict.IntDict.ContainsKey(key))
-            {
-                // Ключ уже существует — берём текущее значение, начальное игнорируем
-                current = RepoDict.IntDict[key];
-            }
-            else
-            {
-                // Первый вызов для данного ключа — инициализируем начальным значением
-                current = start;
-            }
-
-            // ── Записываем следующее значение в RepoDict ──────────────────────
-
-            // Следующее значение = текущее + шаг
-            RepoDict.IntDict[key] = current + step;
+            // Семантика: вернуть текущее значение (до сдвига), сохранить current+step.
+            // Первый вызов для ключа — инициализация начальным значением.
+            int current = 0;
+            RepoDict.IntDict.AddOrUpdate(
+                key,
+                _ => { current = start; return start + step; },
+                (_, existing) => { current = existing; return existing + step; });
 
             // Возвращаем текущее значение (до сдвига)
             return current.ToString();

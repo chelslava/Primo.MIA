@@ -1,4 +1,4 @@
-// =============================================================================
+﻿// =============================================================================
 // CalendarWorkdaysListBack.cs — активность «Календарь: Рабочие дни списком».
 //
 // Возвращает List<DateTime> всех рабочих дней в заданном диапазоне дат.
@@ -359,12 +359,12 @@ namespace Primo.MIA
 
                 // Разбираем начальную дату
                 object startObj = GetPropertyValue(this.Prop_StartDate, nameof(Prop_StartDate), sd);
-                if (!DateTime.TryParse(startObj?.ToString(), out DateTime startDate))
+                if (!CalendarDateHelper.TryParse(startObj, out DateTime startDate))
                     return Fail(ActivityStrings.Error_InvalidStartDate);
 
                 // Разбираем конечную дату
                 object endObj = GetPropertyValue(this.Prop_EndDate, nameof(Prop_EndDate), sd);
-                if (!DateTime.TryParse(endObj?.ToString(), out DateTime endDate))
+                if (!CalendarDateHelper.TryParse(endObj, out DateTime endDate))
                     return Fail(ActivityStrings.Error_InvalidEndDate);
 
                 // Нормализуем порядок — допускаем ввод "наоборот"

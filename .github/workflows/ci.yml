@@ -26,7 +26,6 @@ jobs:
     - name: Check Project Files Exist
       run: |
         if (Test-Path "Primo.MIA.csproj") { Write-Host "✅ Primo.MIA.csproj found" } else { Write-Host "❌ Primo.MIA.csproj NOT found"; exit 1 }
-        if (Test-Path "Primo.MIA.nuspec") { Write-Host "✅ Primo.MIA.nuspec found" } else { Write-Host "❌ Primo.MIA.nuspec NOT found"; exit 1 }
         if (Test-Path "Primo.MIA.Tests\Primo.MIA.Tests.csproj") { Write-Host "✅ Tests project found" } else { Write-Host "❌ Tests project NOT found"; exit 1 }
         
     - name: Validate .gitignore

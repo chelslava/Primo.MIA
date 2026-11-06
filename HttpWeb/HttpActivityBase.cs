@@ -1,4 +1,4 @@
-// =============================================================================
+﻿// =============================================================================
 // HttpActivityBase.cs — базовый класс для HTTP-активностей.
 //
 // Предоставляет общую функциональность для всех HTTP-активностей:
@@ -163,6 +163,7 @@ namespace Primo.MIA
         protected HttpClient CreateHttpClient(ScriptingData sd, int timeoutSeconds)
         {
             var handler = new HttpClientHandler();
+            var certificates = new List<X509Certificate2>();
 
             // Настройка клиентского сертификата
             if (this.Prop_UseCertificate)
@@ -177,6 +178,7 @@ namespace Primo.MIA
 
                 var certificate = new X509Certificate2(certPath, certPassword);
                 handler.ClientCertificates.Add(certificate);
+                certificates.Add(certificate);
             }
 
             // Игнорирование SSL-ошибок (только для тестовых сред)
@@ -186,7 +188,8 @@ namespace Primo.MIA
                     (sender, cert, chain, sslPolicyErrors) => true;
             }
 
-            var client = new HttpClient(handler)
+            // Обёртка диспозирует сертификаты вместе с клиентом (native-ресурсы X509)
+            var client = new HttpClientWithCertificates(handler, certificates)
             {
                 Timeout = TimeSpan.FromSeconds(timeoutSeconds)
             };
@@ -254,6 +257,34 @@ namespace Primo.MIA
         protected string ActivityLabel(string activityName)
         {
             return $"[{activityName}]";
+        }
+    }
+
+    /// <summary>
+    /// HttpClient, который при освобождении также диспозит загруженные
+    /// X509Certificate2 (native-ресурсы не собираются финализатором promptly).
+    /// </summary>
+    internal sealed class HttpClientWithCertificates : HttpClient
+    {
+        private readonly List<X509Certificate2> _certificates;
+
+        public HttpClientWithCertificates(HttpClientHandler handler, List<X509Certificate2> certificates)
+            : base(handler)
+        {
+            _certificates = certificates ?? new List<X509Certificate2>();
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                foreach (var certificate in _certificates)
+                {
+                    certificate.Dispose();
+                }
+                _certificates.Clear();
+            }
+            base.Dispose(disposing);
         }
     }
 }

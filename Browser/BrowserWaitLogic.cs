@@ -1,4 +1,4 @@
-using OpenQA.Selenium;
+﻿using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 using System;
 
@@ -71,7 +71,8 @@ namespace Primo.MIA
                     wait.Until(drv =>
                     {
                         try { var el = drv.FindElement(locator); return el.Displayed; }
-                        catch { return false; }
+                        catch (NoSuchElementException) { return false; }
+                        catch (StaleElementReferenceException) { return false; }
                     });
                     return true;
 
@@ -79,7 +80,8 @@ namespace Primo.MIA
                     wait.Until(drv =>
                     {
                         try { var el = drv.FindElement(locator); return el.Displayed && el.Enabled; }
-                        catch { return false; }
+                        catch (NoSuchElementException) { return false; }
+                        catch (StaleElementReferenceException) { return false; }
                     });
                     return true;
 
@@ -95,7 +97,8 @@ namespace Primo.MIA
                     wait.Until(drv =>
                     {
                         try { var el = drv.FindElement(locator); return el.Text.Contains(text ?? ""); }
-                        catch { return false; }
+                        catch (NoSuchElementException) { return false; }
+                        catch (StaleElementReferenceException) { return false; }
                     });
                     return true;
 

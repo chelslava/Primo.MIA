@@ -1,4 +1,4 @@
-// =============================================================================
+﻿// =============================================================================
 // HttpRetryBack.cs — активность «HTTP: Запрос с повторами».
 //
 // Выполняет HTTP-запросы с настраиваемой политикой повторов:
@@ -562,27 +562,29 @@ namespace Primo.MIA
             switch (this.Prop_Method)
             {
                 case HttpMethodType.GET:
-                    response = await client.GetAsync(url);
+                    response = await client.GetAsync(url).ConfigureAwait(false);
                     break;
 
                 case HttpMethodType.POST:
-                    response = await client.PostAsync(url, CreateStringContent(body));
+                    response = await client.PostAsync(url, CreateStringContent(body)).ConfigureAwait(false);
                     break;
 
                 case HttpMethodType.PUT:
-                    response = await client.PutAsync(url, CreateStringContent(body));
+                    response = await client.PutAsync(url, CreateStringContent(body)).ConfigureAwait(false);
                     break;
 
                 case HttpMethodType.DELETE:
-                    response = await client.DeleteAsync(url);
+                    response = await client.DeleteAsync(url).ConfigureAwait(false);
                     break;
 
                 case HttpMethodType.PATCH:
-                    var request = new HttpRequestMessage(new HttpMethod("PATCH"), url)
+                    using (var request = new HttpRequestMessage(new HttpMethod("PATCH"), url)
                     {
                         Content = CreateStringContent(body)
-                    };
-                    response = await client.SendAsync(request);
+                    })
+                    {
+                        response = await client.SendAsync(request).ConfigureAwait(false);
+                    }
                     break;
 
                 default:

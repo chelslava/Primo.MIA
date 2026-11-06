@@ -404,6 +404,7 @@ namespace Primo.MIA
         private HttpClient CreateHttpClient(ScriptingData sd, int timeout)
         {
             var handler = new HttpClientHandler();
+            var certificates = new List<X509Certificate2>();
 
             // ── Настройка клиентского сертификата ──────────────────────
             if (this.Prop_UseCertificate)
@@ -418,6 +419,7 @@ namespace Primo.MIA
 
                 var certificate = new X509Certificate2(certPath, certPassword);
                 handler.ClientCertificates.Add(certificate);
+                certificates.Add(certificate);
             }
 
             // ── Игнорирование SSL-ошибок (только для тестовых сред) ────
@@ -427,7 +429,8 @@ namespace Primo.MIA
                     (sender, cert, chain, sslPolicyErrors) => true;
             }
 
-            var client = new HttpClient(handler)
+            // Обёртка диспозирует сертификаты вместе с клиентом (native-ресурсы X509)
+            var client = new HttpClientWithCertificates(handler, certificates)
             {
                 Timeout = TimeSpan.FromSeconds(timeout)
             };
@@ -450,27 +453,29 @@ namespace Primo.MIA
             switch (this.Prop_Method)
             {
                 case HttpMethodType.GET:
-                    response = await client.GetAsync(url);
+                    response = await client.GetAsync(url).ConfigureAwait(false);
                     break;
 
                 case HttpMethodType.POST:
-                    response = await client.PostAsync(url, CreateStringContent(body));
+                    response = await client.PostAsync(url, CreateStringContent(body)).ConfigureAwait(false);
                     break;
 
                 case HttpMethodType.PUT:
-                    response = await client.PutAsync(url, CreateStringContent(body));
+                    response = await client.PutAsync(url, CreateStringContent(body)).ConfigureAwait(false);
                     break;
 
                 case HttpMethodType.DELETE:
-                    response = await client.DeleteAsync(url);
+                    response = await client.DeleteAsync(url).ConfigureAwait(false);
                     break;
 
                 case HttpMethodType.PATCH:
-                    var request = new HttpRequestMessage(new HttpMethod("PATCH"), url)
+                    using (var request = new HttpRequestMessage(new HttpMethod("PATCH"), url)
                     {
                         Content = CreateStringContent(body)
-                    };
-                    response = await client.SendAsync(request);
+                    })
+                    {
+                        response = await client.SendAsync(request).ConfigureAwait(false);
+                    }
                     break;
 
                 default:

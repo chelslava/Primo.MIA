@@ -1,4 +1,4 @@
-using Npgsql;
+﻿using Npgsql;
 using NpgsqlTypes;
 using System;
 using System.Collections.Generic;
@@ -403,7 +403,8 @@ namespace Primo.MIA
                 case DateTime v: importer.Write(v, type); break;
                 case Guid    v: importer.Write(v, type); break;
                 case byte[]  v: importer.Write(v, type); break;
-                default: importer.Write(Convert.ToString(value), NpgsqlDbType.Text); break;
+                // Инвариантная культура: сервер PostgreSQL ждёт точку в вещественных числах
+                default: importer.Write(Convert.ToString(value, System.Globalization.CultureInfo.InvariantCulture), NpgsqlDbType.Text); break;
             }
         }
     }

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -102,11 +102,18 @@ namespace Primo.MIA
 
         public static string ApplyFormat(string value, string format)
         {
-            if (DateTime.TryParse(value, out DateTime dateValue))
-                return dateValue.ToString(format);
+            // Инвариантная культура: шаблоны дают одинаковый вывод
+            // независимо от локали машины (разделители, порядок дат)
+            if (DateTime.TryParse(value, CultureInfo.InvariantCulture,
+                    DateTimeStyles.None, out DateTime dateValue) ||
+                DateTime.TryParse(value, CultureInfo.CurrentCulture,
+                    DateTimeStyles.None, out dateValue))
+            {
+                return dateValue.ToString(format, CultureInfo.InvariantCulture);
+            }
 
             if (double.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out double numValue))
-                return numValue.ToString(format);
+                return numValue.ToString(format, CultureInfo.InvariantCulture);
 
             return value;
         }

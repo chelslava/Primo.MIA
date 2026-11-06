@@ -1,4 +1,4 @@
-// =============================================================================
+﻿// =============================================================================
 // BusinessCalendarBack.cs — активность операций с производственным календарём.
 //
 // ИСПРАВЛЕНИЯ БАГОВ:
@@ -325,7 +325,7 @@ namespace Primo.MIA
 
                 // Разбираем входную дату
                 object dateObj = GetPropertyValue(this.Prop_InputDate, nameof(Prop_InputDate), sd);
-                if (!DateTime.TryParse(dateObj?.ToString(), out DateTime inputDate))
+                if (!CalendarDateHelper.TryParse(dateObj, out DateTime inputDate))
                     return Fail(ActivityStrings.Error_InvalidInputDate);
 
                 // [ЛОГ-2] Проверяем соответствие года даты и года календаря
@@ -444,7 +444,7 @@ namespace Primo.MIA
         {
             // Разбираем конечную дату
             object endObj = GetPropertyValue(this.Prop_EndDate, nameof(Prop_EndDate), sd);
-            if (!DateTime.TryParse(endObj?.ToString(), out DateTime endDate))
+            if (!CalendarDateHelper.TryParse(endObj, out DateTime endDate))
                 return Fail("Некорректный формат конечной даты. Ожидается значение типа DateTime.");
 
             // [ЛОГ-2] Проверяем год конечной даты

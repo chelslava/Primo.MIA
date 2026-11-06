@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Data;
 using System.Text;
 
@@ -172,7 +172,7 @@ namespace Primo.MIA
                 {
                     string value = row[column] == null || row[column] == DBNull.Value
                         ? nullDisplay
-                        : row[column].ToString();
+                        : System.Convert.ToString(row[column], System.Globalization.CultureInfo.InvariantCulture);
                     sb.AppendLine($"<td style=\"padding: 8px; border: 1px solid {colors.Border};\">{EscapeHtml(value)}</td>");
                 }
 
@@ -236,7 +236,7 @@ namespace Primo.MIA
                 {
                     string value = row[column] == null || row[column] == DBNull.Value
                         ? nullDisplay
-                        : row[column].ToString();
+                        : System.Convert.ToString(row[column], System.Globalization.CultureInfo.InvariantCulture);
                     sb.AppendLine($"<td>{EscapeHtml(value)}</td>");
                 }
 

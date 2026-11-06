@@ -64,4 +64,24 @@ if ($ResultsPath) {
 }
 
 & $vstest @vstestArgs
-exit $LASTEXITCODE
+$vstestExit = $LASTEXITCODE
+
+# Защита от «пустого зелёного прогона»: vstest возвращает 0, даже если
+# тесты не обнаружены (нет адаптера, сборка не загрузилась). Проверяем trx.
+if ($ResultsPath -and (Test-Path $ResultsPath)) {
+    [xml]$trx = Get-Content $ResultsPath
+    $total = [int]$trx.TestRun.ResultSummary.Counters.total
+    $failed = [int]$trx.TestRun.ResultSummary.Counters.failed
+    if ($total -eq 0) {
+        throw "Пустой прогон: в trx 0 тестов (сборка не загрузилась или адаптер не найден)."
+    }
+    if ($failed -gt 0) {
+        Write-Host "Тесты завершились с ошибками: failed=$failed"
+    }
+    Write-Host "Прогон: total=$total, failed=$failed"
+}
+elseif ($ResultsPath) {
+    throw "Файл результатов не создан: $ResultsPath"
+}
+
+exit $vstestExit

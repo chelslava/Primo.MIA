@@ -1,4 +1,4 @@
-// =============================================================================
+﻿// =============================================================================
 // HttpBatchBack.cs — активность «HTTP: Пакетные запросы».
 //
 // Выполняет несколько HTTP запросов из списка.
@@ -454,29 +454,30 @@ namespace Primo.MIA
 
             try
             {
-                // Создание запроса
-                HttpRequestMessage httpRequest = CreateHttpRequest(request);
-
-                // Добавление заголовков в индивидуальный запрос (не в client.DefaultRequestHeaders)
-                if (!string.IsNullOrWhiteSpace(request.Headers))
+                // Создание запроса (диспозится вместе с содержимым)
+                using (HttpRequestMessage httpRequest = CreateHttpRequest(request))
                 {
-                    var headers = ParseHeaders(request.Headers);
-                    foreach (var header in headers)
+                    // Добавление заголовков в индивидуальный запрос (не в client.DefaultRequestHeaders)
+                    if (!string.IsNullOrWhiteSpace(request.Headers))
                     {
-                        httpRequest.Headers.TryAddWithoutValidation(header.Key, header.Value);
+                        var headers = ParseHeaders(request.Headers);
+                        foreach (var header in headers)
+                        {
+                            httpRequest.Headers.TryAddWithoutValidation(header.Key, header.Value);
+                        }
                     }
+
+                    // Выполнение
+                    var response = await client.SendAsync(httpRequest).ConfigureAwait(false);
+                    var content = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+
+                    result.StatusCode = (int)response.StatusCode;
+                    result.Success = response.IsSuccessStatusCode;
+                    result.Response = content;
+
+                    if (!response.IsSuccessStatusCode)
+                        result.Error = $"HTTP {result.StatusCode}";
                 }
-
-                // Выполнение
-                var response = await client.SendAsync(httpRequest).ConfigureAwait(false);
-                var content = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-
-                result.StatusCode = (int)response.StatusCode;
-                result.Success = response.IsSuccessStatusCode;
-                result.Response = content;
-
-                if (!response.IsSuccessStatusCode)
-                    result.Error = $"HTTP {result.StatusCode}";
             }
             catch (Exception ex)
             {

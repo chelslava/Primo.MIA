@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
 using System.Security;
@@ -13,6 +14,8 @@ namespace Primo.MIA
     /// Данный класс предназначен для упрощения доступа к общим данным,
     /// чтобы избежать передачи параметров по всему проекту.
     /// Все словари создаются один раз и доступны в любом месте проекта.
+    /// Словари потокобезопасны (ConcurrentDictionary) — безопасны при
+    /// параллельном выполнении активностей платформой.
     /// </summary>
     public static class RepoDict
     {
@@ -20,19 +23,19 @@ namespace Primo.MIA
         static RepoDict()
         {
             // Инициализация всех словарей
-            StringDict = new Dictionary<string, string>();
-            BoolDict = new Dictionary<string, bool>();
-            IntDict = new Dictionary<string, int>();
-            DoubleDict = new Dictionary<string, double>();
-            DateDict = new Dictionary<string, DateTime>();
-            PathDict = new Dictionary<string, string>();
-            RegexDict = new Dictionary<string, Regex>();
-            TableDict = new Dictionary<string, DataTable>();
-            StringListDict = new Dictionary<string, List<string>>();
-            SecDict = new Dictionary<string, SecureString>();
-            CredDict = new Dictionary<string, (string login, SecureString password)>();
-            ObjectDict = new Dictionary<string, object>();
-            JsonDict = new Dictionary<string, JToken>();
+            StringDict = new ConcurrentDictionary<string, string>();
+            BoolDict = new ConcurrentDictionary<string, bool>();
+            IntDict = new ConcurrentDictionary<string, int>();
+            DoubleDict = new ConcurrentDictionary<string, double>();
+            DateDict = new ConcurrentDictionary<string, DateTime>();
+            PathDict = new ConcurrentDictionary<string, string>();
+            RegexDict = new ConcurrentDictionary<string, Regex>();
+            TableDict = new ConcurrentDictionary<string, DataTable>();
+            StringListDict = new ConcurrentDictionary<string, List<string>>();
+            SecDict = new ConcurrentDictionary<string, SecureString>();
+            CredDict = new ConcurrentDictionary<string, (string login, SecureString password)>();
+            ObjectDict = new ConcurrentDictionary<string, object>();
+            JsonDict = new ConcurrentDictionary<string, JToken>();
 
             // Запуск методов инициализации по умолчанию
             InitializePaths();
@@ -47,67 +50,67 @@ namespace Primo.MIA
         /// <summary>
         /// Универсальный словарь строковых значений.
         /// </summary>
-        public static Dictionary<string, string> StringDict { get; private set; }
+        public static ConcurrentDictionary<string, string> StringDict { get; private set; }
 
         /// <summary>
         /// Словарь логических значений (настройки, флаги и т.п.).
         /// </summary>
-        public static Dictionary<string, bool> BoolDict { get; private set; }
+        public static ConcurrentDictionary<string, bool> BoolDict { get; private set; }
 
         /// <summary>
         /// Словарь для хранения целочисленных параметров.
         /// </summary>
-        public static Dictionary<string, int> IntDict { get; private set; }
+        public static ConcurrentDictionary<string, int> IntDict { get; private set; }
 
         /// <summary>
         /// Словарь для хранения чисел с плавающей точкой.
         /// </summary>
-        public static Dictionary<string, double> DoubleDict { get; private set; }
+        public static ConcurrentDictionary<string, double> DoubleDict { get; private set; }
 
         /// <summary>
         /// Словарь для хранения дат.
         /// </summary>
-        public static Dictionary<string, DateTime> DateDict { get; private set; }
+        public static ConcurrentDictionary<string, DateTime> DateDict { get; private set; }
 
         /// <summary>
         /// Словарь путей.
         /// </summary>
-        public static Dictionary<string, string> PathDict { get; private set; }
+        public static ConcurrentDictionary<string, string> PathDict { get; private set; }
 
         /// <summary>
         /// Словарь регулярных выражений для повторного использования.
         /// </summary>
-        public static Dictionary<string, Regex> RegexDict { get; private set; }
+        public static ConcurrentDictionary<string, Regex> RegexDict { get; private set; }
 
         /// <summary>
         /// Словарь DataTable по ключу.
         /// </summary>
-        public static Dictionary<string, DataTable> TableDict { get; private set; }
+        public static ConcurrentDictionary<string, DataTable> TableDict { get; private set; }
 
         /// <summary>
         /// Словарь списков строк.
         /// </summary>
-        public static Dictionary<string, List<string>> StringListDict { get; private set; }
+        public static ConcurrentDictionary<string, List<string>> StringListDict { get; private set; }
 
         /// <summary>
         /// Словарь для безопасного хранения строк (SecureString).
         /// </summary>
-        public static Dictionary<string, SecureString> SecDict { get; private set; }
+        public static ConcurrentDictionary<string, SecureString> SecDict { get; private set; }
 
         /// <summary>
         /// Словарь для учетных данных.
         /// </summary>
-        public static Dictionary<string, (string login, SecureString password)> CredDict { get; private set; }
+        public static ConcurrentDictionary<string, (string login, SecureString password)> CredDict { get; private set; }
 
         /// <summary>
         /// Универсальный словарь для хранения произвольных объектов.
         /// </summary>
-        public static Dictionary<string, object> ObjectDict { get; private set; }
+        public static ConcurrentDictionary<string, object> ObjectDict { get; private set; }
 
         /// <summary>
         /// Словарь для хранения JSON данных (JToken).
         /// </summary>
-        public static Dictionary<string, JToken> JsonDict { get; private set; }
+        public static ConcurrentDictionary<string, JToken> JsonDict { get; private set; }
 
         //---------------------------------------------------------------------
         //  HELPER METHODS
@@ -150,7 +153,7 @@ namespace Primo.MIA
         /// </summary>
         public static bool Remove(string key)
         {
-            return ObjectDict.Remove(key);
+            return ObjectDict.TryRemove(key, out _);
         }
 
 

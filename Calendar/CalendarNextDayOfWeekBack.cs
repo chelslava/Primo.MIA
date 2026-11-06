@@ -1,4 +1,4 @@
-// =============================================================================
+﻿// =============================================================================
 // CalendarNextDayOfWeekBack.cs — активность «Календарь: Следующий день недели».
 //
 // Находит ближайшую дату указанного дня недели с учётом производственного
@@ -347,7 +347,7 @@ namespace Primo.MIA
 
                 // Разбираем стартовую дату
                 object startObj = GetPropertyValue(this.Prop_StartDate, nameof(Prop_StartDate), sd);
-                if (!DateTime.TryParse(startObj?.ToString(), out DateTime startDate))
+                if (!CalendarDateHelper.TryParse(startObj, out DateTime startDate))
                     return Fail(ActivityStrings.Error_InvalidStartDate);
 
                 // Разбираем MaxLookAhead — с fallback на 30

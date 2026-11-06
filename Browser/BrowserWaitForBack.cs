@@ -317,7 +317,8 @@ namespace Primo.MIA
                     var element = drv.FindElement(locator);
                     return element.Displayed;
                 }
-                catch { return false; }
+                catch (NoSuchElementException) { return false; }
+                catch (StaleElementReferenceException) { return false; }
             });
             return true;
         }
@@ -333,7 +334,8 @@ namespace Primo.MIA
                     var element = drv.FindElement(locator);
                     return element.Displayed && element.Enabled;
                 }
-                catch { return false; }
+                catch (NoSuchElementException) { return false; }
+                catch (StaleElementReferenceException) { return false; }
             });
             return true;
         }
@@ -370,7 +372,8 @@ namespace Primo.MIA
                     var element = drv.FindElement(locator);
                     return element.Text.Contains(text);
                 }
-                catch { return false; }
+                catch (NoSuchElementException) { return false; }
+                catch (StaleElementReferenceException) { return false; }
             });
             return true;
         }

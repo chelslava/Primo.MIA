@@ -328,7 +328,8 @@ namespace Primo.MIA
         {
             // Ожидаем появления хотя бы одного элемента; при отсутствии возвращаем пустой список
             try { SeleniumHelper.WaitForElement(driver, locator, timeout); }
-            catch { /* элементы не найдены — нормальная ситуация для FindAll */ }
+            catch (NoSuchElementException) { /* элементы не найдены — нормальная ситуация для FindAll */ }
+            catch (TimeoutException) { /* не появились за таймаут — вернём пустой список */ }
 
             // Ищем все совпадающие элементы и сохраняем каждый через LINQ
             var elementIds = SeleniumHelper
