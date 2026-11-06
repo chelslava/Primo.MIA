@@ -70,9 +70,9 @@
                     Margin="5,0,5,5">
 
             <TextBlock Style="{StaticResource ActivityHeader}">
-                <Run Text="Ожидание условия [" Foreground="#FF0E0E0E"/>
+                <Run Text="Ожидание условия ["/>
                 <Run Text="{Binding Path=Prop_Condition, Mode=OneWay}" Foreground="#FF1565C0"/>
-                <Run Text="]" Foreground="#FF0E0E0E"/>
+                <Run Text="]"/>
             </TextBlock>
 
             <TextBlock Text="Условие ожидания:" Style="{StaticResource FieldLabel}"/>

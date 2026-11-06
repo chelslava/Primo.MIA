@@ -6,6 +6,14 @@
              mc:Ignorable="d"
              d:DesignHeight="100" Margin="0,0,0,5">
 
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Primo.MIA;component/Common/Styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
     <Grid Background="{DynamicResource {x:Static SystemColors.ScrollBarBrushKey}}">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
@@ -23,7 +31,7 @@
         <StackPanel Grid.Column="1" VerticalAlignment="Top" Margin="5,0,5,5">
 
             <!-- Заголовок -->
-            <TextBlock FontWeight="Bold" FontSize="12" Foreground="#FF0E0E0E">
+            <TextBlock Style="{StaticResource ActivityHeader}">
                 <Run Text="JSON: Запрос (JSONPath)"/>
             </TextBlock>
 
@@ -33,12 +41,10 @@
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <TextBlock Grid.Column="0" Text="Путь: " VerticalAlignment="Center" FontSize="11" Foreground="#FF0E0E0E"/>
+                <TextBlock Grid.Column="0" Text="Путь: " VerticalAlignment="Center" Style="{StaticResource FieldLabel}"/>
                 <TextBox Grid.Column="1"
                          Text="{Binding Prop_JsonPath, UpdateSourceTrigger=PropertyChanged}"
-                         Height="20"
-                         Margin="0,0,6,0"
-                         BorderThickness="0"
+                         Style="{StaticResource FieldBox}"
                           />
             </Grid>
 

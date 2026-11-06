@@ -28,28 +28,28 @@
         <StackPanel Grid.Column="1" Margin="5,0,5,5">
             <TextBlock Text="БД: Upsert из DataTable" Style="{StaticResource ActivityHeader}"/>
 
-            <TextBlock Text="DataTable:" Style="{StaticResource FieldLabel}"/>
+            <TextBlock Text="Таблица данных (DataTable):" Style="{StaticResource FieldLabel}"/>
             <TextBox Text="{Binding Prop_DataTable, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
 
-            <TextBlock Text="Provider invariant name:" Style="{StaticResource FieldLabel}"/>
+            <TextBlock Text="Поставщик (invariant name):" Style="{StaticResource FieldLabel}"/>
             <TextBox Text="{Binding Prop_ProviderInvariantName, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
 
             <TextBlock Text="Строка подключения:" Style="{StaticResource FieldLabel}"/>
             <TextBox Text="{Binding Prop_ConnectionString, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
 
-            <TextBlock Text="TransactionId (опционально):" Style="{StaticResource FieldLabel}"/>
+            <TextBlock Text="TransactionId (необязательно):" Style="{StaticResource FieldLabel}"/>
             <TextBox Text="{Binding Prop_TransactionId, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
 
             <TextBlock Text="Таблица-приёмник:" Style="{StaticResource FieldLabel}"/>
             <TextBox Text="{Binding Prop_DestinationTable, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
 
-            <TextBlock Text="Key columns (List&lt;string&gt;):" Style="{StaticResource FieldLabel}"/>
+            <TextBlock Text="Ключевые колонки (List&lt;string&gt;):" Style="{StaticResource FieldLabel}"/>
             <TextBox Text="{Binding Prop_KeyColumns, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
 
-            <TextBlock Text="Update columns (List&lt;string&gt;):" Style="{StaticResource FieldLabel}"/>
+            <TextBlock Text="Обновляемые колонки (List&lt;string&gt;):" Style="{StaticResource FieldLabel}"/>
             <TextBox Text="{Binding Prop_UpdateColumns, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
 
-            <TextBlock Text="Column mappings (Dictionary&lt;string,string&gt;):" Style="{StaticResource FieldLabel}"/>
+            <TextBlock Text="Соответствие колонок (Dictionary&lt;string,string&gt;):" Style="{StaticResource FieldLabel}"/>
             <TextBox Text="{Binding Prop_ColumnMappings, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
 
             <TextBlock Text="Таймаут (сек):" Style="{StaticResource FieldLabel}"/>

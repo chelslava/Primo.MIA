@@ -68,9 +68,9 @@
                     Margin="5,0,5,5">
 
             <TextBlock Style="{StaticResource ActivityHeader}">
-                <Run Text="Клик по элементу [" Foreground="#FF0E0E0E"/>
+                <Run Text="Клик по элементу ["/>
                 <Run Text="{Binding Path=Prop_ClickMode, Mode=OneWay}" Foreground="#FF1565C0"/>
-                <Run Text="]" Foreground="#FF0E0E0E"/>
+                <Run Text="]"/>
             </TextBlock>
 
             <TextBlock Text="Режим клика:" Style="{StaticResource FieldLabel}"/>

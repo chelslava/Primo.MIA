@@ -7,6 +7,13 @@
              mc:Ignorable="d"
              d:DesignHeight="70"
              Margin="0,0,0,5">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Primo.MIA;component/Common/Styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
     <Grid Background="{DynamicResource {x:Static SystemColors.ScrollBarBrushKey}}">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
@@ -23,9 +30,7 @@
                     Margin="5,0,5,5">
 
             <TextBlock Text="Скриншот страницы"
-                       FontWeight="Bold" FontSize="12"
-                       Foreground="#FF0E0E0E"
-                       Height="18" Margin="0,2,0,2"/>
+                       Style="{StaticResource ActivityHeader}"/>
 
             <!-- Строка выбора файла: TextBox + кнопка обзора -->
             <Grid Margin="0,2,6,0">
@@ -38,11 +43,7 @@
                 <TextBox Grid.Column="0"
                          Text="{Binding Prop_FilePath, UpdateSourceTrigger=PropertyChanged}"
                          IsReadOnly="False"
-                         BorderThickness="1"
-                         BorderBrush="#D0D7E2"
-                         TextWrapping="NoWrap"
-                         Height="22"
-                         VerticalContentAlignment="Center"/>
+                         Style="{StaticResource FieldBox}"/>
 
                 <!-- Кнопка открытия диалога выбора файла -->
                 <Button Grid.Column="1"

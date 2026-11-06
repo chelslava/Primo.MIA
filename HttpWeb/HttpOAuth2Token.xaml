@@ -9,12 +9,17 @@
              d:DesignHeight="100" Margin="0,0,0,5">
 
     <UserControl.Resources>
-        <ObjectDataProvider x:Key="GrantValues" MethodName="GetValues"
-                            ObjectType="{x:Type system:Enum}">
-            <ObjectDataProvider.MethodParameters>
-                <x:Type TypeName="local:OAuth2GrantType"/>
-            </ObjectDataProvider.MethodParameters>
-        </ObjectDataProvider>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Primo.MIA;component/Common/Styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <ObjectDataProvider x:Key="GrantValues" MethodName="GetValues"
+                                ObjectType="{x:Type system:Enum}">
+                <ObjectDataProvider.MethodParameters>
+                    <x:Type TypeName="local:OAuth2GrantType"/>
+                </ObjectDataProvider.MethodParameters>
+            </ObjectDataProvider>
+        </ResourceDictionary>
     </UserControl.Resources>
 
     <Grid Background="{DynamicResource {x:Static SystemColors.ScrollBarBrushKey}}">
@@ -34,7 +39,7 @@
         <StackPanel Grid.Column="1" VerticalAlignment="Top" Margin="5,0,5,5">
 
             <!-- Заголовок -->
-            <TextBlock FontWeight="Bold" FontSize="12"  Foreground="#FF0E0E0E">
+            <TextBlock Style="{StaticResource ActivityHeader}">
                 <Run Text="HTTP: OAuth2 токен ["/>
                 <Run Text="{Binding Prop_GrantType, Mode=OneWay}"/>
                 <Run Text="]"/>
@@ -46,12 +51,10 @@
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <TextBlock Grid.Column="0" Text="URL: " VerticalAlignment="Center" FontSize="11" Foreground="#FF0E0E0E"/>
+                <TextBlock Grid.Column="0" Text="URL: " VerticalAlignment="Center" Style="{StaticResource FieldLabel}"/>
                 <TextBox Grid.Column="1"
                          Text="{Binding Prop_TokenUrl, UpdateSourceTrigger=PropertyChanged}"
-                         Height="20"
-                         Margin="0,0,6,0"
-                         BorderThickness="0"
+                         Style="{StaticResource FieldBox}"
                          />
             </Grid>
 
@@ -61,12 +64,10 @@
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <TextBlock Grid.Column="0" Text="Client ID: " VerticalAlignment="Center" FontSize="11" Foreground="#FF0E0E0E"/>
+                <TextBlock Grid.Column="0" Text="Client ID: " VerticalAlignment="Center" Style="{StaticResource FieldLabel}"/>
                 <TextBox Grid.Column="1"
                          Text="{Binding Prop_ClientId, UpdateSourceTrigger=PropertyChanged}"
-                         Height="20"
-                         Margin="0,0,6,0"
-                         BorderThickness="0"/>
+                         Style="{StaticResource FieldBox}"/>
             </Grid>
 
         </StackPanel>

@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:common="clr-namespace:Primo.MIA"
              mc:Ignorable="d" d:DesignHeight="220" Margin="0,0,0,5">
     <UserControl.Resources>
         <ResourceDictionary>
@@ -25,7 +26,9 @@
             <TextBlock Text="Пользователь:" Style="{StaticResource FieldLabel}"/>
             <TextBox Text="{Binding Prop_UserName, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
             <TextBlock Text="Пароль:" Style="{StaticResource FieldLabel}"/>
-            <TextBox Text="{Binding Prop_Password, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            <PasswordBox common:PasswordBoxHelper.BindPassword="True"
+                         common:PasswordBoxHelper.BoundPassword="{Binding Prop_Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         Style="{StaticResource FieldPasswordBox}"/>
             <TextBlock Text="Удалённый путь:" Style="{StaticResource FieldLabel}"/>
             <TextBox Text="{Binding Prop_RemotePath, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
             <TextBlock Text="Рекурсивно:" Style="{StaticResource FieldLabel}"/>

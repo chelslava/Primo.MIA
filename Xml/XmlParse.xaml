@@ -9,12 +9,17 @@
              d:DesignHeight="80" Margin="0,0,0,5">
 
     <UserControl.Resources>
-        <ObjectDataProvider x:Key="ParseModeValues" MethodName="GetValues"
-                            ObjectType="{x:Type system:Enum}">
-            <ObjectDataProvider.MethodParameters>
-                <x:Type TypeName="local:XmlParseMode"/>
-            </ObjectDataProvider.MethodParameters>
-        </ObjectDataProvider>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Primo.MIA;component/Common/Styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <ObjectDataProvider x:Key="ParseModeValues" MethodName="GetValues"
+                                ObjectType="{x:Type system:Enum}">
+                <ObjectDataProvider.MethodParameters>
+                    <x:Type TypeName="local:XmlParseMode"/>
+                </ObjectDataProvider.MethodParameters>
+            </ObjectDataProvider>
+        </ResourceDictionary>
     </UserControl.Resources>
 
     <Grid Background="{DynamicResource {x:Static SystemColors.ScrollBarBrushKey}}">
@@ -30,7 +35,7 @@
         <!-- Содержимое -->
         <StackPanel Grid.Column="1" VerticalAlignment="Top" Margin="5,0,5,5">
             <!-- Заголовок -->
-            <TextBlock FontWeight="Bold" FontSize="12" Foreground="#FF0E0E0E">
+            <TextBlock Style="{StaticResource ActivityHeader}">
                 <Run Text="XML: Парсинг ["/>
                 <Run Text="{Binding Prop_ParseMode, Mode=OneWay}"/>
                 <Run Text="]"/>
@@ -39,12 +44,11 @@
             <!-- Режим -->
             <ComboBox ItemsSource="{Binding Source={StaticResource ParseModeValues}}"
                       SelectedItem="{Binding Prop_ParseMode}"
-                      Height="20" Margin="0,2,0,0" FontSize="11"/>
+                      Style="{StaticResource FieldComboBox}"/>
 
             <!-- XML-строка -->
             <TextBox Text="{Binding Prop_XmlString, UpdateSourceTrigger=PropertyChanged}"
-                     Height="20" FontSize="11" Margin="0,2,0,0"
-                     BorderThickness="0" BorderBrush="#D0D7E2"/>
+                     Style="{StaticResource FieldBox}"/>
         </StackPanel>
     </Grid>
 </UserControl>

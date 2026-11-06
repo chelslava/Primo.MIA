@@ -50,9 +50,9 @@
                     Margin="5,0,5,5">
 
             <TextBlock Style="{StaticResource ActivityHeader}">
-                <Run Text="Браузер: Получить информацию [" Foreground="#FF0E0E0E"/>
+                <Run Text="Браузер: Получить информацию ["/>
                 <Run Text="{Binding Path=Prop_InfoType, Mode=OneWay}" Foreground="#FF1565C0"/>
-                <Run Text="]" Foreground="#FF0E0E0E"/>
+                <Run Text="]"/>
             </TextBlock>
 
             <TextBlock Text="Тип информации:" Style="{StaticResource FieldLabel}"/>

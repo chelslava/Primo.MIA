@@ -31,7 +31,7 @@
                Source="pack://application:,,,/Primo.MIA;component/images/bd.png"/>
         <StackPanel Grid.Column="1" Margin="5,0,5,5">
             <TextBlock Text="БД: Начать транзакцию" Style="{StaticResource ActivityHeader}"/>
-            <TextBlock Text="Provider invariant name:" Style="{StaticResource FieldLabel}"/>
+            <TextBlock Text="Поставщик (invariant name):" Style="{StaticResource FieldLabel}"/>
             <TextBox Text="{Binding Prop_ProviderInvariantName, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
             <TextBlock Text="Строка подключения:" Style="{StaticResource FieldLabel}"/>
             <TextBox Text="{Binding Prop_ConnectionString, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>

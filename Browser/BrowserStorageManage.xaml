@@ -11,20 +11,25 @@
              Margin="0,0,0,5">
 
     <UserControl.Resources>
-        <ObjectDataProvider x:Key="StorageTypeValues"
-                            MethodName="GetValues"
-                            ObjectType="{x:Type system:Enum}">
-            <ObjectDataProvider.MethodParameters>
-                <x:Type TypeName="local:StorageType"/>
-            </ObjectDataProvider.MethodParameters>
-        </ObjectDataProvider>
-        <ObjectDataProvider x:Key="StorageOperationValues"
-                            MethodName="GetValues"
-                            ObjectType="{x:Type system:Enum}">
-            <ObjectDataProvider.MethodParameters>
-                <x:Type TypeName="local:StorageOperation"/>
-            </ObjectDataProvider.MethodParameters>
-        </ObjectDataProvider>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Primo.MIA;component/Common/Styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <ObjectDataProvider x:Key="StorageTypeValues"
+                                MethodName="GetValues"
+                                ObjectType="{x:Type system:Enum}">
+                <ObjectDataProvider.MethodParameters>
+                    <x:Type TypeName="local:StorageType"/>
+                </ObjectDataProvider.MethodParameters>
+            </ObjectDataProvider>
+            <ObjectDataProvider x:Key="StorageOperationValues"
+                                MethodName="GetValues"
+                                ObjectType="{x:Type system:Enum}">
+                <ObjectDataProvider.MethodParameters>
+                    <x:Type TypeName="local:StorageOperation"/>
+                </ObjectDataProvider.MethodParameters>
+            </ObjectDataProvider>
+        </ResourceDictionary>
     </UserControl.Resources>
 
     <Grid Background="{DynamicResource {x:Static SystemColors.ScrollBarBrushKey}}">
@@ -42,24 +47,21 @@
                     VerticalAlignment="Top"
                     Margin="5,0,5,5">
 
-            <TextBlock FontWeight="Bold"
-                       FontSize="12">
-                       <Run Text="Управление Web Storage [" FontWeight="Bold" FontSize="12" Foreground="#FF0E0E0E"/>
-                       <Run Text="{Binding Path=Prop_StorageType, Mode=OneWay}" FontWeight="Bold" FontSize="12" Foreground="#FF0E0E0E"/>
-                       <Run Text=", " FontWeight="Bold" FontSize="12" Foreground="#FF0E0E0E"/>
-                       <Run Text="{Binding Path=Prop_Operation, Mode=OneWay}" FontWeight="Bold" FontSize="12" Foreground="#FF0E0E0E"/>
-                       <Run Text="]" FontWeight="Bold" FontSize="12" Foreground="#FF0E0E0E"/>
+            <TextBlock Style="{StaticResource ActivityHeader}">
+                       <Run Text="Управление Web Storage ["/>
+                       <Run Text="{Binding Path=Prop_StorageType, Mode=OneWay}"/>
+                       <Run Text=", "/>
+                       <Run Text="{Binding Path=Prop_Operation, Mode=OneWay}"/>
+                       <Run Text="]"/>
             </TextBlock>
 
             <ComboBox ItemsSource="{Binding Source={StaticResource StorageTypeValues}}"
                       SelectedItem="{Binding Prop_StorageType}"
-                      Margin="0,2,6,2"
-                      Height="22"/>
+                      Style="{StaticResource FieldComboBox}"/>
 
             <ComboBox ItemsSource="{Binding Source={StaticResource StorageOperationValues}}"
                       SelectedItem="{Binding Prop_Operation}"
-                      Margin="0,2,6,2"
-                      Height="22"/>
+                      Style="{StaticResource FieldComboBox}"/>
 
         </StackPanel>
     </Grid>

@@ -28,38 +28,38 @@
         <StackPanel Grid.Column="1" Margin="5,0,5,5">
             <TextBlock Text="БД: Stored procedure" Style="{StaticResource ActivityHeader}"/>
 
-            <TextBlock Text="Provider invariant name:" Style="{StaticResource FieldLabel}"/>
+            <TextBlock Text="Поставщик (invariant name):" Style="{StaticResource FieldLabel}"/>
             <TextBox Text="{Binding Prop_ProviderInvariantName, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
 
             <TextBlock Text="Строка подключения:" Style="{StaticResource FieldLabel}"/>
             <TextBox Text="{Binding Prop_ConnectionString, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
 
-            <TextBlock Text="TransactionId (опционально):" Style="{StaticResource FieldLabel}"/>
+            <TextBlock Text="TransactionId (необязательно):" Style="{StaticResource FieldLabel}"/>
             <TextBox Text="{Binding Prop_TransactionId, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
 
             <TextBlock Text="Имя stored procedure:" Style="{StaticResource FieldLabel}"/>
             <TextBox Text="{Binding Prop_ProcedureName, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
 
-            <TextBlock Text="Input parameters (Dictionary&lt;string,string&gt;):" Style="{StaticResource FieldLabel}"/>
+            <TextBlock Text="Входные параметры (Dictionary&lt;string,string&gt;):" Style="{StaticResource FieldLabel}"/>
             <TextBox Text="{Binding Prop_InputParameters, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
 
-            <TextBlock Text="InputOutput parameters (Dictionary&lt;string,string&gt;):" Style="{StaticResource FieldLabel}"/>
+            <TextBlock Text="Входные/выходные параметры (Dictionary&lt;string,string&gt;):" Style="{StaticResource FieldLabel}"/>
             <TextBox Text="{Binding Prop_InputOutputParameters, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
 
-            <TextBlock Text="Output parameters (List&lt;string&gt;):" Style="{StaticResource FieldLabel}"/>
+            <TextBlock Text="Выходные параметры (List&lt;string&gt;):" Style="{StaticResource FieldLabel}"/>
             <TextBox Text="{Binding Prop_OutputParameterNames, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
 
-            <CheckBox Content="Получать return value"
+            <CheckBox Content="Получать возвращаемое значение (return value)"
                       IsChecked="{Binding Prop_IncludeReturnValue}"
                       Margin="0,6,0,0"/>
 
-            <TextBlock Text="Размер output/inputoutput параметров:" Style="{StaticResource FieldLabel}"/>
+            <TextBlock Text="Размер выходных параметров (output/input-output):" Style="{StaticResource FieldLabel}"/>
             <TextBox Text="{Binding Prop_OutputParameterSize, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
 
             <TextBlock Text="Таймаут (сек):" Style="{StaticResource FieldLabel}"/>
             <TextBox Text="{Binding Prop_CommandTimeoutSeconds, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
 
-            <TextBlock Text="Переменная output parameters:" Style="{StaticResource FieldLabel}"/>
+            <TextBlock Text="Выходные параметры (output parameters):" Style="{StaticResource FieldLabel}"/>
             <TextBox Text="{Binding Prop_OutputParameters, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
         </StackPanel>
     </Grid>

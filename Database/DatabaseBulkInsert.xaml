@@ -38,35 +38,35 @@
         <StackPanel Grid.Column="1" Margin="5,0,5,5">
             <TextBlock Text="БД: Массовая запись из DataTable" Style="{StaticResource ActivityHeader}"/>
 
-            <TextBlock Text="DataTable:" Style="{StaticResource FieldLabel}"/>
+            <TextBlock Text="Таблица данных (DataTable):" Style="{StaticResource FieldLabel}"/>
             <TextBox Text="{Binding Prop_DataTable, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
 
-            <TextBlock Text="Provider invariant name:" Style="{StaticResource FieldLabel}"/>
+            <TextBlock Text="Поставщик (invariant name):" Style="{StaticResource FieldLabel}"/>
             <TextBox Text="{Binding Prop_ProviderInvariantName, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
 
             <TextBlock Text="Строка подключения:" Style="{StaticResource FieldLabel}"/>
             <TextBox Text="{Binding Prop_ConnectionString, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
 
-            <TextBlock Text="TransactionId (опционально):" Style="{StaticResource FieldLabel}"/>
+            <TextBlock Text="TransactionId (необязательно):" Style="{StaticResource FieldLabel}"/>
             <TextBox Text="{Binding Prop_TransactionId, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
 
             <TextBlock Text="Таблица-приёмник:" Style="{StaticResource FieldLabel}"/>
             <TextBox Text="{Binding Prop_DestinationTable, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
 
-            <TextBlock Text="Column mappings (Dictionary&lt;string,string&gt;):" Style="{StaticResource FieldLabel}"/>
+            <TextBlock Text="Соответствие колонок (Dictionary&lt;string,string&gt;):" Style="{StaticResource FieldLabel}"/>
             <TextBox Text="{Binding Prop_ColumnMappings, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
 
-            <TextBlock Text="Batch size:" Style="{StaticResource FieldLabel}"/>
+            <TextBlock Text="Размер пакета:" Style="{StaticResource FieldLabel}"/>
             <TextBox Text="{Binding Prop_BatchSize, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
 
-            <TextBlock Text="Timeout (sec):" Style="{StaticResource FieldLabel}"/>
+            <TextBlock Text="Таймаут (сек):" Style="{StaticResource FieldLabel}"/>
             <TextBox Text="{Binding Prop_BulkCopyTimeoutSeconds, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
 
-            <CheckBox Content="Use table lock (SQL Server fast path)"
+            <CheckBox Content="Использовать блокировку таблицы (SQL Server, TableLock)"
                       IsChecked="{Binding Prop_UseTableLock}"
                       Margin="0,6,0,0"/>
 
-            <CheckBox Content="Keep identity (SQL Server fast path)"
+            <CheckBox Content="Сохранять identity (SQL Server, KeepIdentity)"
                       IsChecked="{Binding Prop_KeepIdentity}"
                       Margin="0,4,0,0"/>
 

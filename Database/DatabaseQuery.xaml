@@ -42,13 +42,13 @@
                 <Run Text="]" Foreground="#FF0E0E0E"/>
             </TextBlock>
 
-            <TextBlock Text="Provider invariant name:" Style="{StaticResource FieldLabel}"/>
+            <TextBlock Text="Поставщик (invariant name):" Style="{StaticResource FieldLabel}"/>
             <TextBox Text="{Binding Prop_ProviderInvariantName, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
 
             <TextBlock Text="Строка подключения:" Style="{StaticResource FieldLabel}"/>
             <TextBox Text="{Binding Prop_ConnectionString, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
 
-            <TextBlock Text="TransactionId (опционально):" Style="{StaticResource FieldLabel}"/>
+            <TextBlock Text="TransactionId (необязательно):" Style="{StaticResource FieldLabel}"/>
             <TextBox Text="{Binding Prop_TransactionId, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
 
             <TextBlock Text="Тип команды:" Style="{StaticResource FieldLabel}"/>

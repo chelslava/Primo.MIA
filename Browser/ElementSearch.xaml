@@ -60,9 +60,9 @@
                     Margin="5,0,5,5">
 
             <TextBlock Style="{StaticResource ActivityHeader}">
-                <Run Text="Поиск элементов [" Foreground="#FF0E0E0E"/>
+                <Run Text="Поиск элементов ["/>
                 <Run Text="{Binding Path=Prop_SearchMode, Mode=OneWay}" Foreground="#FF1565C0"/>
-                <Run Text="]" Foreground="#FF0E0E0E"/>
+                <Run Text="]"/>
             </TextBlock>
 
             <TextBlock Text="Режим поиска:" Style="{StaticResource FieldLabel}"/>

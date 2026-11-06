@@ -67,9 +67,9 @@
                     Margin="5,0,5,5">
 
             <TextBlock Style="{StaticResource ActivityHeader}">
-                <Run Text="Элемент: Ввод [" Foreground="#FF0E0E0E"/>
+                <Run Text="Элемент: Ввод ["/>
                 <Run Text="{Binding Path=Prop_InputMode, Mode=OneWay}" Foreground="#FF1565C0"/>
-                <Run Text="]" Foreground="#FF0E0E0E"/>
+                <Run Text="]"/>
             </TextBlock>
 
             <TextBlock Text="Режим ввода:" Style="{StaticResource FieldLabel}"/>

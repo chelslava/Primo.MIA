@@ -28,25 +28,25 @@
         <StackPanel Grid.Column="1" Margin="5,0,5,5">
             <TextBlock Text="БД: Постраничный запрос" Style="{StaticResource ActivityHeader}"/>
 
-            <TextBlock Text="Provider invariant name:" Style="{StaticResource FieldLabel}"/>
+            <TextBlock Text="Поставщик (invariant name):" Style="{StaticResource FieldLabel}"/>
             <TextBox Text="{Binding Prop_ProviderInvariantName, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
 
             <TextBlock Text="Строка подключения:" Style="{StaticResource FieldLabel}"/>
             <TextBox Text="{Binding Prop_ConnectionString, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
 
-            <TextBlock Text="TransactionId (опционально):" Style="{StaticResource FieldLabel}"/>
+            <TextBlock Text="TransactionId (необязательно):" Style="{StaticResource FieldLabel}"/>
             <TextBox Text="{Binding Prop_TransactionId, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
 
             <TextBlock Text="Исходный SQL:" Style="{StaticResource FieldLabel}"/>
             <TextBox Text="{Binding Prop_CommandText, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
 
-            <TextBlock Text="Order by:" Style="{StaticResource FieldLabel}"/>
+            <TextBlock Text="Сортировка (Order by):" Style="{StaticResource FieldLabel}"/>
             <TextBox Text="{Binding Prop_OrderByExpression, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
 
-            <TextBlock Text="Page number:" Style="{StaticResource FieldLabel}"/>
+            <TextBlock Text="Номер страницы:" Style="{StaticResource FieldLabel}"/>
             <TextBox Text="{Binding Prop_PageNumber, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
 
-            <TextBlock Text="Page size:" Style="{StaticResource FieldLabel}"/>
+            <TextBlock Text="Размер страницы:" Style="{StaticResource FieldLabel}"/>
             <TextBox Text="{Binding Prop_PageSize, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
 
             <TextBlock Text="Параметры (Dictionary&lt;string,string&gt;):" Style="{StaticResource FieldLabel}"/>

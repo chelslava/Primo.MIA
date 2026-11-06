@@ -9,12 +9,17 @@
              d:DesignHeight="100" Margin="0,0,0,5">
 
     <UserControl.Resources>
-        <ObjectDataProvider x:Key="ModeValues" MethodName="GetValues"
-                            ObjectType="{x:Type system:Enum}">
-            <ObjectDataProvider.MethodParameters>
-                <x:Type TypeName="local:JsonParseMode"/>
-            </ObjectDataProvider.MethodParameters>
-        </ObjectDataProvider>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Primo.MIA;component/Common/Styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <ObjectDataProvider x:Key="ModeValues" MethodName="GetValues"
+                                ObjectType="{x:Type system:Enum}">
+                <ObjectDataProvider.MethodParameters>
+                    <x:Type TypeName="local:JsonParseMode"/>
+                </ObjectDataProvider.MethodParameters>
+            </ObjectDataProvider>
+        </ResourceDictionary>
     </UserControl.Resources>
 
     <Grid Background="{DynamicResource {x:Static SystemColors.ScrollBarBrushKey}}">
@@ -34,7 +39,7 @@
         <StackPanel Grid.Column="1" VerticalAlignment="Top" Margin="5,0,5,5">
 
             <!-- Заголовок -->
-            <TextBlock FontWeight="Bold" FontSize="12" Foreground="#FF0E0E0E">
+            <TextBlock Style="{StaticResource ActivityHeader}">
                 <Run Text="JSON: Парсинг ["/>
                 <Run Text="{Binding Prop_Mode, Mode=OneWay}"/>
                 <Run Text="]"/>
@@ -46,12 +51,11 @@
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <TextBlock Grid.Column="0" Text="Режим: " VerticalAlignment="Center" FontSize="11" Foreground="#FF0E0E0E"/>
+                <TextBlock Grid.Column="0" Text="Режим: " VerticalAlignment="Center" Style="{StaticResource FieldLabel}"/>
                 <ComboBox Grid.Column="1"
                           ItemsSource="{Binding Source={StaticResource ModeValues}}"
                           SelectedItem="{Binding Prop_Mode}"
-                          Height="20"
-                          Margin="0,0,6,0"/>
+                          Style="{StaticResource FieldComboBox}"/>
             </Grid>
 
             <!-- Опции -->

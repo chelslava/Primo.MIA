@@ -53,9 +53,9 @@
                     Margin="5,0,5,5">
 
             <TextBlock Style="{StaticResource ActivityHeader}">
-                <Run Text="Навигация [" Foreground="#FF0E0E0E"/>
+                <Run Text="Навигация ["/>
                 <Run Text="{Binding Path=Prop_Mode, Mode=OneWay}" Foreground="#FF1565C0"/>
-                <Run Text="]" Foreground="#FF0E0E0E"/>
+                <Run Text="]"/>
             </TextBlock>
 
             <TextBlock Text="Режим навигации:" Style="{StaticResource FieldLabel}"/>

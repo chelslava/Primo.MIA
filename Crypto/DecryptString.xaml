@@ -44,9 +44,10 @@
                      ToolTip="Base64([соль][IV][шифртекст]) — вывод активности шифрования"/>
 
             <TextBlock Text="Пароль:" Style="{StaticResource FieldLabel}"/>
-            <TextBox Text="{Binding Prop_Password, UpdateSourceTrigger=PropertyChanged}"
-                     Style="{StaticResource FieldBox}"
-                     ToolTip="Пароль, использованный при шифровании"/>
+            <PasswordBox local:PasswordBoxHelper.BindPassword="True"
+                         local:PasswordBoxHelper.BoundPassword="{Binding Prop_Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         Style="{StaticResource FieldPasswordBox}"
+                         ToolTip="Пароль, использованный при шифровании"/>
 
         </StackPanel>
     </Grid>

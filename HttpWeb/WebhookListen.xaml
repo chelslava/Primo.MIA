@@ -45,7 +45,7 @@
 
             <!-- Заголовок -->
             <TextBlock Style="{StaticResource ActivityHeader}">
-                <Run Text="Webhook: Получить" Foreground="#FF0E0E0E"/>
+                <Run Text="Webhook: Получить"/>
             </TextBlock>
 
             <!-- URL-префикс -->

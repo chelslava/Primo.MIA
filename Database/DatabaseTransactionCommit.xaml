@@ -22,7 +22,7 @@
                Source="pack://application:,,,/Primo.MIA;component/images/bd.png"/>
         <StackPanel Grid.Column="1" Margin="5,0,5,5">
             <TextBlock Text="БД: Подтвердить транзакцию" Style="{StaticResource ActivityHeader}"/>
-            <TextBlock Text="TransactionId (опционально):" Style="{StaticResource FieldLabel}"/>
+            <TextBlock Text="TransactionId (необязательно):" Style="{StaticResource FieldLabel}"/>
             <TextBox Text="{Binding Prop_TransactionId, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
         </StackPanel>
     </Grid>

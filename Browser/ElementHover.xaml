@@ -59,9 +59,9 @@
                     Margin="5,0,5,5">
 
             <TextBlock Style="{StaticResource ActivityHeader}">
-                <Run Text="Навести курсор [" Foreground="#FF0E0E0E"/>
+                <Run Text="Навести курсор ["/>
                 <Run Text="{Binding Path=Prop_HoverMode, Mode=OneWay}" Foreground="#FF1565C0"/>
-                <Run Text="]" Foreground="#FF0E0E0E"/>
+                <Run Text="]"/>
             </TextBlock>
 
             <TextBlock Text="Режим наведения:" Style="{StaticResource FieldLabel}"/>
