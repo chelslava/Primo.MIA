@@ -254,7 +254,10 @@ namespace Primo.MIA
                 // Получение драйвера
                 var driver = GetDriverFromContext(sessionId);
 
-                // Получение элемента: либо по ID, либо поиск по локатору
+                // Получение элемента: либо по ID, либо поиск по локатору.
+                // Составная валидация: требуется либо локатор, либо ID элемента
+                Guard.AnyNullOrWhiteSpace(elementId, locatorValue);
+
                 IWebElement element;
                 if (!string.IsNullOrWhiteSpace(locatorValue))
                 {
@@ -268,17 +271,14 @@ namespace Primo.MIA
                     
                     Logger.LogDebug(sdkComponentName, "Элемент найден по локатору: {0}={1}", this.Prop_LocatorType, locatorValue);
                 }
-                else if (!string.IsNullOrWhiteSpace(elementId))
+                else
                 {
+                    // elementId гарантированно непуст (проверено Guard выше)
                     element = ElementRepository.GetElement(elementId);
                     if (element == null)
                         throw new ArgumentException($"Элемент с ID '{elementId}' не найден в репозитории");
-                    
+
                     Logger.LogDebug(sdkComponentName, "Использован сохраненный элемент: {0}", elementId);
-                }
-                else
-                {
-                    throw new ArgumentException("Необходимо указать либо ID элемента, либо локатор для поиска");
                 }
 
                 // Выполнение наведения в зависимости от режима

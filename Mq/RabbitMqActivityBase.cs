@@ -152,24 +152,25 @@ namespace Primo.MIA
             }
             finally
             {
-                try
-                {
-                    channel?.Close();
-                    channel?.Dispose();
-                }
-                catch
-                {
-                    // канал уже закрыт — не критично
-                }
-                try
-                {
-                    connection?.Close();
-                    connection?.Dispose();
-                }
-                catch
-                {
-                    // подключение уже разорвано — не критично
-                }
+                // порядок сохранён: сначала канал, затем подключение;
+                // Close → Dispose внутри каждого шага. Исключения освобождения
+                // уже закрытых ресурсов глушатся, при включённом файловом логе
+                // фиксируются уровнем Debug
+                SafeDispose.Quiet(
+                    () =>
+                    {
+                        channel?.Close();
+                        channel?.Dispose();
+                    },
+                    "RabbitMQ channel close/dispose");
+
+                SafeDispose.Quiet(
+                    () =>
+                    {
+                        connection?.Close();
+                        connection?.Dispose();
+                    },
+                    "RabbitMQ connection close/dispose");
             }
         }
     }

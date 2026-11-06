@@ -84,12 +84,35 @@ namespace Primo.MIA.Common
         /// Проверяет что строка не равна null, пустой или состоит только из пробелов.
         /// </summary>
         ///<param name="value">Проверяемая строка</param>
-        /// <param name="paramName">Имя параметра</param>
+        ///<param name="paramName">Имя параметра</param>
         /// <exception cref="ArgumentException">Выбрасывается если строка некорректна</exception>
         public static void NotNullOrWhiteSpace(string value, string paramName)
         {
             if (string.IsNullOrWhiteSpace(value))
                 throw new ArgumentException($"Параметр '{paramName}' не может быть пустым или состоять только из пробелов", paramName);
+        }
+
+        /// <summary>
+        /// Проверяет составное условие «либо одно, либо другое»: хотя бы одна
+        /// из переданных строк должна быть не пустой. Используется для валидации
+        /// вида «либо ID элемента, либо локатор».
+        /// </summary>
+        ///<param name="values">Набор строк-альтернатив (например, ID элемента и значение локатора)</param>
+        /// <exception cref="ArgumentException">Выбрасывается, если ВСЕ переданные строки пустые
+        /// (null, пустые или состоят только из пробелов)</exception>
+        public static void AnyNullOrWhiteSpace(params string[] values)
+        {
+            if (values == null)
+                throw new ArgumentException("Необходимо передать хотя бы одно значение для проверки");
+
+            foreach (var value in values)
+            {
+                if (!string.IsNullOrWhiteSpace(value))
+                    return; // найдено непустое значение — проверка пройдена
+            }
+
+            throw new ArgumentException(
+                "Необходимо указать хотя бы одно из значений (все переданные значения пусты)");
         }
 
         #endregion

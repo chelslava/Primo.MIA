@@ -18,7 +18,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
-using System.Threading;
+using System.Threading.Tasks;
 
 namespace Primo.MIA
 {
@@ -413,67 +413,33 @@ namespace Primo.MIA
                         .ForEach(h => client.DefaultRequestHeaders.TryAddWithoutValidation(h.Key, h.Value));
 
                     // ── Выполнение запросов с повторами ───────────────────
-                    HttpResponseMessage response = null;
+                    // Retry-цикл вынесен в HttpHelper.SendWithRetryAsync:
+                    // фабрика создаёт новый HttpRequestMessage на каждую попытку,
+                    // задержка считается по стратегии (Fixed/Linear/Exponential),
+                    // побочные эффекты (лог попыток, счётчик) — через колбэки.
                     int attemptsCount = 0;
                     List<string> attemptLogs = new List<string>();
 
-                    for (int attempt = 1; attempt <= maxRetries; attempt++)
-                    {
-                        attemptsCount = attempt;
-
-                        // Освобождаем предыдущий response перед новой попыткой для предотвращения утечки соединений
-                        response?.Dispose();
-                        response = null;
-
-                        try
+                    HttpResponseMessage response = HttpHelper.SendWithRetryAsync(
+                        client,
+                        () => CreateRequest(url, body),
+                        maxRetries,
+                        retryCodes,
+                        attempt =>
                         {
-                            response = ExecuteRequest(client, url, body).ConfigureAwait(false).GetAwaiter().GetResult();
-                            int statusCode = (int)response.StatusCode;
-
-                            attemptLogs.Add($"Попытка {attempt}: HTTP {statusCode}");
-
-                            // Проверяем, нужен ли повтор
-                            if (response.IsSuccessStatusCode)
-                            {
-                                // Успех — выходим из цикла
-                                break;
-                            }
-
-                            if (!HttpHelper.ShouldRetry(statusCode, retryCodes))
-                            {
-                                // Код не в списке для повтора — выходим
-                                break;
-                            }
-
-                            // Если это не последняя попытка — ждём
-                            if (attempt < maxRetries)
-                            {
-                                int delay = HttpHelper.CalculateRetryDelay(this.Prop_DelayStrategy, baseDelayMs, attempt);
-                                attemptLogs.Add($"Ожидание {delay}мс перед повтором...");
-                                Thread.Sleep(delay);
-                            }
-                        }
-                        catch (Exception ex)
+                            // Задержка перед повтором по выбранной стратегии
+                            int delayMs = HttpHelper.CalculateRetryDelay(this.Prop_DelayStrategy, baseDelayMs, attempt);
+                            attemptLogs.Add($"Ожидание {delayMs}мс перед повтором...");
+                            return Task.Delay(delayMs);
+                        },
+                        (attempt, statusCode, error) =>
                         {
-                            // Освобождаем ресурсы при ошибке для предотвращения утечки соединений
-                            response?.Dispose();
-                            response = null;
-
-                            attemptLogs.Add($"Попытка {attempt}: Ошибка — {ex.Message}");
-
-                            // Если это не последняя попытка — ждём и продолжаем
-                            if (attempt < maxRetries)
-                            {
-                                int delay = HttpHelper.CalculateRetryDelay(this.Prop_DelayStrategy, baseDelayMs, attempt);
-                                Thread.Sleep(delay);
-                            }
-                            else
-                            {
-                                // Последняя попытка — пробрасываем ошибку
-                                throw;
-                            }
-                        }
-                    }
+                            attemptsCount = attempt;
+                            attemptLogs.Add(statusCode.HasValue
+                                ? $"Попытка {attempt}: HTTP {statusCode}"
+                                : $"Попытка {attempt}: Ошибка — {error.Message}");
+                        })
+                        .ConfigureAwait(false).GetAwaiter().GetResult();
 
                     // ── Обработка финального ответа ────────────────────────
                     if (response == null)
@@ -552,39 +518,33 @@ namespace Primo.MIA
         // ── Приватные методы ──────────────────────────────────────────────
 
         /// <summary>
-        /// Выполняет HTTP-запрос в соответствии с выбранным методом.
+        /// Создаёт HttpRequestMessage для выбранного метода и тела запроса.
+        /// Вызывается фабрикой на КАЖДУЮ попытку — HttpRequestMessage
+        /// нельзя переиспользовать после отправки.
         /// </summary>
-        private async System.Threading.Tasks.Task<HttpResponseMessage> ExecuteRequest(
-            HttpClient client, string url, string body)
+        private HttpRequestMessage CreateRequest(string url, string body)
         {
-            HttpResponseMessage response;
-
+            HttpMethod method;
             switch (this.Prop_Method)
             {
                 case HttpMethodType.GET:
-                    response = await client.GetAsync(url).ConfigureAwait(false);
+                    method = HttpMethod.Get;
                     break;
 
                 case HttpMethodType.POST:
-                    response = await client.PostAsync(url, CreateStringContent(body)).ConfigureAwait(false);
+                    method = HttpMethod.Post;
                     break;
 
                 case HttpMethodType.PUT:
-                    response = await client.PutAsync(url, CreateStringContent(body)).ConfigureAwait(false);
+                    method = HttpMethod.Put;
                     break;
 
                 case HttpMethodType.DELETE:
-                    response = await client.DeleteAsync(url).ConfigureAwait(false);
+                    method = HttpMethod.Delete;
                     break;
 
                 case HttpMethodType.PATCH:
-                    using (var request = new HttpRequestMessage(new HttpMethod("PATCH"), url)
-                    {
-                        Content = CreateStringContent(body)
-                    })
-                    {
-                        response = await client.SendAsync(request).ConfigureAwait(false);
-                    }
+                    method = new HttpMethod("PATCH");
                     break;
 
                 default:
@@ -592,7 +552,14 @@ namespace Primo.MIA
                         $"Неподдерживаемый HTTP-метод: {this.Prop_Method}");
             }
 
-            return response;
+            var request = new HttpRequestMessage(method, url);
+
+            // Тело запроса — только для методов, которые его переносят
+            // (GET/DELETE через HttpClient всегда уходят без содержимого).
+            if (method != HttpMethod.Get && method != HttpMethod.Delete)
+                request.Content = CreateStringContent(body);
+
+            return request;
         }
 
         /// <summary>

@@ -262,6 +262,9 @@ namespace Primo.MIA
                 bool hasTargetElement = !string.IsNullOrWhiteSpace(targetElementId) || !string.IsNullOrWhiteSpace(targetLocatorValue);
                 bool hasOffset = offsetX != 0 || offsetY != 0;
 
+                // Составная валидация: требуется либо целевой элемент, либо смещение
+                Guard.That(hasTargetElement || hasOffset, "Необходимо указать либо целевой элемент, либо смещение");
+
                 string resultMsg;
 
                 if (hasTargetElement)
@@ -275,14 +278,11 @@ namespace Primo.MIA
 
                     resultMsg = "[Перетаскивание] Выполнено на целевой элемент";
                 }
-                else if (hasOffset)
-                {
-                    SeleniumHelper.DragAndDropByOffset(driver, sourceElement, offsetX, offsetY);
-                    resultMsg = $"[Перетаскивание] Выполнено на смещение ({offsetX}, {offsetY})";
-                }
                 else
                 {
-                    throw new ArgumentException("Необходимо указать либо целевой элемент, либо смещение");
+                    // смещение гарантированно ненулевое (проверено Guard выше)
+                    SeleniumHelper.DragAndDropByOffset(driver, sourceElement, offsetX, offsetY);
+                    resultMsg = $"[Перетаскивание] Выполнено на смещение ({offsetX}, {offsetY})";
                 }
 
                 return CreateSuccessResult(resultMsg);
@@ -311,6 +311,9 @@ namespace Primo.MIA
             string elementId = GetPropertyValue<string>(Prop_SourceElementId, nameof(Prop_SourceElementId), sd);
             string locatorValue = GetPropertyValue<string>(Prop_SourceLocatorValue, nameof(Prop_SourceLocatorValue), sd);
 
+            // Составная валидация: требуется либо локатор, либо ID исходного элемента
+            Guard.AnyNullOrWhiteSpace(elementId, locatorValue);
+
             if (!string.IsNullOrWhiteSpace(locatorValue))
             {
                 string timeoutStr = GetPropertyValue<string>(Prop_WaitTimeout, nameof(Prop_WaitTimeout), sd) ?? "10";
@@ -319,30 +322,27 @@ namespace Primo.MIA
 
                 var elementLocator = new ElementLocator();
                 var locatorType = ConvertLocatorType(Prop_SourceLocatorType);
-                
-                Logger.LogDebug(sdkComponentName, 
-                    "Ожидание исходного элемента: {0}='{1}', режим: {2}", 
+
+                Logger.LogDebug(sdkComponentName,
+                    "Ожидание исходного элемента: {0}='{1}', режим: {2}",
                     locatorType, locatorValue, Prop_WaitMode);
 
                 return elementLocator.FindElementWithWaitMode(
                     driver, locatorType, locatorValue, timeout, Prop_WaitMode);
             }
-            else if (!string.IsNullOrWhiteSpace(elementId))
+            else
             {
+                // elementId гарантированно непуст (проверено Guard выше)
                 var element = ElementRepository.GetElement(elementId);
-                
+
                 // Проверяем кликабельность элемента из репозитория для drag and drop
                 if (element != null && (!element.Displayed || !element.Enabled))
                 {
                     throw new ElementNotInteractableException(
                         $"Исходный элемент с ID '{elementId}' не кликабельный (Displayed: {element.Displayed}, Enabled: {element.Enabled})");
                 }
-                
+
                 return element;
-            }
-            else
-            {
-                throw new ArgumentException("Необходимо указать исходный элемент (ID или локатор)");
             }
         }
 
@@ -354,6 +354,9 @@ namespace Primo.MIA
             string elementId = GetPropertyValue<string>(Prop_TargetElementId, nameof(Prop_TargetElementId), sd);
             string locatorValue = GetPropertyValue<string>(Prop_TargetLocatorValue, nameof(Prop_TargetLocatorValue), sd);
 
+            // Составная валидация: требуется либо локатор, либо ID целевого элемента
+            Guard.AnyNullOrWhiteSpace(elementId, locatorValue);
+
             if (!string.IsNullOrWhiteSpace(locatorValue))
             {
                 string timeoutStr = GetPropertyValue<string>(Prop_WaitTimeout, nameof(Prop_WaitTimeout), sd) ?? "10";
@@ -362,31 +365,28 @@ namespace Primo.MIA
 
                 var elementLocator = new ElementLocator();
                 var locatorType = ConvertLocatorType(Prop_TargetLocatorType);
-                
-                Logger.LogDebug(sdkComponentName, 
-                    "Ожидание целевого элемента: {0}='{1}', режим: Visible", 
+
+                Logger.LogDebug(sdkComponentName,
+                    "Ожидание целевого элемента: {0}='{1}', режим: Visible",
                     locatorType, locatorValue);
 
                 // Для целевого элемента достаточно видимости
                 return elementLocator.FindElementWithWaitMode(
                     driver, locatorType, locatorValue, timeout, ElementWaitMode.Visible);
             }
-            else if (!string.IsNullOrWhiteSpace(elementId))
+            else
             {
+                // elementId гарантированно непуст (проверено Guard выше)
                 var element = ElementRepository.GetElement(elementId);
-                
+
                 // Проверяем видимость целевого элемента
                 if (element != null && !element.Displayed)
                 {
                     throw new ElementNotInteractableException(
                         $"Целевой элемент с ID '{elementId}' не видим на странице");
                 }
-                
+
                 return element;
-            }
-            else
-            {
-                throw new ArgumentException("Необходимо указать целевой элемент (ID или локатор)");
             }
         }
 

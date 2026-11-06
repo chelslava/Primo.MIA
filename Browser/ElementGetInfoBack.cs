@@ -290,6 +290,9 @@ namespace Primo.MIA
         /// </summary>
         private IWebElement GetElement(IWebDriver driver, string elementId, string locatorValue, ScriptingData sd)
         {
+            // Составная валидация: требуется либо локатор, либо ID элемента
+            Guard.AnyNullOrWhiteSpace(elementId, locatorValue);
+
             if (!string.IsNullOrWhiteSpace(locatorValue))
             {
                 string timeoutStr = GetPropertyValue<string>(this.Prop_WaitTimeout, nameof(Prop_WaitTimeout), sd) ?? "10";
@@ -298,22 +301,19 @@ namespace Primo.MIA
 
                 var locatorType = ConvertLocatorType(this.Prop_LocatorType);
                 var element = ElementLocator.FindElement(driver, locatorType, locatorValue, timeout);
-                
+
                 Logger.LogDebug(sdkComponentName, "Элемент найден по локатору: {0}={1}", this.Prop_LocatorType, locatorValue);
-                return element;
-            }
-            else if (!string.IsNullOrWhiteSpace(elementId))
-            {
-                var element = ElementRepository.GetElement(elementId);
-                if (element == null)
-                    throw new ArgumentException($"Элемент с ID '{elementId}' не найден в репозитории");
-                
-                Logger.LogDebug(sdkComponentName, "Использован сохраненный элемент: {0}", elementId);
                 return element;
             }
             else
             {
-                throw new ArgumentException("Необходимо указать либо ID элемента, либо локатор для поиска");
+                // elementId гарантированно непуст (проверено Guard выше)
+                var element = ElementRepository.GetElement(elementId);
+                if (element == null)
+                    throw new ArgumentException($"Элемент с ID '{elementId}' не найден в репозитории");
+
+                Logger.LogDebug(sdkComponentName, "Использован сохраненный элемент: {0}", elementId);
+                return element;
             }
         }
 

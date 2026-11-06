@@ -66,13 +66,14 @@ namespace Primo.MIA
 
         private static void Shuffle(List<string> list, int? randomSeed)
         {
-            var random = randomSeed.HasValue
-                ? new Random(randomSeed.Value)
-                : new Random();
+            // Детерминированный seed — локальный Random; без seed — общий
+            // потокобезопасный источник (issue #12: new Random() на вызов
+            // давал одинаковые перестановки при быстрых вызовах).
+            Random seeded = randomSeed.HasValue ? new Random(randomSeed.Value) : null;
 
             for (int i = list.Count - 1; i > 0; i--)
             {
-                int j = random.Next(i + 1);
+                int j = seeded != null ? seeded.Next(i + 1) : RandomHelper.Next(i + 1);
                 var temp = list[i];
                 list[i] = list[j];
                 list[j] = temp;

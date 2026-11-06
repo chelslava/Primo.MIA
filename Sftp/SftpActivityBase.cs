@@ -205,15 +205,16 @@ namespace Primo.MIA
             }
             finally
             {
-                try
-                {
-                    client?.Disconnect();
-                    client?.Dispose();
-                }
-                catch
-                {
-                    // отключение уже разорванной сессии — не критично
-                }
+                // порядок сохранён: Disconnect → Dispose; исключение освобождения
+                // уже разорванной сессии глушится (не критично), при включённом
+                // файловом логе фиксируется уровнем Debug
+                SafeDispose.Quiet(
+                    () =>
+                    {
+                        client?.Disconnect();
+                        client?.Dispose();
+                    },
+                    "SFTP disconnect/dispose");
             }
         }
 

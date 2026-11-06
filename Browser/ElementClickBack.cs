@@ -321,6 +321,9 @@ namespace Primo.MIA
         /// </summary>
         private IWebElement ResolveElement(ScriptingData sd, IWebDriver driver, string elementId, string locatorValue)
         {
+            // Составная валидация: требуется либо локатор, либо ID элемента
+            Guard.AnyNullOrWhiteSpace(elementId, locatorValue);
+
             if (!string.IsNullOrWhiteSpace(locatorValue))
             {
                 // Парсим таймаут с защитой от некорректных значений
@@ -332,10 +335,8 @@ namespace Primo.MIA
                 return SeleniumHelper.WaitForElementClickable(driver, locator, timeout);
             }
 
-            if (!string.IsNullOrWhiteSpace(elementId))
-                return SeleniumHelper.GetElement(elementId);
-
-            throw new ArgumentException("Необходимо указать либо ID элемента, либо локатор для поиска");
+            // elementId гарантированно непуст (проверено Guard выше)
+            return SeleniumHelper.GetElement(elementId);
         }
 
         /// <summary>

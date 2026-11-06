@@ -227,6 +227,9 @@ namespace Primo.MIA
 
                 IWebDriver driver = GetDriverFromContext(sessionId);
 
+                // Составная валидация: требуется либо локатор, либо ID элемента
+                Guard.AnyNullOrWhiteSpace(elementId, locatorValue);
+
                 IWebElement element;
                 if (!string.IsNullOrWhiteSpace(locatorValue))
                 {
@@ -236,30 +239,27 @@ namespace Primo.MIA
 
                     var elementLocator = new ElementLocator();
                     var locatorType = ConvertLocatorType(Prop_LocatorType);
-                    
-                    Logger.LogDebug(sdkComponentName, 
-                        "Ожидание элемента для получения размеров: {0}='{1}', режим: {2}", 
+
+                    Logger.LogDebug(sdkComponentName,
+                        "Ожидание элемента для получения размеров: {0}='{1}', режим: {2}",
                         locatorType, locatorValue, Prop_WaitMode);
 
                     element = elementLocator.FindElementWithWaitMode(
                         driver, locatorType, locatorValue, timeout, Prop_WaitMode);
                 }
-                else if (!string.IsNullOrWhiteSpace(elementId))
+                else
                 {
+                    // elementId гарантированно непуст (проверено Guard выше)
                     element = ElementRepository.GetElement(elementId);
                     if (element == null)
                         throw new ArgumentException($"Элемент с ID '{elementId}' не найден в репозитории");
-                    
+
                     // Проверяем видимость элемента из репозитория для получения размеров
                     if (!element.Displayed)
                     {
                         throw new ElementNotInteractableException(
                             $"Элемент с ID '{elementId}' не видим на странице для получения размеров");
                     }
-                }
-                else
-                {
-                    throw new ArgumentException("Необходимо указать либо ID элемента, либо локатор для поиска");
                 }
 
                 var (x, y, width, height) = SeleniumHelper.GetElementRect(element);

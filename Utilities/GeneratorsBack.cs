@@ -648,9 +648,10 @@ namespace Primo.MIA
             // Разбор диапазона с дефолтами и валидацией — в GeneratorsLogic
             GeneratorsLogic.ParseRange(minStr, maxStr, out int min, out int max);
 
-            // Каждый вызов создаёт новый Random — достаточно для большинства сценариев.
+            // Потокобезопасный общий источник случайности (issue #12): new Random()
+            // на каждый вызов давал дубли при быстрых вызовах подряд.
             // Для криптографической случайности используйте режим HashId с GUID.
-            return new Random().Next(min, max + 1).ToString();
+            return RandomHelper.Next(min, max + 1).ToString();
         }
 
         /// <summary>

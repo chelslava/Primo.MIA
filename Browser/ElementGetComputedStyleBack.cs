@@ -191,6 +191,9 @@ namespace Primo.MIA
 
                 IWebDriver driver = GetDriverFromContext(sessionId);
 
+                // Составная валидация: требуется либо локатор, либо ID элемента
+                Guard.AnyNullOrWhiteSpace(elementId, locatorValue);
+
                 IWebElement element;
                 if (!string.IsNullOrWhiteSpace(locatorValue))
                 {
@@ -201,13 +204,10 @@ namespace Primo.MIA
                     var locator = SeleniumHelper.CreateLocator(Prop_LocatorType, locatorValue);
                     element = SeleniumHelper.WaitForElementVisible(driver, locator, timeout);
                 }
-                else if (!string.IsNullOrWhiteSpace(elementId))
-                {
-                    element = SeleniumHelper.GetElement(elementId);
-                }
                 else
                 {
-                    throw new ArgumentException("Необходимо указать либо ID элемента, либо локатор для поиска");
+                    // elementId гарантированно непуст (проверено Guard выше)
+                    element = SeleniumHelper.GetElement(elementId);
                 }
 
                 string value = SeleniumHelper.GetComputedStyle(driver, element, cssProperty);

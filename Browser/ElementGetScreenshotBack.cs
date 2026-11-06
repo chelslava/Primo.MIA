@@ -201,6 +201,9 @@ namespace Primo.MIA
 
                 IWebDriver driver = GetDriverFromContext(sessionId);
 
+                // Составная валидация: требуется либо локатор, либо ID элемента
+                Guard.AnyNullOrWhiteSpace(elementId, locatorValue);
+
                 IWebElement element;
                 if (!string.IsNullOrWhiteSpace(locatorValue))
                 {
@@ -218,22 +221,19 @@ namespace Primo.MIA
                     element = elementLocator.FindElementWithWaitMode(
                         driver, locatorType, locatorValue, timeout, Prop_WaitMode);
                 }
-                else if (!string.IsNullOrWhiteSpace(elementId))
+                else
                 {
+                    // elementId гарантированно непуст (проверено Guard выше)
                     element = ElementRepository.GetElement(elementId);
                     if (element == null)
                         throw new ArgumentException($"Элемент с ID '{elementId}' не найден в репозитории");
-                    
+
                     // Проверяем видимость элемента из репозитория для скриншота
                     if (!element.Displayed)
                     {
                         throw new ElementNotInteractableException(
                             $"Элемент с ID '{elementId}' не видим на странице для создания скриншота");
                     }
-                }
-                else
-                {
-                    throw new ArgumentException("Необходимо указать либо ID элемента, либо локатор для поиска");
                 }
 
                 string base64Screenshot = SeleniumHelper.TakeElementScreenshotBase64(element);

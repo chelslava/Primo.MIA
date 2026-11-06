@@ -21,10 +21,7 @@ namespace Primo.MIA
         {
             get
             {
-                int seconds;
-                return int.TryParse(Prop_CommandTimeoutSeconds, out seconds) && seconds > 0
-                    ? seconds * 1000
-                    : 30000;
+                return ActivityTimeoutParser.ParseSecondsToMs(Prop_CommandTimeoutSeconds, 30000);
             }
             set { }
         }

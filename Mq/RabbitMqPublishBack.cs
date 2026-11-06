@@ -19,7 +19,7 @@ namespace Primo.MIA
 
         protected override int sdkTimeOut
         {
-            get { int s; return int.TryParse(Prop_ConnectionTimeoutSeconds, out s) && s > 0 ? s * 1000 : 30000; }
+            get { return ActivityTimeoutParser.ParseSecondsToMs(Prop_ConnectionTimeoutSeconds, 30000); }
             set { }
         }
 
