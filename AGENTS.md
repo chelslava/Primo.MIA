@@ -58,11 +58,11 @@ Primo.MIA/
 ## ANTI-PATTERNS (THIS PROJECT)
 
 - **Generic `Exception` throwing**: Use specific exception types. Calendar module has `CalendarParseException` as a model.
-- **`System.Diagnostics.Debug.WriteLine` for logging**: Three TODO instances in `BrowserActivityBase`. Use Serilog/NLog instead.
+- **`Console.WriteLine` for logging**: `BrowserActivityBase` (LogInfo/LogWarning/LogError) and `Browser/Services/ActivityLogger` write to console — no real logger attached. Use structured logging (e.g., file logger) instead.
 - **Debug artifacts in source**: `plans/` directory is gitignored — don't add planning documents to tracked code.
-- **Hard-coded absolute paths**: `C:\Program Files\Primo\Primo Studio Community x64\` in csproj — breaks cross-platform builds.
+- **Hard-coded absolute paths**: `C:\Program Files\Primo\Primo Studio Community x64\` HintPath in csproj — intentional: CI installs the LTools SDK bundle to that location before build.
 - **Global static state**: `RepoDict` is a global dictionary — avoid adding more global state.
-- **Large monolith files**: `DatabaseHelper.cs` (2010 lines), `BrowserActivityBase.cs` (1201 lines) — prefer smaller focused classes.
+- **Large monolith files**: `DatabaseHelper.cs` (~1100 lines), `TextExtractEntitiesBack.cs` (~1000 lines), `ReadTomlConfigBack.cs` (~950 lines) — prefer smaller focused classes.
 - **No explicit activity registration**: The LTools SDK auto-discovers activities via reflection — don't add manual registration.
 
 ## UNIQUE STYLES
@@ -93,3 +93,10 @@ msbuild Primo.MIA.Tests\Primo.MIA.Tests.csproj /p:Configuration=Debug
 - **CI**: GitHub Actions (`.github/workflows/ci.yml`) — windows-latest build+tests; LTools SDK DLLs come from the private repo `chelslava/primo-ltools-sdk` (secret `PRIMO_SDK_TOKEN`).
 - **Russian locale**: Most UI strings and XML comments are in Russian. README is in Russian.
 - **Not an application**: This is a class library loaded by Primo Studio — no `Main()` entry point.
+
+## VERSIONING
+
+- **Single source of truth**: `<Version>X.Y.Z</Version>` in `Primo.MIA.csproj`. `AssemblyVersion`/`FileVersion` derive from it via `$(Version)` — never hardcode them. `InformationalVersion` additionally embeds the commit SHA.
+- **SemVer**: MAJOR — breaking API changes; MINOR — new activities/features; PATCH — bugfixes.
+- **Release procedure**: (1) add a `Что нового в версии X.Y.Z` section to `CHANGELOG.md`; (2) bump `<Version>` in csproj; (3) commit; (4) `git tag vX.Y.Z && git push <remote> vX.Y.Z` — the tag triggers `release.yml`, which builds with the tag version (overriding csproj) and publishes to nuget.org when `NUGET_API_KEY` is set. Release fails without a CHANGELOG section for the tagged version.
+- **CI guard**: `ci.yml` fails if `AssemblyVersion`/`FileVersion` are hardcoded (must use `$(Version)`) and warns when CHANGELOG lacks a section for the current csproj version.

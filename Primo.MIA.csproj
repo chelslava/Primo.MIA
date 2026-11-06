@@ -6,8 +6,6 @@
     <RootNamespace>Primo.MIA</RootNamespace>
     <AssemblyName>Primo.MIA</AssemblyName>
     <Deterministic>true</Deterministic>
-    <AssemblyVersion>1.2.0.0</AssemblyVersion>
-    <FileVersion>1.2.0.0</FileVersion>
     <ComVisible>false</ComVisible>
     <NeutralLanguage>ru-RU</NeutralLanguage>
     <OutputType>Library</OutputType>
@@ -17,12 +15,19 @@
     <!-- Отключить автоматическое создание bindingRedirects (используем явные в app.config) -->
     <AutoGenerateBindingRedirects>False</AutoGenerateBindingRedirects>
 
-    <!-- NuGet packaging -->
+    <!-- Версионирование: ЕДИНСТВЕННЫЙ источник версии — <Version>.
+         AssemblyVersion и FileVersion наследуются от неё без prerelease-суффикса
+         (они принимают только числа), NuGet-пакет и InformationalVersion несут
+         полный SemVer. При сборке из тега (/p:Version=x.y.z в release.yml) все
+         версии меняются согласованно. InformationalVersion дополнительно
+         содержит SHA коммита (SourceRevisionId). -->
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageId>Primo.MIA</PackageId>
     <Version>1.2.0</Version>
+    <AssemblyVersion>$(Version.Split('-')[0])</AssemblyVersion>
+    <FileVersion>$(Version.Split('-')[0])</FileVersion>
     <Authors>Chelslava</Authors>
-    <Description>Библиотека расширенных активностей для платформы Primo RPA (~90 активностей: Browser, Database, HTTP, Collections, Files, Calendar, Text, и другие)</Description>
+    <Description>Библиотека расширенных активностей для платформы Primo RPA (~120 активностей: Browser, Database, HTTP, Collections, Files, Calendar, Text, и другие)</Description>
     <PackageProjectUrl>https://github.com/chelslava/Primo.MIA</PackageProjectUrl>
     <RepositoryUrl>https://github.com/chelslava/Primo.MIA</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
