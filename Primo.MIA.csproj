@@ -23,7 +23,7 @@
          содержит SHA коммита (SourceRevisionId). -->
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageId>Primo.MIA</PackageId>
-    <Version>1.3.0</Version>
+    <Version>1.4.0</Version>
     <AssemblyVersion>$(Version.Split('-')[0])</AssemblyVersion>
     <FileVersion>$(Version.Split('-')[0])</FileVersion>
     <Authors>Chelslava</Authors>
@@ -36,20 +36,14 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
     <OutputPath>bin\Debug\</OutputPath>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <ItemGroup>
@@ -63,32 +57,41 @@
     <PackageReference Include="MongoDB.Driver" Version="2.30.0" />
     <PackageReference Include="StackExchange.Redis" Version="2.8.41" />
     <PackageReference Include="Npgsql" Version="7.0.8" />
-    <PackageReference Include="SSH.NET" Version="2024.2.0" />
+    <PackageReference Include="SSH.NET" Version="2026.0.0" />
+    <!-- SSH.NET 2026.0.0 тянет System.ValueTuple для net4x, но в .NET 4.8.1 эти типы
+         уже встроены в mscorlib — исключаем активы пакета, иначе ошибка CS0433
+         («тип ValueTuple существует в двух сборках»). -->
+    <PackageReference Include="System.ValueTuple" Version="4.6.2" ExcludeAssets="all" />
     <PackageReference Include="RabbitMQ.Client" Version="6.8.1" />
   </ItemGroup>
 
-  <!-- Local Primo SDK references (not available via NuGet) -->
+  <!-- Local Primo SDK references (not available via NuGet).
+       PrimoSdkPath можно переопределить: dotnet build /p:PrimoSdkPath="D:\SDK\Primo".
+       По умолчанию — путь, куда CI устанавливает бандл SDK (см. AGENTS.md). -->
+  <PropertyGroup>
+    <PrimoSdkPath Condition="'$(PrimoSdkPath)' == ''">C:\Program Files\Primo\Primo Studio Community x64</PrimoSdkPath>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="LTools.Common">
-      <HintPath>C:\Program Files\Primo\Primo Studio Community x64\LTools.Common.dll</HintPath>
+      <HintPath>$(PrimoSdkPath)\LTools.Common.dll</HintPath>
     </Reference>
     <Reference Include="LTools.Dto">
-      <HintPath>C:\Program Files\Primo\Primo Studio Community x64\LTools.Dto.dll</HintPath>
+      <HintPath>$(PrimoSdkPath)\LTools.Dto.dll</HintPath>
     </Reference>
     <Reference Include="LTools.Enums">
-      <HintPath>C:\Program Files\Primo\Primo Studio Community x64\LTools.Enums.dll</HintPath>
+      <HintPath>$(PrimoSdkPath)\LTools.Enums.dll</HintPath>
     </Reference>
     <Reference Include="LTools.Office">
-      <HintPath>C:\Program Files\Primo\Primo Studio Community x64\LTools.Office.dll</HintPath>
+      <HintPath>$(PrimoSdkPath)\LTools.Office.dll</HintPath>
     </Reference>
     <Reference Include="LTools.Scripting">
-      <HintPath>C:\Program Files\Primo\Primo Studio Community x64\LTools.Scripting.dll</HintPath>
+      <HintPath>$(PrimoSdkPath)\LTools.Scripting.dll</HintPath>
     </Reference>
     <Reference Include="LTools.SDK">
-      <HintPath>C:\Program Files\Primo\Primo Studio Community x64\LTools.SDK.dll</HintPath>
+      <HintPath>$(PrimoSdkPath)\LTools.SDK.dll</HintPath>
     </Reference>
     <Reference Include="LTools.Workflow">
-      <HintPath>C:\Program Files\Primo\Primo Studio Community x64\LTools.Workflow.dll</HintPath>
+      <HintPath>$(PrimoSdkPath)\LTools.Workflow.dll</HintPath>
     </Reference>
   </ItemGroup>
 

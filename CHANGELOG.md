@@ -1,5 +1,46 @@
 # Primo.MIA - Selenium Browser Activities
 
+## Что нового в версии 1.4.0
+
+### 🔒 Безопасность
+
+- **SSH.NET 2024.2.0 → 2026.0.0** — закрыты две уязвимости высокого уровня
+  ([GHSA-mggc-4xg6-vcxf](https://github.com/advisories/GHSA-mggc-4xg6-vcxf),
+  [GHSA-q939-rpr3-3284](https://github.com/advisories/GHSA-q939-rpr3-3284));
+  конфликт `System.ValueTuple` решён `ExcludeAssets="all"`, добавлен bindingRedirect
+  `System.Text.Encoding.CodePages`
+- **Пароли больше не видны на экране**: во всех активностях с паролем
+  (SFTP ×5, RabbitMQ ×2, AES-шифрование ×2) поле ввода переведено с `TextBox`
+  на `PasswordBox` (символы скрыты; привязка через новый `PasswordBoxHelper`,
+  сериализация свойств не изменилась)
+
+### 🎨 Единый стиль всех активностей (UI/UX)
+
+- **43 активности переведены на общий словарь стилей** `Common/Styles.xaml`
+  (Browser ×21, HttpWeb ×7, Json ×2, Xml ×2 и дочистка заголовков Run) —
+  убраны ~200 копий инлайновых `FontSize`/`FontWeight`/`Foreground`
+- **Конвертеры централизованы**: `EnumToVisibilityConverter`,
+  `MultiEnumToVisibilityConverter`, `BoolToVisibilityConverter`,
+  `InverseBoolConverter` объявлены в Styles.xaml с каноническими ключами —
+  локальные переобъявления с 5 вариантами имён больше не нужны
+- **Локализация модуля «База данных»**: 15 XAML-файлов переведены на русский
+  (`Provider invariant name:` → «Поставщик (invariant name):» и т.д.);
+  все лейблы таймаутов унифицированы: «Таймаут (сек):»
+- Мёртвые стили удалены, `EditableComboBox` и `ModePanel` больше не вводят в заблуждение
+
+### 🔧 Версионость и инфраструктура
+
+- **csproj-гигиена**: убраны дубли `GeneratePackageOnBuild` и избыточные
+  Debug/Release-свойства; путь к SDK параметризован (`/p:PrimoSdkPath=...`)
+- **`scripts/bump-version.ps1`**: автоматизирует шаги 1–2 релизной процедуры
+  (валидация SemVer → `<Version>` в csproj → секция CHANGELOG)
+- Прекомпиляция XAML проходит без ошибок, сборка: 0 warnings NuGet-графа
+
+### 🧪 Тесты
+
+- 1131 тест: регрессионный прогон после миграции UI и bump'а SSH.NET —
+  без отказов (SFTP/Crypto-наборы 44/44 на SSH.NET 2026.0.0)
+
 ## Что нового в версии 1.3.0
 
 ### ✨ Новый модуль: SFTP (5 активностей) — SSH.NET 2024.2.0
