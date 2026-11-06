@@ -661,13 +661,18 @@ Custom – пользовательский паттерн (по умолчан�
         }
 
         /// <summary>
-        /// Получает номер недели в году
+        /// Получает номер недели в году — культуронезависимо (issue #18).
+        /// Раньше использовался CurrentCulture: нумерация различалась на
+        /// ru-RU и en-US машинах ({week} в имени файла лога). Теперь —
+        /// правило ISO-8601 (FirstFourDayWeek + Monday) в InvariantCulture.
+        /// Отличие от строгого ISO: на стыке годов (29–31 декабря) даёт
+        /// 52/53 вместо «неделя 1 следующего года» — для имени файла
+        /// лога приемлемо.
         /// </summary>
         private int GetWeekNumber(DateTime date)
         {
-            var culture = System.Globalization.CultureInfo.CurrentCulture;
-            return culture.Calendar.GetWeekOfYear(date,
-                System.Globalization.CalendarWeekRule.FirstDay,
+            return System.Globalization.CultureInfo.InvariantCulture.Calendar.GetWeekOfYear(date,
+                System.Globalization.CalendarWeekRule.FirstFourDayWeek,
                 DayOfWeek.Monday);
         }
 
