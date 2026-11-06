@@ -6,19 +6,19 @@
 
 ## OVERVIEW
 
-Primo.MIA — .NET Framework 4.8.1 class library (WPF/XAML) for the Primo RPA platform. Provides ~90 reusable automation activities (Browser, Database, HTTP, Collections, Text, Calendar, Files, Utilities). Distributed as a NuGet package.
+Primo.MIA — .NET Framework 4.8.1 class library (WPF/XAML) for the Primo RPA platform. Provides ~120 reusable automation activities (Browser, Database, HTTP, Collections, Text, Calendar, Files, Utilities). Distributed as a NuGet package.
 
 ## STRUCTURE
 
 ```
 Primo.MIA/
-├── Browser/          # Selenium-based browser automation (26 activities)
+├── Browser/          # Selenium-based browser automation (30 activities)
 ├── Calendar/         # Production calendar parsing (CSV/JSON/XML/TXT)
 ├── Common/           # Shared utilities (Guard, helpers, converters)
-├── Database/         # ADO.NET database operations (16 activities)
+├── Database/         # ADO.NET database operations (15 activities)
 ├── Dictionary/       # Dictionary CRUD operations
 ├── Files/            # File search, wait, cleanup
-├── HttpWeb/          # HTTP requests, OAuth2, webhooks (8 activities)
+├── HttpWeb/          # HTTP requests, OAuth2, webhooks (9 activities)
 ├── Json/             # JSON parse + query
 ├── List/             # List operations (filter, sort, aggregate, etc.)
 ├── Primo.MIA.Tests/  # xUnit tests (mirrors main structure)
@@ -26,7 +26,6 @@ Primo.MIA/
 ├── Tuple/            # Tuple operations (create, zip, sort, etc.)
 ├── Utilities/        # Misc: generators, log, DataTable, Excel, TOML config
 ├── Xml/              # XML parse + query
-└── Properties/       # AssemblyInfo
 ```
 
 ## WHERE TO LOOK
@@ -39,10 +38,10 @@ Primo.MIA/
 | List operations | `List/*.cs` | Filter, sort, group, transform, aggregate |
 | Collection logic | `*/Logic.cs` | Testable logic extracted from activities |
 | Shared helpers | `Common/` | Guard, FileHelper, StringHelper |
-| Enums & constants | `Enums.cs`, `Common/ActivityStrings.cs` | 2055-line enums file |
+| Enums & constants | `Enums/*.cs`, `Common/ActivityStrings.cs` | Per-module enum files |
 | Test infrastructure | `Primo.MIA.Tests/` | xUnit, mirrors module structure |
 | XAML styles | `Common/Styles.xaml` | Centralized WPF styles |
-| NuGet packaging | `Primo.MIA.nuspec` | Auto-generates on build |
+| NuGet packaging | SDK csproj (GeneratePackageOnBuild) | No manual nuspec |
 
 ## CONVENTIONS
 
@@ -77,7 +76,7 @@ Primo.MIA/
 ## COMMANDS
 
 ```bash
-# Build (requires Visual Studio or MSBuild with .NET Framework 4.6.1)
+# Build (requires Visual Studio or MSBuild with .NET Framework 4.8.1; LTools SDK DLLs in C:\Program Files\Primo\)
 msbuild Primo.MIA.csproj /p:Configuration=Debug
 
 # Run tests
@@ -89,8 +88,8 @@ msbuild Primo.MIA.Tests\Primo.MIA.Tests.csproj /p:Configuration=Debug
 
 ## NOTES
 
-- **.NET Framework 4.6.1 only** — no .NET Core/.NET 5+ support. Tests target `net462`.
+- **.NET Framework 4.8.1 only** — no .NET Core/.NET 5+ support. Tests target `net481`.
 - **External SDK dependency**: Requires Primo Studio (`LTools.*.dll`) installed at `C:\Program Files\Primo\` — not available via NuGet.
-- **No CI/CD**: No GitHub Actions, no Makefile, no Docker. Builds are local/developer-machine-only.
+- **CI**: GitHub Actions (`.github/workflows/ci.yml`) — windows-latest build+tests; LTools SDK DLLs come from the private repo `chelslava/primo-ltools-sdk` (secret `PRIMO_SDK_TOKEN`).
 - **Russian locale**: Most UI strings and XML comments are in Russian. README is in Russian.
 - **Not an application**: This is a class library loaded by Primo Studio — no `Main()` entry point.

@@ -50,15 +50,6 @@ jobs:
           }
         }
         
-        if (-not (Test-Path "Primo.MIA.nuspec")) {
-          $errors += "❌ Primo.MIA.nuspec NOT found"
-        } else {
-          Write-Host "✅ Primo.MIA.nuspec found"
-          $nuspec = Get-Content "Primo.MIA.nuspec" -Raw
-          if ($nuspec -match '<id>Primo\.MIA</id>') { Write-Host "✅ Package ID: Primo.MIA" }
-          if ($nuspec -match '<version>([^<]+)</version>') { Write-Host "✅ Version: $($matches[1])" }
-        }
-        
         if (-not (Test-Path "README.md")) {
           $errors += "❌ README.md NOT found"
         } else {
@@ -76,8 +67,8 @@ jobs:
         Write-Host "================================================"
 
   publish-nuget:
-    name: Publish NuGet Package
-    runs-on: ubuntu-latest
+    name: Build & Publish NuGet Package
+    runs-on: windows-latest
     needs: validate-release
     if: startsWith(github.ref, 'refs/tags/v')
 
@@ -93,22 +84,39 @@ jobs:
         echo "version=$TAG" >> $GITHUB_OUTPUT
         echo "Detected version from tag: $TAG"
 
-    - name: Update nuspec version from tag
+    # Пакет собирается из csproj (SDK-style): метаданные берутся из свойств
+    # проекта, версия подменяется свойством Version из тега.
+    # Ручной Primo.MIA.nuspec удалён как устаревший (несоответствие TFM и зависимостей).
+    - name: Checkout LTools SDK (private bundle)
+      uses: actions/checkout@v4
+      with:
+        repository: chelslava/primo-ltools-sdk
+        ref: main
+        token: ${{ secrets.PRIMO_SDK_TOKEN }}
+        path: ltools-sdk
+
+    - name: Install LTools SDK to default Primo location
       shell: pwsh
       run: |
-        $version = "${{ steps.version.outputs.version }}"
-        $nuspec = Get-Content "Primo.MIA.nuspec" -Raw
-        $updated = $nuspec -replace '<version>[^<]+</version>', "<version>$version</version>"
-        Set-Content "Primo.MIA.nuspec" $updated
-        Write-Host "Updated nuspec version to: $version"
+        $dest = "C:\Program Files\Primo\Primo Studio Community x64"
+        New-Item -ItemType Directory -Force -Path $dest | Out-Null
+        Copy-Item -Path "ltools-sdk/*.dll" -Destination $dest -Force
+        $count = (Get-ChildItem $dest -Filter "LTools*.dll").Count
+        Write-Host "Установлено LTools-сборок: $count"
 
-    - name: Setup NuGet
-      uses: nuget/setup-nuget@v2
-      with:
-        nuget-version: '6.x'
-
-    - name: Pack NuGet package
-      run: nuget pack Primo.MIA.nuspec -Version ${{ steps.version.outputs.version }} -OutputDirectory ./nupkg
+    - name: Build Release package
+      shell: pwsh
+      run: |
+        $vswhere = Join-Path ${env:ProgramFiles(x86)} "Microsoft Visual Studio\Installer\vswhere.exe"
+        $vsPath = & $vswhere -latest -products * -requires Microsoft.Component.MSBuild -property installationPath
+        $msbuild = Join-Path $vsPath "MSBuild\Current\Bin\MSBuild.exe"
+        & $msbuild Primo.MIA.csproj /t:Restore /p:Configuration=Release /m
+        if ($LASTEXITCODE -ne 0) { throw "Restore failed: $LASTEXITCODE" }
+        & $msbuild Primo.MIA.csproj /t:Build /p:Configuration=Release "/p:Version=${{ steps.version.outputs.version }}" /m
+        if ($LASTEXITCODE -ne 0) { throw "Build failed: $LASTEXITCODE" }
+        $nupkg = Get-ChildItem "bin\Release\*.nupkg"
+        if (-not $nupkg) { throw "nupkg не создан" }
+        Write-Host "Создан пакет: $($nupkg.Name)"
 
     - name: Publish to NuGet.org
       shell: bash
@@ -119,13 +127,13 @@ jobs:
           echo "NUGET_API_KEY не задан — публикация в nuget.org пропущена"
           exit 0
         fi
-        nuget push ./nupkg/*.nupkg -Source https://api.nuget.org/v3/index.json -ApiKey "$NUGET_API_KEY"
+        dotnet nuget push bin/Release/*.nupkg --source https://api.nuget.org/v3/index.json --api-key "$NUGET_API_KEY" --skip-duplicate
 
     - name: Upload artifact
-      uses: actions/upload-artifact@v4.16.0
+      uses: actions/upload-artifact@v4
       with:
         name: nuget-package-${{ steps.version.outputs.version }}
-        path: ./nupkg/*.nupkg
+        path: bin/Release/*.nupkg
 
   release-instructions:
     name: ℹ️ Release Instructions

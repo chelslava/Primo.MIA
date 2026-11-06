@@ -6,7 +6,7 @@
 
 ## OVERVIEW
 
-xUnit test project for Primo.MIA class library targeting .NET Framework 4.6.2.
+xUnit test project for Primo.MIA class library targeting .NET Framework 4.8.1.
 
 ## STRUCTURE
 
@@ -48,8 +48,8 @@ Primo.MIA.Tests/
 - **AAA pattern**: Use `#region Arrange`, `#region Act`, `#region Assert` comment blocks
 - **Traits**: `[Trait("Category", "Fast")]` (default) or `[Trait("Category", "Integration")]`
 - **Logic extraction**: Test `*Logic.cs` classes, avoid `*Back.cs` (Primo SDK dependency)
-- **Frameworks**: xUnit 2.4.2, FluentAssertions 6.x, Microsoft.NET.Test.Sdk 17.3.2
-- **Target**: net462 (WPF/XAML requires full Framework)
+- **Frameworks**: xUnit 2.9.3, FluentAssertions 7.2.0 (Apache-2.0; v8+ — платная Xceed License), Moq 4.20.72, Microsoft.NET.Test.Sdk 18.5.1
+- **Target**: net481 (WPF/XAML requires full Framework)
 
 ## ANTI-PATTERNS
 

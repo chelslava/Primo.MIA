@@ -24,7 +24,20 @@ namespace Primo.MIA.Tests.Files
         {
             if (Directory.Exists(_testDirectory))
             {
-                Directory.Delete(_testDirectory, true);
+                // Ретрай: freshly-created файлы могут быть кратковременно залочены
+                // антивирусом/индексатором Windows ("используется другим процессом")
+                for (int attempt = 0; attempt < 3; attempt++)
+                {
+                    try
+                    {
+                        Directory.Delete(_testDirectory, true);
+                        return;
+                    }
+                    catch (IOException) when (attempt < 2)
+                    {
+                        Thread.Sleep(150);
+                    }
+                }
             }
         }
 

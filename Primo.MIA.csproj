@@ -6,8 +6,8 @@
     <RootNamespace>Primo.MIA</RootNamespace>
     <AssemblyName>Primo.MIA</AssemblyName>
     <Deterministic>true</Deterministic>
-    <AssemblyVersion>1.0.0.0</AssemblyVersion>
-    <FileVersion>1.0.0.0</FileVersion>
+    <AssemblyVersion>1.2.0.0</AssemblyVersion>
+    <FileVersion>1.2.0.0</FileVersion>
     <ComVisible>false</ComVisible>
     <NeutralLanguage>ru-RU</NeutralLanguage>
     <OutputType>Library</OutputType>
@@ -20,7 +20,7 @@
     <!-- NuGet packaging -->
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageId>Primo.MIA</PackageId>
-    <Version>1.0.0</Version>
+    <Version>1.2.0</Version>
     <Authors>Chelslava</Authors>
     <Description>Библиотека расширенных активностей для платформы Primo RPA (~90 активностей: Browser, Database, HTTP, Collections, Files, Calendar, Text, и другие)</Description>
     <PackageProjectUrl>https://github.com/chelslava/Primo.MIA</PackageProjectUrl>
