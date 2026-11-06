@@ -56,7 +56,7 @@
                 <CheckBox Content="Строгий режим"
                           IsChecked="{Binding Prop_StrictMode}"
                           FontSize="10"
-                          VerticalAlignment="Center" Foreground="#FF0E0E0E"
+                          VerticalAlignment="Center" Foreground="#FF2C3E50"
                           ToolTip="Строгая валидация JSON: синтаксические ошибки — сразу исключение"/>
             </StackPanel>
 

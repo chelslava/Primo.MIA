@@ -68,12 +68,12 @@
                 </TextBox.Text>
             </TextBox>
 
-            <CheckBox Content="Разбивать SQL-текст по GO batch"
+            <CheckBox Foreground="#FF2C3E50" Content="Разбивать SQL-текст по GO batch"
                       IsChecked="{Binding Prop_SplitByGoBatches}"
                       Margin="0,6,0,0"
                       ToolTip="Разбивать SQL-текст на батчи по разделителю GO (как в SQL Server Management Studio)"/>
 
-            <CheckBox Content="Получать id вставленной записи"
+            <CheckBox Foreground="#FF2C3E50" Content="Получать id вставленной записи"
                       IsChecked="{Binding Prop_ReturnIdentity}"
                       Margin="0,4,0,0"
                       ToolTip="Вернуть id последней вставленной записи (SCOPE_IDENTITY / RETURNING)"/>

@@ -97,16 +97,16 @@
                                   IsChecked="{Binding Prop_PreserveCase}"
                                   Margin="0,0,10,0"
                                   ToolTip="Сохранять регистр оригинального символа"
-                                  Foreground="#FF0E0E0E"/>
+                                  Foreground="#FF2C3E50"/>
                         <CheckBox Content="К верхнему"
                                   IsChecked="{Binding Prop_ToUpperCase}"
                                   Margin="0,0,10,0"
                                   ToolTip="Привести результат к верхнему регистру"
-                                  Foreground="#FF0E0E0E"/>
+                                  Foreground="#FF2C3E50"/>
                         <CheckBox Content="К нижнему"
                                   IsChecked="{Binding Prop_ToLowerCase}"
                                   ToolTip="Привести результат к нижнему регистру"
-                                  Foreground="#FF0E0E0E"/>
+                                  Foreground="#FF2C3E50"/>
                     </StackPanel>
                 </StackPanel>
 
@@ -125,7 +125,7 @@
                       IsChecked="{Binding Prop_PreserveNonAlpha}"
                       Margin="0,6,0,2"
                       ToolTip="Оставлять цифры, знаки пунктуации и пробелы без изменений"
-                      Foreground="#FF0E0E0E"/>
+                      Foreground="#FF2C3E50"/>
 
         </StackPanel>
     </Grid>

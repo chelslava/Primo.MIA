@@ -82,7 +82,7 @@
             <!-- Блок для режимов Click и DoubleClick: UseJavaScript -->
             <StackPanel Visibility="{Binding Path=Prop_ClickMode, Converter={StaticResource MultiEnumToVisConverter}, ConverterParameter=Click|DoubleClick}">
                 <TextBlock Text="Использовать JavaScript:" Style="{StaticResource FieldLabel}"/>
-                <CheckBox IsChecked="{Binding Prop_UseJavaScript}"
+                <CheckBox Foreground="#FF2C3E50" IsChecked="{Binding Prop_UseJavaScript}"
                           Margin="0,2,0,2"
                           ToolTip="Выполнить клик через JavaScript вместо нативного действия браузера"/>
             </StackPanel>

@@ -1,4 +1,4 @@
-<!--
+﻿<!--
     TextExtractEntities.xaml
     Визуальный интерфейс активности «Текст: Извлечь сущности».
 
@@ -61,54 +61,54 @@
                 <StackPanel Grid.Column="0">
                     <CheckBox Content="Email"
                               IsChecked="{Binding Prop_ExtractEmail}"
-                              Margin="0,1,0,1" Foreground="#FF0E0E0E"
+                              Margin="0,1,0,1" Foreground="#FF2C3E50"
                               ToolTip="Адреса электронной почты"/>
                     <CheckBox Content="Phone"
                               IsChecked="{Binding Prop_ExtractPhone}"
-                              Margin="0,1,0,1" Foreground="#FF0E0E0E"
+                              Margin="0,1,0,1" Foreground="#FF2C3E50"
                               ToolTip="Российские номера телефонов (+7, 8...)"/>
                     <CheckBox Content="Date"
                               IsChecked="{Binding Prop_ExtractDate}"
-                              Margin="0,1,0,1" Foreground="#FF0E0E0E"
+                              Margin="0,1,0,1" Foreground="#FF2C3E50"
                               ToolTip="Даты в форматах dd.mm.yyyy, yyyy-mm-dd, «15 марта 2026»"/>
                     <CheckBox Content="Money"
                               IsChecked="{Binding Prop_ExtractMoney}"
-                              Margin="0,1,0,1" Foreground="#FF0E0E0E"
+                              Margin="0,1,0,1" Foreground="#FF2C3E50"
                               ToolTip="Денежные суммы с валютой (руб., USD, EUR и т.д.)"/>
                     <CheckBox Content="INN"
                               IsChecked="{Binding Prop_ExtractINN}"
-                              Margin="0,1,0,1" Foreground="#FF0E0E0E"
+                              Margin="0,1,0,1" Foreground="#FF2C3E50"
                               ToolTip="ИНН юрлиц (10 цифр) и физлиц (12 цифр)"/>
                     <CheckBox Content="SNILS"
                               IsChecked="{Binding Prop_ExtractSNILS}"
-                              Margin="0,1,0,1" Foreground="#FF0E0E0E"
+                              Margin="0,1,0,1" Foreground="#FF2C3E50"
                               ToolTip="СНИЛС в формате XXX-XXX-XXX XX"/>
                 </StackPanel>
 
                 <StackPanel Grid.Column="1">
                     <CheckBox Content="Passport"
                               IsChecked="{Binding Prop_ExtractPassport}"
-                              Margin="0,1,0,1" Foreground="#FF0E0E0E"
+                              Margin="0,1,0,1" Foreground="#FF2C3E50"
                               ToolTip="Серия и номер паспорта РФ (4+6 цифр)"/>
                     <CheckBox Content="CarNumber"
                               IsChecked="{Binding Prop_ExtractCarNumber}"
-                              Margin="0,1,0,1" Foreground="#FF0E0E0E"
+                              Margin="0,1,0,1" Foreground="#FF2C3E50"
                               ToolTip="Номера автомобилей РФ (А123ВС77), ГОСТ Р 50577-93"/>
                     <CheckBox Content="URL"
                               IsChecked="{Binding Prop_ExtractURL}"
-                              Margin="0,1,0,1" Foreground="#FF0E0E0E"
+                              Margin="0,1,0,1" Foreground="#FF2C3E50"
                               ToolTip="HTTP/HTTPS/FTP ссылки"/>
                     <CheckBox Content="IP"
                               IsChecked="{Binding Prop_ExtractIP}"
-                              Margin="0,1,0,1" Foreground="#FF0E0E0E"
+                              Margin="0,1,0,1" Foreground="#FF2C3E50"
                               ToolTip="IPv4-адреса"/>
                     <CheckBox Content="GUID"
                               IsChecked="{Binding Prop_ExtractGUID}"
-                              Margin="0,1,0,1" Foreground="#FF0E0E0E"
+                              Margin="0,1,0,1" Foreground="#FF2C3E50"
                               ToolTip="UUID/GUID"/>
                     <CheckBox Content="Custom (свой паттерн)"
                               IsChecked="{Binding Prop_ExtractCustom}"
-                              Margin="0,1,0,1" Foreground="#FF0E0E0E"
+                              Margin="0,1,0,1" Foreground="#FF2C3E50"
                               ToolTip="Включить поиск по пользовательскому Regex"/>
                 </StackPanel>
             </Grid>
@@ -150,11 +150,11 @@
                                   IsChecked="{Binding Prop_NormalizeResults}"
                                   Margin="0,0,10,0"
                                   ToolTip="Привести найденные значения к стандартному виду"
-                                  Foreground="#FF0E0E0E"/>
+                                  Foreground="#FF2C3E50"/>
                         <CheckBox Content="Валидация ИНН"
                                   IsChecked="{Binding Prop_ValidateINN}"
                                   ToolTip="Проверять контрольные цифры ИНН"
-                                  Foreground="#FF0E0E0E"/>
+                                  Foreground="#FF2C3E50"/>
                     </StackPanel>
                 </StackPanel>
 

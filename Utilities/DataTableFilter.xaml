@@ -99,11 +99,13 @@
                         <DataTemplate>
                             <Grid Margin="0,1,0,1">
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="52"/>
+                                    <!-- 44: «И»/«ИЛИ» + стрелка; экономия идёт полям колонки/значения -->
+                                    <ColumnDefinition Width="44"/>
                                     <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="6"/>
-                                    <ColumnDefinition Width="118"/>
-                                    <ColumnDefinition Width="6"/>
+                                    <ColumnDefinition Width="4"/>
+                                    <!-- 100: операторы («Равно», «Содержит»…) вмещаются -->
+                                    <ColumnDefinition Width="100"/>
+                                    <ColumnDefinition Width="4"/>
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
@@ -161,7 +163,7 @@
                         ToolTip="Добавить строку условия"/>
             </StackPanel>
 
-            <CheckBox Content="Учитывать регистр"
+            <CheckBox Foreground="#FF2C3E50" Content="Учитывать регистр"
                       IsChecked="{Binding Prop_CaseSensitive}"
                       VerticalContentAlignment="Center"
                       Margin="0,4,0,2"

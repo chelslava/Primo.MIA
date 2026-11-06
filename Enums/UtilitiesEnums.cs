@@ -510,11 +510,11 @@
     public enum DataTableConditionJoin
     {
         /// <summary>И (AND) — с первым условием игнорируется.</summary>
-        [RuName("И (AND)")]
+        [RuName("И")]
         And,
 
         /// <summary>ИЛИ (OR) — с первым условием игнорируется.</summary>
-        [RuName("ИЛИ (OR)")]
+        [RuName("ИЛИ")]
         Or
     }
 }

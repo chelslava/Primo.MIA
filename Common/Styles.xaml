@@ -29,11 +29,14 @@
          СТИЛИ ЗАГОЛОВКОВ
          ═══════════════════════════════════════════════════════════════════ -->
 
-    <!-- Заголовок активности (может содержать Run'ы с привязкой режима) -->
+    <!-- Заголовок активности (может содержать Run'ы с привязкой режима).
+         TextWrapping=Wrap: длинные режимы переносятся на 2-ю строку
+         вместо обрезки в узкой панели Studio -->
     <Style x:Key="ActivityHeader" TargetType="TextBlock">
         <Setter Property="FontWeight" Value="Bold"/>
         <Setter Property="FontSize"   Value="12"/>
         <Setter Property="Foreground" Value="#FF0E0E0E"/>
+        <Setter Property="TextWrapping" Value="Wrap"/>
         <Setter Property="Margin"     Value="0,2,0,4"/>
     </Style>
 

@@ -76,7 +76,7 @@
 
             <!-- Блок для режимов с учётом регистра: Contains, NotContains, StartsWith, EndsWith, ExactMatch, Regex, NotRegex -->
             <StackPanel Visibility="{Binding Mode, Converter={StaticResource MultiEnumToVisConverter}, ConverterParameter=Contains|NotContains|StartsWith|EndsWith|ExactMatch|Regex|NotRegex}">
-                <CheckBox IsChecked="{Binding Prop_CaseSensitive}"
+                <CheckBox Foreground="#FF2C3E50" IsChecked="{Binding Prop_CaseSensitive}"
                           Margin="0,2,0,2"
                           Content="Учитывать регистр"
                           ToolTip="Учитывать регистр при сравнении строк"/>

@@ -82,13 +82,13 @@
                 <CheckBox Grid.Column="0"
                           Content="Файлы"
                           IsChecked="{Binding Prop_DeleteFiles}"
-                          Margin="0,1,0,1" Foreground="#FF0E0E0E"
+                          Margin="0,1,0,1" Foreground="#FF2C3E50"
                           ToolTip="Удалять файлы по временному критерию и маске"/>
 
                 <CheckBox Grid.Column="1"
                           Content="Пустые папки"
                           IsChecked="{Binding Prop_DeleteEmptyFolders}"
-                          Margin="0,1,0,1" Foreground="#FF0E0E0E"
+                          Margin="0,1,0,1" Foreground="#FF2C3E50"
                           ToolTip="Удалять папки у которых нет содержимого"/>
 
                 <CheckBox Grid.Column="2"
@@ -121,7 +121,7 @@
                               VerticalAlignment="Bottom"
                               Margin="0,0,0,3"
                               ToolTip="Обходить вложенные подпапки"
-                              Foreground="#FF0E0E0E"/>
+                              Foreground="#FF2C3E50"/>
                 </Grid>
             </StackPanel>
 
@@ -179,7 +179,7 @@
                       IsChecked="{Binding Prop_IgnoreErrors}"
                       Margin="0,6,0,2"
                       ToolTip="Продолжать при ошибке отдельного файла/папки. Ошибки записываются в выходной параметр."
-                      Foreground="#FF0E0E0E"/>
+                      Foreground="#FF2C3E50"/>
 
         </StackPanel>
     </Grid>

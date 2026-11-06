@@ -86,12 +86,12 @@
                               IsChecked="{Binding Prop_CaseSensitive}"
                               Margin="0,2,0,2"
                               ToolTip="Учитывать регистр литеральных частей маски"
-                              Foreground="#FF0E0E0E"/>
+                              Foreground="#FF2C3E50"/>
                     <CheckBox Content="Жадный захват"
                               IsChecked="{Binding Prop_GreedyMatch}"
                               Margin="0,2,0,2"
                               ToolTip="Плейсхолдер захватывает максимально длинную подстроку"
-                              Foreground="#FF0E0E0E"/>
+                              Foreground="#FF2C3E50"/>
                 </StackPanel>
             </Grid>
 
@@ -107,14 +107,14 @@
                           IsChecked="{Binding Prop_MultiLine}"
                           Margin="0,2,4,2"
                           ToolTip="Символ '.' в маске совпадает в том числе с переносом строки"
-                          Foreground="#FF0E0E0E"/>
+                          Foreground="#FF2C3E50"/>
 
                 <CheckBox Grid.Column="1"
                           Content="Все вхождения"
                           IsChecked="{Binding Prop_AllMatches}"
                           Margin="4,2,0,2"
                           ToolTip="Найти все совпадения маски в тексте (заполняет «Все результаты»)"
-                          Foreground="#FF0E0E0E"/>
+                          Foreground="#FF2C3E50"/>
             </Grid>
 
         </StackPanel>

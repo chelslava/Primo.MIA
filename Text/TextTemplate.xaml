@@ -97,7 +97,7 @@
                       IsChecked="{Binding Prop_CaseSensitive}"
                       Margin="0,6,0,2"
                       ToolTip="Если включено: ключ 'ФИО' и 'фио' считаются разными"
-                      Foreground="#FF0E0E0E"/>
+                      Foreground="#FF2C3E50"/>
 
             <!-- Файл шаблона и кодировка в одной строке -->
             <Grid Margin="0,4,0,0">

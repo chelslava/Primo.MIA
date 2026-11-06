@@ -104,14 +104,14 @@
                       IsChecked="{Binding Prop_DownloadIfMissing}"
                       Margin="0,6,0,2"
                       ToolTip="Скачать с xmlcalendar.ru если файл не найден"
-                      Foreground="#FF0E0E0E"/>
+                      Foreground="#FF2C3E50"/>
 
             <!-- [П1] Принудительная перезагрузка -->
             <CheckBox Content="Принудительная перезагрузка"
                       IsChecked="{Binding Prop_ForceReload}"
                       Margin="0,2,0,2"
                       ToolTip="Скачать заново даже если файл уже существует"
-                      Foreground="#FF0E0E0E"/>
+                      Foreground="#FF2C3E50"/>
 
             <!--
                 [П5][П6] Блок настроек скачивания — срок кэша и таймаут.

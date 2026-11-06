@@ -79,12 +79,12 @@
                 </TextBox.Text>
             </TextBox>
 
-            <CheckBox Content="Использовать блокировку таблицы (SQL Server, TableLock)"
+            <CheckBox Foreground="#FF2C3E50" Content="Использовать блокировку таблицы (SQL Server, TableLock)"
                       IsChecked="{Binding Prop_UseTableLock}"
                       Margin="0,6,0,0"
                       ToolTip="SqlBulkCopyOptions.TableLock — блокировка таблицы на время загрузки (только SQL Server)"/>
 
-            <CheckBox Content="Сохранять identity (SQL Server, KeepIdentity)"
+            <CheckBox Foreground="#FF2C3E50" Content="Сохранять identity (SQL Server, KeepIdentity)"
                       IsChecked="{Binding Prop_KeepIdentity}"
                       Margin="0,4,0,0"
                       ToolTip="SqlBulkCopyOptions.KeepIdentity — переносить значения identity из DataTable (только SQL Server)"/>
