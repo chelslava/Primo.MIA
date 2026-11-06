@@ -45,7 +45,7 @@
 
             <TextBlock Style="{StaticResource ActivityHeader}">
                 <Run Text="Список: Теория множеств ["/>
-                <Run Text="{Binding Operation, Mode=OneWay}"/>
+                <Run Text="{Binding Operation, Mode=OneWay, Converter={StaticResource EnumDisplayNameConverter}}"/>
                 <Run Text="]"/>
             </TextBlock>
 

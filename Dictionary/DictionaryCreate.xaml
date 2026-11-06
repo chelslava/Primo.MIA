@@ -47,7 +47,7 @@
 
             <TextBlock Style="{StaticResource ActivityHeader}">
                 <Run Text="Словарь: Создать [" Foreground="#FF0E0E0E"/>
-                <Run Text="{Binding Path=Mode, Mode=OneWay}" Foreground="#FF1565C0"/>
+                <Run Text="{Binding Path=Mode, Mode=OneWay, Converter={StaticResource EnumDisplayNameConverter}}" Foreground="#FF1565C0"/>
                 <Run Text="]" Foreground="#FF0E0E0E"/>
             </TextBlock>
 

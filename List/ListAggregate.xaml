@@ -46,7 +46,7 @@
 
             <TextBlock Style="{StaticResource ActivityHeader}">
                 <Run Text="Список: Агрегация ["/>
-                <Run Text="{Binding Mode, Mode=OneWay}"/>
+                <Run Text="{Binding Mode, Mode=OneWay, Converter={StaticResource EnumDisplayNameConverter}}"/>
                 <Run Text="]"/>
             </TextBlock>
 

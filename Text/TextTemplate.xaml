@@ -107,11 +107,11 @@
                 </Grid.ColumnDefinitions>
 
                 <StackPanel Grid.Column="0" Margin="0,0,4,0">
-                    <TextBlock Text="Файл шаблона (необязательно):" Style="{StaticResource FieldLabel}"
-                               ToolTip="Путь к файлу шаблона. Имеет приоритет над полем «Шаблон»"/>
+                    <TextBlock Text="Файл шаблона:" Style="{StaticResource FieldLabel}"
+                               ToolTip="Путь к файлу шаблона (необязательно). Имеет приоритет над полем «Шаблон»"/>
                     <TextBox Text="{Binding Prop_TemplateFile, UpdateSourceTrigger=PropertyChanged}"
                              Style="{StaticResource FieldBox}"
-                             ToolTip="Путь к файлу шаблона. Имеет приоритет над полем «Шаблон»"/>
+                             ToolTip="Путь к файлу шаблона (необязательно). Имеет приоритет над полем «Шаблон»"/>
                 </StackPanel>
 
                 <StackPanel Grid.Column="1">

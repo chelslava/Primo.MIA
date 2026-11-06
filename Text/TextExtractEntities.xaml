@@ -122,10 +122,10 @@
                         <ColumnDefinition Width="110"/>
                     </Grid.ColumnDefinitions>
                     <StackPanel Grid.Column="0" Margin="0,0,4,0">
-                        <TextBlock Text="Пользовательский паттерн:" Style="{StaticResource FieldLabel}"/>
+                        <TextBlock Text="Свой паттерн:" Style="{StaticResource FieldLabel}"/>
                         <TextBox Text="{Binding Prop_CustomPattern, UpdateSourceTrigger=PropertyChanged}"
                                  Style="{StaticResource FieldBox}"
-                                 ToolTip="Regex-паттерн. Пример: ТН-\d{6}"/>
+                                 ToolTip="Пользовательский Regex-паттерн. Пример: ТН-\d{6}"/>
                     </StackPanel>
                     <StackPanel Grid.Column="1">
                         <TextBlock Text="Имя типа:" Style="{StaticResource FieldLabel}"/>

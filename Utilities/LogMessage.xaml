@@ -45,7 +45,7 @@
 
             <TextBlock Style="{StaticResource ActivityHeader}">
                 <Run Text="Лог: Сообщение ["/>
-                <Run Text="{Binding Level, Mode=OneWay}"/>
+                <Run Text="{Binding Level, Mode=OneWay, Converter={StaticResource EnumDisplayNameConverter}}"/>
                 <Run Text="]"/>
             </TextBlock>
 

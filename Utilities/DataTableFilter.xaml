@@ -49,7 +49,7 @@
 
             <TextBlock Style="{StaticResource ActivityHeader}">
                 <Run Text="DataTable: Фильтрация ["/>
-                <Run Text="{Binding Mode, Mode=OneWay}"/>
+                <Run Text="{Binding Mode, Mode=OneWay, Converter={StaticResource EnumDisplayNameConverter}}"/>
                 <Run Text="]"/>
             </TextBlock>
 
@@ -149,8 +149,12 @@
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
 
+                <!-- Width="Auto" локально перекрывает Width=26 из BrowseButton
+                     (тот стиль для иконок); иначе текст обрезается до «+ Д…» -->
                 <Button Content="+ Добавить условие"
                         Style="{StaticResource BrowseButton}"
+                        Width="Auto"
+                        Padding="8,2"
                         HorizontalAlignment="Left"
                         Margin="0,3,0,2"
                         Click="BtnAddCondition_Click"
@@ -171,14 +175,14 @@
                 </Grid.ColumnDefinitions>
 
                 <StackPanel Grid.Column="0">
-                    <TextBlock Text="Прошли фильтр (DataTable):" Style="{StaticResource FieldLabel}"/>
+                    <TextBlock Text="Прошли фильтр:" Style="{StaticResource FieldLabel}"/>
                     <TextBox Text="{Binding Prop_Filtered, UpdateSourceTrigger=PropertyChanged}"
                              Style="{StaticResource FieldBox}"
                              ToolTip="Переменная (DataTable) для строк, прошедших условие"/>
                 </StackPanel>
 
                 <StackPanel Grid.Column="2">
-                    <TextBlock Text="Не прошли фильтр (DataTable):" Style="{StaticResource FieldLabel}"/>
+                    <TextBlock Text="Не прошли фильтр:" Style="{StaticResource FieldLabel}"/>
                     <TextBox Text="{Binding Prop_Rejected, UpdateSourceTrigger=PropertyChanged}"
                              Style="{StaticResource FieldBox}"
                              ToolTip="Переменная (DataTable) для остальных строк"/>
