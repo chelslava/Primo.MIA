@@ -35,7 +35,7 @@
             <!-- Заголовок -->
             <TextBlock Style="{StaticResource ActivityHeader}">
                 <Run Text="HTTP: Запрос с повторами ["/>
-                <Run Text="{Binding Prop_Method, Mode=OneWay, Converter={StaticResource EnumDisplayNameConverter}}"/>
+                <Run Text="{Binding Prop_Method, Mode=OneWay, Converter={StaticResource EnumDisplayNameConverter}}" Foreground="{StaticResource AccentBrush}"/>
                 <Run Text="]"/>
             </TextBlock>
 
@@ -54,10 +54,8 @@
 
             <!-- Retry настройки -->
             <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
-                <TextBlock Text="Попыток: " FontSize="10" VerticalAlignment="Center" Foreground="#FF0E0E0E"/>
+                <TextBlock Text="Попыток: " Style="{StaticResource FieldLabel}" Margin="0,0,4,0" VerticalAlignment="Center"/>
                 <TextBox Width="30"
-                         Height="16"
-                         FontSize="10"
                          VerticalAlignment="Center"
                          Margin="0"
                          Style="{StaticResource ValidatingFieldBox}">
@@ -69,10 +67,8 @@
                         </Binding>
                     </TextBox.Text>
                 </TextBox>
-                <TextBlock Text=" Задержка: " FontSize="10" VerticalAlignment="Center" Foreground="#FF0E0E0E"/>
+                <TextBlock Text=" Задержка: " Style="{StaticResource FieldLabel}" Margin="0,0,4,0" VerticalAlignment="Center"/>
                 <TextBox Width="50"
-                         Height="16"
-                         FontSize="10"
                          VerticalAlignment="Center"
                          Margin="0"
                          Style="{StaticResource ValidatingFieldBox}">
@@ -84,7 +80,7 @@
                         </Binding>
                     </TextBox.Text>
                 </TextBox>
-                <TextBlock Text="мс" FontSize="10" VerticalAlignment="Center" Foreground="#FF0E0E0E"/>
+                <TextBlock Text="мс" Style="{StaticResource HintText}"/>
             </StackPanel>
 
             <!-- Стратегия -->

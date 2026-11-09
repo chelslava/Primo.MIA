@@ -33,20 +33,6 @@
                 <ResourceDictionary Source="/Primo.MIA;component/Common/Styles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
-            <!-- Все значения BusinessCalendarMode (включая новые CountWorkdays, NextWorkday, PrevWorkday) -->
-
-            <!--
-                Конвертер: скрывает/показывает блок по одному значению enum.
-                Используется для блоков DaysCount и EndDate.
-            -->
-            <local:EnumToVisibilityConverter      x:Key="EnumToVisConverter"/>
-
-            <!--
-                Конвертер: показывает блок если значение соответствует ОДНОМУ из перечисленных.
-                Используется для блока DaysCount (AddWorkDays | SubtractWorkDays).
-            -->
-            <local:MultiEnumToVisibilityConverter x:Key="MultiEnumToVisConverter"/>
-
         </ResourceDictionary>
     </UserControl.Resources>
 
@@ -69,9 +55,9 @@
 
             <!-- Заголовок с отображением текущего режима -->
             <TextBlock Style="{StaticResource ActivityHeader}">
-                <Run Text="Календарь: Операции [" Foreground="#FF0E0E0E"/>
-                <Run Text="{Binding Prop_OperationMode, Mode=OneWay, Converter={StaticResource EnumDisplayNameConverter}}" Foreground="#FF1565C0"/>
-                <Run Text="]" Foreground="#FF0E0E0E"/>
+                <Run Text="Календарь: Операции ["/>
+                <Run Text="{Binding Prop_OperationMode, Mode=OneWay, Converter={StaticResource EnumDisplayNameConverter}}" Foreground="{StaticResource AccentBrush}"/>
+                <Run Text="]"/>
             </TextBlock>
 
             <!-- ID календаря (GUID от CalendarLoad) -->

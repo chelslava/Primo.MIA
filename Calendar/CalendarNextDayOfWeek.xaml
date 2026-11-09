@@ -22,18 +22,6 @@
                 <ResourceDictionary Source="/Primo.MIA;component/Common/Styles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
-            <!-- Значения TargetDayOfWeek для ComboBox дня недели -->
-
-            <!-- Значения DayOfWeekSearchMode для ComboBox режима -->
-
-            <!-- Значения DeadlineWeekendBehavior для ComboBox «При выходном» -->
-
-            <!--
-                EnumToVisibilityConverter — показывает блок «При выходном»
-                только в режиме NearestWorkday.
-            -->
-            <local:EnumToVisibilityConverter x:Key="EnumToVisConverter"/>
-
         </ResourceDictionary>
     </UserControl.Resources>
 
@@ -56,11 +44,11 @@
 
             <!-- Заголовок с отображением дня недели и режима -->
             <TextBlock Style="{StaticResource ActivityHeader}">
-                <Run Text="Календарь: следующий " Foreground="#FF0E0E0E"/>
-                <Run Text="{Binding Prop_TargetDayOfWeek, Mode=OneWay, Converter={StaticResource EnumDisplayNameConverter}}" Foreground="#FF1565C0"/>
-                <Run Text=" [" Foreground="#FF0E0E0E"/>
-                <Run Text="{Binding Prop_Mode, Mode=OneWay, Converter={StaticResource EnumDisplayNameConverter}}" Foreground="#FF1565C0"/>
-                <Run Text="]" Foreground="#FF0E0E0E"/>
+                <Run Text="Календарь: следующий "/>
+                <Run Text="{Binding Prop_TargetDayOfWeek, Mode=OneWay, Converter={StaticResource EnumDisplayNameConverter}}" Foreground="{StaticResource AccentBrush}"/>
+                <Run Text=" ["/>
+                <Run Text="{Binding Prop_Mode, Mode=OneWay, Converter={StaticResource EnumDisplayNameConverter}}" Foreground="{StaticResource AccentBrush}"/>
+                <Run Text="]"/>
             </TextBlock>
 
             <!-- ID календаря -->
@@ -118,13 +106,12 @@
                 </Grid.ColumnDefinitions>
 
                 <!-- Чекбокс IncludeStartDate -->
-                <CheckBox Grid.Column="0"
+                <CheckBox Style="{StaticResource FieldCheckBox}" Grid.Column="0"
                           Content="Включать стартовую дату"
                           IsChecked="{Binding Prop_IncludeStartDate}"
                           VerticalAlignment="Bottom"
                           Margin="0,0,4,2"
-                          ToolTip="Вернуть StartDate если она уже нужный день недели"
-                          Foreground="#FF2C3E50"/>
+                          ToolTip="Вернуть StartDate если она уже нужный день недели"/>
 
                 <!-- Макс. дней поиска -->
                 <StackPanel Grid.Column="1">

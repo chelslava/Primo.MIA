@@ -44,7 +44,7 @@
 
             <TextBlock Style="{StaticResource ActivityHeader}">
                 <Run Text="Браузер: Получить информацию ["/>
-                <Run Text="{Binding Path=Prop_InfoType, Mode=OneWay, Converter={StaticResource EnumDisplayNameConverter}}" Foreground="#FF1565C0"/>
+                <Run Text="{Binding Path=Prop_InfoType, Mode=OneWay, Converter={StaticResource EnumDisplayNameConverter}}" Foreground="{StaticResource AccentBrush}"/>
                 <Run Text="]"/>
             </TextBlock>
 

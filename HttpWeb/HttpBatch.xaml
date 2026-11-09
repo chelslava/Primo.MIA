@@ -33,10 +33,10 @@
             <!-- Таблица запросов -->
             <Grid Margin="0,2,0,0">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <TextBlock Grid.Column="0" Text="Таблица запросов:" VerticalAlignment="Center" Style="{StaticResource FieldLabel}"/>
+                <TextBlock Grid.Column="0" Text="Таблица запросов:" VerticalAlignment="Center" Style="{StaticResource FieldLabel}" Margin="0,0,4,0"/>
                 <TextBox Grid.Column="1" Text="{Binding Prop_RequestsTable, UpdateSourceTrigger=PropertyChanged}"
                          Style="{StaticResource FieldBox}"/>
             </Grid>
@@ -44,12 +44,12 @@
             <!-- Параметры -->
             <Grid Margin="0,2,0,0">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="60"/>
-                    <ColumnDefinition Width="80"/>
+                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="60"/>
                 </Grid.ColumnDefinitions>
-                <TextBlock Grid.Column="0" Text="Макс. паралл.:" VerticalAlignment="Center" Style="{StaticResource FieldLabel}"/>
+                <TextBlock Grid.Column="0" Text="Макс. паралл.:" VerticalAlignment="Center" Style="{StaticResource FieldLabel}" Margin="0,0,4,0"/>
                 <TextBox Grid.Column="1"
                          Style="{StaticResource ValidatingFieldBox}">
                     <TextBox.Text>
@@ -60,7 +60,7 @@
                         </Binding>
                     </TextBox.Text>
                 </TextBox>
-                <TextBlock Grid.Column="2" Text="Таймаут (сек):" VerticalAlignment="Center" Style="{StaticResource FieldLabel}"/>
+                <TextBlock Grid.Column="2" Text="Таймаут (сек):" VerticalAlignment="Center" Style="{StaticResource FieldLabel}" Margin="0,0,4,0"/>
                 <TextBox Grid.Column="3"
                          Style="{StaticResource ValidatingFieldBox}">
                     <TextBox.Text>
@@ -74,8 +74,7 @@
             </Grid>
 
             <!-- Чекбоксы -->
-            <CheckBox Content="Остановить при ошибке" IsChecked="{Binding Prop_StopOnError}"
-                      FontSize="11" Margin="0,2,0,0" Foreground="#FF2C3E50"/>
+            <CheckBox Style="{StaticResource FieldCheckBox}" Content="Остановить при ошибке" IsChecked="{Binding Prop_StopOnError}" Margin="0,2,0,0"/>
         </StackPanel>
     </Grid>
 </UserControl>

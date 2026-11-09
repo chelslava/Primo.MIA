@@ -23,10 +23,6 @@
                 <ResourceDictionary Source="/Primo.MIA;component/Common/Styles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
-            <!-- Значения направления транслитерации -->
-
-            <!-- Значения схемы транслитерации -->
-
         </ResourceDictionary>
     </UserControl.Resources>
 
@@ -49,9 +45,9 @@
 
             <!-- Заголовок с направлением и схемой -->
             <TextBlock Style="{StaticResource ActivityHeader}">
-                <Run Text="Текст: Транслитерация [" Foreground="#FF0E0E0E"/>
-                <Run Text="{Binding Prop_Scheme, Mode=OneWay, Converter={StaticResource EnumDisplayNameConverter}}" Foreground="#FF1565C0"/>
-                <Run Text="]" Foreground="#FF0E0E0E"/>
+                <Run Text="Текст: Транслитерация ["/>
+                <Run Text="{Binding Prop_Scheme, Mode=OneWay, Converter={StaticResource EnumDisplayNameConverter}}" Foreground="{StaticResource AccentBrush}"/>
+                <Run Text="]"/>
             </TextBlock>
 
             <!-- Входной текст -->
@@ -93,20 +89,17 @@
                 <StackPanel Grid.Column="0" Margin="0,0,4,0">
                     <TextBlock Text="Постобработка:" Style="{StaticResource FieldLabel}"/>
                     <StackPanel Orientation="Horizontal">
-                        <CheckBox Content="Сохр. регистр"
+                        <CheckBox Style="{StaticResource FieldCheckBox}" Content="Сохр. регистр"
                                   IsChecked="{Binding Prop_PreserveCase}"
                                   Margin="0,0,10,0"
-                                  ToolTip="Сохранять регистр оригинального символа"
-                                  Foreground="#FF2C3E50"/>
-                        <CheckBox Content="К верхнему"
+                                  ToolTip="Сохранять регистр оригинального символа"/>
+                        <CheckBox Style="{StaticResource FieldCheckBox}" Content="К верхнему"
                                   IsChecked="{Binding Prop_ToUpperCase}"
                                   Margin="0,0,10,0"
-                                  ToolTip="Привести результат к верхнему регистру"
-                                  Foreground="#FF2C3E50"/>
-                        <CheckBox Content="К нижнему"
+                                  ToolTip="Привести результат к верхнему регистру"/>
+                        <CheckBox Style="{StaticResource FieldCheckBox}" Content="К нижнему"
                                   IsChecked="{Binding Prop_ToLowerCase}"
-                                  ToolTip="Привести результат к нижнему регистру"
-                                  Foreground="#FF2C3E50"/>
+                                  ToolTip="Привести результат к нижнему регистру"/>
                     </StackPanel>
                 </StackPanel>
 
@@ -121,11 +114,10 @@
             </Grid>
 
             <!-- Сохранять нетранслитерируемые символы -->
-            <CheckBox Content="Сохранять нетранслитерируемые символы"
+            <CheckBox Style="{StaticResource FieldCheckBox}" Content="Сохранять нетранслитерируемые символы"
                       IsChecked="{Binding Prop_PreserveNonAlpha}"
                       Margin="0,6,0,2"
-                      ToolTip="Оставлять цифры, знаки пунктуации и пробелы без изменений"
-                      Foreground="#FF2C3E50"/>
+                      ToolTip="Оставлять цифры, знаки пунктуации и пробелы без изменений"/>
 
         </StackPanel>
     </Grid>

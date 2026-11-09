@@ -32,11 +32,6 @@
                 <ResourceDictionary Source="/Primo.MIA;component/Common/Styles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
-
-
-            <!-- Конвертеры для условной видимости -->
-            <local:EnumToVisibilityConverter x:Key="EnumToVisConverter"/>
-            <local:MultiEnumToVisibilityConverter x:Key="MultiEnumToVisConverter"/>
         </ResourceDictionary>
     </UserControl.Resources>
 
@@ -57,7 +52,7 @@
 
             <TextBlock Style="{StaticResource ActivityHeader}">
                 <Run Text="Ожидание условия ["/>
-                <Run Text="{Binding Path=Prop_Condition, Mode=OneWay, Converter={StaticResource EnumDisplayNameConverter}}" Foreground="#FF1565C0"/>
+                <Run Text="{Binding Path=Prop_Condition, Mode=OneWay, Converter={StaticResource EnumDisplayNameConverter}}" Foreground="{StaticResource AccentBrush}"/>
                 <Run Text="]"/>
             </TextBlock>
 

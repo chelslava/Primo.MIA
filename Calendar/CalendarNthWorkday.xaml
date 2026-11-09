@@ -27,17 +27,6 @@
                 <ResourceDictionary Source="/Primo.MIA;component/Common/Styles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
-            <!-- Значения NthWorkdayPeriod для ComboBox периода -->
-
-            <!-- Значения DayOfWeekFilter для ComboBox фильтра -->
-
-            <!--
-                Конвертеры для управления видимостью полей в зависимости от периода
-                и фильтра дней недели.
-            -->
-            <local:EnumToVisibilityConverter      x:Key="EnumToVisConverter"/>
-            <local:MultiEnumToVisibilityConverter x:Key="MultiEnumToVisConverter"/>
-
         </ResourceDictionary>
     </UserControl.Resources>
 
@@ -60,11 +49,11 @@
 
             <!-- Заголовок с отображением периода -->
             <TextBlock Style="{StaticResource ActivityHeader}">
-                <Run Text="Календарь: " Foreground="#FF0E0E0E"/>
-                <Run Text="{Binding Prop_N, Mode=OneWay, Converter={StaticResource EnumDisplayNameConverter}}" Foreground="#FF1565C0"/>
-                <Run Text="-й рабочий день [" Foreground="#FF0E0E0E"/>
-                <Run Text="{Binding Prop_Period, Mode=OneWay, Converter={StaticResource EnumDisplayNameConverter}}" Foreground="#FF1565C0"/>
-                <Run Text="]" Foreground="#FF0E0E0E"/>
+                <Run Text="Календарь: "/>
+                <Run Text="{Binding Prop_N, Mode=OneWay, Converter={StaticResource EnumDisplayNameConverter}}" Foreground="{StaticResource AccentBrush}"/>
+                <Run Text="-й рабочий день ["/>
+                <Run Text="{Binding Prop_Period, Mode=OneWay, Converter={StaticResource EnumDisplayNameConverter}}" Foreground="{StaticResource AccentBrush}"/>
+                <Run Text="]"/>
             </TextBlock>
 
             <!-- ID календаря -->
@@ -127,11 +116,10 @@
             </StackPanel>
 
             <!-- Включать сокращённые дни -->
-            <CheckBox Content="Включать сокращённые дни"
+            <CheckBox Style="{StaticResource FieldCheckBox}" Content="Включать сокращённые дни"
                       IsChecked="{Binding Prop_IncludeShortDays}"
                       Margin="0,6,0,2"
-                      ToolTip="Учитывать ShortWorkday (например, 31 декабря) в отсчёте N"
-                      Foreground="#FF2C3E50"/>
+                      ToolTip="Учитывать ShortWorkday (например, 31 декабря) в отсчёте N"/>
 
             <!-- Фильтр по дням недели -->
             <TextBlock Text="Фильтр дней недели:" Style="{StaticResource FieldLabel}"/>

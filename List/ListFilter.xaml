@@ -29,9 +29,6 @@
             </ResourceDictionary.MergedDictionaries>
             
 
-            <!-- Конвертеры для условной видимости -->
-            <local:EnumToVisibilityConverter x:Key="EnumToVisConverter"/>
-            <local:MultiEnumToVisibilityConverter x:Key="MultiEnumToVisConverter"/>
         </ResourceDictionary>
     </UserControl.Resources>
 
@@ -52,7 +49,7 @@
 
             <TextBlock Style="{StaticResource ActivityHeader}">
                 <Run Text="Список: Фильтрация ["/>
-                <Run Text="{Binding Mode, Mode=OneWay, Converter={StaticResource EnumDisplayNameConverter}}"/>
+                <Run Text="{Binding Mode, Mode=OneWay, Converter={StaticResource EnumDisplayNameConverter}}" Foreground="{StaticResource AccentBrush}"/>
                 <Run Text="]"/>
             </TextBlock>
 
@@ -76,7 +73,7 @@
 
             <!-- Блок для режимов с учётом регистра: Contains, NotContains, StartsWith, EndsWith, ExactMatch, Regex, NotRegex -->
             <StackPanel Visibility="{Binding Mode, Converter={StaticResource MultiEnumToVisConverter}, ConverterParameter=Contains|NotContains|StartsWith|EndsWith|ExactMatch|Regex|NotRegex}">
-                <CheckBox Foreground="#FF2C3E50" IsChecked="{Binding Prop_CaseSensitive}"
+                <CheckBox Style="{StaticResource FieldCheckBox}" IsChecked="{Binding Prop_CaseSensitive}"
                           Margin="0,2,0,2"
                           Content="Учитывать регистр"
                           ToolTip="Учитывать регистр при сравнении строк"/>

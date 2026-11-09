@@ -24,14 +24,6 @@
                 <ResourceDictionary Source="/Primo.MIA;component/Common/Styles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
-
-
-            <!-- Показывает поле при нескольких значениях enum -->
-            <local:MultiEnumToVisibilityConverter x:Key="MultiEnumToVis"/>
-
-            <!-- Показывает блок «Маска файлов» только если выбраны Файлы -->
-            <BooleanToVisibilityConverter x:Key="BoolToVis"/>
-
         </ResourceDictionary>
     </UserControl.Resources>
 
@@ -52,15 +44,13 @@
 
             <!-- Заголовок -->
             <TextBlock Style="{StaticResource ActivityHeader}">
-                <Run Text="Файл: Очистка по времени" Foreground="#FF0E0E0E"/>
+                <Run Text="Файл: Очистка по времени"/>
             </TextBlock>
 
             <!-- DryRun — первым, выделен -->
-            <CheckBox Content="Пробный запуск (DryRun) — ничего не удалять"
+            <CheckBox Style="{StaticResource DangerCheckBox}" Content="Пробный запуск (DryRun) — ничего не удалять"
                       IsChecked="{Binding Prop_DryRun}"
                       Margin="0,0,0,6"
-                      FontWeight="SemiBold"
-                      Foreground="#FFC55A11"
                       ToolTip="Только показывает список кандидатов, ничего не трогает. Рекомендуется при первом запуске."/>
 
             <!-- Папка -->
@@ -79,23 +69,22 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
-                <CheckBox Grid.Column="0"
+                <CheckBox Style="{StaticResource FieldCheckBox}" Grid.Column="0"
                           Content="Файлы"
                           IsChecked="{Binding Prop_DeleteFiles}"
-                          Margin="0,1,0,1" Foreground="#FF2C3E50"
+                          Margin="0,1,0,1"
                           ToolTip="Удалять файлы по временному критерию и маске"/>
 
-                <CheckBox Grid.Column="1"
+                <CheckBox Style="{StaticResource FieldCheckBox}" Grid.Column="1"
                           Content="Пустые папки"
                           IsChecked="{Binding Prop_DeleteEmptyFolders}"
-                          Margin="0,1,0,1" Foreground="#FF2C3E50"
+                          Margin="0,1,0,1"
                           ToolTip="Удалять папки у которых нет содержимого"/>
 
-                <CheckBox Grid.Column="2"
+                <CheckBox Style="{StaticResource DangerCheckBox}" Grid.Column="2"
                           Content="Папки целиком"
                           IsChecked="{Binding Prop_DeleteFoldersWithContent}"
-                          Margin="0,1,0,1" Foreground="#FFC55A11"
-                          FontWeight="SemiBold"
+                          Margin="0,1,0,1"
                           ToolTip="Удалять папки вместе со всем содержимым. Необратимо — используйте DryRun."/>
             </Grid>
 
@@ -115,13 +104,12 @@
                                  ToolTip="Одна или несколько масок через запятую:&#xA;  *.tmp&#xA;  *.log, *.tmp&#xA;  report_*.pdf; temp_??.xlsx&#xA;Пусто = все файлы (*)"/>
                     </StackPanel>
 
-                    <CheckBox Grid.Column="1"
+                    <CheckBox Style="{StaticResource FieldCheckBox}" Grid.Column="1"
                               Content="Рекурсивно"
                               IsChecked="{Binding Prop_Recursive}"
                               VerticalAlignment="Bottom"
                               Margin="0,0,0,3"
-                              ToolTip="Обходить вложенные подпапки"
-                              Foreground="#FF2C3E50"/>
+                              ToolTip="Обходить вложенные подпапки"/>
                 </Grid>
             </StackPanel>
 
@@ -149,7 +137,7 @@
 
             <!-- Старше N дней — для OlderThanDays и Both -->
             <StackPanel Visibility="{Binding Prop_ThresholdMode,
-                                    Converter={StaticResource MultiEnumToVis},
+                                    Converter={StaticResource MultiEnumToVisibilityConverter},
                                     ConverterParameter=OlderThanDays|Both}">
                 <TextBlock Text="Старше чем (дней):" Style="{StaticResource FieldLabel}"/>
                 <TextBox Style="{StaticResource ValidatingFieldBox}"
@@ -166,7 +154,7 @@
 
             <!-- Раньше даты — для BeforeDate и Both -->
             <StackPanel Visibility="{Binding Prop_ThresholdMode,
-                                    Converter={StaticResource MultiEnumToVis},
+                                    Converter={StaticResource MultiEnumToVisibilityConverter},
                                     ConverterParameter=BeforeDate|Both}">
                 <TextBlock Text="Раньше даты:" Style="{StaticResource FieldLabel}"/>
                 <TextBox Text="{Binding Prop_ThresholdDate, UpdateSourceTrigger=PropertyChanged}"
@@ -175,11 +163,10 @@
             </StackPanel>
 
             <!-- Игнорировать ошибки -->
-            <CheckBox Content="Игнорировать ошибки удаления"
+            <CheckBox Style="{StaticResource FieldCheckBox}" Content="Игнорировать ошибки удаления"
                       IsChecked="{Binding Prop_IgnoreErrors}"
                       Margin="0,6,0,2"
-                      ToolTip="Продолжать при ошибке отдельного файла/папки. Ошибки записываются в выходной параметр."
-                      Foreground="#FF2C3E50"/>
+                      ToolTip="Продолжать при ошибке отдельного файла/папки. Ошибки записываются в выходной параметр."/>
 
         </StackPanel>
     </Grid>

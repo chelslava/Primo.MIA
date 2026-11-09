@@ -30,11 +30,6 @@
                 <ResourceDictionary Source="/Primo.MIA;component/Common/Styles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
-
-
-            <!-- Конвертеры для условной видимости -->
-            <local:EnumToVisibilityConverter x:Key="EnumToVisConverter"/>
-            <local:MultiEnumToVisibilityConverter x:Key="MultiEnumToVisConverter"/>
         </ResourceDictionary>
     </UserControl.Resources>
 
@@ -55,7 +50,7 @@
 
             <TextBlock Style="{StaticResource ActivityHeader}">
                 <Run Text="Клик по элементу ["/>
-                <Run Text="{Binding Path=Prop_ClickMode, Mode=OneWay, Converter={StaticResource EnumDisplayNameConverter}}" Foreground="#FF1565C0"/>
+                <Run Text="{Binding Path=Prop_ClickMode, Mode=OneWay, Converter={StaticResource EnumDisplayNameConverter}}" Foreground="{StaticResource AccentBrush}"/>
                 <Run Text="]"/>
             </TextBlock>
 
@@ -82,7 +77,7 @@
             <!-- Блок для режимов Click и DoubleClick: UseJavaScript -->
             <StackPanel Visibility="{Binding Path=Prop_ClickMode, Converter={StaticResource MultiEnumToVisConverter}, ConverterParameter=Click|DoubleClick}">
                 <TextBlock Text="Использовать JavaScript:" Style="{StaticResource FieldLabel}"/>
-                <CheckBox Foreground="#FF2C3E50" IsChecked="{Binding Prop_UseJavaScript}"
+                <CheckBox Style="{StaticResource FieldCheckBox}" IsChecked="{Binding Prop_UseJavaScript}"
                           Margin="0,2,0,2"
                           ToolTip="Выполнить клик через JavaScript вместо нативного действия браузера"/>
             </StackPanel>

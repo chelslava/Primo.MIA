@@ -35,7 +35,7 @@
             <!-- Заголовок -->
             <TextBlock Style="{StaticResource ActivityHeader}">
                 <Run Text="JSON: Парсинг ["/>
-                <Run Text="{Binding Prop_Mode, Mode=OneWay, Converter={StaticResource EnumDisplayNameConverter}}"/>
+                <Run Text="{Binding Prop_Mode, Mode=OneWay, Converter={StaticResource EnumDisplayNameConverter}}" Foreground="{StaticResource AccentBrush}"/>
                 <Run Text="]"/>
             </TextBlock>
 
@@ -53,10 +53,8 @@
 
             <!-- Опции -->
             <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
-                <CheckBox Content="Строгий режим"
+                <CheckBox Style="{StaticResource FieldCheckBox}" Content="Строгий режим"
                           IsChecked="{Binding Prop_StrictMode}"
-                          FontSize="10"
-                          VerticalAlignment="Center" Foreground="#FF2C3E50"
                           ToolTip="Строгая валидация JSON: синтаксические ошибки — сразу исключение"/>
             </StackPanel>
 

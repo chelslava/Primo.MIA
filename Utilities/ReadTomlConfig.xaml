@@ -30,10 +30,6 @@
                 <ResourceDictionary Source="/Primo.MIA;component/Common/Styles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
-            <!-- Источник данных для ComboBox режима чтения -->
-
-            <!-- Универсальный конвертер enum → Visibility -->
-            <local:EnumToVisibilityConverter x:Key="EnumToVisConverter"/>
         </ResourceDictionary>
     </UserControl.Resources>
 
@@ -58,9 +54,9 @@
 
             <!-- ── Заголовок активности с текущим режимом ── -->
             <TextBlock Style="{StaticResource ActivityHeader}">
-                <Run Text="Конфиг: Чтение TOML [" Foreground="#FF0E0E0E"/>
-                <Run Text="{Binding Path=ReadMode, Mode=OneWay, Converter={StaticResource EnumDisplayNameConverter}}" Foreground="#FF1565C0"/>
-                <Run Text="]" Foreground="#FF0E0E0E"/>
+                <Run Text="Конфиг: Чтение TOML ["/>
+                <Run Text="{Binding Path=ReadMode, Mode=OneWay, Converter={StaticResource EnumDisplayNameConverter}}" Foreground="{StaticResource AccentBrush}"/>
+                <Run Text="]"/>
             </TextBlock>
 
             <!-- ── Режим чтения ── -->

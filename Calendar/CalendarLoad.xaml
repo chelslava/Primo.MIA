@@ -25,15 +25,10 @@
                 <ResourceDictionary Source="/Primo.MIA;component/Common/Styles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
-
-
-            <!-- Конвертер bool→Visibility для скрытия блока настроек скачивания -->
-            <BooleanToVisibilityConverter x:Key="BoolToVis"/>
-
         </ResourceDictionary>
     </UserControl.Resources>
 
-    <Grid Background="{DynamicResource {x:Static SystemColors.ScrollBarBrushKey}}" Width="240">
+    <Grid Background="{DynamicResource {x:Static SystemColors.ScrollBarBrushKey}}">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="*"/>
@@ -55,7 +50,7 @@
 
             <!-- Заголовок -->
             <TextBlock Style="{StaticResource ActivityHeader}">
-                <Run Text="Календарь: Загрузить" Foreground="#FF0E0E0E"/>
+                <Run Text="Календарь: Загрузить"/>
             </TextBlock>
 
             <!-- Путь к папке -->
@@ -100,18 +95,16 @@
                       ToolTip="Регион: Россия, Казахстан, Беларусь, Узбекистан"/>
 
             <!-- Загрузить из интернета -->
-            <CheckBox Content="Загрузить из интернета"
+            <CheckBox Style="{StaticResource FieldCheckBox}" Content="Загрузить из интернета"
                       IsChecked="{Binding Prop_DownloadIfMissing}"
                       Margin="0,6,0,2"
-                      ToolTip="Скачать с xmlcalendar.ru если файл не найден"
-                      Foreground="#FF2C3E50"/>
+                      ToolTip="Скачать с xmlcalendar.ru если файл не найден"/>
 
             <!-- [П1] Принудительная перезагрузка -->
-            <CheckBox Content="Принудительная перезагрузка"
+            <CheckBox Style="{StaticResource FieldCheckBox}" Content="Принудительная перезагрузка"
                       IsChecked="{Binding Prop_ForceReload}"
                       Margin="0,2,0,2"
-                      ToolTip="Скачать заново даже если файл уже существует"
-                      Foreground="#FF2C3E50"/>
+                      ToolTip="Скачать заново даже если файл уже существует"/>
 
             <!--
                 [П5][П6] Блок настроек скачивания — срок кэша и таймаут.

@@ -22,11 +22,6 @@
                 <ResourceDictionary Source="/Primo.MIA;component/Common/Styles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
-            <!-- Значения фильтра по дням недели для ComboBox -->
-
-            <!-- Конвертер: показывает блок «Маска» только при CustomMask -->
-            <local:EnumToVisibilityConverter x:Key="EnumToVisConverter"/>
-
         </ResourceDictionary>
     </UserControl.Resources>
 
@@ -49,7 +44,7 @@
 
             <!-- Заголовок -->
             <TextBlock Style="{StaticResource ActivityHeader}">
-                <Run Text="Календарь: Рабочие дни списком" Foreground="#FF0E0E0E"/>
+                <Run Text="Календарь: Рабочие дни списком"/>
             </TextBlock>
 
             <!-- ID календаря -->
@@ -81,11 +76,10 @@
             </Grid>
 
             <!-- Включать сокращённые дни -->
-            <CheckBox Content="Включать сокращённые дни"
+            <CheckBox Style="{StaticResource FieldCheckBox}" Content="Включать сокращённые дни"
                       IsChecked="{Binding Prop_IncludeShortDays}"
                       Margin="0,6,0,2"
-                      ToolTip="Включать в список дни типа ShortWorkday (например, 31 декабря)"
-                      Foreground="#FF2C3E50"/>
+                      ToolTip="Включать в список дни типа ShortWorkday (например, 31 декабря)"/>
 
             <!-- Фильтр по дням недели -->
             <TextBlock Text="Фильтр дней недели:" Style="{StaticResource FieldLabel}"/>

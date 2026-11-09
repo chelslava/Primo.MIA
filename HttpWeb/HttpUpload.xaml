@@ -64,19 +64,15 @@
 
             <!-- Опции -->
             <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
-                <TextBlock Text="Поле: " FontSize="10" VerticalAlignment="Center" Foreground="#FF0E0E0E"/>
+                <TextBlock Text="Поле: " Style="{StaticResource FieldLabel}" Margin="0,0,4,0" VerticalAlignment="Center"/>
                 <TextBox Text="{Binding Prop_FieldName, UpdateSourceTrigger=PropertyChanged}"
                          Width="50"
-                         Height="16"
-                         FontSize="10"
                          VerticalAlignment="Center"
-                         BorderThickness="0"
-                          />
-                <TextBlock Text=" | " FontSize="10" VerticalAlignment="Center" Foreground="Gray"/>
-                <TextBlock Text="Таймаут (сек):" FontSize="10" VerticalAlignment="Center" Foreground="#FF0E0E0E"/>
+                         Margin="0"
+                         Style="{StaticResource FieldBox}"/>
+                <TextBlock Text=" | " Style="{StaticResource HintText}"/>
+                <TextBlock Text="Таймаут (сек):" Style="{StaticResource FieldLabel}" Margin="0,0,4,0" VerticalAlignment="Center"/>
                 <TextBox Width="40"
-                         Height="16"
-                         FontSize="10"
                          VerticalAlignment="Center"
                          Margin="0"
                          Style="{StaticResource ValidatingFieldBox}">

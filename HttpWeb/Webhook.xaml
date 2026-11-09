@@ -1,4 +1,4 @@
-<!--
+﻿<!--
     Webhook.xaml
     Визуальный интерфейс активности «Webhook: Отправить».
 
@@ -22,7 +22,6 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/Primo.MIA;component/Common/Styles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
-            <BooleanToVisibilityConverter x:Key="BoolToVis"/>
         </ResourceDictionary>
     </UserControl.Resources>
 
@@ -154,11 +153,9 @@
             </Grid>
 
             <!-- Игнорировать SSL — предупреждение -->
-            <CheckBox Content="Игнорировать ошибки SSL"
+            <CheckBox Style="{StaticResource DangerCheckBox}" Content="Игнорировать ошибки SSL"
                       IsChecked="{Binding Prop_IgnoreSslErrors}"
                       Margin="0,6,0,2"
-                      Foreground="#FFC55A11"
-                      FontWeight="SemiBold"
                       ToolTip="Только для тестовых сред! В продакшене создаёт угрозу безопасности."/>
 
         </StackPanel>

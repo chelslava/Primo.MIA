@@ -23,10 +23,6 @@
                 <ResourceDictionary Source="/Primo.MIA;component/Common/Styles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
-            <!-- Значения синтаксиса плейсхолдеров -->
-
-            <!-- Значения поведения при пропущенном ключе -->
-
         </ResourceDictionary>
     </UserControl.Resources>
 
@@ -49,9 +45,9 @@
 
             <!-- Заголовок -->
             <TextBlock Style="{StaticResource ActivityHeader}">
-                <Run Text="Текст: Шаблонизатор [" Foreground="#FF0E0E0E"/>
-                <Run Text="{Binding Prop_Syntax, Mode=OneWay, Converter={StaticResource EnumDisplayNameConverter}}" Foreground="#FF1565C0"/>
-                <Run Text="]" Foreground="#FF0E0E0E"/>
+                <Run Text="Текст: Шаблонизатор ["/>
+                <Run Text="{Binding Prop_Syntax, Mode=OneWay, Converter={StaticResource EnumDisplayNameConverter}}" Foreground="{StaticResource AccentBrush}"/>
+                <Run Text="]"/>
             </TextBlock>
 
             <!-- Шаблон (многострочный) -->
@@ -93,11 +89,10 @@
             </Grid>
 
             <!-- Учитывать регистр -->
-            <CheckBox Content="Учитывать регистр ключей"
+            <CheckBox Style="{StaticResource FieldCheckBox}" Content="Учитывать регистр ключей"
                       IsChecked="{Binding Prop_CaseSensitive}"
                       Margin="0,6,0,2"
-                      ToolTip="Если включено: ключ 'ФИО' и 'фио' считаются разными"
-                      Foreground="#FF2C3E50"/>
+                      ToolTip="Если включено: ключ 'ФИО' и 'фио' считаются разными"/>
 
             <!-- Файл шаблона и кодировка в одной строке -->
             <Grid Margin="0,4,0,0">

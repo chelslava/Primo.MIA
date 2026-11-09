@@ -22,8 +22,20 @@
     <common:MultiEnumToVisibilityConverter x:Key="MultiEnumToVisibilityConverter"/>
     <common:BoolToVisibilityConverter x:Key="BoolToVis"/>
     <common:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
-    <common:InverseBoolConverter x:Key="InverseBool"/>
     <common:EnumDisplayNameConverter x:Key="EnumDisplayNameConverter"/>
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         ИМЕНОВАННЫЕ КИСТИ (единая палитра)
+         ═══════════════════════════════════════════════════════════════════ -->
+
+    <!-- Акцент режима в заголовке: «Модуль: Название [Режим]» -->
+    <SolidColorBrush x:Key="AccentBrush" Color="#FF1565C0"/>
+
+    <!-- Опасное действие: DryRun, необратимые операции -->
+    <SolidColorBrush x:Key="DangerBrush" Color="#FFC55A11"/>
+
+    <!-- Основной цвет текста контролов (лейблы, чекбоксы, подсказки-акценты) -->
+    <SolidColorBrush x:Key="TextBrush" Color="#FF2C3E50"/>
 
     <!-- ═══════════════════════════════════════════════════════════════════
          СТИЛИ ЗАГОЛОВКОВ
@@ -91,6 +103,25 @@
         <Setter Property="VerticalContentAlignment" Value="Center"/>
     </Style>
 
+    <!-- Стандартный CheckBox: цвет и отступы централизованы здесь.
+         Переопределять индивидуально можно только Margin/ToolTip/FontWeight. -->
+    <Style x:Key="FieldCheckBox" TargetType="CheckBox">
+        <Setter Property="Foreground"      Value="{StaticResource TextBrush}"/>
+        <Setter Property="FontSize"        Value="11"/>
+        <Setter Property="Margin"          Value="0,2,6,2"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="Cursor"          Value="Hand"/>
+    </Style>
+
+    <!-- «Опасный» CheckBox: DryRun, необратимые операции -->
+    <Style x:Key="DangerCheckBox"
+           TargetType="CheckBox"
+           BasedOn="{StaticResource FieldCheckBox}">
+        <Setter Property="Foreground"      Value="{StaticResource DangerBrush}"/>
+        <Setter Property="FontWeight"      Value="SemiBold"/>
+    </Style>
+
     <!-- ═══════════════════════════════════════════════════════════════════
          СТИЛИ ВЫПАДАЮЩИХ СПИСКОВ
          ═══════════════════════════════════════════════════════════════════ -->
@@ -128,6 +159,29 @@
         <Setter Property="BorderBrush"     Value="Transparent"/>
         <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="Cursor"          Value="Hand"/>
+    </Style>
+
+    <!-- Текстовая кнопка (не иконка): ширина по содержимому,
+         чтобы текст не обрезался как «+ Д…» у узкой BrowseButton -->
+    <Style x:Key="TextButton"
+           TargetType="Button"
+           BasedOn="{StaticResource BrowseButton}">
+        <Setter Property="Width"           Value="Auto"/>
+        <Setter Property="Padding"         Value="8,2"/>
+        <Setter Property="ToolTip"         Value=""/>
+    </Style>
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         ПОДСКАЗКИ
+         ═══════════════════════════════════════════════════════════════════ -->
+
+    <!-- Мелкая поясняющая подсказка рядом с полем (FontSize 10, серый) -->
+    <Style x:Key="HintText" TargetType="TextBlock">
+        <Setter Property="FontSize"        Value="10"/>
+        <Setter Property="Foreground"      Value="#FF808080"/>
+        <Setter Property="TextWrapping"    Value="Wrap"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="Margin"          Value="0,0,6,0"/>
     </Style>
 
 </ResourceDictionary>

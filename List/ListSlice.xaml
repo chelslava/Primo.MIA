@@ -45,7 +45,7 @@
 
             <TextBlock Style="{StaticResource ActivityHeader}">
                 <Run Text="Список: Срез ["/>
-                <Run Text="{Binding Mode, Mode=OneWay, Converter={StaticResource EnumDisplayNameConverter}}"/>
+                <Run Text="{Binding Mode, Mode=OneWay, Converter={StaticResource EnumDisplayNameConverter}}" Foreground="{StaticResource AccentBrush}"/>
                 <Run Text="]"/>
             </TextBlock>
 

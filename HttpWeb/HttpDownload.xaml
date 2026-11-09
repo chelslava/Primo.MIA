@@ -62,15 +62,11 @@
 
             <!-- Опции -->
             <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
-                <CheckBox Content="Перезаписать"
-                          IsChecked="{Binding Prop_Overwrite}"
-                          FontSize="10"
-                          VerticalAlignment="Center" Foreground="#FF2C3E50"/>
-                <TextBlock Text=" | " FontSize="10" VerticalAlignment="Center" Foreground="Gray"/>
-                <TextBlock Text="Таймаут (сек):" FontSize="10" VerticalAlignment="Center" Foreground="#FF0E0E0E"/>
+                <CheckBox Style="{StaticResource FieldCheckBox}" Content="Перезаписать"
+                          IsChecked="{Binding Prop_Overwrite}"/>
+                <TextBlock Text=" | " Style="{StaticResource HintText}"/>
+                <TextBlock Text="Таймаут (сек):" Style="{StaticResource FieldLabel}" Margin="0,0,4,0" VerticalAlignment="Center"/>
                 <TextBox Width="40"
-                         Height="16"
-                         FontSize="10"
                          VerticalAlignment="Center"
                          Margin="0"
                          Style="{StaticResource ValidatingFieldBox}">

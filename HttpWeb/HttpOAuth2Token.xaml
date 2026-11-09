@@ -35,7 +35,7 @@
             <!-- Заголовок -->
             <TextBlock Style="{StaticResource ActivityHeader}">
                 <Run Text="HTTP: OAuth2 токен ["/>
-                <Run Text="{Binding Prop_GrantType, Mode=OneWay, Converter={StaticResource EnumDisplayNameConverter}}"/>
+                <Run Text="{Binding Prop_GrantType, Mode=OneWay, Converter={StaticResource EnumDisplayNameConverter}}" Foreground="{StaticResource AccentBrush}"/>
                 <Run Text="]"/>
             </TextBlock>
 

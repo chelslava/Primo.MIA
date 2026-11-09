@@ -29,10 +29,10 @@
                Source="pack://application:,,,/Primo.MIA;component/images/bd.png"/>
 
         <StackPanel Grid.Column="1" Margin="5,0,5,5">
-            <TextBlock>
-                <Run Text="БД: Запрос [" Foreground="#FF0E0E0E"/>
-                <Run Text="{Binding Path=Prop_CommandType, Mode=OneWay, Converter={StaticResource EnumDisplayNameConverter}}" Foreground="#FF1565C0"/>
-                <Run Text="]" Foreground="#FF0E0E0E"/>
+            <TextBlock Style="{StaticResource ActivityHeader}">
+                <Run Text="БД: Запрос ["/>
+                <Run Text="{Binding Path=Prop_CommandType, Mode=OneWay, Converter={StaticResource EnumDisplayNameConverter}}" Foreground="{StaticResource AccentBrush}"/>
+                <Run Text="]"/>
             </TextBlock>
 
             <TextBlock Text="Поставщик (invariant name):" Style="{StaticResource FieldLabel}"/>

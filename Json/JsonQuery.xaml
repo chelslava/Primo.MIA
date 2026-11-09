@@ -50,10 +50,8 @@
 
             <!-- Опции -->
             <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
-                <CheckBox Content="Только первое совпадение"
+                <CheckBox Style="{StaticResource FieldCheckBox}" Content="Только первое совпадение"
                           IsChecked="{Binding Prop_ReturnFirst}"
-                          FontSize="10"
-                          VerticalAlignment="Center" Foreground="#FF2C3E50"
                           ToolTip="Вернуть первое совпадение вместо списка всех совпадений"/>
             </StackPanel>
 

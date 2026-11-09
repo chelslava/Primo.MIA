@@ -24,9 +24,6 @@
                 <ResourceDictionary Source="/Primo.MIA;component/Common/Styles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
-
-
-            <local:EnumToVisibilityConverter x:Key="EnumToVisConverter"/>
         </ResourceDictionary>
     </UserControl.Resources>
 
@@ -47,7 +44,7 @@
 
             <TextBlock Style="{StaticResource ActivityHeader}">
                 <Run Text="Поиск элементов ["/>
-                <Run Text="{Binding Path=Prop_SearchMode, Mode=OneWay, Converter={StaticResource EnumDisplayNameConverter}}" Foreground="#FF1565C0"/>
+                <Run Text="{Binding Path=Prop_SearchMode, Mode=OneWay, Converter={StaticResource EnumDisplayNameConverter}}" Foreground="{StaticResource AccentBrush}"/>
                 <Run Text="]"/>
             </TextBlock>
 

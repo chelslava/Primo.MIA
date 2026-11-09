@@ -45,7 +45,7 @@
 
             <TextBlock Style="{StaticResource ActivityHeader}">
                 <Run Text="DataTable в HTML ["/>
-                <Run Text="{Binding Prop_Theme, Mode=OneWay, Converter={StaticResource EnumDisplayNameConverter}}"/>
+                <Run Text="{Binding Prop_Theme, Mode=OneWay, Converter={StaticResource EnumDisplayNameConverter}}" Foreground="{StaticResource AccentBrush}"/>
                 <Run Text="]"/>
             </TextBlock>
 
@@ -70,9 +70,8 @@
                 </StackPanel>
             </Grid>
 
-            <CheckBox Foreground="#FF2C3E50" Content="Нумерация строк"
+            <CheckBox Style="{StaticResource FieldCheckBox}" Content="Нумерация строк"
                       IsChecked="{Binding Prop_ShowRowNumbers}"
-                      VerticalContentAlignment="Center"
                       Margin="0,4,0,2"
                       ToolTip="Добавить колонку с порядковыми номерами строк"/>
 

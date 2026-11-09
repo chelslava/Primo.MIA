@@ -57,7 +57,7 @@
             <TextBox Text="{Binding Prop_OutputParameterNames, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
                      ToolTip="Имена выходных параметров (Output) через список: @total, @status"/>
 
-            <CheckBox Foreground="#FF2C3E50" Content="Получать возвращаемое значение (return value)"
+            <CheckBox Style="{StaticResource FieldCheckBox}" Content="Получать возвращаемое значение (return value)"
                       IsChecked="{Binding Prop_IncludeReturnValue}"
                       Margin="0,6,0,0"
                       ToolTip="Добавить параметр @RETURN_VALUE — возвращаемое значение процедуры"/>
