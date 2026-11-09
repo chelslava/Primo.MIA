@@ -70,7 +70,7 @@
                 </StackPanel>
             </Grid>
 
-            <CheckBox Content="Нумерация строк"
+            <CheckBox Foreground="#FF2C3E50" Content="Нумерация строк"
                       IsChecked="{Binding Prop_ShowRowNumbers}"
                       VerticalContentAlignment="Center"
                       Margin="0,4,0,2"

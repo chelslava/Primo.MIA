@@ -149,7 +149,7 @@
                           Content="Форматировать (отступы)"
                           IsChecked="{Binding Prop_Indent}"
                           VerticalAlignment="Center"
-                          Foreground="#FF0E0E0E"
+                          Foreground="#FF2C3E50"
                           ToolTip="Форматировать JSON с отступами (human-readable). Увеличивает размер."/>
 
                 <!-- Определять типы — только при JsonToDataTable -->
@@ -160,7 +160,7 @@
                     <CheckBox Content="Определять типы колонок"
                               IsChecked="{Binding Prop_TypeInference}"
                               VerticalAlignment="Center"
-                              Foreground="#FF0E0E0E"
+                              Foreground="#FF2C3E50"
                               ToolTip="Автоматически определять типы: int, double, bool, DateTime.&#xA;Выключить если нужны все колонки как string."/>
                 </StackPanel>
             </Grid>
