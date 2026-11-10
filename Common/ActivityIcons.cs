@@ -83,5 +83,8 @@
         /// <summary>Иконка для активностей работы с архивами (issue #28)</summary>
         public const string Archive = BasePath + "folder.png";
 
+        /// <summary>Иконка для активностей FTP/FTPS (issue #31)</summary>
+        public const string Ftp = BasePath + "folder.png";
+
     }
 }

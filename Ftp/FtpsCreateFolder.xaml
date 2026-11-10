@@ -1,0 +1,40 @@
+<UserControl x:Class="Primo.MIA.FtpsCreateFolder"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:common="clr-namespace:Primo.MIA"
+             mc:Ignorable="d" d:DesignHeight="260" Margin="0,0,0,5">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Primo.MIA;component/Common/Styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <Grid Background="{DynamicResource {x:Static SystemColors.ScrollBarBrushKey}}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Image Grid.Column="0" Width="32" Height="32" Margin="5" VerticalAlignment="Center"
+               Source="pack://application:,,,/Primo.MIA;component/images/folder.png"/>
+        <StackPanel Grid.Column="1" Margin="5,0,5,5">
+            <TextBlock Text="FTPS: Создать папку" Style="{StaticResource ActivityHeader}"/>
+            <TextBlock Text="Хост:" Style="{StaticResource FieldLabel}"/>
+            <TextBox Text="{Binding Prop_Host, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                     ToolTip="Хост FTPS-сервера, например ftp.example.com (explicit TLS; порт — в панели свойств, по умолчанию 21)"/>
+            <TextBlock Text="Пользователь:" Style="{StaticResource FieldLabel}"/>
+            <TextBox Text="{Binding Prop_UserName, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                     ToolTip="Имя пользователя; пусто = anonymous"/>
+            <TextBlock Text="Пароль:" Style="{StaticResource FieldLabel}"/>
+            <PasswordBox common:PasswordBoxHelper.BindPassword="True"
+                         common:PasswordBoxHelper.BoundPassword="{Binding Prop_Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         Style="{StaticResource FieldPasswordBox}"
+                         ToolTip="Пароль FTPS; пусто = anonymous"/>
+            <TextBlock Text="Удалённый путь:" Style="{StaticResource FieldLabel}"/>
+            <TextBox Text="{Binding Prop_RemotePath, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                     ToolTip="Путь создаваемой папки, включая имя: /uploads/2026-11"/>
+        </StackPanel>
+    </Grid>
+</UserControl>

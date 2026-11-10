@@ -1229,6 +1229,33 @@ namespace Primo.MIA.Common
         public const string Error_TextRegexPatternRequired = "Регулярное выражение обязательно";
 
         // ═══════════════════════════════════════════════════════════════════════
+        // FTPS (issue #31)
+        // ═══════════════════════════════════════════════════════════════════════
+
+        public const string Activity_FtpsUpload       = "FTPS: Загрузить файл";
+        public const string Activity_FtpsDownload     = "FTPS: Скачать файл";
+        public const string Activity_FtpsList         = "FTPS: Список файлов";
+        public const string Activity_FtpsDelete       = "FTPS: Удалить файл";
+        public const string Activity_FtpsCreateFolder = "FTPS: Создать папку";
+
+        public const string Field_FtpHost                 = "Хост";
+        public const string Field_FtpPort                 = "Порт";
+        public const string Field_FtpUserName             = "Пользователь";
+        public const string Field_FtpPassword             = "Пароль";
+        public const string Field_FtpConnectionTimeout    = "Таймаут подключения (сек)";
+        public const string Field_FtpOperationTimeout     = "Таймаут операции (сек)";
+        public const string Field_FtpLocalPath            = "Локальный путь";
+        public const string Field_FtpRemotePath           = "Удалённый путь";
+        public const string Field_FtpOverwrite            = "Перезаписать";
+        public const string Field_FtpBytesUploaded        = "Передано байт";
+        public const string Field_FtpBytesDownloaded      = "Получено байт";
+        public const string Field_FtpListResult           = "Список";
+
+        public const string Error_FtpHostRequired         = "Хост FTPS-сервера обязателен";
+        public const string Error_FtpLocalPathRequired    = "Локальный путь обязателен";
+        public const string Error_FtpRemotePathRequired   = "Удалённый путь обязателен";
+
+        // ═══════════════════════════════════════════════════════════════════════
         // КРИПТОГРАФИЯ
         // ═══════════════════════════════════════════════════════════════════════
 

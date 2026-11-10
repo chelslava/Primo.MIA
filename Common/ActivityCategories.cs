@@ -57,5 +57,8 @@ namespace Primo.MIA.Common
 
         /// <summary>Категория "MIA → Архивы" (issue #28)</summary>
         public const string Archive = Prefix + "Архивы";
+
+        /// <summary>Категория "MIA → FTP" (issue #31)</summary>
+        public const string Ftp = Prefix + "FTP";
     }
 }
