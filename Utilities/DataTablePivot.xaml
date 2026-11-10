@@ -1,0 +1,76 @@
+﻿<UserControl x:Class="Primo.MIA.DataTablePivot"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:common="clr-namespace:Primo.MIA"
+             mc:Ignorable="d" d:DesignHeight="340" Margin="0,0,0,5">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Primo.MIA;component/Common/Styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <Grid Background="{DynamicResource {x:Static SystemColors.ScrollBarBrushKey}}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Image Grid.Column="0" Width="32" Height="32" Margin="5" VerticalAlignment="Center"
+               Source="pack://application:,,,/Primo.MIA;component/images/table.png"/>
+        <StackPanel Grid.Column="1" Margin="5,0,5,5">
+            <TextBlock Style="{StaticResource ActivityHeader}">
+                <Run Text="DataTable: Pivot / Unpivot ["/>
+                <Run Text="{Binding Prop_Mode, Mode=OneWay, Converter={StaticResource EnumDisplayNameConverter}}" Foreground="{StaticResource AccentBrush}"/>
+                <Run Text="]"/>
+            </TextBlock>
+            <TextBlock Text="Р РµР¶РёРј:" Style="{StaticResource FieldLabel}"/>
+            <ComboBox ItemsSource="{common:EnumValues common:DataTablePivotMode}"
+                      SelectedValue="{Binding Prop_Mode}"
+                      SelectedValuePath="Key"
+                      DisplayMemberPath="Display"
+                      Style="{StaticResource FieldComboBox}"
+                      ToolTip="Pivot вЂ” СЃРІРѕРґРЅР°СЏ; Unpivot вЂ” СЂР°Р·Р±РѕСЂ СЃРІРѕРґРЅРѕР№"/>
+            <TextBlock Text="РСЃС…РѕРґРЅР°СЏ С‚Р°Р±Р»РёС†Р°:" Style="{StaticResource FieldLabel}"/>
+            <TextBox Text="{Binding Prop_SourceTable, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            <StackPanel Visibility="{Binding Prop_Mode,
+                                    Converter={StaticResource EnumToVisConverter},
+                                    ConverterParameter=Pivot}">
+                <TextBlock Text="РљРѕР»РѕРЅРєР° СЃС‚СЂРѕРє:" Style="{StaticResource FieldLabel}"/>
+                <TextBox Text="{Binding Prop_RowKeyColumn, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                         ToolTip="РЈРЅРёРєР°Р»СЊРЅС‹Рµ Р·РЅР°С‡РµРЅРёСЏ в†’ СЃС‚СЂРѕРєРё СЂРµР·СѓР»СЊС‚Р°С‚Р°"/>
+                <TextBlock Text="Pivot-РєРѕР»РѕРЅРєР°:" Style="{StaticResource FieldLabel}"/>
+                <TextBox Text="{Binding Prop_PivotColumn, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                         ToolTip="РЈРЅРёРєР°Р»СЊРЅС‹Рµ Р·РЅР°С‡РµРЅРёСЏ в†’ РєРѕР»РѕРЅРєРё СЂРµР·СѓР»СЊС‚Р°С‚Р°"/>
+                <TextBlock Text="РљРѕР»РѕРЅРєР° Р·РЅР°С‡РµРЅРёР№:" Style="{StaticResource FieldLabel}"/>
+                <TextBox Text="{Binding Prop_ValueColumn, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+                <TextBlock Text="РђРіСЂРµРіР°С‚:" Style="{StaticResource FieldLabel}"/>
+                <ComboBox ItemsSource="{common:EnumValues common:DataTableAggregation}"
+                          SelectedValue="{Binding Prop_Aggregation}"
+                          SelectedValuePath="Key"
+                          DisplayMemberPath="Display"
+                          Style="{StaticResource FieldComboBox}"
+                          ToolTip="РЎСѓРјРјР° / РљРѕР»РёС‡РµСЃС‚РІРѕ / РњРёРЅРёРјСѓРј / РњР°РєСЃРёРјСѓРј / РџРµСЂРІРѕРµ"/>
+            </StackPanel>
+            <StackPanel Visibility="{Binding Prop_Mode,
+                                    Converter={StaticResource EnumToVisConverter},
+                                    ConverterParameter=Unpivot}">
+                <TextBlock Text="РљР»СЋС‡РµРІС‹Рµ РєРѕР»РѕРЅРєРё:" Style="{StaticResource FieldLabel}"/>
+                <TextBox Text="{Binding Prop_KeyColumns, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                         ToolTip="РљРѕРїРёСЂСѓСЋС‚СЃСЏ РІ РєР°Р¶РґСѓСЋ СЃС‚СЂРѕРєСѓ, С‡РµСЂРµР· Р·Р°РїСЏС‚СѓСЋ: Р”Р°С‚Р°,Р РµРіРёРѕРЅ"/>
+                <TextBlock Text="Р Р°Р·РІРѕСЂР°С‡РёРІР°РµРјС‹Рµ РєРѕР»РѕРЅРєРё:" Style="{StaticResource FieldLabel}"/>
+                <TextBox Text="{Binding Prop_ValueColumns, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                         ToolTip="РС… РёРјРµРЅР° Рё Р·РЅР°С‡РµРЅРёСЏ в†’ СЃС‚СЂРѕРєРё, С‡РµСЂРµР· Р·Р°РїСЏС‚СѓСЋ: РЇРЅРІР°СЂСЊ,Р¤РµРІСЂР°Р»СЊ,РњР°СЂС‚"/>
+                <TextBlock Text="РРјСЏ РєРѕР»РѕРЅРєРё РїР°СЂР°РјРµС‚СЂР°:" Style="{StaticResource FieldLabel}"/>
+                <TextBox Text="{Binding Prop_VariableColumnName, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                         ToolTip="РџРѕ СѓРјРѕР»С‡Р°РЅРёСЋ В«РџР°СЂР°РјРµС‚СЂВ»"/>
+                <TextBlock Text="РРјСЏ РєРѕР»РѕРЅРєРё Р·РЅР°С‡РµРЅРёСЏ:" Style="{StaticResource FieldLabel}"/>
+                <TextBox Text="{Binding Prop_ValueColumnName, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                         ToolTip="РџРѕ СѓРјРѕР»С‡Р°РЅРёСЋ В«Р—РЅР°С‡РµРЅРёРµВ»"/>
+            </StackPanel>
+            <TextBlock Text="Р РµР·СѓР»СЊС‚Р°С‚ (out):" Style="{StaticResource FieldLabel}"/>
+            <TextBox Text="{Binding Prop_Result, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+        </StackPanel>
+    </Grid>
+</UserControl>

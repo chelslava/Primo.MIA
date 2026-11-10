@@ -1288,6 +1288,37 @@ namespace Primo.MIA.Common
         public const string Error_PaginateItemsPathRequired   = "JSONPath к массиву элементов обязателен";
 
         // ═══════════════════════════════════════════════════════════════════════
+        // DATATABLE: JOIN / PIVOT (issue #36)
+        // ═══════════════════════════════════════════════════════════════════════
+
+        public const string Activity_DataTableJoin  = "DataTable: Соединение";
+        public const string Activity_DataTablePivot = "DataTable: Pivot / Unpivot";
+
+        public const string Field_JoinLeftTable     = "Левая таблица";
+        public const string Field_JoinRightTable    = "Правая таблица";
+        public const string Field_JoinLeftKeys      = "Ключевые колонки (лево)";
+        public const string Field_JoinRightKeys     = "Ключевые колонки (право)";
+        public const string Field_JoinKind          = "Тип соединения";
+        public const string Field_JoinSuffix        = "Суффикс";
+        public const string Field_JoinCaseSensitive = "Учитывать регистр";
+        public const string Field_JoinResult        = "Результат";
+
+        public const string Field_PivotMode          = "Режим";
+        public const string Field_PivotSource        = "Исходная таблица";
+        public const string Field_PivotRowKey        = "Колонка строк";
+        public const string Field_PivotPivotColumn   = "Pivot-колонка";
+        public const string Field_PivotValueColumn   = "Колонка значений";
+        public const string Field_PivotAggregation   = "Агрегат";
+        public const string Field_PivotKeyColumns    = "Ключевые колонки";
+        public const string Field_PivotValueColumns  = "Разворачиваемые колонки";
+        public const string Field_PivotVarName       = "Имя колонки параметра";
+        public const string Field_PivotValueName     = "Имя колонки значения";
+        public const string Field_PivotResult        = "Результат";
+
+        public const string Error_JoinTableRequired  = "Таблица обязательна";
+        public const string Error_JoinKeysRequired   = "Ключевые колонки обязательны";
+
+        // ═══════════════════════════════════════════════════════════════════════
         // КРИПТОГРАФИЯ
         // ═══════════════════════════════════════════════════════════════════════
 

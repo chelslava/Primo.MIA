@@ -1,0 +1,64 @@
+﻿<UserControl x:Class="Primo.MIA.DataTableJoin"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:common="clr-namespace:Primo.MIA"
+             mc:Ignorable="d" d:DesignHeight="300" Margin="0,0,0,5">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Primo.MIA;component/Common/Styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <Grid Background="{DynamicResource {x:Static SystemColors.ScrollBarBrushKey}}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Image Grid.Column="0" Width="32" Height="32" Margin="5" VerticalAlignment="Center"
+               Source="pack://application:,,,/Primo.MIA;component/images/table.png"/>
+        <StackPanel Grid.Column="1" Margin="5,0,5,5">
+            <TextBlock Style="{StaticResource ActivityHeader}">
+                <Run Text="DataTable: РЎРѕРµРґРёРЅРµРЅРёРµ ["/>
+                <Run Text="{Binding Prop_JoinKind, Mode=OneWay, Converter={StaticResource EnumDisplayNameConverter}}" Foreground="{StaticResource AccentBrush}"/>
+                <Run Text="]"/>
+            </TextBlock>
+            <TextBlock Text="Р›РµРІР°СЏ С‚Р°Р±Р»РёС†Р°:" Style="{StaticResource FieldLabel}"/>
+            <TextBox Text="{Binding Prop_LeftTable, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                     ToolTip="РџРµСЂРµРјРµРЅРЅР°СЏ DataTable"/>
+            <TextBlock Text="РџСЂР°РІР°СЏ С‚Р°Р±Р»РёС†Р°:" Style="{StaticResource FieldLabel}"/>
+            <TextBox Text="{Binding Prop_RightTable, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                     ToolTip="РџРµСЂРµРјРµРЅРЅР°СЏ DataTable"/>
+            <TextBlock Text="РљР»СЋС‡РµРІС‹Рµ РєРѕР»РѕРЅРєРё (Р»РµРІРѕ):" Style="{StaticResource FieldLabel}"/>
+            <TextBox Text="{Binding Prop_LeftKeys, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                     ToolTip="Р§РµСЂРµР· Р·Р°РїСЏС‚СѓСЋ: Id,Code"/>
+            <TextBlock Text="РљР»СЋС‡РµРІС‹Рµ РєРѕР»РѕРЅРєРё (РїСЂР°РІРѕ):" Style="{StaticResource FieldLabel}"/>
+            <TextBox Text="{Binding Prop_RightKeys, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                     ToolTip="Р§РµСЂРµР· Р·Р°РїСЏС‚СѓСЋ, РїРѕ РїРѕСЂСЏРґРєСѓ СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓСЋС‚ Р»РµРІС‹Рј"/>
+            <TextBlock Text="РўРёРї СЃРѕРµРґРёРЅРµРЅРёСЏ:" Style="{StaticResource FieldLabel}"/>
+            <ComboBox ItemsSource="{common:EnumValues common:DataTableJoinKind}"
+                      SelectedValue="{Binding Prop_JoinKind}"
+                      SelectedValuePath="Key"
+                      DisplayMemberPath="Display"
+                      Style="{StaticResource FieldComboBox}"
+                      ToolTip="Inner вЂ” РїРµСЂРµСЃРµС‡РµРЅРёРµ; Left вЂ” РІСЃРµ Р»РµРІС‹Рµ; Right вЂ” РІСЃРµ РїСЂР°РІС‹Рµ; Full вЂ” РѕР±СЉРµРґРёРЅРµРЅРёРµ"/>
+            <Grid Margin="0,4,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="РЎСѓС„С„РёРєСЃ:" VerticalAlignment="Center" Style="{StaticResource FieldLabel}" Margin="0,0,4,0"/>
+                <TextBox Grid.Column="1" Text="{Binding Prop_RightSuffix, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                         ToolTip="Р”Р»СЏ РєРѕРЅС„Р»РёРєС‚РѕРІ РёРјС‘РЅ РєРѕР»РѕРЅРѕРє (РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ _right)"/>
+            </Grid>
+            <CheckBox Style="{StaticResource FieldCheckBox}" Margin="0,6,6,2"
+                      Content="РЈС‡РёС‚С‹РІР°С‚СЊ СЂРµРіРёСЃС‚СЂ РєР»СЋС‡РµР№"
+                      IsChecked="{Binding Prop_CaseSensitive}"
+                      ToolTip="Р”Р»СЏ СЃС‚СЂРѕРєРѕРІС‹С… РєР»СЋС‡РµР№"/>
+            <TextBlock Text="Р РµР·СѓР»СЊС‚Р°С‚ (out):" Style="{StaticResource FieldLabel}"/>
+            <TextBox Text="{Binding Prop_Result, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+        </StackPanel>
+    </Grid>
+</UserControl>
