@@ -1256,6 +1256,38 @@ namespace Primo.MIA.Common
         public const string Error_FtpRemotePathRequired   = "Удалённый путь обязателен";
 
         // ═══════════════════════════════════════════════════════════════════════
+        // HTTP: ОЖИДАНИЕ И ПАГИНАЦИЯ (issue #32)
+        // ═══════════════════════════════════════════════════════════════════════
+
+        public const string Activity_WaitForHttp    = "HTTP: Ожидание условия";
+        public const string Activity_HttpPaginate   = "HTTP: Пагинация";
+
+        public const string Field_WaitHttpUrl            = "URL";
+        public const string Field_WaitHttpExpectedStatus = "Ожидаемый статус";
+        public const string Field_WaitHttpBodyContains   = "Тело содержит";
+        public const string Field_WaitHttpTimeout        = "Таймаут (сек)";
+        public const string Field_WaitHttpInterval       = "Интервал (мс)";
+        public const string Field_WaitHttpIgnoreSsl      = "Игнорировать ошибки SSL";
+        public const string Field_WaitHttpResult         = "Условие выполнено";
+        public const string Field_WaitHttpLastBody       = "Последнее тело";
+        public const string Field_WaitHttpAttempts       = "Попыток";
+
+        public const string Field_PaginateMode        = "Режим";
+        public const string Field_PaginateUrlTemplate = "Шаблон URL";
+        public const string Field_PaginateItemsPath   = "JSONPath элементов";
+        public const string Field_PaginateCursorPath  = "JSONPath курсора";
+        public const string Field_PaginateStartPage   = "Начальная страница";
+        public const string Field_PaginateMaxPages    = "Лимит страниц";
+        public const string Field_PaginateStopOnEmpty = "Стоп на пустой странице";
+        public const string Field_PaginateItems       = "Элементы";
+        public const string Field_PaginatePageCount   = "Страниц загружено";
+        public const string Field_PaginateNextCursor  = "Следующий курсор";
+
+        public const string Error_WaitHttpUrlRequired         = "URL эндпоинта обязателен";
+        public const string Error_PaginateUrlRequired         = "Шаблон URL с {page} или {cursor} обязателен";
+        public const string Error_PaginateItemsPathRequired   = "JSONPath к массиву элементов обязателен";
+
+        // ═══════════════════════════════════════════════════════════════════════
         // КРИПТОГРАФИЯ
         // ═══════════════════════════════════════════════════════════════════════
 

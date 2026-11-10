@@ -1,0 +1,85 @@
+﻿<UserControl x:Class="Primo.MIA.WaitForHttp"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:common="clr-namespace:Primo.MIA"
+             mc:Ignorable="d" d:DesignHeight="300" Margin="0,0,0,5">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Primo.MIA;component/Common/Styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <Grid Background="{DynamicResource {x:Static SystemColors.ScrollBarBrushKey}}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Image Grid.Column="0" Width="32" Height="32" Margin="5" VerticalAlignment="Center"
+               Source="pack://application:,,,/Primo.MIA;component/images/http.png"/>
+        <StackPanel Grid.Column="1" Margin="5,0,5,5">
+            <TextBlock Style="{StaticResource ActivityHeader}">
+                <Run Text="HTTP: РћР¶РёРґР°РЅРёРµ СѓСЃР»РѕРІРёСЏ"/>
+            </TextBlock>
+            <TextBlock Text="URL:" Style="{StaticResource FieldLabel}"/>
+            <TextBox Text="{Binding Prop_Url, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                     ToolTip="Р­РЅРґРїРѕРёРЅС‚ РґР»СЏ РѕРїСЂРѕСЃР° (GET): /api/jobs/42/status"/>
+            <Grid Margin="0,4,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="РћР¶РёРґР°РµРјС‹Р№ СЃС‚Р°С‚СѓСЃ:" VerticalAlignment="Center" Style="{StaticResource FieldLabel}" Margin="0,0,4,0"/>
+                <TextBox Grid.Column="1" Text="{Binding Prop_ExpectedStatus, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                         ToolTip="200 (РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ); 0 = Р»СЋР±РѕР№ 2xx"/>
+            </Grid>
+            <TextBlock Text="РўРµР»Рѕ СЃРѕРґРµСЂР¶РёС‚:" Style="{StaticResource FieldLabel}"/>
+            <TextBox Text="{Binding Prop_BodyContains, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                     ToolTip="РћР±СЏР·Р°С‚РµР»СЊРЅР°СЏ РїРѕРґСЃС‚СЂРѕРєР° РІ С‚РµР»Рµ РѕС‚РІРµС‚Р°, РЅР°РїСЂРёРјРµСЂ &quot;\&quot;status\&quot;: \&quot;done\&quot;&quot;.&#xA;РџСѓСЃС‚Рѕ вЂ” РЅРµ РїСЂРѕРІРµСЂСЏС‚СЊ"/>
+            <Grid Margin="0,4,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="РўР°Р№РјР°СѓС‚ (СЃРµРє):" VerticalAlignment="Center" Style="{StaticResource FieldLabel}" Margin="0,0,4,0"/>
+                <TextBox Grid.Column="1" Text="{Binding Prop_TimeoutSeconds, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                         ToolTip="РћР±С‰РёР№ С‚Р°Р№РјР°СѓС‚ РѕР¶РёРґР°РЅРёСЏ (РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ 60, РјР°РєСЃРёРјСѓРј 3600)"/>
+                <TextBlock Grid.Column="2" Text="РРЅС‚РµСЂРІР°Р» (РјСЃ):" VerticalAlignment="Center" Style="{StaticResource FieldLabel}" Margin="0,0,4,0"/>
+                <TextBox Grid.Column="3" Text="{Binding Prop_PollIntervalMs, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                         ToolTip="РџР°СѓР·Р° РјРµР¶РґСѓ РїРѕРїС‹С‚РєР°РјРё (РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ 1000, РјРёРЅРёРјСѓРј 100)"/>
+            </Grid>
+            <CheckBox Style="{StaticResource DangerCheckBox}" Margin="0,6,6,2"
+                      Content="РРіРЅРѕСЂРёСЂРѕРІР°С‚СЊ РѕС€РёР±РєРё SSL"
+                      IsChecked="{Binding Prop_IgnoreSslErrors}"
+                      ToolTip="РўРѕР»СЊРєРѕ РґР»СЏ С‚РµСЃС‚РѕРІС‹С… СЃСЂРµРґ! Р’ РїСЂРѕРґР°РєС€РµРЅРµ СЃРѕР·РґР°С‘С‚ СѓРіСЂРѕР·Сѓ Р±РµР·РѕРїР°СЃРЅРѕСЃС‚Рё."/>
+            <Grid Margin="0,4,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="РЈСЃР»РѕРІРёРµ РІС‹РїРѕР»РЅРµРЅРѕ (out): " VerticalAlignment="Center" Style="{StaticResource FieldLabel}" Margin="0,0,4,0"/>
+                <TextBox Grid.Column="1" Text="{Binding Prop_Result, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            </Grid>
+            <Grid Margin="0,2,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="РџРѕСЃР»РµРґРЅРµРµ С‚РµР»Рѕ (out): " VerticalAlignment="Center" Style="{StaticResource FieldLabel}" Margin="0,0,4,0"/>
+                <TextBox Grid.Column="1" Text="{Binding Prop_LastBody, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            </Grid>
+            <Grid Margin="0,2,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="РџРѕРїС‹С‚РѕРє (out): " VerticalAlignment="Center" Style="{StaticResource FieldLabel}" Margin="0,0,4,0"/>
+                <TextBox Grid.Column="1" Text="{Binding Prop_Attempts, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            </Grid>
+        </StackPanel>
+    </Grid>
+</UserControl>
