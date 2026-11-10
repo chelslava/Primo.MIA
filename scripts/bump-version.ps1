@@ -1,4 +1,4 @@
-# Скрипт повышения версии (шаги 1-2 релизной процедуры из AGENTS.md).
+﻿# Скрипт повышения версии (шаги 1-2 релизной процедуры из AGENTS.md).
 # Использование: .\scripts\bump-version.ps1 -NewVersion 1.4.0
 #                .\scripts\bump-version.ps1 -NewVersion 1.5.0-beta1
 # Что делает:
