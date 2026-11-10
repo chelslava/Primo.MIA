@@ -149,16 +149,12 @@ namespace Primo.MIA
         /// </summary>
         private bool IsSessionValid(IWebDriver driver)
         {
-            try
+            // Попытка получить текущий URL как проверка активности (issue #38)
+            return SafeTry.Result(() =>
             {
-                // Попытка получить текущий URL как проверка активности
                 var _ = driver.Url;
                 return true;
-            }
-            catch
-            {
-                return false;
-            }
+            }, false, "SessionManager: проверка активности сессии");
         }
     }
 }

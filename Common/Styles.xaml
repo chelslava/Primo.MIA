@@ -13,15 +13,12 @@
          ═══════════════════════════════════════════════════════════════════ -->
 
     <!-- ═══════════════════════════════════════════════════════════════════
-         КОНВЕРТЕРЫ (канонические экземпляры)
+         КОНВЕРТЕРЫ (канонические ключи — одни на конвертер, issue #38)
          ═══════════════════════════════════════════════════════════════════ -->
 
     <common:EnumToVisibilityConverter x:Key="EnumToVisConverter"/>
-    <common:EnumToVisibilityConverter x:Key="EnumToVisibilityConverter"/>
     <common:MultiEnumToVisibilityConverter x:Key="MultiEnumToVisConverter"/>
-    <common:MultiEnumToVisibilityConverter x:Key="MultiEnumToVisibilityConverter"/>
     <common:BoolToVisibilityConverter x:Key="BoolToVis"/>
-    <common:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
     <common:EnumDisplayNameConverter x:Key="EnumDisplayNameConverter"/>
 
     <!-- ═══════════════════════════════════════════════════════════════════

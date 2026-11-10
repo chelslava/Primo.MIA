@@ -60,7 +60,7 @@
 
             <!-- DataTable — виден только при DataTableToJson -->
             <StackPanel Visibility="{Binding Prop_Direction,
-                        Converter={StaticResource EnumToVisibilityConverter},
+                        Converter={StaticResource EnumToVisConverter},
                         ConverterParameter=DataTableToJson}">
                 <TextBlock Text="DataTable (входная):" Style="{StaticResource FieldLabel}"/>
                 <TextBox Text="{Binding Prop_DataTable, UpdateSourceTrigger=PropertyChanged}"
@@ -70,7 +70,7 @@
 
             <!-- JSON — виден только при JsonToDataTable -->
             <StackPanel Visibility="{Binding Prop_Direction,
-                        Converter={StaticResource EnumToVisibilityConverter},
+                        Converter={StaticResource EnumToVisConverter},
                         ConverterParameter=JsonToDataTable}">
                 <TextBlock Text="JSON (входной):" Style="{StaticResource FieldLabel}"/>
                 <TextBox Text="{Binding Prop_Json, UpdateSourceTrigger=PropertyChanged}"
@@ -106,7 +106,7 @@
 
             <!-- Формат JSON + NULL Mode — только при DataTableToJson -->
             <StackPanel Visibility="{Binding Prop_Direction,
-                        Converter={StaticResource EnumToVisibilityConverter},
+                        Converter={StaticResource EnumToVisConverter},
                         ConverterParameter=DataTableToJson}">
                 <Grid Margin="0,2,0,0">
                     <Grid.ColumnDefinitions>
@@ -145,7 +145,7 @@
                 <!-- Определять типы — только при JsonToDataTable -->
                 <StackPanel Grid.Column="1"
                             Visibility="{Binding Prop_Direction,
-                            Converter={StaticResource EnumToVisibilityConverter},
+                            Converter={StaticResource EnumToVisConverter},
                             ConverterParameter=JsonToDataTable}">
                     <CheckBox Style="{StaticResource FieldCheckBox}" Content="Определять типы колонок"
                               IsChecked="{Binding Prop_TypeInference}"

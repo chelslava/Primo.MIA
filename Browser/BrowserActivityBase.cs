@@ -78,15 +78,12 @@ namespace Primo.MIA
         /// </summary>
         protected IWebDriver TryGetDriverFromContext(string sessionId)
         {
-            try
+            // сессия могла быть закрыта — fallback null (issue #38)
+            return SafeTry.Result(() =>
             {
                 string resolvedSessionId = SessionResolver.Resolve(sessionId);
                 return SeleniumHelper.GetDriver(resolvedSessionId);
-            }
-            catch
-            {
-                return null;
-            }
+            }, null, "BrowserActivityBase: драйвер из контекста");
         }
 
         #endregion

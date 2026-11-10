@@ -6,7 +6,7 @@
 
 ## OVERVIEW
 
-Primo.MIA — .NET Framework 4.8.1 class library (WPF/XAML) for the Primo RPA platform. Provides ~120 reusable automation activities (Browser, Database, HTTP, Collections, Text, Calendar, Files, Utilities). Distributed as a NuGet package.
+Primo.MIA — .NET Framework 4.8.1 class library (WPF/XAML) for the Primo RPA platform. Provides ~134 reusable automation activities (Browser, Database/Redis/MongoDB, HTTP, MQ, SFTP, FTP, Collections, Text, Calendar, Files, Archive, Crypto, Utilities). Distributed as a NuGet package.
 
 ## STRUCTURE
 
@@ -57,18 +57,20 @@ Primo.MIA/
 
 ## ANTI-PATTERNS (THIS PROJECT)
 
-- **Generic `Exception` throwing**: Use specific exception types. Calendar module has `CalendarParseException` as a model.
-- **`Console.WriteLine` for logging**: `BrowserActivityBase` (LogInfo/LogWarning/LogError) and `Browser/Services/ActivityLogger` write to console — no real logger attached. Use structured logging (e.g., file logger) instead.
+- **Generic `Exception` throwing**: Use specific exception types. Calendar module has `CalendarParseException` as a model. (Audit 1.4.0 purged all generic throws; `ArgumentException` from raw `throw` in `*Back.cs` is CI-warned — use `Guard.*`.)
+- **~~`Console.WriteLine` for logging~~ FIXED (1.4.0–1.6.0)**: logging goes through `Common/ActivityFileLogger` (env-gated file logger) and platform `AddToLog`. The only remaining call site is `ActivityFileLogger.cs` itself — its own emergency fallback when file logging fails.
 - **Debug artifacts in source**: `plans/` directory is gitignored — don't add planning documents to tracked code.
 - **Hard-coded absolute paths**: `C:\Program Files\Primo\Primo Studio Community x64\` HintPath in csproj — intentional: CI installs the LTools SDK bundle to that location before build.
 - **Global static state**: `RepoDict` is a global dictionary — avoid adding more global state. Assumes **one robot per process** (Primo Studio limitation); ambient context (browser sessions, DB transactions) is NOT isolated between parallel robot runs in a shared host.
-- **Large monolith files**: `DatabaseHelper.cs` (~1100 lines), `TextExtractEntitiesBack.cs` (~1000 lines), `ReadTomlConfigBack.cs` (~950 lines) — prefer smaller focused classes.
+- **Large monolith files**: `DatabaseHelper.cs` (~1120 lines), `TextExtractEntitiesBack.cs` (~1010), `ReadTomlConfigBack.cs` (~980) — prefer smaller focused classes; DatabaseHelper is partially split into `Database*Helper.cs` already.
 - **No explicit activity registration**: The LTools SDK auto-discovers activities via reflection — don't add manual registration.
 
 ## UNIQUE STYLES
 
 - **`*Back.cs` suffix**: Naming convention for activity backend logic (not ViewModel/Service/Presenter).
 - **`RepoDict`**: Static global dictionary for ambient context storage (11 typed dictionaries + generic `ObjectDict`).
+- **Unified activity UI (`Common/Styles.xaml`)**: all XAMLs merge the shared dictionary. Canonical keys — converters `EnumToVisConverter` / `MultiEnumToVisConverter` / `BoolToVis` / `EnumDisplayNameConverter` (no local re-declarations, no long aliases); styles `ActivityHeader`, `FieldLabel`, `FieldBox`, `ValidatingFieldBox`, `FieldComboBox`, `FieldCheckBox` / `DangerCheckBox` (orange = destructive), `FieldPasswordBox`, `BrowseButton` / `TextButton`, `HintText`; brushes `TextBrush` (#FF2C3E50), `AccentBrush` (#FF1565C0 mode accent), `DangerBrush` (#FFC55A11). Header pattern: `«Модуль: Название [Режим]»` with accent mode-Run. New activities: zero inline colors/fonts — styles only.
+- **Safe helpers**: `SafeDispose.Quiet` (disposal), `SafeTry.Result` (fallback value + Debug log) — replace anonymous `catch { }` in new code.
 - **`BrowserSessionContext`**: Ambient context pattern for implicit session ID propagation. `Pop(sessionId)` removes a specific session (issue #20), not the stack top. `BrowserSessionRegistry` TTL-evicts abandoned browser sessions (24h) on each new session registration — same pattern as `DatabaseTransactionManager`.
 - **Bug tracking in comments**: Calendar module uses `[БАГ-N]` / `[FIX-N]` tags directly in code comments.
 - **Dual dictionary pattern**: `ProductionCalendar` uses forward + reverse dictionaries for O(1) lookup instead of O(n) `Any()`.

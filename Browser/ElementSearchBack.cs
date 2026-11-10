@@ -356,16 +356,12 @@ namespace Primo.MIA
 
             if (!string.IsNullOrWhiteSpace(elementId))
             {
-                // Проверяем элемент из репозитория
-                try
-                {
-                    var element = this.ElementRepository.GetElement(elementId);
-                    found = element != null;
-                }
-                catch
-                {
-                    found = false;
-                }
+                // Проверяем элемент из репозитория (issue #38)
+                var element = SafeTry.Result(
+                    () => this.ElementRepository.GetElement(elementId),
+                    null,
+                    "ElementSearch ExistsMode: элемент из репозитория");
+                found = element != null;
             }
             else if (!string.IsNullOrWhiteSpace(locatorValue))
             {
@@ -520,14 +516,11 @@ namespace Primo.MIA
         {
             if (!string.IsNullOrWhiteSpace(elementId))
             {
-                try
-                {
-                    return this.ElementRepository.GetElement(elementId);
-                }
-                catch
-                {
-                    return null;
-                }
+                // элемент мог быть удалён из репозитория — fallback null (issue #38)
+                return SafeTry.Result(
+                    () => this.ElementRepository.GetElement(elementId),
+                    null,
+                    "ElementSearch: элемент из репозитория");
             }
 
             if (!string.IsNullOrWhiteSpace(locatorValue))

@@ -137,14 +137,11 @@ namespace Primo.MIA
             int timeoutSeconds,
             ElementWaitMode waitMode)
         {
-            try
-            {
-                return FindElementWithWaitMode(driver, locatorType, locatorValue, timeoutSeconds, waitMode);
-            }
-            catch
-            {
-                return null;
-            }
+            // поиск мог не найти/устареть — fallback null (issue #38)
+            return SafeTry.Result(
+                () => FindElementWithWaitMode(driver, locatorType, locatorValue, timeoutSeconds, waitMode),
+                null,
+                "ElementLocator: TryFindElementWithWaitMode");
         }
 
         /// <summary>

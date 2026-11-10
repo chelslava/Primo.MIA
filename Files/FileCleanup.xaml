@@ -137,7 +137,7 @@
 
             <!-- Старше N дней — для OlderThanDays и Both -->
             <StackPanel Visibility="{Binding Prop_ThresholdMode,
-                                    Converter={StaticResource MultiEnumToVisibilityConverter},
+                                    Converter={StaticResource MultiEnumToVisConverter},
                                     ConverterParameter=OlderThanDays|Both}">
                 <TextBlock Text="Старше чем (дней):" Style="{StaticResource FieldLabel}"/>
                 <TextBox Style="{StaticResource ValidatingFieldBox}"
@@ -154,7 +154,7 @@
 
             <!-- Раньше даты — для BeforeDate и Both -->
             <StackPanel Visibility="{Binding Prop_ThresholdMode,
-                                    Converter={StaticResource MultiEnumToVisibilityConverter},
+                                    Converter={StaticResource MultiEnumToVisConverter},
                                     ConverterParameter=BeforeDate|Both}">
                 <TextBlock Text="Раньше даты:" Style="{StaticResource FieldLabel}"/>
                 <TextBox Text="{Binding Prop_ThresholdDate, UpdateSourceTrigger=PropertyChanged}"
