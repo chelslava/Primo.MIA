@@ -1360,6 +1360,8 @@ namespace Primo.MIA.Common
 
         public const string Activity_RabbitMqPublish = "RabbitMQ: Отправить сообщение";
         public const string Activity_RabbitMqConsume = "RabbitMQ: Получить сообщение";
+        public const string Activity_RabbitMqDeclareQueue = "RabbitMQ: Объявить очередь";
+        public const string Activity_RabbitMqPurgeQueue = "RabbitMQ: Очистить очередь";
 
         public const string Field_MqHost = "Хост";
         public const string Field_MqPort = "Порт";
@@ -1383,6 +1385,14 @@ namespace Primo.MIA.Common
         public const string Field_MqMessageRoutingKey = "Routing Key сообщения";
         public const string Field_MqDeliveryTag = "Delivery Tag";
         public const string Field_MqHasMessage = "Сообщение получено";
+        public const string Field_MqDurable = "Durable";
+        public const string Field_MqExclusive = "Exclusive";
+        public const string Field_MqAutoDelete = "Auto Delete";
+        public const string Field_MqBindToExchange = "Привязать к Exchange";
+        public const string Field_MqMessageCount = "Сообщений в очереди";
+        public const string Field_MqPurgedCount = "Удалено сообщений";
+
+        public const string Error_MqUserNameRequired = "Пользователь не может быть пустым";
 
         public const string Error_MqHostRequired = "Хост не может быть пустым";
         public const string Error_MqQueueRequired = "Очередь не может быть пустой";
@@ -1394,6 +1404,7 @@ namespace Primo.MIA.Common
 
         public const string Activity_KafkaPublish = "Kafka: Отправить сообщение";
         public const string Activity_KafkaConsume = "Kafka: Получить сообщение";
+        public const string Activity_KafkaConsumeBatch = "Kafka: Получить пакет";
 
         public const string Field_KafkaBootstrapServers = "Bootstrap-серверы";
         public const string Field_KafkaSecurityProtocol = "Протокол безопасности";
@@ -1413,6 +1424,14 @@ namespace Primo.MIA.Common
         public const string Field_KafkaMessageBody = "Тело полученного сообщения";
         public const string Field_KafkaMessageKey = "Ключ сообщения";
         public const string Field_KafkaMessageOffset = "Offset сообщения";
+
+        // Батч-потребление (issue #33)
+        public const string Field_KafkaMaxMessages     = "Максимум сообщений в пакете";
+        public const string Field_KafkaBatchTimeout    = "Таймаут пакета (сек)";
+        public const string Field_KafkaCommitAfterBatch = "Коммит пакета";
+        public const string Field_KafkaBatchMessages   = "Сообщения";
+        public const string Field_KafkaBatchInfo       = "Пакет (метаданные)";
+        public const string Field_KafkaBatchCount      = "Получено";
 
         public const string Kafka_Category_Publish = "Публикация";
         public const string Kafka_Category_Consume = "Получение";

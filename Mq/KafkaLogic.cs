@@ -8,6 +8,7 @@
 using Primo.MIA.Common;
 using Confluent.Kafka;
 using System;
+using System.Collections.Generic;
 
 namespace Primo.MIA
 {
@@ -172,6 +173,57 @@ namespace Primo.MIA
                 return result == null
                     ? null
                     : ToKafkaMessage(result);
+            }
+            finally
+            {
+                SafeDispose.Quiet(() => consumer.Unsubscribe(), "Kafka: unsubscribe");
+            }
+        }
+
+        /// <summary>
+        /// Ждёт пакет сообщений из топика: до maxMessages или истечения
+        /// общего таймаута (issue #33). Таймаут — НА ВЕСЬ пакет, не на одно
+        /// сообщение: продовые потребители вычитывают доступные сообщения
+        /// и не ждут полного размера.
+        /// </summary>
+        /// <param name="consumer">Консьюмер (конфигурация задаёт AutoCommit).</param>
+        /// <param name="topic">Топик.</param>
+        /// <param name="maxMessages">Максимум сообщений в пакете.</param>
+        /// <param name="timeoutSeconds">Общий таймаут ожидания пакета, сек.</param>
+        public List<KafkaMessage> WaitForMessageBatch(
+            IConsumer<string, string> consumer,
+            string topic,
+            int maxMessages,
+            int timeoutSeconds)
+        {
+            if (consumer == null)
+                throw new ArgumentNullException(nameof(consumer));
+            Guard.NotNullOrWhiteSpace(topic, nameof(topic));
+            if (maxMessages <= 0)
+                maxMessages = 10;
+            if (timeoutSeconds <= 0)
+                timeoutSeconds = 30;
+
+            consumer.Subscribe(topic);
+            try
+            {
+                var messages = new List<KafkaMessage>();
+                var deadline = DateTime.UtcNow.AddSeconds(timeoutSeconds);
+
+                while (messages.Count < maxMessages)
+                {
+                    var remaining = deadline - DateTime.UtcNow;
+                    if (remaining <= TimeSpan.Zero)
+                        break;
+
+                    var result = consumer.Consume(remaining);
+                    if (result == null)
+                        break; // больше сообщений нет до истечения бюджета
+
+                    messages.Add(ToKafkaMessage(result));
+                }
+
+                return messages;
             }
             finally
             {

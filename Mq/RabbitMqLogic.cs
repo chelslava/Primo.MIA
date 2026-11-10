@@ -92,6 +92,61 @@ namespace Primo.MIA
         }
 
         /// <summary>
+        /// Чистое решение «нужна ли привязка к exchange» — тестируется без
+        /// брокера (QueueBind — extension-метод клиента, Moq его не мокает).
+        /// </summary>
+        public bool ShouldBind(string bindToExchange)
+        {
+            return !string.IsNullOrWhiteSpace(bindToExchange);
+        }
+
+        /// <summary>
+        /// Топология: объявляет очередь (durable/exclusive/autoDelete) и,
+        /// опционально, привязывает её к exchange по routing key (issue #33).
+        /// </summary>
+        /// <returns>Число сообщений, уже находящихся в очереди.</returns>
+        public uint DeclareQueue(
+            IModel model,
+            string queue,
+            bool durable,
+            bool exclusive,
+            bool autoDelete,
+            string bindToExchange,
+            string routingKey)
+        {
+            if (model == null)
+                throw new ArgumentNullException(nameof(model));
+            Guard.NotNullOrWhiteSpace(queue, nameof(queue));
+
+            var result = model.QueueDeclare(
+                queue: queue,
+                durable: durable,
+                exclusive: exclusive,
+                autoDelete: autoDelete,
+                arguments: null);
+
+            if (ShouldBind(bindToExchange))
+            {
+                model.QueueBind(queue, bindToExchange, routingKey ?? string.Empty);
+            }
+
+            return result.MessageCount;
+        }
+
+        /// <summary>
+        /// Очищает очередь: удаляет все сообщения (issue #33).
+        /// </summary>
+        /// <returns>Число удалённых сообщений.</returns>
+        public uint PurgeQueue(IModel model, string queue)
+        {
+            if (model == null)
+                throw new ArgumentNullException(nameof(model));
+            Guard.NotNullOrWhiteSpace(queue, nameof(queue));
+
+            return model.QueuePurge(queue);
+        }
+
+        /// <summary>
         /// Ждёт одно сообщение из очереди с таймаутом. При таймауте возвращает
         /// null (активность выставит HasMessage = false).
         /// </summary>
