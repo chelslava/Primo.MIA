@@ -1,0 +1,72 @@
+name: Integration Tests
+
+# issue #21: тесты, требующие внешних систем (реальный браузер, БД, сеть),
+# помечаются [Trait("Category", "Integration")] и выполняются только здесь —
+# вручную или по расписанию. Стандартный CI (ci.yml) их исключает.
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Еженедельно по воскресеньям в 04:00 UTC
+    - cron: '0 4 * * 0'
+
+jobs:
+  integration:
+    name: Integration Tests (Windows)
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v4
+      name: Checkout code
+
+    - name: Checkout LTools SDK (private bundle)
+      uses: actions/checkout@v4
+      with:
+        repository: chelslava/primo-ltools-sdk
+        ref: main
+        token: ${{ secrets.PRIMO_SDK_TOKEN }}
+        path: ltools-sdk
+
+    - name: Install LTools SDK to default Primo location
+      shell: pwsh
+      run: |
+        $dest = "C:\Program Files\Primo\Primo Studio Community x64"
+        New-Item -ItemType Directory -Force -Path $dest | Out-Null
+        Copy-Item -Path "ltools-sdk/*.dll" -Destination $dest -Force
+        $count = (Get-ChildItem $dest -Filter "LTools*.dll").Count
+        Write-Host "Установлено LTools-сборок: $count"
+
+    - name: Run integration tests
+      shell: pwsh
+      # AllowEmptyRun: пока в репозитории нет тестов с трейтом
+      # Category=Integration, прогон пуст — это не ошибка
+      run: scripts\run-tests-vs.ps1 -ResultsPath "$PWD\test-results\integration.trx" -TestFilter "Category=Integration" -AllowEmptyRun
+
+    - name: Test summary
+      if: always()
+      shell: pwsh
+      run: |
+        $trxFile = "test-results\integration.trx"
+        if (Test-Path $trxFile) {
+          $xml = [xml](Get-Content $trxFile)
+          $counters = $xml.TestRun.ResultSummary.Counters
+          echo "## Integration Test Results" >> $env:GITHUB_STEP_SUMMARY
+          echo "| Status | Count |" >> $env:GITHUB_STEP_SUMMARY
+          echo "|--------|-------|" >> $env:GITHUB_STEP_SUMMARY
+          echo "| Passed  | $($counters.passed) |" >> $env:GITHUB_STEP_SUMMARY
+          echo "| Failed  | $($counters.failed) |" >> $env:GITHUB_STEP_SUMMARY
+          echo "| Skipped | $($counters.skipped) |" >> $env:GITHUB_STEP_SUMMARY
+          echo "| **Total** | **$($counters.total)** |" >> $env:GITHUB_STEP_SUMMARY
+          if ([int]$counters.total -eq 0) {
+            echo "ℹ️ Integration-тестов пока нет — добавляйте их с \`[Trait(\"Category\", \"Integration\")] \`" >> $env:GITHUB_STEP_SUMMARY
+          }
+        }
+
+    - name: Upload test results
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: integration-results-${{ github.run_number }}
+        path: test-results/*.trx
+        retention-days: 30
+        if-no-files-found: ignore

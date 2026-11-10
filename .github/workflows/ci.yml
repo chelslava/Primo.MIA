@@ -151,7 +151,9 @@ jobs:
 
     - name: Build and run tests
       shell: pwsh
-      run: scripts\run-tests-vs.ps1 -ResultsPath "$PWD\test-results\results.trx"
+      # issue #21: стандартный прогон исключает Category=Integration —
+      # тесты с внешними системами выполняет отдельный workflow integration.yml
+      run: scripts\run-tests-vs.ps1 -ResultsPath "$PWD\test-results\results.trx" -TestFilter "Category!=Integration"
 
     - name: Test summary
       if: always()

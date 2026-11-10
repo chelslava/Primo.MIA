@@ -1,7 +1,10 @@
-param(
+﻿param(
     [string]$Configuration = "Debug",
     [string]$TestFilter,
-    [string]$ResultsPath   # опционально: полный путь к .trx с результатами тестов (для CI)
+    [string]$ResultsPath,   # опционально: полный путь к .trx с результатами тестов (для CI)
+    # issue #21: разрешить прогон без тестов (integration-job, пока нет тестов
+    # с трейтом Category=Integration — иначе защита ниже бросит "пустой прогон")
+    [switch]$AllowEmptyRun
 )
 
 $ErrorActionPreference = "Stop"
@@ -72,8 +75,11 @@ if ($ResultsPath -and (Test-Path $ResultsPath)) {
     [xml]$trx = Get-Content $ResultsPath
     $total = [int]$trx.TestRun.ResultSummary.Counters.total
     $failed = [int]$trx.TestRun.ResultSummary.Counters.failed
-    if ($total -eq 0) {
+    if ($total -eq 0 -and -not $AllowEmptyRun) {
         throw "Пустой прогон: в trx 0 тестов (сборка не загрузилась или адаптер не найден)."
+    }
+    if ($total -eq 0 -and $AllowEmptyRun) {
+        Write-Host "Прогон пуст (0 тестов) — допустимо для -AllowEmptyRun (issue #21)."
     }
     if ($failed -gt 0) {
         Write-Host "Тесты завершились с ошибками: failed=$failed"

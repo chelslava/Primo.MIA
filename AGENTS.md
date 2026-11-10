@@ -51,7 +51,7 @@ Primo.MIA/
 - **Properties**: Use `Prop_` prefix, backing fields with `InvokePropertyChanged()`, `[StoringProperty]` attribute for serialization.
 - **Execution**: Override `TimedAction()` — get inputs from `sd.Variables`, set outputs via `SetVariableValue()`, return `ExecutionResult`.
 - **XAML**: Use `{StaticResource}` from `Common/Styles.xaml`. For enum-dependent visibility: `EnumToVisibilityConverter` / `MultiEnumToVisibilityConverter` with pipe-separated params.
-- **Testing**: xUnit, FluentAssertions, AAA pattern with `#region` blocks, trait categories (`"Fast"`, `"Integration"`).
+- **Testing**: xUnit, FluentAssertions, AAA pattern with `#region` blocks, trait categories (`"Fast"`, `"Integration"`). Tests touching real external systems (browser, DB, network) MUST carry `[Trait("Category", "Integration")]` — standard CI excludes them; they run in the separate `integration.yml` workflow (manual/weekly). Pure-logic scenario tests stay `"Fast"` even if named `Scenario_*`.
 - **Namespaces**: `Primo.MIA.{Module}` pattern. All XAML uses `xmlns:local="clr-namespace:Primo.MIA"`.
 - **Documentation**: Russian XML comments on public APIs. Russian UI labels in XAML.
 

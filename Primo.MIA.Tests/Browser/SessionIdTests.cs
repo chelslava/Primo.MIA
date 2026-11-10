@@ -309,10 +309,10 @@ namespace Primo.MIA.Tests.Browser
 
         #endregion
 
-        #region Integration Tests
+        #region Сценарные тесты (не трогают внешних систем — см. issue #21)
 
         [Fact]
-        public void Integration_SessionWorkflow_SimulatesContainerUsage()
+        public void Scenario_SessionWorkflow_SimulatesContainerUsage()
         {
             // Arrange
             const string outerSession = "outer-browser-session";

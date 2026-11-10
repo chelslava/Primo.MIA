@@ -861,11 +861,13 @@ namespace Primo.MIA.Tests.Utilities
         }
 
         // =====================================================================
-        // Интеграционные тесты
+        // Сценарные тесты: комплексные сценарии на чистой логике
+        // (исторически назывались «Integration» — внешних систем не трогают;
+        // issue #21: имя приведено в соответствие с содержанием)
         // =====================================================================
 
-        [Fact(DisplayName = "Интеграция: сложное выражение с LIKE, IN и скобками")]
-        public void Integration_ComplexExpression()
+        [Fact(DisplayName = "Сценарий: сложное выражение с LIKE, IN и скобками")]
+        public void Scenario_ComplexExpression()
         {
             // Arrange
             var table = CreateTestTable();
@@ -882,8 +884,8 @@ namespace Primo.MIA.Tests.Utilities
                 .And.Equal(35, 40);
         }
 
-        [Fact(DisplayName = "Интеграция: фильтр по конструктору даёт тот же результат, что SQL")]
-        public void Integration_ConditionsMatchSql()
+        [Fact(DisplayName = "Сценарий: фильтр по конструктору даёт тот же результат, что SQL")]
+        public void Scenario_ConditionsMatchSql()
         {
             // Arrange
             var table = CreateTestTable();
