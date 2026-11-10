@@ -1,0 +1,132 @@
+<UserControl x:Class="Primo.MIA.CsvToDataTable"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:Primo.MIA"
+             mc:Ignorable="d"
+             d:DesignHeight="260" Margin="0,0,0,5">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Primo.MIA;component/Common/Styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid Background="{DynamicResource {x:Static SystemColors.ScrollBarBrushKey}}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <Image Grid.Column="0"
+               Width="32" Height="32" Margin="5"
+               VerticalAlignment="Center"
+               Source="pack://application:,,,/Primo.MIA;component/images/table.png"/>
+
+        <StackPanel Grid.Column="1" VerticalAlignment="Top" Margin="5,0,5,5">
+
+            <TextBlock Style="{StaticResource ActivityHeader}">
+                <Run Text="CSV → DataTable"/>
+            </TextBlock>
+
+            <!-- Источник -->
+            <TextBlock Text="Источник:" Style="{StaticResource FieldLabel}"/>
+            <ComboBox ItemsSource="{local:EnumValues local:CsvLocation}"
+                      SelectedValue="{Binding Prop_Source}"
+                      SelectedValuePath="Key"
+                      DisplayMemberPath="Display"
+                      Style="{StaticResource FieldComboBox}"
+                      ToolTip="Строка — CSV-текст в поле ниже;&#xA;Файл — чтение файла с диска (кодировка настраивается)"/>
+
+            <!-- CSV-текст — только режим Строка -->
+            <StackPanel Visibility="{Binding Prop_Source,
+                                    Converter={StaticResource EnumToVisConverter},
+                                    ConverterParameter=String}">
+                <TextBlock Text="CSV (входной):" Style="{StaticResource FieldLabel}"/>
+                <TextBox Text="{Binding Prop_Csv, UpdateSourceTrigger=PropertyChanged}"
+                         Style="{StaticResource FieldBox}"
+                         AcceptsReturn="True"
+                         TextWrapping="Wrap"
+                         Height="72"
+                         ToolTip="CSV-текст по RFC 4180: кавычки с удвоением (&quot;&quot;), переводы строк внутри кавычкованных полей поддерживаются"/>
+            </StackPanel>
+
+            <!-- Файл — только режим Файл -->
+            <StackPanel Visibility="{Binding Prop_Source,
+                                    Converter={StaticResource EnumToVisConverter},
+                                    ConverterParameter=File}">
+                <TextBlock Text="Путь к файлу:" Style="{StaticResource FieldLabel}"/>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBox x:Name="TxtFilePath"
+                             Grid.Column="0"
+                             Text="{Binding Prop_FilePath, UpdateSourceTrigger=PropertyChanged}"
+                             Style="{StaticResource FieldBox}"
+                             Margin="0,2,4,0"
+                             ToolTip="Путь к CSV-файлу"/>
+                    <Button Grid.Column="1"
+                            Style="{StaticResource BrowseButton}"
+                            Content=""
+                            Click="BtnBrowseCsv_Click"
+                            ToolTip="Выбрать файл...">
+                        <Button.Background>
+                            <ImageBrush ImageSource="/Primo.MIA;component/images/folder.png" TileMode="None"/>
+                        </Button.Background>
+                    </Button>
+                </Grid>
+            </StackPanel>
+
+            <!-- Настройки: разделитель + кодировка -->
+            <Grid Margin="0,4,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="Разделитель:" VerticalAlignment="Center" Style="{StaticResource FieldLabel}" Margin="0,0,4,0"/>
+                <TextBox Grid.Column="1" Text="{Binding Prop_Delimiter, UpdateSourceTrigger=PropertyChanged}"
+                         Style="{StaticResource FieldBox}"
+                         ToolTip="',' (по умолчанию), ';', '|', таб.&#xA;Многосимвольные разделители поддерживаются"/>
+            </Grid>
+            <Grid Margin="0,2,0,0"
+                  Visibility="{Binding Prop_Source,
+                               Converter={StaticResource EnumToVisConverter},
+                               ConverterParameter=File}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="Кодировка:" VerticalAlignment="Center" Style="{StaticResource FieldLabel}" Margin="0,0,4,0"/>
+                <TextBox Grid.Column="1" Text="{Binding Prop_Encoding, UpdateSourceTrigger=PropertyChanged}"
+                         Style="{StaticResource FieldBox}"
+                         ToolTip="utf-8 (по умолчанию), windows-1251, utf-16.&#xA;BOM определяется автоматически"/>
+            </Grid>
+
+            <!-- Чекбоксы -->
+            <CheckBox Style="{StaticResource FieldCheckBox}" Margin="0,6,6,2"
+                      Content="Первая строка — заголовки колонок"
+                      IsChecked="{Binding Prop_HasHeader}"
+                      ToolTip="Имена колонок берутся из файла; иначе Column1..N"/>
+            <CheckBox Style="{StaticResource FieldCheckBox}"
+                      Content="Определять типы колонок"
+                      IsChecked="{Binding Prop_TypeInference}"
+                      ToolTip="int → double → bool → DateTime (InvariantCulture).&#xA;Выключить, если нужны все колонки как string"/>
+
+            <!-- Выходные -->
+            <Grid Margin="0,4,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="DataTable (out): " VerticalAlignment="Center" Style="{StaticResource FieldLabel}" Margin="0,0,4,0"/>
+                <TextBox Grid.Column="1" Text="{Binding Prop_ResultTable, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            </Grid>
+
+        </StackPanel>
+    </Grid>
+</UserControl>

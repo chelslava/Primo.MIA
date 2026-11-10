@@ -1184,6 +1184,31 @@ namespace Primo.MIA.Common
         public const string Error_ArchiveFolderRequired     = "Папка распаковки обязательна";
 
         // ═══════════════════════════════════════════════════════════════════════
+        // CSV ↔ DATATABLE (issue #29)
+        // ═══════════════════════════════════════════════════════════════════════
+
+        public const string Activity_CsvToDataTable  = "CSV → DataTable";
+        public const string Activity_DataTableToCsv  = "DataTable → CSV";
+
+        public const string Field_CsvSource        = "Источник";
+        public const string Field_CsvTarget        = "Приёмник";
+        public const string Field_CsvInputText     = "CSV (входной)";
+        public const string Field_CsvFilePath      = "Путь к файлу";
+        public const string Field_CsvDelimiter     = "Разделитель";
+        public const string Field_CsvHasHeader     = "Первая строка — заголовки";
+        public const string Field_CsvIncludeHeader = "Заголовки колонок";
+        public const string Field_CsvTypeInference = "Определять типы колонок";
+        public const string Field_CsvDBNullToEmpty = "DBNull как пустое";
+        public const string Field_CsvEncoding      = "Кодировка";
+        public const string Field_CsvInputTable    = "DataTable (входная)";
+        public const string Field_CsvResultTable   = "DataTable";
+        public const string Field_CsvResultText    = "CSV";
+
+        public const string Error_CsvTextRequired  = "CSV-текст обязателен (режим «Строка»)";
+        public const string Error_CsvFileRequired  = "Путь к CSV-файлу обязателен (режим «Файл»)";
+        public const string Error_CsvTableRequired = "Входная DataTable обязательна";
+
+        // ═══════════════════════════════════════════════════════════════════════
         // КРИПТОГРАФИЯ
         // ═══════════════════════════════════════════════════════════════════════
 
