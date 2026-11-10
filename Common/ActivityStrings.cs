@@ -1209,6 +1209,26 @@ namespace Primo.MIA.Common
         public const string Error_CsvTableRequired = "Входная DataTable обязательна";
 
         // ═══════════════════════════════════════════════════════════════════════
+        // TEXT REGEX (issue #30)
+        // ═══════════════════════════════════════════════════════════════════════
+
+        public const string Activity_TextRegex       = "Текст: Regex";
+        public const string Field_RegexMode          = "Режим";
+        public const string Field_RegexInput         = "Текст (входной)";
+        // Field_RegexPattern переиспользуется из секции List ("Regex паттерн")
+        public const string Field_RegexReplacement   = "Замена ($1, ${имя})";
+        public const string Field_RegexIgnoreCase    = "Игнорировать регистр";
+        public const string Field_RegexMultiline     = "Multiline (^/$ по строкам)";
+        public const string Field_RegexSingleline    = "Singleline (. захватывает переносы)";
+        public const string Field_RegexTimeout       = "Таймаут (мс, 0 = 1000)";
+        public const string Field_RegexMatchesTable  = "Совпадения";
+        public const string Field_RegexResult        = "Результат";
+        // Field_MatchCount переиспользуется из секции TextParse ("Количество совпадений")
+
+        public const string Error_TextRegexInputRequired   = "Входной текст обязателен";
+        public const string Error_TextRegexPatternRequired = "Регулярное выражение обязательно";
+
+        // ═══════════════════════════════════════════════════════════════════════
         // КРИПТОГРАФИЯ
         // ═══════════════════════════════════════════════════════════════════════
 

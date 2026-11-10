@@ -1,0 +1,139 @@
+<UserControl x:Class="Primo.MIA.TextRegex"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:Primo.MIA"
+             mc:Ignorable="d"
+             d:DesignHeight="300" Margin="0,0,0,5">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Primo.MIA;component/Common/Styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid Background="{DynamicResource {x:Static SystemColors.ScrollBarBrushKey}}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <Image Grid.Column="0"
+               Width="32" Height="32" Margin="5"
+               VerticalAlignment="Center"
+               Source="pack://application:,,,/Primo.MIA;component/images/regex.png"/>
+
+        <StackPanel Grid.Column="1" VerticalAlignment="Top" Margin="5,0,5,5">
+
+            <TextBlock Style="{StaticResource ActivityHeader}">
+                <Run Text="Текст: Regex ["/>
+                <Run Text="{Binding Prop_Mode, Mode=OneWay, Converter={StaticResource EnumDisplayNameConverter}}" Foreground="{StaticResource AccentBrush}"/>
+                <Run Text="]"/>
+            </TextBlock>
+
+            <!-- Режим -->
+            <TextBlock Text="Режим:" Style="{StaticResource FieldLabel}"/>
+            <ComboBox ItemsSource="{local:EnumValues local:TextRegexMode}"
+                      SelectedValue="{Binding Prop_Mode}"
+                      SelectedValuePath="Key"
+                      DisplayMemberPath="Display"
+                      Style="{StaticResource FieldComboBox}"
+                      ToolTip="Найти совпадения — DataTable (Match, Index, группы);&#xA;Заменить — строка с подстановками $1, ${имя}"/>
+
+            <!-- Входной текст -->
+            <TextBlock Text="Текст (входной):" Style="{StaticResource FieldLabel}"/>
+            <TextBox Text="{Binding Prop_InputText, UpdateSourceTrigger=PropertyChanged}"
+                     Style="{StaticResource FieldBox}"
+                     AcceptsReturn="True"
+                     TextWrapping="Wrap"
+                     Height="52"
+                     ToolTip="Обрабатываемый текст"/>
+
+            <!-- Выражение -->
+            <TextBlock Text="Regex паттерн:" Style="{StaticResource FieldLabel}"/>
+            <TextBox Text="{Binding Prop_Pattern, UpdateSourceTrigger=PropertyChanged}"
+                     Style="{StaticResource FieldBox}"
+                     ToolTip="Регулярное выражение .NET. Именованные группы: (?&lt;name&gt;...)"/>
+
+            <!-- Замена — только режим Replace -->
+            <StackPanel Visibility="{Binding Prop_Mode,
+                                    Converter={StaticResource EnumToVisConverter},
+                                    ConverterParameter=Replace}">
+                <TextBlock Text="Замена:" Style="{StaticResource FieldLabel}"/>
+                <TextBox Text="{Binding Prop_Replacement, UpdateSourceTrigger=PropertyChanged}"
+                         Style="{StaticResource FieldBox}"
+                         ToolTip="Подстановки: $1 — группа 1, ${name} — именованная группа, $$ — литеральный знак доллара"/>
+            </StackPanel>
+
+            <!-- Опции в две колонки -->
+            <Grid Margin="0,4,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <CheckBox Grid.Column="0" Style="{StaticResource FieldCheckBox}"
+                          Content="Игнорировать регистр"
+                          IsChecked="{Binding Prop_IgnoreCase}"
+                          ToolTip="RegexOptions.IgnoreCase"/>
+                <CheckBox Grid.Column="1" Style="{StaticResource FieldCheckBox}"
+                          Content="Multiline"
+                          IsChecked="{Binding Prop_Multiline}"
+                          ToolTip="^ и $ соответствуют границам строк, а не всего текста"/>
+            </Grid>
+            <Grid Margin="0,2,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <CheckBox Grid.Column="0" Style="{StaticResource FieldCheckBox}"
+                          Content="Singleline"
+                          IsChecked="{Binding Prop_Singleline}"
+                          ToolTip="Точка (. ) захватывает и переводы строк"/>
+                <TextBlock Grid.Column="1" Text="Таймаут (мс):" VerticalAlignment="Center" Style="{StaticResource FieldLabel}" Margin="0,0,4,0"/>
+                <TextBox Width="50"
+                         VerticalAlignment="Center"
+                         Margin="0"
+                         Grid.Column="1"
+                         Text="{Binding Prop_TimeoutMs, UpdateSourceTrigger=PropertyChanged}"
+                         Style="{StaticResource FieldBox}"
+                         ToolTip="Максимальное время на поиск (ReDoS-защита).&#xA;0 = 1000 мс, максимум 60000"/>
+            </Grid>
+
+            <!-- Выходные -->
+            <Grid Margin="0,4,0,0"
+                  Visibility="{Binding Prop_Mode,
+                               Converter={StaticResource EnumToVisConverter},
+                               ConverterParameter=Match}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="Совпадения (out): " VerticalAlignment="Center" Style="{StaticResource FieldLabel}" Margin="0,0,4,0"/>
+                <TextBox Grid.Column="1" Text="{Binding Prop_MatchesTable, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            </Grid>
+            <Grid Margin="0,2,0,0"
+                  Visibility="{Binding Prop_Mode,
+                               Converter={StaticResource EnumToVisConverter},
+                               ConverterParameter=Replace}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="Результат (out): " VerticalAlignment="Center" Style="{StaticResource FieldLabel}" Margin="0,0,4,0"/>
+                <TextBox Grid.Column="1" Text="{Binding Prop_Result, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            </Grid>
+            <Grid Margin="0,2,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="Найдено (out): " VerticalAlignment="Center" Style="{StaticResource FieldLabel}" Margin="0,0,4,0"/>
+                <TextBox Grid.Column="1" Text="{Binding Prop_MatchCount, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            </Grid>
+
+        </StackPanel>
+    </Grid>
+</UserControl>
