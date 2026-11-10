@@ -11,6 +11,7 @@ namespace Primo.MIA.Tests.Browser
     /// - SessionResolver (разрешение ID сессии с приоритетами)
     /// </summary>
         [Trait("Category", "Fast")]
+    [Collection("BrowserSessionStack")]
     public class SessionIdTests : IDisposable
     {
         public SessionIdTests()

@@ -11,7 +11,12 @@ namespace Primo.MIA.Tests.Common
     /// Проверяют, что параллельные Push/Pop из разных потоков
     /// не искажают стек и не падают (FIX: стеки переведены на ConcurrentStack).
     /// </summary>
+    /// <remarks>
+    /// Коллекция "BrowserSessionStack": класс трогает общий ключ стека браузера
+    /// в RepoDict — xUnit выполняет такие классы последовательно (issue #20).
+    /// </remarks>
     [Trait("Category", "Fast")]
+    [Collection("BrowserSessionStack")]
     public class AmbientContextConcurrencyTests
     {
         private static void DrainTransactionContext()

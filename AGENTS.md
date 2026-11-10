@@ -61,7 +61,7 @@ Primo.MIA/
 - **`Console.WriteLine` for logging**: `BrowserActivityBase` (LogInfo/LogWarning/LogError) and `Browser/Services/ActivityLogger` write to console — no real logger attached. Use structured logging (e.g., file logger) instead.
 - **Debug artifacts in source**: `plans/` directory is gitignored — don't add planning documents to tracked code.
 - **Hard-coded absolute paths**: `C:\Program Files\Primo\Primo Studio Community x64\` HintPath in csproj — intentional: CI installs the LTools SDK bundle to that location before build.
-- **Global static state**: `RepoDict` is a global dictionary — avoid adding more global state.
+- **Global static state**: `RepoDict` is a global dictionary — avoid adding more global state. Assumes **one robot per process** (Primo Studio limitation); ambient context (browser sessions, DB transactions) is NOT isolated between parallel robot runs in a shared host.
 - **Large monolith files**: `DatabaseHelper.cs` (~1100 lines), `TextExtractEntitiesBack.cs` (~1000 lines), `ReadTomlConfigBack.cs` (~950 lines) — prefer smaller focused classes.
 - **No explicit activity registration**: The LTools SDK auto-discovers activities via reflection — don't add manual registration.
 
@@ -69,7 +69,7 @@ Primo.MIA/
 
 - **`*Back.cs` suffix**: Naming convention for activity backend logic (not ViewModel/Service/Presenter).
 - **`RepoDict`**: Static global dictionary for ambient context storage (11 typed dictionaries + generic `ObjectDict`).
-- **`BrowserSessionContext`**: Ambient context pattern for implicit session ID propagation.
+- **`BrowserSessionContext`**: Ambient context pattern for implicit session ID propagation. `Pop(sessionId)` removes a specific session (issue #20), not the stack top. `BrowserSessionRegistry` TTL-evicts abandoned browser sessions (24h) on each new session registration — same pattern as `DatabaseTransactionManager`.
 - **Bug tracking in comments**: Calendar module uses `[БАГ-N]` / `[FIX-N]` tags directly in code comments.
 - **Dual dictionary pattern**: `ProductionCalendar` uses forward + reverse dictionaries for O(1) lookup instead of O(n) `Any()`.
 

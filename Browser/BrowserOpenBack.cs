@@ -305,6 +305,11 @@ namespace Primo.MIA
                 // Сохраняем драйвер в репозитории
                 RepoDict.Set(sessionId, newDriver);
 
+                // issue #20: регистрируем сессию в реестре с TTL — при аварийном
+                // прерывании робота заброшенная сессия будет закрыта при
+                // следующем Push (защита от утечки WebDriver)
+                BrowserSessionRegistry.Register(sessionId);
+
                 // Регистрируем сессию в ambient-контексте
                 // дочерние активности с пустым Prop_SessionId получат её автоматически
                 // через SessionResolver.Resolve → BrowserSessionContext.Current

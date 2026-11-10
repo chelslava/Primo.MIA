@@ -83,19 +83,26 @@ ID сессии*: [String] Идентификатор сессии, получе
                 // Логирование начала операции
                 Logger.LogInfo(sdkComponentName, "Начинается закрытие браузера для сессии: {0}", sessionId);
 
-                // Закрытие браузера
-                driver.Quit();
-                driver.Dispose();
+                string resolvedSessionId = SessionResolver.Resolve(sessionId);
+
+                // issue #20: Quit/Dispose через SafeDispose.Quiet — исключение
+                // освобождения уже разорванного драйвера не должно маскировать
+                // результат активности
+                SafeDispose.Quiet(() => driver.Quit(), $"BrowserClose: Quit сессии {resolvedSessionId}");
+                SafeDispose.Quiet(() => driver.Dispose(), $"BrowserClose: Dispose сессии {resolvedSessionId}");
 
                 // Удаление из SessionManager
-                string resolvedSessionId = SessionResolver.Resolve(sessionId);
                 SessionManager.RemoveSession(resolvedSessionId);
+
+                // issue #20: снимаем с реестра TTL-учёта
+                BrowserSessionRegistry.Unregister(resolvedSessionId);
 
                 // Удаление из RepoDict (для обратной совместимости)
                 RepoDict.Remove(resolvedSessionId);
 
-                // Снимаем сессию из ambient-контекста
-                BrowserSessionContext.Pop();
+                // Снимаем сессию из ambient-контекста: целевой Pop — контейнер
+                // закрывает свою сессию, а не вершину стека (issue #20)
+                BrowserSessionContext.Pop(resolvedSessionId);
 
                 // Логирование успешного завершения
                 Logger.LogInfo(sdkComponentName, "Браузер успешно закрыт для сессии: {0}", resolvedSessionId);
