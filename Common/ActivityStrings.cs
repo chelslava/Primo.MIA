@@ -1319,6 +1319,19 @@ namespace Primo.MIA.Common
         public const string Error_JoinKeysRequired   = "Ключевые колонки обязательны";
 
         // ═══════════════════════════════════════════════════════════════════════
+        // HTML: ТАБЛИЦА → DATATABLE (issue #36)
+        // ═══════════════════════════════════════════════════════════════════════
+
+        public const string Activity_HtmlTableToDataTable = "HTML: Таблица → DataTable";
+
+        public const string Field_HtmlTableInput   = "HTML";
+        public const string Field_HtmlTableIndex   = "Индекс таблицы";
+        public const string Field_HtmlTableHeader  = "Первая строка — заголовки";
+        public const string Field_HtmlTableResult  = "DataTable";
+
+        public const string Error_HtmlTableRequired = "HTML обязателен";
+
+        // ═══════════════════════════════════════════════════════════════════════
         // КРИПТОГРАФИЯ
         // ═══════════════════════════════════════════════════════════════════════
 

@@ -64,6 +64,10 @@
          («тип ValueTuple существует в двух сборках»). -->
     <PackageReference Include="System.ValueTuple" Version="4.6.2" ExcludeAssets="all" />
     <PackageReference Include="RabbitMQ.Client" Version="6.8.1" />
+    <!-- HtmlAgilityPack (issue #36): парсинг HTML-таблиц для HtmlTableToDataTable.
+         Managed-only (без нативных библиотек) — дублей в nupkg быть не может,
+         но контрольная проверка после сборки сохранена по уроку #19. -->
+    <PackageReference Include="HtmlAgilityPack" Version="1.12.2" />
     <!-- Kafka (issue #19): Confluent.Kafka 2.x — net472+/netstandard2.0;
          нативный librdkafka.redist подтягивается транзитивно.
          Явная ссылка с ExcludeAssets/PrivateAssets=all: без неё content-ассеты
