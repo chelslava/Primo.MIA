@@ -54,5 +54,8 @@ namespace Primo.MIA.Common
 
         /// <summary>Категория "MIA → Очереди сообщений"</summary>
         public const string MessageQueues = Prefix + "Очереди сообщений";
+
+        /// <summary>Категория "MIA → Архивы" (issue #28)</summary>
+        public const string Archive = Prefix + "Архивы";
     }
 }

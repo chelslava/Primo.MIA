@@ -1,0 +1,115 @@
+<UserControl x:Class="Primo.MIA.ZipArchiveExtract"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:Primo.MIA"
+             mc:Ignorable="d"
+             d:DesignHeight="220" Margin="0,0,0,5">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Primo.MIA;component/Common/Styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid Background="{DynamicResource {x:Static SystemColors.ScrollBarBrushKey}}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <Image Grid.Column="0"
+               Width="32" Height="32" Margin="5"
+               VerticalAlignment="Center"
+               Source="pack://application:,,,/Primo.MIA;component/images/folder.png"/>
+
+        <StackPanel Grid.Column="1" VerticalAlignment="Top" Margin="5,0,5,5">
+
+            <TextBlock Style="{StaticResource ActivityHeader}">
+                <Run Text="Архив: Распаковать ZIP"/>
+            </TextBlock>
+
+            <!-- Архив -->
+            <TextBlock Text="Архив:" Style="{StaticResource FieldLabel}"/>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBox x:Name="TxtZipPath"
+                         Grid.Column="0"
+                         Text="{Binding Prop_ZipPath, UpdateSourceTrigger=PropertyChanged}"
+                         Style="{StaticResource FieldBox}"
+                         Margin="0,2,4,0"
+                         ToolTip="Путь к ZIP-файлу для распаковки"/>
+                <Button Grid.Column="1"
+                        Style="{StaticResource BrowseButton}"
+                        Content=""
+                        Click="BtnBrowseZip_Click"
+                        ToolTip="Выбрать файл...">
+                    <Button.Background>
+                        <ImageBrush ImageSource="/Primo.MIA;component/images/folder.png" TileMode="None"/>
+                    </Button.Background>
+                </Button>
+            </Grid>
+
+            <!-- Папка распаковки -->
+            <TextBlock Text="Папка распаковки:" Style="{StaticResource FieldLabel}"/>
+            <TextBox Text="{Binding Prop_DestinationFolder, UpdateSourceTrigger=PropertyChanged}"
+                     Style="{StaticResource FieldBox}"
+                     ToolTip="Папка назначения (создаётся при отсутствии).&#xA;Защита от Zip Slip включена: записи архива не могут выйти за пределы папки."/>
+
+            <!-- Настройки в одну строку -->
+            <Grid Margin="0,4,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="Перезапись:" VerticalAlignment="Center" Style="{StaticResource FieldLabel}" Margin="0,0,4,0"/>
+                <ComboBox Grid.Column="1"
+                          ItemsSource="{local:EnumValues local:ArchiveOverwritePolicy}"
+                          SelectedValue="{Binding Prop_OverwritePolicy}"
+                          SelectedValuePath="Key"
+                          DisplayMemberPath="Display"
+                          Style="{StaticResource FieldComboBox}"
+                          Margin="0,2,0,2"
+                          ToolTip="Пропускать — не трогать существующие файлы;&#xA;Перезаписывать — заменить;&#xA;Ошибка — прервать выполнение при первом существующем"/>
+            </Grid>
+
+            <TextBlock Text="Маска файлов:" Style="{StaticResource FieldLabel}"/>
+            <TextBox Text="{Binding Prop_FileMask, UpdateSourceTrigger=PropertyChanged}"
+                     Style="{StaticResource FieldBox}"
+                     ToolTip="Извлекать только совпавшие файлы: *.pdf, report_*.csv.&#xA;Пусто = извлекать все записи"/>
+
+            <!-- Выходные -->
+            <Grid Margin="0,4,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="Извлечено (out): " VerticalAlignment="Center" Style="{StaticResource FieldLabel}" Margin="0,0,4,0"/>
+                <TextBox Grid.Column="1" Text="{Binding Prop_ExtractedCount, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            </Grid>
+            <Grid Margin="0,2,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="Пропущено (out): " VerticalAlignment="Center" Style="{StaticResource FieldLabel}" Margin="0,0,4,0"/>
+                <TextBox Grid.Column="1" Text="{Binding Prop_SkippedCount, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            </Grid>
+            <Grid Margin="0,2,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="Папка (out): " VerticalAlignment="Center" Style="{StaticResource FieldLabel}" Margin="0,0,4,0"/>
+                <TextBox Grid.Column="1" Text="{Binding Prop_ResultFolder, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            </Grid>
+
+        </StackPanel>
+    </Grid>
+</UserControl>

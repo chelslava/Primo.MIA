@@ -1155,6 +1155,35 @@ namespace Primo.MIA.Common
         public const string Field_JsonResultTable = "Результат (DataTable)";
 
         // ═══════════════════════════════════════════════════════════════════════
+        // АРХИВЫ (issue #28)
+        // ═══════════════════════════════════════════════════════════════════════
+
+        public const string Activity_ZipArchiveCreate  = "Архив: Создать ZIP";
+        public const string Activity_ZipArchiveExtract = "Архив: Распаковать ZIP";
+
+        public const string Archive_Category_Input    = "Входные данные";
+        public const string Archive_Category_Settings = "Настройки";
+        public const string Archive_Category_Output   = "Выходные данные";
+
+        public const string Field_ArchiveSourcePaths    = "Источники";
+        public const string Field_ArchiveDestination    = "Архив (результат)";
+        public const string Field_ArchiveCompression    = "Сжатие";
+        public const string Field_ArchiveZipPath        = "Архив";
+        public const string Field_ArchiveExtractFolder  = "Папка распаковки";
+        public const string Field_ArchiveOverwritePolicy = "Перезапись";
+        public const string Field_ArchiveFileMask       = "Маска файлов";
+        public const string Field_ArchiveResultPath     = "Путь архива";
+        public const string Field_ArchiveEntryCount     = "Файлов в архиве";
+        public const string Field_ArchiveExtractedCount = "Извлечено";
+        public const string Field_ArchiveSkippedCount   = "Пропущено";
+        public const string Field_ArchiveResultFolder   = "Папка";
+
+        public const string Error_ArchiveSourceRequired     = "Источники для архивации обязательны";
+        public const string Error_ArchiveDestinationRequired = "Путь к создаваемому архиву обязателен";
+        public const string Error_ArchiveZipRequired        = "Путь к ZIP-архиву обязателен";
+        public const string Error_ArchiveFolderRequired     = "Папка распаковки обязательна";
+
+        // ═══════════════════════════════════════════════════════════════════════
         // КРИПТОГРАФИЯ
         // ═══════════════════════════════════════════════════════════════════════
 

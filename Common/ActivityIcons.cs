@@ -80,5 +80,8 @@
         /// <summary>Иконка для активностей очередей сообщений</summary>
         public const string MessageQueue = BasePath + "http.png";
 
+        /// <summary>Иконка для активностей работы с архивами (issue #28)</summary>
+        public const string Archive = BasePath + "folder.png";
+
     }
 }
