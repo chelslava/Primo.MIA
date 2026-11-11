@@ -68,6 +68,10 @@
          Managed-only (без нативных библиотек) — дублей в nupkg быть не может,
          но контрольная проверка после сборки сохранена по уроку #19. -->
     <PackageReference Include="HtmlAgilityPack" Version="1.12.2" />
+    <!-- NJsonSchema (issue #34): валидация/генерация JSON Schema.
+         Managed-only (Newtonsoft.Json + Namotion.Reflection, оба транзитивно);
+         Newtonsoft 13 уже в прямых зависимостях — конфликтов версий нет. -->
+    <PackageReference Include="NJsonSchema" Version="11.6.2" />
     <!-- Kafka (issue #19): Confluent.Kafka 2.x — net472+/netstandard2.0;
          нативный librdkafka.redist подтягивается транзитивно.
          Явная ссылка с ExcludeAssets/PrivateAssets=all: без неё content-ассеты

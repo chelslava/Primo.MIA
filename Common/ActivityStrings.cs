@@ -1332,6 +1332,27 @@ namespace Primo.MIA.Common
         public const string Error_HtmlTableRequired = "HTML обязателен";
 
         // ═══════════════════════════════════════════════════════════════════════
+        // JSON SCHEMA (issue #34)
+        // ═══════════════════════════════════════════════════════════════════════
+
+        public const string Activity_JsonSchemaValidate = "JSON: Валидация по схеме";
+        public const string Activity_JsonSchemaGenerate = "JSON: Схема из примера";
+
+        public const string Field_SchemaJson             = "JSON";
+        public const string Field_SchemaDefinition       = "JSON Schema";
+        public const string Field_SchemaIsValid          = "Валиден";
+        public const string Field_SchemaErrorCount       = "Ошибок";
+        public const string Field_SchemaErrors           = "Ошибки";
+        public const string Field_SchemaSample           = "Пример JSON";
+        public const string Field_SchemaTitle            = "Заголовок (title)";
+        public const string Field_SchemaPretty           = "Форматировать (отступы)";
+        public const string Field_SchemaResult           = "Schema";
+
+        public const string Error_SchemaJsonRequired       = "Проверяемый JSON обязателен";
+        public const string Error_SchemaDefinitionRequired = "JSON Schema обязательна";
+        public const string Error_SchemaSampleRequired     = "Пример JSON обязателен";
+
+        // ═══════════════════════════════════════════════════════════════════════
         // КРИПТОГРАФИЯ
         // ═══════════════════════════════════════════════════════════════════════
 
