@@ -72,6 +72,10 @@
          Managed-only (Newtonsoft.Json + Namotion.Reflection, оба транзитивно);
          Newtonsoft 13 уже в прямых зависимостях — конфликтов версий нет. -->
     <PackageReference Include="NJsonSchema" Version="11.6.2" />
+    <!-- BouncyCastle.Cryptography (issue #35): OpenPGP для PGP-активностей.
+         Уже приходил транзитивно через SSH.NET (>= 2.7.0) — новая зависимость
+         пакета не добавляется, только явное закрепление версии. Managed-only. -->
+    <PackageReference Include="BouncyCastle.Cryptography" Version="2.7.0" />
     <!-- Kafka (issue #19): Confluent.Kafka 2.x — net472+/netstandard2.0;
          нативный librdkafka.redist подтягивается транзитивно.
          Явная ссылка с ExcludeAssets/PrivateAssets=all: без неё content-ассеты

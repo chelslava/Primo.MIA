@@ -1,0 +1,80 @@
+<UserControl x:Class="Primo.MIA.PgpDecryptFile"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:common="clr-namespace:Primo.MIA"
+             mc:Ignorable="d" d:DesignHeight="300" Margin="0,0,0,5">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Primo.MIA;component/Common/Styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <Grid Background="{DynamicResource {x:Static SystemColors.ScrollBarBrushKey}}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Image Grid.Column="0" Width="32" Height="32" Margin="5" VerticalAlignment="Center"
+               Source="pack://application:,,,/Primo.MIA;component/images/sharp.png"/>
+        <StackPanel Grid.Column="1" Margin="5,0,5,5">
+            <TextBlock Text="Крипто: PGP Расшифровать файл" Style="{StaticResource ActivityHeader}"/>
+            <TextBlock Text="Зашифрованный файл:" Style="{StaticResource FieldLabel}"/>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBox x:Name="TxtInputPath"
+                         Grid.Column="0"
+                         Text="{Binding Prop_InputPath, UpdateSourceTrigger=PropertyChanged}"
+                         Style="{StaticResource FieldBox}"
+                         Margin="0,2,4,0"
+                         ToolTip=".pgp или .asc"/>
+                <Button Grid.Column="1"
+                        Style="{StaticResource BrowseButton}"
+                        Content=""
+                        Click="BtnBrowseInput_Click"
+                        ToolTip="Выбрать файл...">
+                    <Button.Background>
+                        <ImageBrush ImageSource="/Primo.MIA;component/images/folder.png" TileMode="None"/>
+                    </Button.Background>
+                </Button>
+            </Grid>
+            <TextBlock Text="Файл результата:" Style="{StaticResource FieldLabel}"/>
+            <TextBox Text="{Binding Prop_OutputPath, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                     ToolTip="Расшифрованный файл (пересоздаётся)"/>
+            <TextBlock Text="Приватный ключ:" Style="{StaticResource FieldLabel}"/>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBox x:Name="TxtPrivateKeyPath"
+                         Grid.Column="0"
+                         Text="{Binding Prop_PrivateKeyPath, UpdateSourceTrigger=PropertyChanged}"
+                         Style="{StaticResource FieldBox}"
+                         Margin="0,2,4,0"
+                         ToolTip=".asc или .gpg владельца"/>
+                <Button Grid.Column="1"
+                        Style="{StaticResource BrowseButton}"
+                        Content=""
+                        Click="BtnBrowseKey_Click"
+                        ToolTip="Выбрать файл ключа...">
+                    <Button.Background>
+                        <ImageBrush ImageSource="/Primo.MIA;component/images/folder.png" TileMode="None"/>
+                    </Button.Background>
+                </Button>
+            </Grid>
+            <TextBlock Text="Парольная фраза:" Style="{StaticResource FieldLabel}"/>
+            <PasswordBox common:PasswordBoxHelper.BindPassword="True"
+                         common:PasswordBoxHelper.BoundPassword="{Binding Prop_Passphrase, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         Style="{StaticResource FieldPasswordBox}"
+                         ToolTip="Парольная фраза приватного ключа (если установлена)"/>
+            <TextBlock Text="Путь результата (out):" Style="{StaticResource FieldLabel}"/>
+            <TextBox Text="{Binding Prop_ResultPath, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+        </StackPanel>
+    </Grid>
+</UserControl>

@@ -1353,6 +1353,25 @@ namespace Primo.MIA.Common
         public const string Error_SchemaSampleRequired     = "Пример JSON обязателен";
 
         // ═══════════════════════════════════════════════════════════════════════
+        // PGP (issue #35)
+        // ═══════════════════════════════════════════════════════════════════════
+
+        public const string Activity_PgpEncryptFile = "Крипто: PGP Шифровать файл";
+        public const string Activity_PgpDecryptFile = "Крипто: PGP Расшифровать файл";
+
+        public const string Field_PgpInputFile  = "Исходный файл";
+        public const string Field_PgpOutputFile = "Файл результата";
+        public const string Field_PgpPublicKey  = "Публичный ключ";
+        public const string Field_PgpPrivateKey = "Приватный ключ";
+        public const string Field_PgpPassphrase = "Парольная фраза";
+        public const string Field_PgpArmor      = "ASCII-armored (.asc)";
+        public const string Field_PgpResultPath = "Путь результата";
+
+        public const string Error_PgpInputRequired  = "Исходный файл обязателен";
+        public const string Error_PgpOutputRequired = "Файл результата обязателен";
+        public const string Error_PgpKeyRequired    = "Путь к ключу обязателен";
+
+        // ═══════════════════════════════════════════════════════════════════════
         // КРИПТОГРАФИЯ
         // ═══════════════════════════════════════════════════════════════════════
 
