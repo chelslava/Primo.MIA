@@ -60,5 +60,8 @@ namespace Primo.MIA.Common
 
         /// <summary>Категория "MIA → FTP" (issue #31)</summary>
         public const string Ftp = Prefix + "FTP";
+
+        /// <summary>Категория "MIA → Почта" (issue #37)</summary>
+        public const string Email = Prefix + "Почта";
     }
 }

@@ -1372,6 +1372,32 @@ namespace Primo.MIA.Common
         public const string Error_PgpKeyRequired    = "Путь к ключу обязателен";
 
         // ═══════════════════════════════════════════════════════════════════════
+        // ПОЧТА (issue #37, фаза 1 — SMTP)
+        // ═══════════════════════════════════════════════════════════════════════
+
+        public const string Activity_SmtpSend = "Почта: Отправить письмо";
+
+        public const string Mail_Category_Message = "Письмо";
+
+        public const string Field_MailHost       = "Хост";
+        public const string Field_MailPort       = "Порт";
+        public const string Field_MailUserName   = "Пользователь";
+        public const string Field_MailPassword   = "Пароль";
+        public const string Field_MailFrom       = "Отправитель";
+        public const string Field_MailTo         = "Получатели";
+        public const string Field_MailCc         = "Копия";
+        public const string Field_MailSubject    = "Тема";
+        public const string Field_MailBody       = "Тело письма";
+        public const string Field_MailBodyHtml   = "Тело HTML";
+        public const string Field_MailAttachments = "Вложения";
+        public const string Field_MailTlsMode    = "TLS";
+        public const string Field_MailTimeout    = "Таймаут (сек)";
+
+        public const string Error_MailHostRequired = "Хост SMTP обязателен";
+        public const string Error_MailFromRequired = "Отправитель обязателен";
+        public const string Error_MailToRequired   = "Получатели обязательны";
+
+        // ═══════════════════════════════════════════════════════════════════════
         // КРИПТОГРАФИЯ
         // ═══════════════════════════════════════════════════════════════════════
 

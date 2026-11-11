@@ -1,0 +1,87 @@
+<UserControl x:Class="Primo.MIA.SmtpSend"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:common="clr-namespace:Primo.MIA"
+             mc:Ignorable="d" d:DesignHeight="380" Margin="0,0,0,5">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Primo.MIA;component/Common/Styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <Grid Background="{DynamicResource {x:Static SystemColors.ScrollBarBrushKey}}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Image Grid.Column="0" Width="32" Height="32" Margin="5" VerticalAlignment="Center"
+               Source="pack://application:,,,/Primo.MIA;component/images/http.png"/>
+        <StackPanel Grid.Column="1" Margin="5,0,5,5">
+            <TextBlock Text="Почта: Отправить письмо" Style="{StaticResource ActivityHeader}"/>
+
+            <TextBlock Text="Хост:" Style="{StaticResource FieldLabel}"/>
+            <TextBox Text="{Binding Prop_Host, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                     ToolTip="SMTP-сервер, например smtp.yandex.ru (порт и TLS — ниже и в панели свойств)"/>
+            <Grid Margin="0,2,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="Порт:" VerticalAlignment="Center" Style="{StaticResource FieldLabel}" Margin="0,0,4,0"/>
+                <TextBox Grid.Column="1" Text="{Binding Prop_Port, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                         ToolTip="587 (STARTTLS), 465 (TLS), 25 (без шифрования)"/>
+                <TextBlock Grid.Column="2" Text="TLS:" VerticalAlignment="Center" Style="{StaticResource FieldLabel}" Margin="0,0,4,0"/>
+                <TextBox Grid.Column="3" Text="{Binding Prop_TlsMode, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                         ToolTip="StartTls (по умолчанию), ImplicitTls (465), None"/>
+            </Grid>
+            <Grid Margin="0,2,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="Пользователь:" VerticalAlignment="Center" Style="{StaticResource FieldLabel}" Margin="0,0,4,0"/>
+                <TextBox Grid.Column="1" Text="{Binding Prop_UserName, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                         ToolTip="Пусто = без авторизации"/>
+                <TextBlock Grid.Column="2" Text="Пароль:" VerticalAlignment="Center" Style="{StaticResource FieldLabel}" Margin="0,0,4,0"/>
+                <PasswordBox common:PasswordBoxHelper.BindPassword="True"
+                             common:PasswordBoxHelper.BoundPassword="{Binding Prop_Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                             Style="{StaticResource FieldPasswordBox}"/>
+            </Grid>
+
+            <TextBlock Text="Отправитель:" Style="{StaticResource FieldLabel}"/>
+            <TextBox Text="{Binding Prop_From, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                     ToolTip="email или «Имя &lt;email&gt;»"/>
+            <TextBlock Text="Получатели:" Style="{StaticResource FieldLabel}"/>
+            <TextBox Text="{Binding Prop_To, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                     ToolTip="Через ; или , : a@mail.ru; b@corp.ru"/>
+            <TextBlock Text="Копия:" Style="{StaticResource FieldLabel}"/>
+            <TextBox Text="{Binding Prop_Cc, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            <TextBlock Text="Тема:" Style="{StaticResource FieldLabel}"/>
+            <TextBox Text="{Binding Prop_Subject, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            <TextBlock Text="Тело письма:" Style="{StaticResource FieldLabel}"/>
+            <TextBox Text="{Binding Prop_Body, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                     AcceptsReturn="True" TextWrapping="Wrap" Height="52"/>
+            <CheckBox Style="{StaticResource FieldCheckBox}" Margin="0,2,6,2"
+                      Content="Тело HTML"
+                      IsChecked="{Binding Prop_BodyIsHtml}"/>
+            <TextBlock Text="Вложения:" Style="{StaticResource FieldLabel}"/>
+            <TextBox Text="{Binding Prop_Attachments, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                     ToolTip="Пути файлов через ; : C:\отчёты\итог.xlsx; C:\акт.pdf"/>
+            <Grid Margin="0,2,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="Таймаут (сек):" VerticalAlignment="Center" Style="{StaticResource FieldLabel}" Margin="0,0,4,0"/>
+                <TextBox Grid.Column="1" Text="{Binding Prop_TimeoutSeconds, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            </Grid>
+        </StackPanel>
+    </Grid>
+</UserControl>
