@@ -23,7 +23,7 @@
          содержит SHA коммита (SourceRevisionId). -->
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageId>Primo.MIA</PackageId>
-    <Version>1.7.0</Version>
+    <Version>1.8.0</Version>
     <AssemblyVersion>$(Version.Split('-')[0])</AssemblyVersion>
     <FileVersion>$(Version.Split('-')[0])</FileVersion>
     <Authors>Chelslava</Authors>

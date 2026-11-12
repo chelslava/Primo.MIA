@@ -1,5 +1,50 @@
 ﻿# Primo.MIA - Selenium Browser Activities
 
+## Что нового в версии 1.8.0
+
+Реализация issues [#34–#37](https://github.com/chelslava/Primo.MIA/issues?q=is%3Aissue+milestone%3A1.8.0).
+**+11 активностей (150 → 161), +113 тестов (1435 → 1548). Mail-модуль завершён (SMTP/IMAP/POP3/EML).**
+
+### ✨ Новый модуль: Mail (4 активности) — MailKit (#37)
+
+- **SmtpSend** — отправка писем по SMTP: вложения (пути/DataTable), TLS/
+  STARTTLS, HTML-тело, SecureString-пароль (PasswordBox)
+- **ImapReceive** — выборка писем с серверными фильтрами (тема/отправитель/
+  SINCE/UNSEEN), выдача от новых к старым, «Отметить прочитанными», вложения
+  в папку (подпапка «Письмо_N» на письмо), тело в переменную/файл
+- **Pop3Receive** — простая выборка для legacy-ящиков: POP3 не умеет серверные
+  поиск и флаги, поэтому фильтры применяются клиентски, выдача сортируется
+  «от новых к старым» по дате; дедупликация при опросе — по колонке UID
+  (UIDL); режим «Удалить после загрузки» (коммит при отключении)
+- **EmlParse** — разбор локального .eml: тема/от/кому/дата/тело, вложения
+  в папку
+- Общий вывод: DataTable со сводкой писем, количество, тело последнего
+  письма, пути вложений
+- MailCommon — общие чистые операции (дата «С даты», тело письма, сохранение
+  вложений) без сетевой части
+- MailKit 4.18.2 (managed-only, MimeKit транзитивно; >= 4.16.0 закрывает
+  STARTTLS-инъекцию GHSA-9j88-vvj5-vhgr/NU1902)
+
+### 🔗 DataTable: объединение и развороты (#36)
+
+- **DataTableJoin** — Inner/Left/Right/Full по ключевым колонкам
+- **Pivot / Unpivot** — разворот строк в колонки и обратно
+
+### 🌐 HtmlTableToDataTable (#36)
+
+- Извлечение таблиц из HTML: rowspan/colspan, вложенные таблицы
+- HtmlAgilityPack 1.12.2 (managed-only)
+
+### 📋 JSON Schema: контрактный контроль (#34)
+
+- **JsonSchemaValidate** — валидация JSON по схеме (NJsonSchema)
+- **JsonSchemaGenerate** — генерация схемы из образца JSON
+
+### 🔐 Crypto: PGP-файлы (#35)
+
+- **Шифровать файл / Расшифровать файл** — OpenPGP (BouncyCastle.Cryptography
+  2.7.0, уже приходил через SSH.NET): ASCII-armor, passphrase-ключи, связки
+
 ## Что нового в версии 1.7.0
 
 Реализация issues [#20–#33](https://github.com/chelslava/Primo.MIA/issues?q=is%3Aissue+milestone%3A1.7.0) и части #38.
