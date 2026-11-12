@@ -86,5 +86,8 @@
         /// <summary>Иконка для активностей FTP/FTPS (issue #31)</summary>
         public const string Ftp = BasePath + "folder.png";
 
+        /// <summary>Иконка для почтовых активностей (issue #37)</summary>
+        public const string Mail = BasePath + "http.png";
+
     }
 }

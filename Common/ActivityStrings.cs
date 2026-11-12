@@ -1397,6 +1397,35 @@ namespace Primo.MIA.Common
         public const string Error_MailFromRequired = "Отправитель обязателен";
         public const string Error_MailToRequired   = "Получатели обязательны";
 
+        // ── Почта: IMAP/EML (issue #37, фаза 2) ─────────────────────────
+
+        public const string Activity_ImapReceive = "Почта: Получить письма";
+        public const string Activity_EmlParse    = "Почта: Разобрать EML";
+
+        public const string Mail_Category_Filter = "Фильтры";
+        public const string Mail_Category_Output = "Вывод";
+
+        public const string Field_MailFolder         = "Папка";
+        public const string Field_MailSubjectFilter  = "Тема содержит";
+        public const string Field_MailFromFilter     = "Отправитель содержит";
+        public const string Field_MailSince          = "С даты";
+        public const string Field_MailOnlyUnseen     = "Только непрочитанные";
+        public const string Field_MailMaxCount       = "Макс. писем";
+        public const string Field_MailMarkSeen       = "Отметить прочитанными";
+        public const string Field_MailAttachmentsDir = "Вложения → папка";
+        public const string Field_MailBodyToFile     = "Тело → файл";
+        public const string Field_MailMessages       = "Письма (DataTable)";
+        public const string Field_MailCount          = "Кол-во писем";
+        public const string Field_MailBodyOut        = "Тело (последнее)";
+        public const string Field_MailAttachmentsOut = "Вложения (пути)";
+
+        public const string Field_MailEmlPath = "Путь к EML";
+        public const string Field_MailToOut   = "Кому";
+        public const string Field_MailDateOut = "Дата";
+
+        public const string Error_MailFolderNotFound = "Папка IMAP не найдена";
+        public const string Error_MailEmlRequired    = "Путь к EML обязателен";
+
         // ═══════════════════════════════════════════════════════════════════════
         // КРИПТОГРАФИЯ
         // ═══════════════════════════════════════════════════════════════════════

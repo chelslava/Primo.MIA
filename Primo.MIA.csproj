@@ -77,8 +77,9 @@
          пакета не добавляется, только явное закрепление версии. Managed-only. -->
     <PackageReference Include="BouncyCastle.Cryptography" Version="2.7.0" />
     <!-- MailKit (issue #37, фаза 1): SMTP-отправка. Managed-only
-         (MimeKit транзитивно); IMAP/POP3 — фазы 2/3. -->
-    <PackageReference Include="MailKit" Version="4.1.0" />
+         (MimeKit транзитивно); IMAP/POP3 — фазы 2/3.
+         >= 4.16.0: фикс STARTTLS-инъекции (GHSA-9j88-vvj5-vhgr, NU1902). -->
+    <PackageReference Include="MailKit" Version="4.18.2" />
     <!-- Kafka (issue #19): Confluent.Kafka 2.x — net472+/netstandard2.0;
          нативный librdkafka.redist подтягивается транзитивно.
          Явная ссылка с ExcludeAssets/PrivateAssets=all: без неё content-ассеты

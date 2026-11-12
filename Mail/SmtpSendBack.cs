@@ -191,7 +191,7 @@ namespace Primo.MIA
 Настройки:
 TLS: [String] StartTls / ImplicitTls / None (по умолчанию StartTls).
 Таймаут (сек): [Int32] По умолчанию 60.";
-            sdkComponentIcon = ActivityIcons.Http;
+            sdkComponentIcon = ActivityIcons.Mail;
 
             sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
