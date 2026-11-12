@@ -1426,6 +1426,14 @@ namespace Primo.MIA.Common
         public const string Error_MailFolderNotFound = "Папка IMAP не найдена";
         public const string Error_MailEmlRequired    = "Путь к EML обязателен";
 
+        // ── Почта: POP3 (issue #37, фаза 3) ─────────────────────────────
+
+        public const string Activity_Pop3Receive = "Почта: Получить письма (POP3)";
+
+        public const string Field_MailDeleteAfterDownload = "Удалить после загрузки";
+
+        public const string Error_MailPop3HostRequired = "Хост POP3 обязателен";
+
         // ═══════════════════════════════════════════════════════════════════════
         // КРИПТОГРАФИЯ
         // ═══════════════════════════════════════════════════════════════════════
