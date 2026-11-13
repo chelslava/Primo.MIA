@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
+using Primo.MIA.Common;
 
 namespace Primo.MIA
 {
@@ -131,13 +132,16 @@ namespace Primo.MIA
                     string regexPattern = "^" + Regex.Escape(pattern)
                         .Replace("\\*", ".*")
                         .Replace("\\?", ".") + "$";
-                    var wildcardRegex = new Regex(regexPattern, RegexOptions.IgnoreCase | RegexOptions.Compiled);
+                    // Кэш + match timeout (issue #24): фильтр проверяется
+                    // на каждой попытке опроса в цикле ожидания
+                    var wildcardRegex = RegexCache.Get(regexPattern, RegexOptions.IgnoreCase | RegexOptions.Compiled);
                     return file => wildcardRegex.IsMatch(file.Name);
 
                 case FileFilterType.Regex:
                     try
                     {
-                        var regex = new Regex(pattern, RegexOptions.IgnoreCase | RegexOptions.Compiled);
+                        // Кэш + match timeout (issue #24) — ReDoS-защита паттерна
+                        var regex = RegexCache.Get(pattern, RegexOptions.IgnoreCase | RegexOptions.Compiled);
                         return file => regex.IsMatch(file.Name);
                     }
                     catch (ArgumentException ex)

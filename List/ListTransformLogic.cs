@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Primo.MIA.Common;
 
 namespace Primo.MIA
 {
@@ -83,7 +84,9 @@ namespace Primo.MIA
                 case ListTransformMode.Replace:
                     if (!caseSensitive)
                     {
-                        var replaceRegex = new Regex(
+                        // Кэш + match timeout (issue #24): паттерн может
+                        // обрабатываться на каждом элементе длинных списков
+                        var replaceRegex = RegexCache.Get(
                             Regex.Escape(find),
                             RegexOptions.Compiled | RegexOptions.IgnoreCase);
                         return s =>
@@ -103,7 +106,8 @@ namespace Primo.MIA
                     var regexOptions = caseSensitive
                         ? RegexOptions.Compiled
                         : RegexOptions.Compiled | RegexOptions.IgnoreCase;
-                    var regex = new Regex(find, regexOptions);
+                    // Кэш + match timeout (issue #24) — ReDoS-защита
+                    var regex = RegexCache.Get(find, regexOptions);
                     return s =>
                     {
                         var value = normalize(s);

@@ -751,7 +751,9 @@ namespace Primo.MIA
                         {
                             TypeName   = customTypeName,
                             Confidence = 100,
-                            Pattern    = new Regex(
+                            // Кэш + match timeout (issue #24) — пользовательский
+                            // паттерн применяется ко всему тексту
+                            Pattern    = RegexCache.Get(
                                 this.Prop_CustomPattern,
                                 RegexOptions.Compiled | RegexOptions.IgnoreCase)
                         });

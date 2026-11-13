@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Primo.MIA.Common;
 
 namespace Primo.MIA
 {
@@ -84,7 +85,8 @@ namespace Primo.MIA
         {
             try
             {
-                return new Regex(pattern, RegexOptions.IgnoreCase | RegexOptions.Compiled);
+                // Кэш + match timeout (issue #24) — ReDoS-защита паттерна
+                return RegexCache.Get(pattern, RegexOptions.IgnoreCase | RegexOptions.Compiled);
             }
             catch (ArgumentException ex)
             {

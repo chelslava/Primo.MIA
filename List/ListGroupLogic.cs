@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Primo.MIA.Common;
 
 namespace Primo.MIA
 {
@@ -46,7 +47,8 @@ namespace Primo.MIA
                     if (string.IsNullOrEmpty(regexPattern))
                         throw new ArgumentException("Regex паттерн обязателен для режима ByRegexGroup");
 
-                    var regex = new Regex(regexPattern, RegexOptions.Compiled);
+                    // Кэш + match timeout (issue #24) — Match на каждом элементе
+                    var regex = RegexCache.Get(regexPattern, RegexOptions.Compiled);
                     return source
                         .Where(value => !string.IsNullOrEmpty(value))
                         .Select(value => new { Original = value, Match = regex.Match(value) })

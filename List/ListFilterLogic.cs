@@ -63,7 +63,8 @@ namespace Primo.MIA
                     var options = caseSensitive
                         ? RegexOptions.Compiled
                         : RegexOptions.Compiled | RegexOptions.IgnoreCase;
-                    var regex = new Regex(pattern, options, TimeSpan.FromSeconds(1));
+                    // Кэш + match timeout (issue #24) — единый хелпер
+                    var regex = RegexCache.Get(pattern, options);
                     return value => value != null && regex.IsMatch(value);
                 }
 
@@ -72,7 +73,8 @@ namespace Primo.MIA
                     var options = caseSensitive
                         ? RegexOptions.Compiled
                         : RegexOptions.Compiled | RegexOptions.IgnoreCase;
-                    var regex = new Regex(pattern, options, TimeSpan.FromSeconds(1));
+                    // Кэш + match timeout (issue #24) — единый хелпер
+                    var regex = RegexCache.Get(pattern, options);
                     return value => value == null || !regex.IsMatch(value);
                 }
 

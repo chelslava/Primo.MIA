@@ -616,7 +616,9 @@ Regex - Использование регулярных выражений. На
                 .Replace("\\*", ".*")
                 .Replace("\\?", ".") + "$";
 
-            var regex = new Regex(regexPattern, RegexOptions.IgnoreCase | RegexOptions.Compiled);
+            // Кэш + match timeout (issue #24): фильтр проверяется на каждой
+            // попытке опроса в цикле ожидания
+            var regex = RegexCache.Get(regexPattern, RegexOptions.IgnoreCase | RegexOptions.Compiled);
             return file => regex.IsMatch(file.Name);
         }
 
@@ -627,7 +629,8 @@ Regex - Использование регулярных выражений. На
         {
             try
             {
-                var regex = new Regex(pattern, RegexOptions.IgnoreCase | RegexOptions.Compiled);
+                // Кэш + match timeout (issue #24) — ReDoS-защита паттерна
+                var regex = RegexCache.Get(pattern, RegexOptions.IgnoreCase | RegexOptions.Compiled);
                 return file => regex.IsMatch(file.Name);
             }
             catch (ArgumentException ex)
