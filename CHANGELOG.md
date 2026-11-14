@@ -2,8 +2,8 @@
 
 ## Что нового в версии 1.8.0
 
-Реализация issues [#34–#37](https://github.com/chelslava/Primo.MIA/issues?q=is%3Aissue+milestone%3A1.8.0).
-**+11 активностей (150 → 161), +113 тестов (1435 → 1548). Mail-модуль завершён (SMTP/IMAP/POP3/EML).**
+Реализация issues [#34–#37](https://github.com/chelslava/Primo.MIA/issues?q=is%3Aissue+milestone%3A1.8.0) и части [#24](https://github.com/chelslava/Primo.MIA/issues/24), [#26](https://github.com/chelslava/Primo.MIA/issues/26).
+**+11 активностей (150 → 162), +139 тестов (1435 → 1574). Mail-модуль завершён (SMTP/IMAP/POP3/EML).**
 
 ### ✨ Новый модуль: Mail (4 активности) — MailKit (#37)
 
