@@ -16,7 +16,8 @@ namespace Primo.MIA
             List<string> keyColumns,
             List<string> updateColumns,
             Dictionary<string, string> columnMappings,
-            int commandTimeoutSeconds)
+            int commandTimeoutSeconds,
+            int batchSize = 0)
         {
             if (dataTable == null)
                 throw new ArgumentNullException(nameof(dataTable), "Исходная таблица данных не указана.");
@@ -32,6 +33,17 @@ namespace Primo.MIA
                 : System.Linq.Enumerable.ToList(System.Linq.Enumerable.Where(allMappings, m =>
                     System.Linq.Enumerable.All(keyMappings, k =>
                         !string.Equals(k.SourceColumn, m.SourceColumn, StringComparison.OrdinalIgnoreCase))));
+
+            // Батч-путь (issue #22): один запрос на порцию строк вместо
+            // 1–2 round-trip'ов на строку; прочие провайдеры — построчно
+            if (DatabaseUpsertBatchHelper.IsBatchSupported(providerInvariantName)
+                && dataTable.Rows.Count > 0)
+            {
+                return DatabaseUpsertBatchHelper.ExecuteUpsertBatchCore(
+                    connection, transaction, providerInvariantName, dataTable,
+                    destinationTableName, allMappings, keyMappings, updateMappings,
+                    commandTimeoutSeconds, batchSize);
+            }
 
             using (var updateCommand = CreateUpsertUpdateCommand(connection, transaction, providerInvariantName,
                        destinationTableName, keyMappings, updateMappings, commandTimeoutSeconds))

@@ -49,12 +49,13 @@ namespace Primo.MIA
             List<string> keyColumns,
             List<string> updateColumns,
             Dictionary<string, string> columnMappings,
-            int timeoutSeconds)
+            int timeoutSeconds,
+            int batchSize = 0)
         {
             var transactionHandle = DatabaseTransactionManager.Get(transactionId);
             var result = transactionHandle != null
-                ? DatabaseHelper.ExecuteUpsert(transactionHandle, dataTable, destinationTable, keyColumns, updateColumns, columnMappings, timeoutSeconds)
-                : DatabaseHelper.ExecuteUpsert(provider, connectionString, dataTable, destinationTable, keyColumns, updateColumns, columnMappings, timeoutSeconds);
+                ? DatabaseHelper.ExecuteUpsert(transactionHandle, dataTable, destinationTable, keyColumns, updateColumns, columnMappings, timeoutSeconds, batchSize)
+                : DatabaseHelper.ExecuteUpsert(provider, connectionString, dataTable, destinationTable, keyColumns, updateColumns, columnMappings, timeoutSeconds, batchSize);
 
             return new DatabaseBulkResult
             {

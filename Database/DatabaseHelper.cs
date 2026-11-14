@@ -380,7 +380,8 @@ namespace Primo.MIA
             List<string> keyColumns,
             List<string> updateColumns = null,
             Dictionary<string, string> columnMappings = null,
-            int commandTimeoutSeconds = 60)
+            int commandTimeoutSeconds = 60,
+            int batchSize = 0)
         {
             using (var connection = OpenConnection(providerInvariantName, connectionString))
             using (var transaction = connection.BeginTransaction())
@@ -394,7 +395,8 @@ namespace Primo.MIA
                     keyColumns,
                     updateColumns,
                     columnMappings,
-                    commandTimeoutSeconds);
+                    commandTimeoutSeconds,
+                    batchSize);
                 transaction.Commit();
                 return result;
             }
@@ -407,7 +409,8 @@ namespace Primo.MIA
             List<string> keyColumns,
             List<string> updateColumns = null,
             Dictionary<string, string> columnMappings = null,
-            int commandTimeoutSeconds = 60)
+            int commandTimeoutSeconds = 60,
+            int batchSize = 0)
         {
             EnsureTransactionHandle(transactionHandle);
             return DatabaseUpsertHelper.ExecuteUpsertCore(
@@ -419,7 +422,8 @@ namespace Primo.MIA
                 keyColumns,
                 updateColumns,
                 columnMappings,
-                commandTimeoutSeconds);
+                commandTimeoutSeconds,
+                batchSize);
         }
 
         // --- Bulk Insert ---

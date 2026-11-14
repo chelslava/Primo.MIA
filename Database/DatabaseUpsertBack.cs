@@ -125,6 +125,17 @@ namespace Primo.MIA
             set { _propCommandTimeoutSeconds = value; InvokePropertyChanged(this, nameof(Prop_CommandTimeoutSeconds)); }
         }
 
+        private string _propBatchSize = "0";
+        [LTools.Common.Model.Serialization.StoringProperty]
+        [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
+        [System.ComponentModel.Category(ActivityStrings.Category_Settings), System.ComponentModel.DisplayName(ActivityStrings.Field_BatchSize)]
+        /// <summary>Размер порции батч-UPSERT (0 = 500 по умолчанию).</summary>
+        public string Prop_BatchSize
+        {
+            get => _propBatchSize;
+            set { _propBatchSize = value; InvokePropertyChanged(this, nameof(Prop_BatchSize)); }
+        }
+
         private string _propInsertedCount;
         [LTools.Common.Model.Serialization.StoringProperty]
         [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
@@ -168,6 +179,7 @@ ID транзакции: [String] Идентификатор активной т
 Маппинг колонок: [Dictionary<String, String>] Соответствие колонок DataTable колонкам таблицы БД (SourceColumn → DestinationColumn).
 
 Настройки:
+Порция батча: [Int32] Строк в одном запросе (0 = 500). Провайдеры SqlClient/Npgsql/MySql выполняют UPSERT порциями (MERGE / ON CONFLICT / ON DUPLICATE KEY); прочие провайдеры — построчно.
 Таймаут: [Int32] Таймаут выполнения каждой команды в секундах. По умолчанию 60.
 
 Выходные данные:
@@ -185,6 +197,7 @@ ID транзакции: [String] Идентификатор активной т
                 PropertyBuilder.Script<List<string>>("Prop_UpdateColumns", "Колонки для обновления (опционально)"),
                 PropertyBuilder.Script<Dictionary<string, string>>("Prop_ColumnMappings", "Маппинг SourceColumn -> DestinationColumn"),
                 PropertyBuilder.Int("Prop_CommandTimeoutSeconds", "Таймаут выполнения в секундах"),
+                PropertyBuilder.Int("Prop_BatchSize", "Размер порции батч-UPSERT (0 = 500)"),
                 PropertyBuilder.Variable<int>("Prop_InsertedCount", "Сколько строк было вставлено"),
                 PropertyBuilder.Variable<int>("Prop_UpdatedCount", "Сколько строк было обновлено")
             };
@@ -207,11 +220,12 @@ ID транзакции: [String] Идентификатор активной т
                 var updateColumns = GetPropertyValue<List<string>>(Prop_UpdateColumns, nameof(Prop_UpdateColumns), sd);
                 var columnMappings = GetPropertyValue<Dictionary<string, string>>(Prop_ColumnMappings, nameof(Prop_ColumnMappings), sd);
                 var timeout = ParseIntOrDefault(GetPropertyValue<string>(Prop_CommandTimeoutSeconds, nameof(Prop_CommandTimeoutSeconds), sd), 60);
+                var batchSize = ParseIntOrDefault(GetPropertyValue<string>(Prop_BatchSize, nameof(Prop_BatchSize), sd), 0);
 
                 var transactionId = DatabaseTransactionResolver.ResolveOptional(explicitTransactionId);
 
                 var logic = new DatabaseBulkLogic();
-                var upsertResult = logic.Upsert(provider, connectionString, transactionId, dataTable, destinationTable, keyColumns, updateColumns, columnMappings, timeout);
+                var upsertResult = logic.Upsert(provider, connectionString, transactionId, dataTable, destinationTable, keyColumns, updateColumns, columnMappings, timeout, batchSize);
 
                 SetVariableValue(Prop_InsertedCount, upsertResult.InsertedCount, sd);
                 SetVariableValue(Prop_UpdatedCount, upsertResult.UpdatedCount, sd);
