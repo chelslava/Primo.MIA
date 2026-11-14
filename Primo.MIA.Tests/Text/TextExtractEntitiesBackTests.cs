@@ -214,27 +214,40 @@ namespace Primo.MIA.Tests.Text
         // Вспомогательные методы (отражение)
         // =====================================================================
 
-        /// <summary>Вызывает приватный статический метод Back-класса, возвращающий строку.</summary>
+        /// <summary>Вызывает статический метод нормализации, возвращающий строку.</summary>
         private static string InvokeStaticString(string methodName, string arg)
         {
-            return (string)BackType
-                .GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Static)
-                .Invoke(null, new object[] { arg });
+            return (string)FindStaticMethod(methodName).Invoke(null, new object[] { arg });
         }
 
-        /// <summary>Вызывает приватный статический метод Back-класса, возвращающий bool.</summary>
+        /// <summary>
+        /// Вызывает статический метод нормализации/валидации. После issue #38
+        /// методы живут в TextEntityPatterns — ищем там, затем в Back.
+        /// </summary>
+        private static MethodInfo FindStaticMethod(string methodName)
+        {
+            var patternsType = typeof(Primo.MIA.DatabaseHelper).Assembly
+                .GetType("Primo.MIA.TextEntityPatterns", throwOnError: true);
+            return patternsType.GetMethod(methodName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)
+                ?? BackType.GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Static);
+        }
+
         private static bool InvokeStaticBool(string methodName, string arg)
         {
-            return (bool)BackType
-                .GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Static)
-                .Invoke(null, new object[] { arg });
+            return (bool)FindStaticMethod(methodName).Invoke(null, new object[] { arg });
         }
 
+        /// <summary>
+        /// issue #38: реестр паттернов и нормализаторы вынесены в
+        /// TextEntityPatterns — поле ищется там, затем в Back (fallback).
+        /// </summary>
         private static object GetStaticField(string fieldName)
         {
-            return BackType
-                .GetField(fieldName, BindingFlags.NonPublic | BindingFlags.Static)
-                .GetValue(null);
+            var patternsType = typeof(Primo.MIA.DatabaseHelper).Assembly
+                .GetType("Primo.MIA.TextEntityPatterns", throwOnError: true);
+            var field = patternsType.GetField(fieldName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)
+                     ?? BackType.GetField(fieldName, BindingFlags.NonPublic | BindingFlags.Static);
+            return field.GetValue(null);
         }
 
         private static object GetPatternProperty(object pattern, string propertyName)

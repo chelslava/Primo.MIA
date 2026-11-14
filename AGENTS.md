@@ -1,4 +1,4 @@
-# PROJECT KNOWLEDGE BASE
+﻿# PROJECT KNOWLEDGE BASE
 
 **Generated:** 2026-05-23
 **Commit:** cb1269a2
@@ -65,7 +65,7 @@ Primo.MIA/
 - **Debug artifacts in source**: `plans/` directory is gitignored — don't add planning documents to tracked code.
 - **Hard-coded absolute paths**: `C:\Program Files\Primo\Primo Studio Community x64\` HintPath in csproj — intentional: CI installs the LTools SDK bundle to that location before build.
 - **Global static state**: `RepoDict` is a global dictionary — avoid adding more global state. Assumes **one robot per process** (Primo Studio limitation); ambient context (browser sessions, DB transactions) is NOT isolated between parallel robot runs in a shared host.
-- **Large monolith files**: `DatabaseHelper.cs` (~1120 lines), `TextExtractEntitiesBack.cs` (~1010), `ReadTomlConfigBack.cs` (~980) — prefer smaller focused classes; DatabaseHelper is partially split into `Database*Helper.cs` already.
+- **Large monolith files — SPLIT (issue #38)**: `DatabaseHelper.cs` (~950; SQL identifiers → `DatabaseSqlHelper.cs`, converters/bulk/upsert → `Database*Helper.cs`), `TextExtractEntitiesBack.cs` (~700; patterns/normalizers → `TextExtractEntitiesPatterns.cs`), `ReadTomlConfigBack.cs` (~600; logic → `ReadTomlConfigLogic.cs`). Keep new helpers in separate focused files.
 - **No explicit activity registration**: The LTools SDK auto-discovers activities via reflection — don't add manual registration.
 
 ## UNIQUE STYLES
