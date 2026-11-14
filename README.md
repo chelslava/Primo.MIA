@@ -5,12 +5,13 @@
 [![CI](https://github.com/chelslava/Primo.MIA/actions/workflows/ci.yml/badge.svg)](https://github.com/chelslava/Primo.MIA/actions/workflows/ci.yml)
 [![.NET Framework](https://img.shields.io/badge/.NET%20Framework-4.8.1-blue.svg)](https://dotnet.microsoft.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Release](https://github.com/chelslava/Primo.MIA/actions/workflows/release.yml/badge.svg)](https://github.com/chelslava/Primo.MIA/actions/workflows/release.yml)
 
 ---
 
 ## 📋 Обзор
 
-Primo.MIA — это набор из **~130 переиспользуемых активностей** для автоматизации бизнес-процессов в среде **Primo Studio**. Библиотека расширяет стандартные возможности Primo RPA дополнительными инструментами для работы с браузерами, базами данных, HTTP-запросами, коллекциями, файлами и другими сущностями.
+Primo.MIA — это набор из **~162 переиспользуемых активностей** для автоматизации бизнес-процессов в среде **Primo Studio**. Библиотека расширяет стандартные возможности Primo RPA дополнительными инструментами для работы с браузерами, базами данных, HTTP-запросами, коллекциями, файлами и другими сущностями.
 
 Распространяется в виде NuGet-пакета и интегрируется автоматически через механизм рефлексии LTools SDK.
 
@@ -21,7 +22,7 @@ Primo.MIA — это набор из **~130 переиспользуемых а�
 | Модуль | Количество | Описание |
 |--------|------------|----------|
 | **Browser** | 30 | Автоматизация браузеров на Selenium WebDriver. Работа с элементами, вкладками, окнами, куки, localStorage, shadow DOM, iframe. |
-| **Database (ADO.NET)** | 15 | Операции с реляционными БД через ADO.NET. Запросы, транзакции, пакетные операции, DataTable. |
+| **Database (ADO.NET)** | 16 | Операции с реляционными БД через ADO.NET. Запросы, транзакции, пакетные операции, батч-UPSERT (MERGE / ON CONFLICT / ON DUPLICATE KEY), SecureString-пароль подключения, DataTable. |
 | **Database (MongoDB)** | 6 | NoSQL операции с MongoDB. Запросы, вставка, обновление, удаление, агрегация. |
 | **Database (Redis)** | 9 | Кэширование и очереди через Redis. Строки, хэши, списки, счётчики. |
 | **HttpWeb** | 11 | HTTP/HTTPS запросы, OAuth2 авторизация, перезапуск токенов, вебхуки, батчевые запросы, ожидание условия (poll, для long-running API), пагинация REST ({page}/{cursor} → агрегация элементов). |
@@ -33,12 +34,12 @@ Primo.MIA — это набор из **~130 переиспользуемых а�
 | **Calendar** | 5 | Загрузка и парсинг производственных календарей (CSV/JSON/XML/TXT). Подсчёт рабочих/выходных дней. |
 | **Json** | 4 | Парсинг JSON и запросы по JsonPath, валидация по JSON Schema (список ошибок с путями) и генерация схемы из примера (NJsonSchema). |
 | **Xml** | 2 | Парсинг XML и запросы по XPath. |
-| **Utilities** | 12 | Генераторы данных, логирование, DataTable ↔ HTML и фильтрация DataTable (SQL-подобные выражения и конструктор условий, сохранение порядка строк), соединение DataTable (Inner/Left/Right/Full), Pivot/Unpivot, HTML-таблица → DataTable (rowspan/colspan, вложенные), перерасчёт ячеек Excel, чтение TOML конфигов, CSV ↔ DataTable (RFC 4180). |
+| **Utilities** | 12 | Генераторы данных, логирование, DataTable ↔ HTML и фильтрация DataTable (SQL-подобные выражения и конструктор условий, сохранение порядка строк), соединение DataTable (Inner/Left/Right/Full), Pivot/Unpivot, HTML-таблица → DataTable (rowspan/colspan, вложенные), перерасчёт ячеек Excel, чтение TOML конфигов, CSV ↔ DataTable (RFC 4180), очистка состояния прогона. |
 | **Криптография** | 7 | Хэширование строки/файла (MD5/SHA), шифрование строк AES-256 (PBKDF2), Base64, PGP-шифрование/расшифровка файлов (OpenPGP/BouncyCastle: armored и бинарный, ASCII-passphrase). |
 | **SFTP** | 5 | Загрузка/скачивание/листинг/удаление по SFTP (SSH.NET). Аутентификация паролем или ключом, проверка host key. |
 | **FTP** | 5 | Загрузка/скачивание/листинг/удаление/создание папки по FTPS — explicit TLS (FtpWebRequest, без зависимостей). Сертификаты — стандартная валидация (fail-closed). |
 | **Очереди сообщений** | 7 | RabbitMQ: публикация/получение (persistent, TLS), топология — объявление очереди с привязкой к exchange и очистка. Kafka: публикация, потребление по одному и батчем (лимит/таймаут пакета, явный коммит offset'ов, SASL/TLS). |
-| **Почта** | 1 | Отправка писем по SMTP (MailKit): STARTTLS/implicit TLS, вложения, plain/HTML тело. IMAP/POP3 — в планах (#37). |
+| **Почта** | 4 | SMTP-отправка, IMAP-выборка с серверными фильтрами, POP3 для legacy-ящиков (дедупликация по UIDL), разбор EML — MailKit. Вложения в папку, тело в переменную/файл. |
 | **Архивы** | 2 | Создание и распаковка ZIP (System.IO.Compression): файлы/папки/маски, уровни сжатия, политики перезаписи, защита от Zip Slip. Пароли/AES не поддерживаются стандартным .NET. |
 | **JsonDataTable** | 1 | Конвертация DataTable ↔ JSON без зависимостей. Три формата, выборка колонок, автотипы. |
 
