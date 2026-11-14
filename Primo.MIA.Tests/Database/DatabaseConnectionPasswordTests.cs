@@ -8,8 +8,10 @@ namespace Primo.MIA.Tests.Database
     /// <summary>
     /// Тесты SecureString-пароля строки подключения (issue #26):
     /// плейсхолдер {password}, обратная совместимость, ошибки, декодирование.
+    /// Коллекция BrowserSessionStack: тесты мутируют глобальный RepoDict.SecDict.
     /// </summary>
     [Trait("Category", "Fast")]
+    [Collection("BrowserSessionStack")]
     public class DatabaseConnectionPasswordTests
     {
         private const string Plain = "s3cr3t-пароль";

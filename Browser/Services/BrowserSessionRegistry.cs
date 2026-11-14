@@ -93,6 +93,44 @@ namespace Primo.MIA
         }
 
         /// <summary>
+        /// Немедленно закрывает (Quit + Dispose) ВСЕ зарегистрированные сессии
+        /// и снимает их с учёта. Вызывается при очистке состояния прогона
+        /// (<see cref="RepoDict.ClearRunScope"/>, issue #27): разделяемый
+        /// процесс Studio не должен наследовать WebDriver прошлых роботов.
+        /// Возвращает список закрытых ID.
+        /// </summary>
+        /// <param name="reason">Причина закрытия (для журнала); null — без причины.</param>
+        public static IReadOnlyList<string> CloseAll(string reason = null)
+        {
+            List<string> ids;
+            lock (SyncRoot)
+            {
+                ids = new List<string>(RegisteredAtUtc.Keys);
+                RegisteredAtUtc.Clear();
+            }
+
+            foreach (var id in ids)
+            {
+                // Quit может упасть (драйвер уже мёртв) — освобождение глушится
+                var driver = RepoDict.Get<IWebDriver>(id);
+                if (driver != null)
+                {
+                    SafeDispose.Quiet(() => driver.Quit(), $"BrowserSessionRegistry: Quit сессии {id}");
+                    SafeDispose.Quiet(() => driver.Dispose(), $"BrowserSessionRegistry: Dispose сессии {id}");
+                }
+                RepoDict.Remove(id);
+            }
+
+            if (ids.Count > 0)
+                ActivityFileLogger.Warning(
+                    "BrowserSessionRegistry",
+                    $"Закрыто сессий браузера при очистке прогона: {ids.Count}" +
+                    (string.IsNullOrWhiteSpace(reason) ? string.Empty : $" ({reason})"));
+
+            return ids;
+        }
+
+        /// <summary>
         /// Число сессий на учёте (для тестов и диагностики).
         /// </summary>
         public static int Count

@@ -216,6 +216,7 @@ namespace Primo.MIA.Common
         public const string Activity_LogMessage = "Логирование";
         public const string Activity_SearchFiles = "Поиск файлов";
         public const string Activity_ReadTomlConfig = "Чтение TOML конфигурации";
+        public const string Activity_ClearRunScope = "Утилиты: Очистка состояния прогона";
         public const string Activity_Generators = "Генераторы";
         public const string Activity_ExcelCellRecalculate = "Excel: Пересчёт ячеек";
         public const string Activity_WaitForFile = "Ожидание файла";
@@ -275,6 +276,7 @@ namespace Primo.MIA.Common
         public const string Field_ResponseTime = "Время ответа (мс)";
         public const string Field_ConnectionString = "Строка подключения";
         public const string Field_DbPassword = "Пароль подключения";
+        public const string Field_ClosedSessions = "Закрыто сессий";
         public const string Field_DbProviderInvariantName = "Provider invariant name";
         public const string Field_CommandType = "Тип команды";
         public const string Field_CommandText = "SQL / имя процедуры";
