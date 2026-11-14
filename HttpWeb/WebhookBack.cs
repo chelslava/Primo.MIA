@@ -450,20 +450,19 @@ namespace Primo.MIA
                             var response = client.SendAsync(request).ConfigureAwait(false).GetAwaiter().GetResult();
                             statusCode   = (int)response.StatusCode;
                             responseBody = response.Content.ReadAsStringAsync().ConfigureAwait(false).GetAwaiter().GetResult();
-                            isSuccess    = statusCode >= 200 && statusCode < 300;
+                            isSuccess    = WebhookServerCore.IsSuccessStatusCode(statusCode);
 
-                            // Успех или клиентская ошибка (4xx) — не повторяем
-                            if (isSuccess || (statusCode >= 400 && statusCode < 500))
+                            // Успех или клиентская ошибка (4xx) — не повторяем;
+                            // 5xx/сетевая ошибка — повторяем пока есть попытки
+                            if (!WebhookServerCore.ShouldRetry(statusCode, false, attempts, maxAttempts))
                                 break;
 
-                            // Серверная ошибка (5xx) — повторяем если есть попытки
-                            if (attempts < maxAttempts)
-                                Thread.Sleep(retryDelayMs);
+                            Thread.Sleep(retryDelayMs);
                         }
                         catch (Exception ex)
                         {
                             lastEx = ex;
-                            if (attempts < maxAttempts)
+                            if (WebhookServerCore.ShouldRetry(0, true, attempts, maxAttempts))
                                 Thread.Sleep(retryDelayMs);
                         }
                     }
@@ -482,9 +481,7 @@ namespace Primo.MIA
                 SetVariableValue(this.Prop_AttemptCount, attempts,     sd);
 
                 string attemptsStr = attempts > 1 ? $", попыток: {attempts}" : string.Empty;
-                string resultMsg   = isSuccess
-                    ? $"Вебхук отправлен → {statusCode}{attemptsStr}"
-                    : $"Вебхук вернул {statusCode}{attemptsStr}";
+                string resultMsg   = WebhookServerCore.BuildResultMessage(statusCode, isSuccess, attempts);
 
                 return new ExecutionResult
                 {
@@ -513,9 +510,7 @@ namespace Primo.MIA
 
         /// <summary>
         /// Формирует JSON-строку для отправки.
-        /// Приоритет: Template > Payload.
-        /// Template — подставляет переменные через Regex.Replace.
-        /// Payload   — возвращает как есть (уже JSON-строка).
+        /// Приоритет: Template > Payload — общая логика WebhookServerCore.
         /// </summary>
         private string BuildPayload(ScriptingData sd)
         {
@@ -535,29 +530,14 @@ namespace Primo.MIA
                         new LTools.Scripting.Model.ScriptTransferObject { Variables = sd.Variables }
                     ) as Dictionary<string, string>;
 
-                if (vars == null || vars.Count == 0)
-                    return template;
-
-                // Подстановка {{ключ}} → значение через Regex.Replace + LINQ
-                // StringComparer.OrdinalIgnoreCase для регистронезависимого поиска
-                string result = Regex.Replace(template, @"\{\{([^}]+)\}\}", match =>
-                {
-                    string key = match.Groups[1].Value.Trim();
-                    return vars
-                        .Where(kv => string.Compare(kv.Key, key,
-                            StringComparison.OrdinalIgnoreCase) == 0)
-                        .Select(kv => kv.Value)
-                        .FirstOrDefault() ?? match.Value; // не найдено — оставляем {{ключ}}
-                });
-
-                return result;
+                return WebhookServerCore.ApplyTemplate(template, vars);
             }
 
             // ── Режим payload ──────────────────────────────────────────────
             string payload = GetPropertyValue<string>(
                 this.Prop_Payload, nameof(Prop_Payload), sd);
 
-            return string.IsNullOrWhiteSpace(payload) ? null : payload;
+            return WebhookServerCore.ResolvePayload(template, payload);
         }
 
         // =====================================================================

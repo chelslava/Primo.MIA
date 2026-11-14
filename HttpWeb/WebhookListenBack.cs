@@ -362,9 +362,8 @@ namespace Primo.MIA
                 if (string.IsNullOrWhiteSpace(prefix))
                     return Fail("URL-префикс обязателен");
 
-                // Нормализуем префикс — должен завершаться слешем
-                if (!prefix.EndsWith("/"))
-                    prefix += "/";
+                // Нормализация префикса — общая логика WebhookServerCore
+                prefix = WebhookServerCore.NormalizePrefix(prefix);
 
                 object timeoutObj = GetPropertyValue(
                     this.Prop_TimeoutSeconds, nameof(Prop_TimeoutSeconds), sd);
@@ -374,13 +373,8 @@ namespace Primo.MIA
                 string allowedMethodsRaw = GetPropertyValue<string>(
                     this.Prop_AllowedMethods, nameof(Prop_AllowedMethods), sd) ?? string.Empty;
 
-                // Разбираем разрешённые методы через LINQ
-                HashSet<string> allowedMethods = new HashSet<string>(
-                    allowedMethodsRaw
-                        .Split(new[] { ',', ';', ' ' }, StringSplitOptions.RemoveEmptyEntries)
-                        .Select(m => m.Trim().ToUpperInvariant())
-                        .Where(m => !string.IsNullOrEmpty(m)),
-                    StringComparer.OrdinalIgnoreCase);
+                // Разбор разрешённых методов — общая логика WebhookServerCore
+                HashSet<string> allowedMethods = WebhookServerCore.ParseAllowedMethods(allowedMethodsRaw);
 
                 string secretToken = GetPropertyValue<string>(
                     this.Prop_SecretToken, nameof(Prop_SecretToken), sd) ?? string.Empty;
@@ -388,7 +382,7 @@ namespace Primo.MIA
                 object codeObj = GetPropertyValue(
                     this.Prop_ResponseCode, nameof(Prop_ResponseCode), sd);
                 int.TryParse(codeObj?.ToString(), out int responseCode);
-                if (responseCode <= 0) responseCode = 200;
+                responseCode = WebhookServerCore.ResolveResponseCode(responseCode);
 
                 string responseBodyText = GetPropertyValue<string>(
                     this.Prop_ResponseBody, nameof(Prop_ResponseBody), sd) ?? string.Empty;
@@ -471,41 +465,16 @@ namespace Primo.MIA
                     receivedBody = reader.ReadToEnd();
                 }
 
-                // Читаем заголовки в Dictionary через LINQ
-                Dictionary<string, string> receivedHeaders = request.Headers.AllKeys
-                    .Where(k => k != null)
-                    .ToDictionary(
-                        k  => k,
-                        k  => request.Headers[k] ?? string.Empty,
-                        StringComparer.OrdinalIgnoreCase
-                    );
+                // Разбор заголовков/query — общая логика WebhookServerCore
+                Dictionary<string, string> receivedHeaders =
+                    WebhookServerCore.ParseNameValues(request.Headers);
 
-                // Читаем query-параметры через LINQ
-                Dictionary<string, string> queryParams = request.QueryString.AllKeys
-                    .Where(k => k != null)
-                    .ToDictionary(
-                        k  => k,
-                        k  => request.QueryString[k] ?? string.Empty,
-                        StringComparer.OrdinalIgnoreCase
-                    );
+                Dictionary<string, string> queryParams =
+                    WebhookServerCore.ParseNameValues(request.QueryString);
 
-                // ── Проверяем секретный токен ──────────────────────────────
+                // ── Проверяем секретный токен — общая логика WebhookServerCore ──
 
-                bool isTokenValid = true;
-                if (!string.IsNullOrWhiteSpace(secretToken))
-                {
-                    // Проверяем стандартные заголовки для токенов
-                    string receivedToken =
-                        receivedHeaders.TryGetValue("X-Webhook-Secret", out string t1) ? t1 :
-                        receivedHeaders.TryGetValue("X-Hub-Signature-256", out string t2) ? t2 :
-                        receivedHeaders.TryGetValue("Authorization", out string t3) ? t3 :
-                        string.Empty;
-
-                    isTokenValid = string.Equals(
-                        receivedToken.TrimStart(),
-                        secretToken,
-                        StringComparison.Ordinal);
-                }
+                bool isTokenValid = WebhookServerCore.IsTokenValid(receivedHeaders, secretToken);
 
                 // ── Отправляем ответ отправителю ──────────────────────────
 
@@ -521,13 +490,11 @@ namespace Primo.MIA
                 SetVariableValue(this.Prop_IsTimeout,       false,           sd);
                 SetVariableValue(this.Prop_IsTokenValid,    isTokenValid,    sd);
 
-                    string tokenWarning = isTokenValid ? string.Empty : " ⚠ токен не совпал";
                     return new ExecutionResult
                     {
                         IsSuccess      = true,
-                        SuccessMessage =
-                            $"Получен {receivedMethod} от {request.RemoteEndPoint}" +
-                            $", тело: {receivedBody.Length} байт{tokenWarning}"
+                        SuccessMessage = WebhookServerCore.BuildReceiveMessage(
+                            receivedMethod, request.RemoteEndPoint.ToString(), receivedBody.Length, isTokenValid)
                     };
                 }
             }
