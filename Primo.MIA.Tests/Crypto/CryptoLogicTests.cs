@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Security.Cryptography;
 using System.Text;
 using FluentAssertions;
 using Primo.MIA;
@@ -161,6 +162,68 @@ namespace Primo.MIA.Tests.Crypto
             Action act = () => _logic.DecryptString(encrypted, "wrong-password");
             act.Should().Throw<InvalidOperationException>()
                 .WithMessage("*пароль*");
+        }
+
+        [Fact]
+        public void EncryptString_UsesAuthenticatedV2Format()
+        {
+            // GCM (аутентифицированный) вместо старого CBC: неверный пароль
+            // или изменение данных всегда обнаруживаются (defect 1/256, CI)
+            var encrypted = _logic.EncryptString("data", "pass");
+            encrypted.Should().StartWith("MIA2.");
+        }
+
+        [Fact]
+        public void DecryptString_TamperedCiphertext_ThrowsInvalidOperation()
+        {
+            var encrypted = _logic.EncryptString("authenticate me", "пароль");
+            var payload = Convert.FromBase64String(encrypted.Substring("MIA2.".Length));
+            payload[payload.Length - 1] ^= 0xFF; // повреждение тега аутентификации
+            var tampered = "MIA2." + Convert.ToBase64String(payload);
+
+            Action act = () => _logic.DecryptString(tampered, "пароль");
+            act.Should().Throw<InvalidOperationException>()
+                .WithMessage("*изменены*");
+        }
+
+        [Fact]
+        public void DecryptString_LegacyCbcFormat_StillDecrypts()
+        {
+            // Обратная совместимость: строка в старом формате (до v2)
+            // [salt 16][IV 16][AES-256-CBC PKCS7] расшифровывается
+            const string password = "old-secret";
+            const string original = "старый формат";
+
+            var salt = new byte[16];
+            using (var rng = new RNGCryptoServiceProvider())
+                rng.GetBytes(salt);
+
+            byte[] iv, ciphertext;
+            using (var derive = new Rfc2898DeriveBytes(password, salt, 100_000, HashAlgorithmName.SHA256))
+            {
+                var key = derive.GetBytes(32);
+                iv = derive.GetBytes(16);
+                using (var aes = Aes.Create())
+                {
+                    aes.Key = key;
+                    aes.IV = iv;
+                    aes.Mode = CipherMode.CBC;
+                    aes.Padding = PaddingMode.PKCS7;
+                    using (var encryptor = aes.CreateEncryptor())
+                    {
+                        var plain = Encoding.UTF8.GetBytes(original);
+                        ciphertext = encryptor.TransformFinalBlock(plain, 0, plain.Length);
+                    }
+                }
+            }
+
+            var payload = new byte[salt.Length + iv.Length + ciphertext.Length];
+            Buffer.BlockCopy(salt, 0, payload, 0, salt.Length);
+            Buffer.BlockCopy(iv, 0, payload, salt.Length, iv.Length);
+            Buffer.BlockCopy(ciphertext, 0, payload, salt.Length + iv.Length, ciphertext.Length);
+
+            _logic.DecryptString(Convert.ToBase64String(payload), password)
+                .Should().Be(original);
         }
 
         [Fact]
