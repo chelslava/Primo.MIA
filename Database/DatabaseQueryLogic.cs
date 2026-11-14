@@ -15,6 +15,18 @@ namespace Primo.MIA
 
     public class DatabaseQueryLogic
     {
+        private readonly IDatabaseExecutor _executor;
+
+        public DatabaseQueryLogic() : this(new DatabaseExecutor())
+        {
+        }
+
+        /// <summary>Тестовый шов (issue #10): подмена исполнителя БД моком.</summary>
+        public DatabaseQueryLogic(IDatabaseExecutor executor)
+        {
+            _executor = executor ?? new DatabaseExecutor();
+        }
+
         public DatabaseQueryResult Execute(
             string provider,
             string connectionString,
@@ -26,8 +38,8 @@ namespace Primo.MIA
         {
             var transactionHandle = DatabaseTransactionManager.Get(transactionId);
             var table = transactionHandle != null
-                ? DatabaseHelper.ExecuteQuery(transactionHandle, commandText, commandType, timeoutSeconds, parameters)
-                : DatabaseHelper.ExecuteQuery(provider, connectionString, commandText, commandType, timeoutSeconds, parameters);
+                ? _executor.ExecuteQuery(transactionHandle, commandText, commandType, timeoutSeconds, parameters)
+                : _executor.ExecuteQuery(provider, connectionString, commandText, commandType, timeoutSeconds, parameters);
 
             var columnNames = table.Columns.Cast<DataColumn>().Select(c => c.ColumnName).ToList();
 

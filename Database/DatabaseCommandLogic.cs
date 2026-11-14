@@ -13,6 +13,18 @@ namespace Primo.MIA
 
     public class DatabaseCommandLogic
     {
+        private readonly IDatabaseExecutor _executor;
+
+        public DatabaseCommandLogic() : this(new DatabaseExecutor())
+        {
+        }
+
+        /// <summary>Тестовый шов (issue #10): подмена исполнителя БД моком.</summary>
+        public DatabaseCommandLogic(IDatabaseExecutor executor)
+        {
+            _executor = executor ?? new DatabaseExecutor();
+        }
+
         public DatabaseCommandResult ExecuteNonQuery(
             string provider,
             string connectionString,
@@ -26,8 +38,8 @@ namespace Primo.MIA
         {
             var transactionHandle = DatabaseTransactionManager.Get(transactionId);
             var result = transactionHandle != null
-                ? DatabaseHelper.ExecuteNonQuery(transactionHandle, commandText, commandType, timeoutSeconds, splitByGoBatches, returnIdentity, parameters)
-                : DatabaseHelper.ExecuteNonQuery(provider, connectionString, commandText, commandType, timeoutSeconds, splitByGoBatches, returnIdentity, parameters);
+                ? _executor.ExecuteNonQuery(transactionHandle, commandText, commandType, timeoutSeconds, splitByGoBatches, returnIdentity, parameters)
+                : _executor.ExecuteNonQuery(provider, connectionString, commandText, commandType, timeoutSeconds, splitByGoBatches, returnIdentity, parameters);
 
             return new DatabaseCommandResult
             {
@@ -50,8 +62,8 @@ namespace Primo.MIA
         {
             var transactionHandle = DatabaseTransactionManager.Get(transactionId);
             var rawValue = transactionHandle != null
-                ? DatabaseHelper.ExecuteScalar(transactionHandle, commandText, commandType, timeoutSeconds, parameters)
-                : DatabaseHelper.ExecuteScalar(provider, connectionString, commandText, commandType, timeoutSeconds, parameters);
+                ? _executor.ExecuteScalar(transactionHandle, commandText, commandType, timeoutSeconds, parameters)
+                : _executor.ExecuteScalar(provider, connectionString, commandText, commandType, timeoutSeconds, parameters);
 
             return new DatabaseCommandResult
             {

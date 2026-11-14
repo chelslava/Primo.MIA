@@ -14,6 +14,18 @@ namespace Primo.MIA
 
     public class DatabaseBulkLogic
     {
+        private readonly IDatabaseExecutor _executor;
+
+        public DatabaseBulkLogic() : this(new DatabaseExecutor())
+        {
+        }
+
+        /// <summary>Тестовый шов (issue #10): подмена исполнителя БД моком.</summary>
+        public DatabaseBulkLogic(IDatabaseExecutor executor)
+        {
+            _executor = executor ?? new DatabaseExecutor();
+        }
+
         public DatabaseBulkResult BulkInsert(
             string provider,
             string connectionString,
@@ -29,8 +41,8 @@ namespace Primo.MIA
         {
             var transactionHandle = DatabaseTransactionManager.Get(transactionId);
             var result = transactionHandle != null
-                ? DatabaseHelper.ExecuteBulkInsert(transactionHandle, dataTable, destinationTable, batchSize, timeoutSeconds, useTableLock, keepIdentity, preloadMode, columnMappings)
-                : DatabaseHelper.ExecuteBulkInsert(provider, connectionString, dataTable, destinationTable, batchSize, timeoutSeconds, useTableLock, keepIdentity, preloadMode, columnMappings);
+                ? _executor.ExecuteBulkInsert(transactionHandle, dataTable, destinationTable, batchSize, timeoutSeconds, useTableLock, keepIdentity, preloadMode, columnMappings)
+                : _executor.ExecuteBulkInsert(provider, connectionString, dataTable, destinationTable, batchSize, timeoutSeconds, useTableLock, keepIdentity, preloadMode, columnMappings);
 
             return new DatabaseBulkResult
             {
@@ -54,8 +66,8 @@ namespace Primo.MIA
         {
             var transactionHandle = DatabaseTransactionManager.Get(transactionId);
             var result = transactionHandle != null
-                ? DatabaseHelper.ExecuteUpsert(transactionHandle, dataTable, destinationTable, keyColumns, updateColumns, columnMappings, timeoutSeconds, batchSize)
-                : DatabaseHelper.ExecuteUpsert(provider, connectionString, dataTable, destinationTable, keyColumns, updateColumns, columnMappings, timeoutSeconds, batchSize);
+                ? _executor.ExecuteUpsert(transactionHandle, dataTable, destinationTable, keyColumns, updateColumns, columnMappings, timeoutSeconds, batchSize)
+                : _executor.ExecuteUpsert(provider, connectionString, dataTable, destinationTable, keyColumns, updateColumns, columnMappings, timeoutSeconds, batchSize);
 
             return new DatabaseBulkResult
             {
