@@ -175,8 +175,8 @@ namespace Primo.MIA
                 var first = GetPropertyValue<Dictionary<string, string>>(this.Prop_FirstDictionary, "Prop_FirstDictionary", sd);
                 var second = GetPropertyValue<Dictionary<string, string>>(this.Prop_SecondDictionary, "Prop_SecondDictionary", sd);
 
-                if (first == null) throw new ArgumentNullException("Prop_FirstDictionary", "Первый словарь не может быть null");
-                if (second == null) throw new ArgumentNullException("Prop_SecondDictionary", "Второй словарь не может быть null");
+                Guard.NotNull(first, "Prop_FirstDictionary");
+                Guard.NotNull(second, "Prop_SecondDictionary");
 
                 // Находим конфликтующие ключи через LINQ Intersect
                 List<string> conflictKeys = first.Keys

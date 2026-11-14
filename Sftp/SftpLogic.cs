@@ -70,7 +70,7 @@ namespace Primo.MIA
             var hasKey = !string.IsNullOrWhiteSpace(settings.PrivateKeyPath);
 
             if (!hasPassword && !hasKey)
-                throw new ArgumentException(
+                Guard.That(hasPassword || hasKey,
                     "Не заданы данные аутентификации: укажите пароль или путь к приватному ключу",
                     nameof(settings));
 
@@ -110,10 +110,8 @@ namespace Primo.MIA
         /// </summary>
         public void DeleteDirectoryRecursive(SftpClient client, string path)
         {
-            if (client == null)
-                throw new ArgumentNullException(nameof(client));
-            if (string.IsNullOrWhiteSpace(path))
-                throw new ArgumentException("Путь не может быть пустым", nameof(path));
+            Guard.NotNull(client, nameof(client));
+            Guard.NotNullOrWhiteSpace(path, nameof(path));
 
             foreach (var file in client.ListDirectory(path))
             {
@@ -134,8 +132,7 @@ namespace Primo.MIA
         /// </summary>
         public void ApplyHostKeyPolicy(SftpClient client, SftpConnectionSettings settings)
         {
-            if (settings == null)
-                throw new ArgumentNullException(nameof(settings));
+            Guard.NotNull(settings, nameof(settings));
 
             if (settings.AllowAnyHostKey)
             {

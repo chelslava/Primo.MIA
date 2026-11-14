@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 
+using Primo.MIA.Common;
+
 namespace Primo.MIA
 {
     public class DictionaryCreateResult
@@ -27,16 +29,11 @@ namespace Primo.MIA
 
         public DictionaryCreateResult FromLists(List<string> keysList, List<string> valuesList)
         {
-            if (keysList == null)
-                throw new ArgumentNullException(nameof(keysList), "Список ключей не может быть null");
-            if (valuesList == null)
-                throw new ArgumentNullException(nameof(valuesList), "Список значений не может быть null");
-            if (keysList.Count != valuesList.Count)
-            {
-                throw new ArgumentException(
-                    $"Длина списка ключей ({keysList.Count}) " +
-                    $"не совпадает с длиной списка значений ({valuesList.Count})");
-            }
+            Guard.NotNull(keysList, nameof(keysList));
+            Guard.NotNull(valuesList, nameof(valuesList));
+            Guard.That(keysList.Count == valuesList.Count,
+                $"Длина списка ключей ({keysList.Count}) " +
+                $"не совпадает с длиной списка значений ({valuesList.Count})");
 
             var result = keysList
                 .Zip(valuesList, (key, value) => new { Key = key, Value = value })
@@ -53,8 +50,7 @@ namespace Primo.MIA
 
         public DictionaryCreateResult Clone(Dictionary<string, string> source)
         {
-            if (source == null)
-                throw new ArgumentNullException(nameof(source), "Словарь не может быть null для режима Clone");
+            Guard.NotNull(source, nameof(source));
 
             var result = source.ToDictionary(pair => pair.Key, pair => pair.Value);
             return new DictionaryCreateResult
@@ -67,8 +63,7 @@ namespace Primo.MIA
 
         public DictionaryCreateResult Invert(Dictionary<string, string> source, bool throwOnDuplicates = false)
         {
-            if (source == null)
-                throw new ArgumentNullException(nameof(source), "Словарь не может быть null для режима Invert");
+            Guard.NotNull(source, nameof(source));
 
             var duplicates = source.Values
                 .GroupBy(value => value)

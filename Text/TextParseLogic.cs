@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
+using Primo.MIA.Common;
+
 namespace Primo.MIA
 {
     public class TextParseResult
@@ -127,7 +129,7 @@ namespace Primo.MIA
                 string groupName = match.Groups[1].Value.Trim();
                 if (!IsValidGroupName(groupName))
                 {
-                    throw new ArgumentException(
+                    Guard.That(IsValidGroupName(groupName),
                         $"Недопустимое имя плейсхолдера «{groupName}». " +
                         "Имя должно начинаться с буквы или _, содержать только буквы, цифры и _");
                 }
@@ -145,7 +147,7 @@ namespace Primo.MIA
 
             if (!hasPlaceholders)
             {
-                throw new ArgumentException(
+                Guard.That(hasPlaceholders,
                     "Маска не содержит ни одного плейсхолдера. " +
                     "Добавьте хотя бы один плейсхолдер, например {Значение}");
             }

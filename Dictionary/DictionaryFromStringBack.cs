@@ -180,8 +180,7 @@ namespace Primo.MIA
                 string pairSep = GetPropertyValue<string>(this.Prop_PairSeparator, "Prop_PairSeparator", sd);
                 string kvSep = GetPropertyValue<string>(this.Prop_KeyValueSeparator, "Prop_KeyValueSeparator", sd);
 
-                if (string.IsNullOrEmpty(input))
-                    throw new ArgumentException("Входная строка не может быть пустой");
+                Guard.NotNullOrEmpty(input, "Prop_InputString");
 
                 // Нормализация разделителей
                 if (string.IsNullOrEmpty(pairSep)) pairSep = ";";

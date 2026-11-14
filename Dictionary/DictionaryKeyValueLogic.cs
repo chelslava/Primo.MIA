@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 
+using Primo.MIA.Common;
+
 namespace Primo.MIA
 {
     public class DictionaryGetValueResult
@@ -40,10 +42,8 @@ namespace Primo.MIA
             string defaultValue = "",
             bool throwIfNotFound = false)
         {
-            if (dictionary == null)
-                throw new ArgumentNullException(nameof(dictionary), "Словарь не может быть null");
-            if (string.IsNullOrEmpty(key))
-                throw new ArgumentException("Ключ не может быть пустым", nameof(key));
+            Guard.NotNull(dictionary, nameof(dictionary));
+            Guard.NotNullOrEmpty(key, nameof(key));
 
             var found = dictionary.TryGetValue(key, out var value);
 
@@ -71,12 +71,9 @@ namespace Primo.MIA
             string key,
             string value)
         {
-            if (dictionary == null)
-                throw new ArgumentNullException(nameof(dictionary), "Словарь не может быть null");
-            if (string.IsNullOrEmpty(key))
-                throw new ArgumentException("Ключ не может быть пустым", nameof(key));
-            if (value == null)
-                throw new ArgumentNullException(nameof(value), "Значение не может быть null");
+            Guard.NotNull(dictionary, nameof(dictionary));
+            Guard.NotNullOrEmpty(key, nameof(key));
+            Guard.NotNull(value, nameof(value));
 
             var isUpdate = dictionary.ContainsKey(key);
             var result = dictionary.ToDictionary(pair => pair.Key, pair => pair.Value);
@@ -94,8 +91,7 @@ namespace Primo.MIA
             Dictionary<string, string> dictionary,
             string key)
         {
-            if (dictionary == null)
-                throw new ArgumentNullException(nameof(dictionary), "Словарь не может быть null");
+            Guard.NotNull(dictionary, nameof(dictionary));
 
             var found = !string.IsNullOrEmpty(key) && dictionary.ContainsKey(key);
 
@@ -112,8 +108,7 @@ namespace Primo.MIA
             string value,
             bool caseSensitive = false)
         {
-            if (dictionary == null)
-                throw new ArgumentNullException(nameof(dictionary), "Словарь не может быть null");
+            Guard.NotNull(dictionary, nameof(dictionary));
             if (value == null)
             {
                 return new DictionaryContainsResult
@@ -143,8 +138,7 @@ namespace Primo.MIA
             Dictionary<string, string> dictionary,
             string key)
         {
-            if (dictionary == null)
-                throw new ArgumentNullException(nameof(dictionary), "Словарь не может быть null");
+            Guard.NotNull(dictionary, nameof(dictionary));
 
             var result = dictionary.ToDictionary(pair => pair.Key, pair => pair.Value);
             var found = result.Remove(key);
@@ -159,8 +153,7 @@ namespace Primo.MIA
 
         public DictionarySetValueResult Clear(Dictionary<string, string> dictionary)
         {
-            if (dictionary == null)
-                throw new ArgumentNullException(nameof(dictionary), "Словарь не может быть null");
+            Guard.NotNull(dictionary, nameof(dictionary));
 
             return new DictionarySetValueResult
             {

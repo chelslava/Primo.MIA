@@ -117,8 +117,8 @@ namespace Primo.MIA
                 var dict = GetPropertyValue<Dictionary<string, string>>(this.Prop_Dictionary, "Prop_Dictionary", sd);
                 string searchVal = GetPropertyValue<string>(this.Prop_SearchValue, "Prop_SearchValue", sd);
 
-                if (dict == null) throw new ArgumentNullException("Prop_Dictionary", "Словарь не может быть null");
-                if (searchVal == null) throw new ArgumentNullException("Prop_SearchValue", "Искомое значение не может быть null");
+                Guard.NotNull(dict, "Prop_Dictionary");
+                Guard.NotNull(searchVal, "Prop_SearchValue");
 
                 var result = logic.ContainsValue(dict, searchVal, this.Prop_CaseSensitive);
 

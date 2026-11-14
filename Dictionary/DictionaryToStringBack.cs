@@ -147,8 +147,7 @@ namespace Primo.MIA
                 string pairSep = GetPropertyValue<string>(this.Prop_PairSeparator, "Prop_PairSeparator", sd);
                 string kvSep = GetPropertyValue<string>(this.Prop_KeyValueSeparator, "Prop_KeyValueSeparator", sd);
 
-                if (dict == null)
-                    throw new ArgumentNullException("Prop_Dictionary", "Словарь не может быть null");
+                Guard.NotNull(dict, "Prop_Dictionary");
 
                 // Нормализация разделителей
                 if (string.IsNullOrEmpty(pairSep)) pairSep = ";";

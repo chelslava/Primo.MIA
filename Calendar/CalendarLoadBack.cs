@@ -495,6 +495,8 @@ namespace Primo.MIA
                 { CalendarFormat.Txt,  () => new TxtCalendarParser()  }
             };
 
+            Guard.EnumDefined(this.Prop_Format, nameof(this.Prop_Format));
+
             if (factory.TryGetValue(this.Prop_Format, out Func<ICalendarParser> create))
                 return create();
 

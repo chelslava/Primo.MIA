@@ -59,8 +59,7 @@ namespace Primo.MIA.Common
         /// </summary>
         public static void ValidateDirectoryExists(string directoryPath, string parameterName = "Директория")
         {
-            if (string.IsNullOrWhiteSpace(directoryPath))
-                throw new ArgumentException($"{parameterName} не может быть пустой");
+            Guard.NotNullOrWhiteSpace(directoryPath, parameterName);
 
             if (!Directory.Exists(directoryPath))
                 throw new DirectoryNotFoundException($"{parameterName} не найдена: {directoryPath}");
@@ -71,8 +70,7 @@ namespace Primo.MIA.Common
         /// </summary>
         public static void ValidateFileExists(string filePath, string parameterName = "Файл")
         {
-            if (string.IsNullOrWhiteSpace(filePath))
-                throw new ArgumentException($"{parameterName} не может быть пустым");
+            Guard.NotNullOrWhiteSpace(filePath, parameterName);
 
             if (!File.Exists(filePath))
                 throw new FileNotFoundException($"{parameterName} не найден: {filePath}");

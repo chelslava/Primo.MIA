@@ -145,12 +145,9 @@ namespace Primo.MIA
                 string key = GetPropertyValue<string>(this.Prop_Key, "Prop_Key", sd);
                 string value = GetPropertyValue<string>(this.Prop_Value, "Prop_Value", sd);
 
-                if (dict == null)
-                    throw new ArgumentNullException("Prop_Dictionary", "Словарь не может быть null");
-                if (string.IsNullOrEmpty(key))
-                    throw new ArgumentException("Ключ не может быть пустым");
-                if (value == null)
-                    throw new ArgumentNullException("Prop_Value", "Значение не может быть null");
+                Guard.NotNull(dict, "Prop_Dictionary");
+                Guard.NotNullOrEmpty(key, "Prop_Key");
+                Guard.NotNull(value, "Prop_Value");
 
                 var result = logic.SetValue(dict, key, value);
 

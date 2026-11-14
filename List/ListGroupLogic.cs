@@ -18,8 +18,7 @@ namespace Primo.MIA
             string regexPattern = null,
             int topN = 10)
         {
-            if (source == null)
-                throw new ArgumentNullException(nameof(source));
+            Guard.NotNull(source, nameof(source));
 
             switch (mode)
             {
@@ -44,8 +43,8 @@ namespace Primo.MIA
                         .ToDictionary(group => group.Key, group => group.ToList());
 
                 case ListGroupMode.ByRegexGroup:
-                    if (string.IsNullOrEmpty(regexPattern))
-                        throw new ArgumentException("Regex паттерн обязателен для режима ByRegexGroup");
+                    Guard.That(!string.IsNullOrEmpty(regexPattern),
+                        "Regex паттерн обязателен для режима ByRegexGroup");
 
                     // Кэш + match timeout (issue #24) — Match на каждом элементе
                     var regex = RegexCache.Get(regexPattern, RegexOptions.Compiled);

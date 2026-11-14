@@ -12,6 +12,8 @@
 using System;
 using System.Globalization;
 
+using Primo.MIA.Common;
+
 namespace Primo.MIA
 {
     /// <summary>
@@ -70,8 +72,7 @@ namespace Primo.MIA
             min = int.TryParse(minStr, out int parsedMin) ? parsedMin : 0;
             max = int.TryParse(maxStr, out int parsedMax) ? parsedMax : 100;
 
-            if (min > max)
-                throw new ArgumentException($"Минимальное ({min}) не может быть больше максимального ({max})");
+            Guard.That(min <= max, $"Минимальное ({min}) не может быть больше максимального ({max})");
         }
 
         /// <summary>
@@ -137,8 +138,8 @@ namespace Primo.MIA
                     return unixSeconds.ToString(CultureInfo.InvariantCulture);
 
                 case TimestampFormat.Custom:
-                    if (string.IsNullOrWhiteSpace(customFormat))
-                        throw new ArgumentException("Кастомный формат даты не может быть пустым при выборе Custom");
+                    Guard.That(!string.IsNullOrWhiteSpace(customFormat),
+                        "Кастомный формат даты не может быть пустым при выборе Custom");
                     return now.ToString(customFormat);
 
                 default:

@@ -197,11 +197,8 @@ namespace Primo.MIA
                 var dict = GetPropertyValue<Dictionary<string, string>>(this.Prop_Dictionary, "Prop_Dictionary", sd);
                 string query = GetPropertyValue<string>(this.Prop_Query, "Prop_Query", sd);
 
-                if (dict == null)
-                    throw new ArgumentNullException("Prop_Dictionary", "Словарь не может быть null");
-
-                if (query == null)
-                    throw new ArgumentNullException("Prop_Query", "Строка поиска не может быть null");
+                Guard.NotNull(dict, "Prop_Dictionary");
+                Guard.NotNull(query, "Prop_Query");
 
                 var result = logic.Filter(dict, query, this.Prop_Target, this.Prop_Method, this.Prop_CaseSensitive);
 

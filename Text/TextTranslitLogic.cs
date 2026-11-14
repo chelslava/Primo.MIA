@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
+using Primo.MIA.Common;
+
 namespace Primo.MIA
 {
     public class TranslitResult
@@ -132,8 +134,7 @@ namespace Primo.MIA
             bool preserveCase = true,
             bool preserveNonAlpha = true)
         {
-            if (text == null)
-                throw new ArgumentNullException(nameof(text));
+            Guard.NotNull(text, nameof(text));
 
             TranslitDirection actualDirection = direction;
             if (direction == TranslitDirection.AutoDetect)

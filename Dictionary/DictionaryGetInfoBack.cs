@@ -129,8 +129,7 @@ namespace Primo.MIA
             {
                 var dict = GetPropertyValue<Dictionary<string, string>>(this.Prop_Dictionary, "Prop_Dictionary", sd);
 
-                if (dict == null)
-                    throw new ArgumentNullException("Prop_Dictionary", "Словарь не может быть null");
+                Guard.NotNull(dict, "Prop_Dictionary");
 
                 // Сортируем один раз — и ключи и значения в одном порядке
                 var sorted = dict.OrderBy(p => p.Key).ToList();
