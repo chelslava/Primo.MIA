@@ -234,6 +234,7 @@ namespace Primo.MIA.Common
         public const string Activity_DatabaseListTables = "БД: Список таблиц";
         public const string Activity_DatabaseListColumns = "БД: Список колонок";
         public const string Activity_DatabaseGetTableSchema = "БД: Схема таблицы";
+        public const string Activity_DatabaseSetPassword = "БД: Задать пароль подключения";
 
         // ═══════════════════════════════════════════════════════════════════════
         // ДОПОЛНИТЕЛЬНЫЕ ПОЛЯ (сохранены все оригинальные константы)
@@ -273,6 +274,7 @@ namespace Primo.MIA.Common
         public const string Field_IsSuccess = "Успешно";
         public const string Field_ResponseTime = "Время ответа (мс)";
         public const string Field_ConnectionString = "Строка подключения";
+        public const string Field_DbPassword = "Пароль подключения";
         public const string Field_DbProviderInvariantName = "Provider invariant name";
         public const string Field_CommandType = "Тип команды";
         public const string Field_CommandText = "SQL / имя процедуры";
