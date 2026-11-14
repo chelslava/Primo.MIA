@@ -6,7 +6,7 @@
 
 ## OVERVIEW
 
-Primo.MIA — .NET Framework 4.8.1 class library (WPF/XAML) for the Primo RPA platform. Provides ~134 reusable automation activities (Browser, Database/Redis/MongoDB, HTTP, MQ, SFTP, FTP, Collections, Text, Calendar, Files, Archive, Crypto, Utilities). Distributed as a NuGet package.
+Primo.MIA — .NET Framework 4.8.1 class library (WPF/XAML) for the Primo RPA platform. Provides ~162 reusable automation activities (Browser, Mail (SMTP/IMAP/POP3/EML), Database/Redis/MongoDB, HTTP, MQ, SFTP, FTP, Collections, Text, Calendar, Files, Archive, Crypto, Utilities). Distributed as a NuGet package.
 
 ## STRUCTURE
 
@@ -14,17 +14,18 @@ Primo.MIA — .NET Framework 4.8.1 class library (WPF/XAML) for the Primo RPA pl
 Primo.MIA/
 ├── Browser/          # Selenium-based browser automation (30 activities)
 ├── Calendar/         # Production calendar parsing (CSV/JSON/XML/TXT)
-├── Common/           # Shared utilities (Guard, helpers, converters)
-├── Database/         # ADO.NET database operations (15 activities)
+├── Common/           # Shared utilities (Guard, RegexCache, helpers, converters)
+├── Database/         # ADO.NET database operations (16 activities incl. password builder)
 ├── Dictionary/       # Dictionary CRUD operations
 ├── Files/            # File search, wait, cleanup
 ├── HttpWeb/          # HTTP requests, OAuth2, webhooks (9 activities)
-├── Json/             # JSON parse + query
+├── Json/             # JSON parse + query + JSON Schema
 ├── List/             # List operations (filter, sort, aggregate, etc.)
+├── Mail/             # Email: SmtpSend, ImapReceive, Pop3Receive, EmlParse (MailKit)
 ├── Primo.MIA.Tests/  # xUnit tests (mirrors main structure)
-├── Text/             # Parse, template, transliterate
+├── Text/             # Parse, template, transliterate, entity extraction
 ├── Tuple/            # Tuple operations (create, zip, sort, etc.)
-├── Utilities/        # Misc: generators, log, DataTable, Excel, TOML config
+├── Utilities/        # Misc: generators, log, DataTable join/pivot, Excel, TOML config
 ├── Xml/              # XML parse + query
 ```
 
@@ -36,8 +37,10 @@ Primo.MIA/
 | Database queries | `Database/*Back.cs` | ADO.NET, transactions, bulk ops |
 | HTTP/API calls | `HttpWeb/*Back.cs` | RestSharp, OAuth2, webhook listener |
 | List operations | `List/*.cs` | Filter, sort, group, transform, aggregate |
+| Email (SMTP/IMAP/POP3/EML) | `Mail/*Back.cs` + `Mail/*Logic.cs` | MailKit; shared pure ops in `Mail/MailCommon.cs` |
 | Collection logic | `*/Logic.cs` | Testable logic extracted from activities |
-| Shared helpers | `Common/` | Guard, FileHelper, StringHelper |
+| Shared helpers | `Common/` | Guard, FileHelper, StringHelper, RegexCache |
+| DB connection password | `Database/DatabaseConnectionHelper.cs` | `{password}` placeholder + `RepoDict.SecDict` |
 | Enums & constants | `Enums/*.cs`, `Common/ActivityStrings.cs` | Per-module enum files |
 | Test infrastructure | `Primo.MIA.Tests/` | xUnit, mirrors module structure |
 | XAML styles | `Common/Styles.xaml` | Centralized WPF styles |
@@ -50,7 +53,7 @@ Primo.MIA/
 - **Validation**: Use `Guard.*` methods from `Primo.MIA.Common` — NOT inline null checks.
 - **Properties**: Use `Prop_` prefix, backing fields with `InvokePropertyChanged()`, `[StoringProperty]` attribute for serialization.
 - **Execution**: Override `TimedAction()` — get inputs from `sd.Variables`, set outputs via `SetVariableValue()`, return `ExecutionResult`.
-- **XAML**: Use `{StaticResource}` from `Common/Styles.xaml`. For enum-dependent visibility: `EnumToVisibilityConverter` / `MultiEnumToVisibilityConverter` with pipe-separated params.
+- **XAML**: Use `{StaticResource}` from `Common/Styles.xaml`. For enum-dependent visibility: `EnumToVisConverter` / `MultiEnumToVisConverter` with pipe-separated params (canonical keys — no local re-declarations).
 - **Testing**: xUnit, FluentAssertions, AAA pattern with `#region` blocks, trait categories (`"Fast"`, `"Integration"`). Tests touching real external systems (browser, DB, network) MUST carry `[Trait("Category", "Integration")]` — standard CI excludes them; they run in the separate `integration.yml` workflow (manual/weekly). Pure-logic scenario tests stay `"Fast"` even if named `Scenario_*`.
 - **Namespaces**: `Primo.MIA.{Module}` pattern. All XAML uses `xmlns:local="clr-namespace:Primo.MIA"`.
 - **Documentation**: Russian XML comments on public APIs. Russian UI labels in XAML.

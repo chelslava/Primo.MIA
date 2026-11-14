@@ -34,7 +34,7 @@
                     Margin="5,0,5,5">
 
             <TextBlock Style="{StaticResource ActivityHeader}"
-                       Text="Получение свойства элемента"/>
+                       Text="Элемент: Получить свойство"/>
 
             <ComboBox ItemsSource="{local:EnumValues local:ElementLocatorType}" SelectedValue="{Binding Prop_LocatorType}" SelectedValuePath="Key" DisplayMemberPath="Display" 
                       Style="{StaticResource FieldComboBox}"/>

@@ -51,7 +51,8 @@
             <TextBlock Text="Режим фильтрации:" Style="{StaticResource FieldLabel}"/>
             <ComboBox ItemsSource="{local:EnumValues local:DictionaryFilterTarget}" SelectedValue="{Binding Prop_Target}" SelectedValuePath="Key" DisplayMemberPath="Display" 
                       Style="{StaticResource FieldComboBox}"
-                      ToolTip="Выберите режим фильтрации словаря"/>
+                      ToolTip="Ключи — условие к ключам; Значения — к значениям; Ключи и значения —
+пара остаётся, если условие выполнено хотя бы для ключа ИЛИ значения"/>
 
             <TextBlock Text="Исходный словарь:" Style="{StaticResource FieldLabel}"/>
             <TextBox Text="{Binding Prop_Dictionary, UpdateSourceTrigger=PropertyChanged}"

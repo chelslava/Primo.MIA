@@ -34,7 +34,7 @@
                     VerticalAlignment="Top" 
                     Margin="5,0,5,5">
             <TextBlock Style="{StaticResource ActivityHeader}"
-                       Text="Выбор опции в элементе"/>
+                       Text="Элемент: Выбор в списке"/>
 
             <ComboBox ItemsSource="{local:EnumValues local:ElementLocatorType}" SelectedValue="{Binding Prop_LocatorType}" SelectedValuePath="Key" DisplayMemberPath="Display" 
                       Style="{StaticResource FieldComboBox}"/>

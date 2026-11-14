@@ -10,7 +10,7 @@
           ReadProfile          → показывает: ProfileName, DefaultProfileName
       - Читаемые лейблы: FontSize=11, жирный, тёмный цвет
       - Поле FilePath снабжено кнопкой "..." для открытия диалога выбора файла
-      - Использует универсальные конвертеры из Common/Converters/EnumToVisibilityConverter.cs
+      - Использует канонические конвертеры Styles.xaml (EnumToVisConverter, EnumDisplayNameConverter)
       - Использует стили из Common/Styles.xaml
 -->
 <UserControl x:Class="Primo.MIA.ReadTomlConfig"

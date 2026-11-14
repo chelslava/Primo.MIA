@@ -1,4 +1,4 @@
-<!--
+﻿<!--
     BrowserClose.xaml
     Визуальный интерфейс активности "Закрытие браузера".
 
@@ -40,7 +40,7 @@
                     Margin="5,0,5,5">
 
             <TextBlock Style="{StaticResource ActivityHeader}"
-                       Text="Закрыть браузер"/>
+                       Text="Браузер: Закрыть"/>
 
             <TextBlock Text="ID сессии браузера:" Style="{StaticResource FieldLabel}"/>
             <TextBox Text="{Binding Prop_SessionId, UpdateSourceTrigger=PropertyChanged}"

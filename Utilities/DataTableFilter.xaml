@@ -106,7 +106,8 @@
 
                                 <ComboBox ItemsSource="{local:EnumValues local:DataTableConditionJoin}" SelectedValue="{Binding Join}" SelectedValuePath="Key" DisplayMemberPath="Display" Grid.Column="0"
                                           Style="{StaticResource FieldComboBox}"
-                                          ToolTip="Связка с предыдущим условием"/>
+                                          ToolTip="Связка с предыдущим условием: И (AND) — выполнить вместе с предыдущим,
+ИЛИ (OR) — достаточно одного из условий. У первого условия игнорируется"/>
 
                                 <TextBox Grid.Column="1"
                                          Text="{Binding Column, UpdateSourceTrigger=PropertyChanged}"

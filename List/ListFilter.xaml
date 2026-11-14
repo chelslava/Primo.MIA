@@ -56,7 +56,9 @@
             <TextBlock Text="Режим фильтрации:" Style="{StaticResource FieldLabel}"/>
             <ComboBox ItemsSource="{local:EnumValues local:ListFilterMode}" SelectedValue="{Binding Mode}" SelectedValuePath="Key" DisplayMemberPath="Display" 
                       Style="{StaticResource FieldComboBox}"
-                      ToolTip="Выберите условие фильтрации"/>
+                      ToolTip="Содержит / Не содержит / Начинается с / Заканчивается на / Точное совпадение /
+Соответствует regex / Не соответствует regex / Непустые / Только пустые /
+Длина в диапазоне (Мин. и Макс. длина) / Только числа"/>
 
             <TextBlock Text="Список:" Style="{StaticResource FieldLabel}"/>
             <TextBox Text="{Binding Prop_List, UpdateSourceTrigger=PropertyChanged}"
