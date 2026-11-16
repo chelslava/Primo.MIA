@@ -3,7 +3,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:system="clr-namespace:System;assembly=mscorlib"
              xmlns:common="clr-namespace:Primo.MIA"
+             xmlns:local="clr-namespace:Primo.MIA"
              mc:Ignorable="d" d:DesignHeight="380" Margin="0,0,0,5">
     <UserControl.Resources>
         <ResourceDictionary>
@@ -33,11 +35,25 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.Column="0" Text="Порт:" VerticalAlignment="Center" Style="{StaticResource FieldLabel}" Margin="0,0,4,0"/>
-                <TextBox Grid.Column="1" Text="{Binding Prop_Port, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
-                         ToolTip="587 (STARTTLS), 465 (TLS), 25 (без шифрования)"/>
+                <TextBox Grid.Column="1" Style="{StaticResource ValidatingFieldBox}"
+                         ToolTip="587 (STARTTLS), 465 (TLS), 25 (без шифрования)">
+                    <TextBox.Text>
+                        <Binding Path="Prop_Port" UpdateSourceTrigger="PropertyChanged">
+                            <Binding.ValidationRules>
+                                <local:NumericValidationRule/>
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </TextBox.Text>
+                </TextBox>
                 <TextBlock Grid.Column="2" Text="TLS:" VerticalAlignment="Center" Style="{StaticResource FieldLabel}" Margin="0,0,4,0"/>
-                <TextBox Grid.Column="3" Text="{Binding Prop_TlsMode, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
-                         ToolTip="StartTls (по умолчанию), ImplicitTls (465), None"/>
+                <ComboBox Grid.Column="3" IsEditable="True"
+                          Text="{Binding Prop_TlsMode, UpdateSourceTrigger=PropertyChanged}"
+                          Style="{StaticResource FieldComboBox}"
+                          ToolTip="StartTls (по умолчанию), ImplicitTls (465), None">
+                    <system:String>StartTls</system:String>
+                    <system:String>ImplicitTls</system:String>
+                    <system:String>None</system:String>
+                </ComboBox>
             </Grid>
             <Grid Margin="0,2,0,0">
                 <Grid.ColumnDefinitions>
@@ -80,7 +96,15 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.Column="0" Text="Таймаут (сек):" VerticalAlignment="Center" Style="{StaticResource FieldLabel}" Margin="0,0,4,0"/>
-                <TextBox Grid.Column="1" Text="{Binding Prop_TimeoutSeconds, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+                <TextBox Grid.Column="1" Style="{StaticResource ValidatingFieldBox}">
+                    <TextBox.Text>
+                        <Binding Path="Prop_TimeoutSeconds" UpdateSourceTrigger="PropertyChanged">
+                            <Binding.ValidationRules>
+                                <local:NumericValidationRule/>
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </TextBox.Text>
+                </TextBox>
             </Grid>
         </StackPanel>
     </Grid>

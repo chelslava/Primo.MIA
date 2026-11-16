@@ -22,8 +22,27 @@
             <TextBlock Text="Почта: Разобрать EML" Style="{StaticResource ActivityHeader}"/>
 
             <TextBlock Text="Путь к EML:" Style="{StaticResource FieldLabel}"/>
-            <TextBox Text="{Binding Prop_EmlPath, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
-                     ToolTip="Файл .eml, например C:\входящие\письмо.eml"/>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBox x:Name="TxtEmlPath"
+                         Grid.Column="0"
+                         Text="{Binding Prop_EmlPath, UpdateSourceTrigger=PropertyChanged}"
+                         Style="{StaticResource FieldBox}"
+                         Margin="0,2,4,0"
+                         ToolTip="Файл .eml, например C:\входящие\письмо.eml"/>
+                <Button Grid.Column="1"
+                        Style="{StaticResource BrowseButton}"
+                        Content=""
+                        Click="BtnBrowseEml_Click"
+                        ToolTip="Выбрать EML-файл...">
+                    <Button.Background>
+                        <ImageBrush ImageSource="/Primo.MIA;component/images/folder.png" TileMode="None"/>
+                    </Button.Background>
+                </Button>
+            </Grid>
             <TextBlock Text="Вложения → папка:" Style="{StaticResource FieldLabel}"/>
             <TextBox Text="{Binding Prop_AttachmentsDir, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
                      ToolTip="Пусто — не сохранять"/>

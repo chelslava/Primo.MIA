@@ -32,20 +32,26 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition />
         </Grid.RowDefinitions>
 
-        <TextBlock Grid.Row="0" 
-                   Text="Тип браузера:" 
+        <TextBlock Grid.Row="0"
+                   Text="Браузер: Открыть сессию"
+                   Style="{StaticResource ActivityHeader}"
+                   Margin="5,4,5,0"/>
+
+        <TextBlock Grid.Row="1"
+                   Text="Тип браузера:"
                    Style="{StaticResource FieldLabel}"
                    Margin="5,4,0,0"/>
 
-        <ComboBox ItemsSource="{local:EnumValues local:BrowserType}" SelectedValue="{Binding Prop_BrowserType}" SelectedValuePath="Key" DisplayMemberPath="Display" Grid.Row="1"
+        <ComboBox ItemsSource="{local:EnumValues local:BrowserType}" SelectedValue="{Binding Prop_BrowserType}" SelectedValuePath="Key" DisplayMemberPath="Display" Grid.Row="2"
                   Style="{StaticResource FieldComboBox}"
                   Margin="5,0,5,4"
                   ToolTip="Выберите тип браузера для запуска (Chrome, Firefox, Edge, Safari)"/>
 
-        <Grid Grid.Row="2">
+        <Grid Grid.Row="3">
             <Grid Grid.Column="0" Background="{DynamicResource {x:Static SystemColors.ScrollBarBrushKey}}" Margin="0,10,0,0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>

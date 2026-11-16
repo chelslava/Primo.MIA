@@ -3,7 +3,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:system="clr-namespace:System;assembly=mscorlib"
              xmlns:common="clr-namespace:Primo.MIA"
+             xmlns:local="clr-namespace:Primo.MIA"
              mc:Ignorable="d" d:DesignHeight="480" Margin="0,0,0,5">
     <UserControl.Resources>
         <ResourceDictionary>
@@ -33,11 +35,25 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.Column="0" Text="Порт:" VerticalAlignment="Center" Style="{StaticResource FieldLabel}" Margin="0,0,4,0"/>
-                <TextBox Grid.Column="1" Text="{Binding Prop_Port, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
-                         ToolTip="993 (TLS), 143 (STARTTLS/plain)"/>
+                <TextBox Grid.Column="1" Style="{StaticResource ValidatingFieldBox}"
+                         ToolTip="993 (TLS), 143 (STARTTLS/plain)">
+                    <TextBox.Text>
+                        <Binding Path="Prop_Port" UpdateSourceTrigger="PropertyChanged">
+                            <Binding.ValidationRules>
+                                <local:NumericValidationRule/>
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </TextBox.Text>
+                </TextBox>
                 <TextBlock Grid.Column="2" Text="TLS:" VerticalAlignment="Center" Style="{StaticResource FieldLabel}" Margin="0,0,4,0"/>
-                <TextBox Grid.Column="3" Text="{Binding Prop_TlsMode, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
-                         ToolTip="ImplicitTls (по умолчанию, 993), StartTls (143), None"/>
+                <ComboBox Grid.Column="3" IsEditable="True"
+                          Text="{Binding Prop_TlsMode, UpdateSourceTrigger=PropertyChanged}"
+                          Style="{StaticResource FieldComboBox}"
+                          ToolTip="ImplicitTls (по умолчанию, 993), StartTls (143), None">
+                    <system:String>ImplicitTls</system:String>
+                    <system:String>StartTls</system:String>
+                    <system:String>None</system:String>
+                </ComboBox>
             </Grid>
             <Grid Margin="0,2,0,0">
                 <Grid.ColumnDefinitions>
@@ -82,8 +98,16 @@
                 <TextBox Grid.Column="1" Text="{Binding Prop_Since, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
                          ToolTip="ГГГГ-ММ-ДД или ДД.ММ.ГГГГ; пусто — без ограничения"/>
                 <TextBlock Grid.Column="2" Text="Макс. писем:" VerticalAlignment="Center" Style="{StaticResource FieldLabel}" Margin="0,0,4,0"/>
-                <TextBox Grid.Column="3" Text="{Binding Prop_MaxCount, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
-                         ToolTip="0 — без ограничения; выдача от новых к старым"/>
+                <TextBox Grid.Column="3" Style="{StaticResource ValidatingFieldBox}"
+                         ToolTip="0 — без ограничения; выдача от новых к старым">
+                    <TextBox.Text>
+                        <Binding Path="Prop_MaxCount" UpdateSourceTrigger="PropertyChanged">
+                            <Binding.ValidationRules>
+                                <local:NumericValidationRule/>
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </TextBox.Text>
+                </TextBox>
             </Grid>
             <CheckBox Style="{StaticResource FieldCheckBox}" Margin="0,2,6,2"
                       Content="Только непрочитанные"
@@ -106,7 +130,15 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.Column="0" Text="Таймаут (сек):" VerticalAlignment="Center" Style="{StaticResource FieldLabel}" Margin="0,0,4,0"/>
-                <TextBox Grid.Column="1" Text="{Binding Prop_TimeoutSeconds, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+                <TextBox Grid.Column="1" Style="{StaticResource ValidatingFieldBox}">
+                    <TextBox.Text>
+                        <Binding Path="Prop_TimeoutSeconds" UpdateSourceTrigger="PropertyChanged">
+                            <Binding.ValidationRules>
+                                <local:NumericValidationRule/>
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </TextBox.Text>
+                </TextBox>
             </Grid>
         </StackPanel>
     </Grid>

@@ -35,9 +35,9 @@
             <TextBlock Text="Удалённый путь:" Style="{StaticResource FieldLabel}"/>
             <TextBox Text="{Binding Prop_RemotePath, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
                      ToolTip="Путь к файлу или папке на сервере для удаления"/>
-            <TextBlock Text="Рекурсивно:" Style="{StaticResource FieldLabel}"/>
-            <TextBox Text="{Binding Prop_Recursive, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
-                     ToolTip="Рекурсивное удаление каталога (True/False)"/>
+            <CheckBox Style="{StaticResource FieldCheckBox}" Content="Рекурсивно (каталог со всем содержимым)"
+                      IsChecked="{Binding Prop_Recursive}"
+                      ToolTip="Удаление каталога вместе со всем содержимым. Необратимо — файлы удаляются мимо корзины"/>
         </StackPanel>
     </Grid>
 </UserControl>
