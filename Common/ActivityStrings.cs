@@ -1591,6 +1591,29 @@ namespace Primo.MIA.Common
         public const string Error_KafkaTopicRequired = "Топик не может быть пустым";
         public const string Error_KafkaGroupIdRequired = "Group ID не может быть пустым";
         public const string Error_KafkaMessageRequired = "Сообщение не может быть пустым";
+
+        // ── Excel (issue #47) ──────────────────────────────────────────
+        public const string Activity_ExcelReadRange   = "Excel: Прочитать диапазон";
+        public const string Activity_ExcelWriteRange  = "Excel: Записать диапазон";
+
+        public const string Field_ExcelFilePath        = "Файл (.xlsx)";
+        public const string Field_ExcelSheetName       = "Лист";
+        public const string Field_ExcelRange           = "Диапазон";
+        public const string Field_ExcelHeaderRow       = "Первая строка — заголовки";
+        public const string Field_ExcelStartCell       = "Начальная ячейка";
+        public const string Field_ExcelWriteMode       = "Режим записи";
+        public const string Field_ExcelCreateIfMissing = "Создавать файл/лист при отсутствии";
+        public const string Field_ExcelWriteHeaders    = "Записать заголовки колонок";
+        public const string Field_ExcelTable           = "Таблица (DataTable)";
+        public const string Field_ExcelResultTable     = "Результат (DataTable)";
+        public const string Field_ExcelRowCount        = "Кол-во строк";
+        public const string Field_ExcelColumnNames     = "Имена колонок";
+        public const string Field_ExcelWrittenRows     = "Записано строк";
+
+        public const string Error_ExcelFileRequired     = "Путь к файлу Excel не может быть пустым";
+        public const string Error_ExcelTableRequired    = "Таблица (DataTable) не может быть пустой";
+        public const string Error_ExcelRangeInvalid     = "Некорректный диапазон";
+        public const string Error_ExcelStartCellInvalid = "Некорректная начальная ячейка";
     }
 
 }

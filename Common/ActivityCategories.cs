@@ -63,5 +63,8 @@ namespace Primo.MIA.Common
 
         /// <summary>Категория "MIA → Почта" (issue #37)</summary>
         public const string Email = Prefix + "Почта";
+
+        /// <summary>Категория "MIA → Excel" (issue #47)</summary>
+        public const string Excel = Prefix + "Excel";
     }
 }

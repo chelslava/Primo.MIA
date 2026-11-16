@@ -27,7 +27,7 @@
     <AssemblyVersion>$(Version.Split('-')[0])</AssemblyVersion>
     <FileVersion>$(Version.Split('-')[0])</FileVersion>
     <Authors>Chelslava</Authors>
-    <Description>Библиотека расширенных активностей для платформы Primo RPA (~130 активностей: Browser, Database, HTTP, SFTP, RabbitMQ, Crypto, Collections, Files, Calendar, Text, и другие)</Description>
+    <Description>Библиотека расширенных активностей для платформы Primo RPA (~164 активностей: Browser, Database, HTTP, SFTP, RabbitMQ, Kafka, Mail, Excel, Crypto, Collections, Files, Calendar, Text, и другие)</Description>
     <PackageProjectUrl>https://github.com/chelslava/Primo.MIA</PackageProjectUrl>
     <RepositoryUrl>https://github.com/chelslava/Primo.MIA</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
@@ -87,6 +87,11 @@
          наш nupkg; у потребителя они приходят транзитивно через Confluent.Kafka -->
     <PackageReference Include="Confluent.Kafka" Version="2.12.0" />
     <PackageReference Include="librdkafka.redist" Version="2.12.0" ExcludeAssets="all" PrivateAssets="all" />
+    <!-- Excel (issue #47): ClosedXML — чтение/запись .xlsx без Interop и без
+         установленного Excel (подтверждённый спрос №1: QA-портал про объёмы,
+         кейс ЦУПИС на Habr). MIT, netstandard2.0 → net481.
+         DocumentFormat.OpenXml и SixLabors.Fonts подтягиваются транзитивно. -->
+    <PackageReference Include="ClosedXML" Version="0.104.2" />
   </ItemGroup>
 
   <!-- Local Primo SDK references (not available via NuGet).
