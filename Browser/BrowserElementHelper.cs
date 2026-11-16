@@ -20,43 +20,33 @@ namespace Primo.MIA
             Action<string> logWarning)
         {
             retryConfig = retryConfig ?? RetryConfiguration.Default;
-            int attempt = 0;
-            Exception lastException = null;
+            int maxAttempts = Math.Max(1, retryConfig.MaxRetries);
 
-            while (attempt < retryConfig.MaxRetries)
-            {
-                try
+            // issue #43: retry через общий механизм Common/RetryPolicy
+            var outcome = RetryPolicy.Execute(
+                attemptNumber =>
                 {
-                    attempt++;
-                    logInfo($"Попытка {attempt}/{retryConfig.MaxRetries} поиска элемента [{locatorType}={locatorValue}]");
+                    logInfo($"Попытка {attemptNumber}/{maxAttempts} поиска элемента [{locatorType}={locatorValue}]");
+                    return findElement(driver, locatorType, locatorValue, timeout);
+                },
+                maxAttempts,
+                shouldRetryException: (ex, attemptNumber) => IsRetryableException(ex, retryConfig),
+                delayMs: retryConfig.RetryDelayMs,
+                exponentialBackoff: retryConfig.ExponentialBackoff,
+                failureCallback: (ex, attemptNumber) =>
+                    logWarning($"Попытка {attemptNumber} не удалась: {ex.Message}"),
+                delayCallback: (attemptNumber, delay) =>
+                    logInfo($"Ожидание {delay}ms перед следующей попыткой"));
 
-                    IWebElement element = findElement(driver, locatorType, locatorValue, timeout);
+            if (outcome.LastException != null)
+                throw new NoSuchElementException(
+                    $"Элемент не найден после {outcome.Attempts} попыток. Последняя ошибка: {outcome.LastException?.Message}",
+                    outcome.LastException);
 
-                    if (attempt > 1)
-                        logInfo($"Элемент найден после {attempt} попыток");
+            if (outcome.Attempts > 1)
+                logInfo($"Элемент найден после {outcome.Attempts} попыток");
 
-                    return element;
-                }
-                catch (Exception ex) when (IsRetryableException(ex, retryConfig))
-                {
-                    lastException = ex;
-                    logWarning($"Попытка {attempt} не удалась: {ex.Message}");
-
-                    if (attempt < retryConfig.MaxRetries)
-                    {
-                        int delay = retryConfig.ExponentialBackoff
-                            ? retryConfig.RetryDelayMs * (int)Math.Pow(2, attempt - 1)
-                            : retryConfig.RetryDelayMs;
-
-                        logInfo($"Ожидание {delay}ms перед следующей попыткой");
-                        System.Threading.Thread.Sleep(delay);
-                    }
-                }
-            }
-
-            throw new NoSuchElementException(
-                $"Элемент не найден после {retryConfig.MaxRetries} попыток. Последняя ошибка: {lastException?.Message}",
-                lastException);
+            return outcome.LastResult;
         }
 
         private static bool IsRetryableException(Exception ex, RetryConfiguration config)

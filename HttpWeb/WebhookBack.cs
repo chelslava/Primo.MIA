@@ -409,26 +409,22 @@ namespace Primo.MIA
                 bool   isSuccess    = false;
                 int    attempts     = 0;
                 int    maxAttempts  = retryCount + 1;
-                Exception lastEx    = null;
 
                 using (var client = HttpClientPool.CreateClient(
                            false, null, null, this.Prop_IgnoreSslErrors,
                            TimeSpan.FromSeconds(timeoutSec)))
                 {
-                    // ── Retry-цикл ─────────────────────────────────────────────
+                    // ── Retry через общий механизм Common/RetryPolicy (issue #43) ──
 
-                    while (attempts < maxAttempts)
-                    {
-                        attempts++;
-                        lastEx = null;
-
-                        try
+                    var outcome = RetryPolicy.Execute(
+                        attemptNumber =>
                         {
                             // Формируем StringContent с нужным Content-Type
                             var content = new System.Net.Http.StringContent(
                                 json, Encoding.UTF8, contentType);
 
-                            // Создаём запрос — POST всегда
+                            // Создаём запрос — POST всегда (переиспользовать
+                            // HttpRequestMessage нельзя — после отправки недействителен)
                             var request = new System.Net.Http.HttpRequestMessage(
                                 System.Net.Http.HttpMethod.Post, url)
                             {
@@ -440,30 +436,33 @@ namespace Primo.MIA
                                 request.Headers.TryAddWithoutValidation(kv.Key, kv.Value));
 
                             var response = client.SendAsync(request).ConfigureAwait(false).GetAwaiter().GetResult();
-                            statusCode   = (int)response.StatusCode;
-                            responseBody = response.Content.ReadAsStringAsync().ConfigureAwait(false).GetAwaiter().GetResult();
-                            isSuccess    = WebhookServerCore.IsSuccessStatusCode(statusCode);
+                            return (Code: (int)response.StatusCode,
+                                    Body: response.Content.ReadAsStringAsync()
+                                        .ConfigureAwait(false).GetAwaiter().GetResult());
+                        },
+                        maxAttempts,
+                        // Успех или клиентская ошибка (4xx) — не повторяем;
+                        // 5xx/сетевая ошибка — повторяем пока есть попытки
+                        shouldRetryResult: (r, attemptNumber) =>
+                            WebhookServerCore.ShouldRetry(r.Code, false, attemptNumber, maxAttempts),
+                        // Любое сетевое исключение — повторяем пока есть попытки
+                        shouldRetryException: (ex, attemptNumber) =>
+                            WebhookServerCore.ShouldRetry(0, true, attemptNumber, maxAttempts),
+                        delayMs: retryDelayMs);
 
-                            // Успех или клиентская ошибка (4xx) — не повторяем;
-                            // 5xx/сетевая ошибка — повторяем пока есть попытки
-                            if (!WebhookServerCore.ShouldRetry(statusCode, false, attempts, maxAttempts))
-                                break;
+                    attempts = outcome.Attempts;
 
-                            Thread.Sleep(retryDelayMs);
-                        }
-                        catch (Exception ex)
-                        {
-                            lastEx = ex;
-                            if (WebhookServerCore.ShouldRetry(0, true, attempts, maxAttempts))
-                                Thread.Sleep(retryDelayMs);
-                        }
+                    if (outcome.HasResult)
+                    {
+                        statusCode   = outcome.LastResult.Code;
+                        responseBody = outcome.LastResult.Body;
+                        isSuccess    = WebhookServerCore.IsSuccessStatusCode(statusCode);
                     }
+
+                    // ── Все попытки исчерпаны сетевыми исключениями ───────────
+                    if (outcome.LastException != null && !outcome.HasResult)
+                        return Fail($"Ошибка отправки вебхука после {attempts} попыток: {outcome.LastException.Message}");
                 }
-
-                // ── Если все попытки исчерпаны с исключением ──────────────
-
-                if (lastEx != null && statusCode == 0)
-                    return Fail($"Ошибка отправки вебхука после {attempts} попыток: {lastEx.Message}");
 
                 // ── Записываем выходные параметры ─────────────────────────
 
