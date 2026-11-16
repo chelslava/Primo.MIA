@@ -160,8 +160,9 @@ namespace Primo.MIA
                         throw new ArgumentException($"Неизвестный режим навигации: {Prop_Mode}");
                 }
 
-                // Небольшая пауза для стабилизации
-                System.Threading.Thread.Sleep(500);
+                // issue #42: вместо слепой паузы — ожидание готовности документа
+                // (обычно мгновенно: команды навигации Selenium блокируются до загрузки)
+                SeleniumHelper.WaitForDocumentReady(driver, 10);
 
                 Logger.LogInfo(sdkComponentName, "Навигация {0} успешно завершена", Prop_Mode);
 

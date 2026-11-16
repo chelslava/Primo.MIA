@@ -97,6 +97,7 @@ msbuild Primo.MIA.Tests\Primo.MIA.Tests.csproj /p:Configuration=Debug
 - **External SDK dependency**: Requires Primo Studio (`LTools.*.dll`) installed at `C:\Program Files\Primo\` — not available via NuGet.
 - **CI**: GitHub Actions (`.github/workflows/ci.yml`) — windows-latest build+tests; LTools SDK DLLs come from the private repo `chelslava/primo-ltools-sdk` (secret `PRIMO_SDK_TOKEN`).
 - **Russian locale**: Most UI strings and XML comments are in Russian. README is in Russian.
+- **Cancellation (issue #42)**: LTools SDK does NOT expose a scenario-cancellation signal to a running activity (verified by reflection over LTools.* 2026-11): Studio stops the robot *between* activities; a blocking activity is bounded only by its own timeout. Consequences: `sdkTimeOut` must cover internal waits with a margin (pattern: +10 s in Kafka/RabbitMQ consume); do NOT add CancellationToken parameters to Back classes — there is nothing to pass; poll loops should exit early on readiness (`SeleniumHelper.WaitForDocumentReady` instead of blind `Thread.Sleep`).
 - **Not an application**: This is a class library loaded by Primo Studio — no `Main()` entry point.
 
 ## VERSIONING

@@ -286,6 +286,29 @@ namespace Primo.MIA.Common
         }
 
         /// <summary>
+        /// Ожидает готовности документа (document.readyState == complete) с лимитом.
+        /// Замена слепой паузы после навигации (issue #42): обычно выходит мгновенно
+        /// (Selenium-команды навигации уже блокируются до загрузки), на SPA/долгих XHR —
+        /// даёт гарантию готовности вместо фиксированного Sleep.
+        /// </summary>
+        /// <param name="driver">Драйвер сессии</param>
+        /// <param name="timeoutSeconds">Лимит ожидания готовности, сек</param>
+        public static void WaitForDocumentReady(IWebDriver driver, int timeoutSeconds = 10)
+        {
+            try
+            {
+                new WebDriverWait(driver, TimeSpan.FromSeconds(timeoutSeconds))
+                    .Until(d => ((IJavaScriptExecutor)d)
+                        .ExecuteScript("return document.readyState")?.ToString() == "complete");
+            }
+            catch (WebDriverTimeoutException)
+            {
+                // Страница не «complete» за лимит (SPA/долгие фоновые запросы) —
+                // не ошибка навигации: поведенчески эквивалентно прежней слепой паузе
+            }
+        }
+
+        /// <summary>
         /// Генерирует уникальный ID для элемента.
         /// </summary>
         /// <param name="prefix">Префикс для ID</param>
