@@ -20,29 +20,29 @@
         <Image Grid.Column="0" Width="32" Height="32" Margin="5" VerticalAlignment="Center"
                Source="pack://application:,,,/Primo.MIA;component/images/http.png"/>
         <StackPanel Grid.Column="1" Margin="5,0,5,5">
-            <TextBlock Text="Kafka: РџРѕР»СѓС‡РёС‚СЊ РїР°РєРµС‚" Style="{StaticResource ActivityHeader}"/>
-            <TextBlock Text="Bootstrap-СЃРµСЂРІРµСЂС‹:" Style="{StaticResource FieldLabel}"/>
+            <TextBlock Text="Kafka: Получить пакет" Style="{StaticResource ActivityHeader}"/>
+            <TextBlock Text="Bootstrap-серверы:" Style="{StaticResource FieldLabel}"/>
             <TextBox Text="{Binding Prop_BootstrapServers, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
-                     ToolTip="РђРґСЂРµСЃР° РєР»Р°СЃС‚РµСЂР° Kafka С‡РµСЂРµР· Р·Р°РїСЏС‚СѓСЋ: host1:9092,host2:9092 (РїСЂРѕС‚РѕРєРѕР» Р±РµР·РѕРїР°СЃРЅРѕСЃС‚Рё Рё SASL вЂ” РІ РїР°РЅРµР»Рё СЃРІРѕР№СЃС‚РІ)"/>
-            <TextBlock Text="РўРѕРїРёРє:" Style="{StaticResource FieldLabel}"/>
+                     ToolTip="Адреса кластера Kafka через запятую: host1:9092,host2:9092 (протокол безопасности и SASL — в панели свойств)"/>
+            <TextBlock Text="Топик:" Style="{StaticResource FieldLabel}"/>
             <TextBox Text="{Binding Prop_Topic, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
-                     ToolTip="РРјСЏ С‚РѕРїРёРєР° Kafka"/>
+                     ToolTip="Имя топика Kafka"/>
             <TextBlock Text="Group ID:" Style="{StaticResource FieldLabel}"/>
             <TextBox Text="{Binding Prop_GroupId, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
-                     ToolTip="Consumer-РіСЂСѓРїРїР°: СЃРѕРѕР±С‰РµРЅРёСЏ СЂР°СЃРїСЂРµРґРµР»СЏСЋС‚СЃСЏ РїРѕ РіСЂСѓРїРїР°Рј; РЅР°С‡Р°Р»СЊРЅРѕРµ СЃРјРµС‰РµРЅРёРµ, Auto Commit Рё РєРѕРјРјРёС‚ РїР°РєРµС‚Р° вЂ” РІ РїР°РЅРµР»Рё СЃРІРѕР№СЃС‚РІ"/>
-            <TextBlock Text="РњР°РєСЃРёРјСѓРј СЃРѕРѕР±С‰РµРЅРёР№:" Style="{StaticResource FieldLabel}"/>
+                     ToolTip="Consumer-группа: сообщения распределяются по группам; начальное смещение, Auto Commit и коммит пакета — в панели свойств"/>
+            <TextBlock Text="Максимум сообщений:" Style="{StaticResource FieldLabel}"/>
             <TextBox Text="{Binding Prop_MaxMessages, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
-                     ToolTip="Р Р°Р·РјРµСЂ РїР°РєРµС‚Р° (РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ 10)"/>
-            <TextBlock Text="РўР°Р№РјР°СѓС‚ РїР°РєРµС‚Р° (СЃРµРє):" Style="{StaticResource FieldLabel}"/>
+                     ToolTip="Размер пакета (по умолчанию 10)"/>
+            <TextBlock Text="Таймаут пакета (сек):" Style="{StaticResource FieldLabel}"/>
             <TextBox Text="{Binding Prop_TimeoutSeconds, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
-                     ToolTip="РћР±С‰РёР№ С‚Р°Р№РјР°СѓС‚ РѕР¶РёРґР°РЅРёСЏ РїР°РєРµС‚Р° (РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ 30); РјРµРЅСЊС€Рµ вЂ” РµСЃР»Рё СЃРѕРѕР±С‰РµРЅРёР№ РјРµРЅСЊС€Рµ"/>
-            <TextBlock Text="РЎРѕРѕР±С‰РµРЅРёСЏ (out):" Style="{StaticResource FieldLabel}"/>
+                     ToolTip="Общий таймаут ожидания пакета (по умолчанию 30); меньше — если сообщений меньше"/>
+            <TextBlock Text="Сообщения (out):" Style="{StaticResource FieldLabel}"/>
             <TextBox Text="{Binding Prop_Messages, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
-                     ToolTip="Р’С‹С…РѕРґРЅР°СЏ РїРµСЂРµРјРµРЅРЅР°СЏ List&lt;string&gt;: С‚РµР»Р° СЃРѕРѕР±С‰РµРЅРёР№"/>
-            <TextBlock Text="РџР°РєРµС‚ (РјРµС‚Р°РґР°РЅРЅС‹Рµ) (out):" Style="{StaticResource FieldLabel}"/>
+                     ToolTip="Выходная переменная List&lt;string&gt;: тела сообщений"/>
+            <TextBlock Text="Пакет (метаданные) (out):" Style="{StaticResource FieldLabel}"/>
             <TextBox Text="{Binding Prop_MessagesInfo, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
                      ToolTip="DataTable: topic, partition, offset, key, body"/>
-            <TextBlock Text="РџРѕР»СѓС‡РµРЅРѕ (out):" Style="{StaticResource FieldLabel}"/>
+            <TextBlock Text="Получено (out):" Style="{StaticResource FieldLabel}"/>
             <TextBox Text="{Binding Prop_Count, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
         </StackPanel>
     </Grid>

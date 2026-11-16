@@ -20,35 +20,35 @@
         <Image Grid.Column="0" Width="32" Height="32" Margin="5" VerticalAlignment="Center"
                Source="pack://application:,,,/Primo.MIA;component/images/http.png"/>
         <StackPanel Grid.Column="1" Margin="5,0,5,5">
-            <TextBlock Text="RabbitMQ: РћР±СЉСЏРІРёС‚СЊ РѕС‡РµСЂРµРґСЊ" Style="{StaticResource ActivityHeader}"/>
-            <TextBlock Text="РҐРѕСЃС‚:" Style="{StaticResource FieldLabel}"/>
+            <TextBlock Text="RabbitMQ: Объявить очередь" Style="{StaticResource ActivityHeader}"/>
+            <TextBlock Text="Хост:" Style="{StaticResource FieldLabel}"/>
             <TextBox Text="{Binding Prop_Host, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
-                     ToolTip="РҐРѕСЃС‚ RabbitMQ (РїРѕСЂС‚, TLS, VirtualHost вЂ” РІ РїР°РЅРµР»Рё СЃРІРѕР№СЃС‚РІ)"/>
-            <TextBlock Text="РџРѕР»СЊР·РѕРІР°С‚РµР»СЊ:" Style="{StaticResource FieldLabel}"/>
+                     ToolTip="Хост RabbitMQ (порт, TLS, VirtualHost — в панели свойств)"/>
+            <TextBlock Text="Пользователь:" Style="{StaticResource FieldLabel}"/>
             <TextBox Text="{Binding Prop_UserName, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
-            <TextBlock Text="РџР°СЂРѕР»СЊ:" Style="{StaticResource FieldLabel}"/>
+            <TextBlock Text="Пароль:" Style="{StaticResource FieldLabel}"/>
             <PasswordBox common:PasswordBoxHelper.BindPassword="True"
                          common:PasswordBoxHelper.BoundPassword="{Binding Prop_Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                          Style="{StaticResource FieldPasswordBox}"/>
-            <TextBlock Text="РћС‡РµСЂРµРґСЊ:" Style="{StaticResource FieldLabel}"/>
+            <TextBlock Text="Очередь:" Style="{StaticResource FieldLabel}"/>
             <TextBox Text="{Binding Prop_Queue, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
-                     ToolTip="РРјСЏ РѕС‡РµСЂРµРґРё"/>
+                     ToolTip="Имя очереди"/>
             <CheckBox Style="{StaticResource FieldCheckBox}" Margin="0,6,6,2"
-                      Content="Durable (РїРµСЂРµР¶РёРІР°РµС‚ РїРµСЂРµР·Р°РїСѓСЃРє Р±СЂРѕРєРµСЂР°)"
+                      Content="Durable (переживает перезапуск брокера)"
                       IsChecked="{Binding Prop_Durable}"/>
             <CheckBox Style="{StaticResource FieldCheckBox}"
-                      Content="Exclusive (РѕРґРЅРѕ РїРѕРґРєР»СЋС‡РµРЅРёРµ)"
+                      Content="Exclusive (одно подключение)"
                       IsChecked="{Binding Prop_Exclusive}"/>
             <CheckBox Style="{StaticResource FieldCheckBox}"
-                      Content="Auto Delete (СѓРґР°Р»РёС‚СЊ РїСЂРё РѕС‚РєР»СЋС‡РµРЅРёРё РїРѕС‚СЂРµР±РёС‚РµР»РµР№)"
+                      Content="Auto Delete (удалить при отключении потребителей)"
                       IsChecked="{Binding Prop_AutoDelete}"/>
-            <TextBlock Text="РџСЂРёРІСЏР·Р°С‚СЊ Рє Exchange:" Style="{StaticResource FieldLabel}"/>
+            <TextBlock Text="Привязать к Exchange:" Style="{StaticResource FieldLabel}"/>
             <TextBox Text="{Binding Prop_BindToExchange, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
-                     ToolTip="РџСѓСЃС‚Рѕ вЂ” РЅРµ РїСЂРёРІСЏР·С‹РІР°С‚СЊ"/>
+                     ToolTip="Пусто — не привязывать"/>
             <TextBlock Text="Routing Key:" Style="{StaticResource FieldLabel}"/>
             <TextBox Text="{Binding Prop_RoutingKey, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
-                     ToolTip="РљР»СЋС‡ РїСЂРёРІСЏР·РєРё (РїСѓСЃС‚Рѕ = РІСЃРµ СЃРѕРѕР±С‰РµРЅРёСЏ exchange)"/>
-            <TextBlock Text="РЎРѕРѕР±С‰РµРЅРёР№ РІ РѕС‡РµСЂРµРґРё (out):" Style="{StaticResource FieldLabel}"/>
+                     ToolTip="Ключ привязки (пусто = все сообщения exchange)"/>
+            <TextBlock Text="Сообщений в очереди (out):" Style="{StaticResource FieldLabel}"/>
             <TextBox Text="{Binding Prop_MessageCount, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
         </StackPanel>
     </Grid>
