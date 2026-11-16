@@ -399,17 +399,10 @@ namespace Primo.MIA
 
                 // ── Создаём HttpClient ─────────────────────────────────────
 
-                var handler = new System.Net.Http.HttpClientHandler();
-                if (this.Prop_IgnoreSslErrors)
-                {
-                    // issue #11: факт обхода TLS-валидации должен быть виден в логе робота
-                    Common.ActivityFileLogger.Warning(
-                        nameof(WebhookBack),
-                        "Проверка TLS-сертификата сервера ОТКЛЮЧЕНА (IgnoreSslErrors=true). " +
-                        "Используйте только в тестовых средах.");
-                    handler.ServerCertificateCustomValidationCallback =
-                        (msg, cert, chain, errors) => true;
-                }
+                // issue #39: HttpClient берём из общего пула HttpClientPool —
+                // ручной `new HttpClientHandler()` на каждый вызов воспроизводил
+                // антипаттерн socket-exhaustion (issue #4). Пул сам логирует
+                // обход TLS-валидации и не кэширует такой handler (issue #11).
 
                 int    statusCode   = 0;
                 string responseBody = string.Empty;
@@ -418,10 +411,9 @@ namespace Primo.MIA
                 int    maxAttempts  = retryCount + 1;
                 Exception lastEx    = null;
 
-                using (var client = new System.Net.Http.HttpClient(handler)
-                {
-                    Timeout = TimeSpan.FromSeconds(timeoutSec)
-                })
+                using (var client = HttpClientPool.CreateClient(
+                           false, null, null, this.Prop_IgnoreSslErrors,
+                           TimeSpan.FromSeconds(timeoutSec)))
                 {
                     // ── Retry-цикл ─────────────────────────────────────────────
 
