@@ -20,6 +20,8 @@
                Source="pack://application:,,,/Primo.MIA;component/images/bd.png"/>
         <StackPanel Grid.Column="1" Margin="5,0,5,5">
             <TextBlock Text="Redis: Удалить ключ" Style="{StaticResource ActivityHeader}"/>
+            <TextBlock Style="{StaticResource DangerHint}"
+                       Text="⚠ Необратимо: ключи удаляются из Redis (DEL)"/>
             <TextBlock Text="Строка подключения:" Style="{StaticResource FieldLabel}"/>
             <TextBox Text="{Binding Prop_ConnectionString, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
                      ToolTip="Строка подключения StackExchange.Redis (например localhost:6379)"/>

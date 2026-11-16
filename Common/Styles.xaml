@@ -181,4 +181,13 @@
         <Setter Property="Margin"          Value="0,0,6,0"/>
     </Style>
 
+    <!-- Подсказка «опасно» под заголовком: предупреждение о необратимом
+         действии (удаление файлов/ключей/документов, очистка очереди).
+         Цвет DangerBrush — в паре с DangerCheckBox (issue #40). -->
+    <Style x:Key="DangerHint" TargetType="TextBlock" BasedOn="{StaticResource HintText}">
+        <Setter Property="Foreground"      Value="{StaticResource DangerBrush}"/>
+        <Setter Property="FontWeight"      Value="SemiBold"/>
+        <Setter Property="Margin"          Value="0,0,0,2"/>
+    </Style>
+
 </ResourceDictionary>

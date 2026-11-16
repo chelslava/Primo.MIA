@@ -21,6 +21,8 @@
                Source="pack://application:,,,/Primo.MIA;component/images/http.png"/>
         <StackPanel Grid.Column="1" Margin="5,0,5,5">
             <TextBlock Text="RabbitMQ: Очистить очередь" Style="{StaticResource ActivityHeader}"/>
+            <TextBlock Style="{StaticResource DangerHint}"
+                       Text="⚠ Необратимо: все сообщения в очереди будут удалены"/>
             <TextBlock Text="Хост:" Style="{StaticResource FieldLabel}"/>
             <TextBox Text="{Binding Prop_Host, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
                      ToolTip="Хост RabbitMQ (порт, TLS, VirtualHost — в панели свойств)"/>
