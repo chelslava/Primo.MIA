@@ -49,8 +49,7 @@ namespace Primo.MIA
         {
             get
             {
-                string waitStr = this.Prop_WaitTimeout?.Trim('"') ?? "10";
-                int waitSec = int.TryParse(waitStr, out int w) ? w : 10;
+                int waitSec = ActivityTimeoutParser.ParseSecondsOrDefault(this.Prop_WaitTimeout, 10);
                 return (waitSec + 5) * 1000;
             }
             set { }
@@ -314,8 +313,7 @@ namespace Primo.MIA
 
                 // Парсим таймаут
                 string waitStr = GetPropertyValue<string>(Prop_WaitTimeout, nameof(Prop_WaitTimeout), sd) ?? "10";
-                int waitTimeout = int.TryParse(waitStr, out int wt) ? wt : 10;
-                ValidatePositive(waitTimeout, "Prop_WaitTimeout");
+                int waitTimeout = ActivityTimeoutParser.ParseSecondsOrDefault(waitStr, 10);
 
                 // Выполняем операцию в зависимости от режима
                 switch (Prop_SearchMode)

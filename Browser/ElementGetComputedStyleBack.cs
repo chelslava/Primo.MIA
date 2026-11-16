@@ -198,8 +198,7 @@ namespace Primo.MIA
                 if (!string.IsNullOrWhiteSpace(locatorValue))
                 {
                     string timeoutStr = GetPropertyValue<string>(Prop_WaitTimeout, nameof(Prop_WaitTimeout), sd) ?? "10";
-                    int timeout = int.TryParse(timeoutStr, out int t) ? t : 10;
-                    timeout = SeleniumHelper.ValidateTimeout(timeout, 10);
+                    int timeout = ActivityTimeoutParser.ParseSecondsOrDefault(timeoutStr, 10);
 
                     var locator = SeleniumHelper.CreateLocator(Prop_LocatorType, locatorValue);
                     element = SeleniumHelper.WaitForElementVisible(driver, locator, timeout);

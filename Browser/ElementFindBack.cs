@@ -254,8 +254,7 @@ namespace Primo.MIA
 
                 // Парсинг и валидация таймаута
                 string timeoutStr = GetPropertyValue<string>(this.Prop_WaitTimeout, nameof(Prop_WaitTimeout), sd) ?? "10";
-                int timeout = int.TryParse(timeoutStr, out int t) ? t : 10;
-                timeout = SeleniumHelper.ValidateTimeout(timeout, 10);
+                int timeout = ActivityTimeoutParser.ParseSecondsOrDefault(timeoutStr, 10);
 
                 // Создание локатора один раз для обоих режимов
                 var locator = SeleniumHelper.CreateLocator(this.Prop_LocatorType, locatorValue);

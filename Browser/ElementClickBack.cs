@@ -328,8 +328,7 @@ namespace Primo.MIA
             {
                 // Парсим таймаут с защитой от некорректных значений
                 string timeoutStr = GetPropertyValue<string>(this.Prop_WaitTimeout, nameof(Prop_WaitTimeout), sd) ?? "10";
-                int timeout = int.TryParse(timeoutStr, out int t) ? t : 10;
-                timeout = SeleniumHelper.ValidateTimeout(timeout, 10);
+                int timeout = ActivityTimeoutParser.ParseSecondsOrDefault(timeoutStr, 10);
 
                 var locator = SeleniumHelper.CreateLocator(this.Prop_LocatorType, locatorValue);
                 return SeleniumHelper.WaitForElementClickable(driver, locator, timeout);

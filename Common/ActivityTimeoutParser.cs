@@ -64,6 +64,30 @@ namespace Primo.MIA
         }
 
         /// <summary>
+        /// Разбирает строку с таймаутом в секундах и возвращает целые секунды.
+        /// Пустое/отсутствующее значение — норма, используется молча: <paramref name="defaultSeconds"/>.
+        /// Непустое, но неразбираемое (&lt;=0, не число) — ошибка конфигурации: предупреждение
+        /// в файловый лог (issue #44) и значение по умолчанию (поведение прежних мест не меняется).
+        /// </summary>
+        /// <param name="value">Строка со значением таймаута в секундах.</param>
+        /// <param name="defaultSeconds">Значение по умолчанию в секундах.</param>
+        /// <returns>Положительные секунды из строки, иначе <paramref name="defaultSeconds"/>.</returns>
+        public static int ParseSecondsOrDefault(string value, int defaultSeconds)
+        {
+            if (TryParsePositiveSeconds(value, out int seconds))
+                return seconds;
+
+            if (!string.IsNullOrWhiteSpace(value))
+            {
+                Common.ActivityFileLogger.Warning(
+                    "ActivityTimeoutParser",
+                    $"Некорректное значение таймаута «{value}» — использовано значение по умолчанию: {defaultSeconds} с.");
+            }
+
+            return defaultSeconds;
+        }
+
+        /// <summary>
         /// Разбирает строку в положительное число секунд (InvariantCulture).
         /// </summary>
         /// <param name="value">Исходная строка.</param>

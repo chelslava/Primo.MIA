@@ -379,8 +379,7 @@ namespace Primo.MIA
                 if (!string.IsNullOrWhiteSpace(locatorValue))
                 {
                     string timeoutStr = GetPropertyValue<string>(this.Prop_WaitTimeout, nameof(Prop_WaitTimeout), sd) ?? "10";
-                    int timeout = int.TryParse(timeoutStr, out int t) ? t : 10;
-                    ValidatePositive(timeout, "Prop_WaitTimeout");
+                    int timeout = ActivityTimeoutParser.ParseSecondsOrDefault(timeoutStr, 10);
 
                     var locatorType = ConvertLocatorType(this.Prop_LocatorType);
                     element = ElementLocator.FindElement(driver, locatorType, locatorValue, timeout);

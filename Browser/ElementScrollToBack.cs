@@ -197,8 +197,7 @@ namespace Primo.MIA
                 {
                     // Поиск элемента по локатору с ожиданием видимости
                     string timeoutStr = GetPropertyValue<string>(this.Prop_WaitTimeout, nameof(Prop_WaitTimeout), sd) ?? "10";
-                    int timeout = int.TryParse(timeoutStr, out int t) ? t : 10;
-                    ValidatePositive(timeout, "Prop_WaitTimeout");
+                    int timeout = ActivityTimeoutParser.ParseSecondsOrDefault(timeoutStr, 10);
 
                     var elementLocator = new ElementLocator();
                     var locatorType = ConvertLocatorType(this.Prop_LocatorType);

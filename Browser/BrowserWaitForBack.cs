@@ -43,9 +43,7 @@ namespace Primo.MIA
             get
             {
                 string timeoutStr = GetPropertyValue<string>(this.Prop_Timeout, nameof(Prop_Timeout), null) ?? "30";
-                if (int.TryParse(timeoutStr, out int timeout))
-                    return timeout * 1000;
-                return 30000;
+                return ActivityTimeoutParser.ParseSecondsToMs(timeoutStr, 30000);
             }
             set { }
         }
@@ -216,8 +214,7 @@ namespace Primo.MIA
                 string sessionId = GetPropertyValue<string>(Prop_SessionId, nameof(Prop_SessionId), sd);
                 string timeoutStr = GetPropertyValue<string>(Prop_Timeout, nameof(Prop_Timeout), sd) ?? "30";
 
-                int timeout = int.TryParse(timeoutStr, out int t) ? t : 30;
-                timeout = SeleniumHelper.ValidateTimeout(timeout, 30);
+                int timeout = ActivityTimeoutParser.ParseSecondsOrDefault(timeoutStr, 30);
 
                 // Получение драйвера через базовый класс
                 IWebDriver driver = GetDriverFromContext(sessionId);
