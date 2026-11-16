@@ -139,7 +139,9 @@ namespace Primo.MIA
                     var regexOptions = comparison == StringComparison.Ordinal
                         ? RegexOptions.None
                         : RegexOptions.IgnoreCase;
-                    return Regex.IsMatch(text, pattern, regexOptions);
+                    // issue #45: кэш + match timeout вместо компиляции на каждый элемент
+                    return RegexCache.Get(pattern, regexOptions | RegexOptions.Compiled)
+                        .IsMatch(text);
                 case DictionaryFilterMethod.Wildcard:
                     return MatchesWildcard(text, pattern, comparison);
                 default:
@@ -157,7 +159,7 @@ namespace Primo.MIA
                 ? RegexOptions.None
                 : RegexOptions.IgnoreCase;
 
-            return Regex.IsMatch(text, regexPattern, options);
+            return RegexCache.Get(regexPattern, options | RegexOptions.Compiled).IsMatch(text);
         }
     }
 }

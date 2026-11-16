@@ -69,7 +69,8 @@ namespace Primo.MIA
             Regex regex;
             try
             {
-                regex = new Regex(compiledPattern, options);
+                // issue #45: кэш + match timeout вместо new Regex на каждый вызов
+                regex = RegexCache.Get(compiledPattern, options);
             }
             catch (Exception ex)
             {
