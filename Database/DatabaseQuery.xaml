@@ -17,18 +17,7 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
-    <Grid Background="{DynamicResource {x:Static SystemColors.ScrollBarBrushKey}}">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
-
-        <Image Grid.Column="0"
-               Width="32" Height="32" Margin="5"
-               VerticalAlignment="Center"
-               Source="pack://application:,,,/Primo.MIA;component/images/bd.png"/>
-
-        <StackPanel Grid.Column="1" Margin="5,0,5,5">
+    <local:ActivityPanel IconSource="pack://application:,,,/Primo.MIA;component/images/bd.png">
             <TextBlock Style="{StaticResource ActivityHeader}">
                 <Run Text="БД: Запрос ["/>
                 <Run Text="{Binding Path=Prop_CommandType, Mode=OneWay, Converter={StaticResource EnumDisplayNameConverter}}" Foreground="{StaticResource AccentBrush}"/>
@@ -79,6 +68,5 @@
             <TextBlock Text="Список колонок (переменная):" Style="{StaticResource FieldLabel}"/>
             <TextBox Text="{Binding Prop_ColumnNames, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
                      ToolTip="Переменная (список строк) с именами колонок результата"/>
-        </StackPanel>
-    </Grid>
+    </local:ActivityPanel>
 </UserControl>

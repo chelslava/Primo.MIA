@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:common="clr-namespace:Primo.MIA"
-             mc:Ignorable="d" d:DesignHeight="260" Margin="0,0,0,5">
+             mc:Ignorable="d" xmlns:local="clr-namespace:Primo.MIA" d:DesignHeight="260" Margin="0,0,0,5">
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -12,14 +12,7 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
-    <Grid Background="{DynamicResource {x:Static SystemColors.ScrollBarBrushKey}}">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
-        <Image Grid.Column="0" Width="32" Height="32" Margin="5" VerticalAlignment="Center"
-               Source="pack://application:,,,/Primo.MIA;component/images/folder.png"/>
-        <StackPanel Grid.Column="1" Margin="5,0,5,5">
+    <local:ActivityPanel IconSource="pack://application:,,,/Primo.MIA;component/images/folder.png">
             <TextBlock Text="FTPS: Скачать файл" Style="{StaticResource ActivityHeader}"/>
             <TextBlock Text="Хост:" Style="{StaticResource FieldLabel}"/>
             <TextBox Text="{Binding Prop_Host, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
@@ -63,6 +56,5 @@
                       ToolTip="Заменить существующий локальный файл"/>
             <TextBlock Text="Получено байт (out): " VerticalAlignment="Center" Style="{StaticResource FieldLabel}" Margin="0,6,0,0"/>
             <TextBox Text="{Binding Prop_BytesDownloaded, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
-        </StackPanel>
-    </Grid>
+    </local:ActivityPanel>
 </UserControl>

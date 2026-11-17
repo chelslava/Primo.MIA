@@ -32,20 +32,7 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
-    <Grid Background="{DynamicResource {x:Static SystemColors.ScrollBarBrushKey}}">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
-
-        <Image Grid.Column="0"
-               Width="32" Height="32" Margin="5"
-               VerticalAlignment="Center"
-               Source="pack://application:,,,/Primo.MIA;component/images/list.png"/>
-
-        <StackPanel Grid.Column="1"
-                    VerticalAlignment="Top"
-                    Margin="5,0,5,5">
+    <local:ActivityPanel IconSource="pack://application:,,,/Primo.MIA;component/images/list.png">
 
             <TextBlock Style="{StaticResource ActivityHeader}">
                 <Run Text="Список: Фильтрация ["/>
@@ -103,7 +90,5 @@
             <TextBox Text="{Binding Prop_Rejected, UpdateSourceTrigger=PropertyChanged}"
                      Style="{StaticResource FieldBox}"
                      ToolTip="Переменная для элементов, не прошедших фильтр"/>
-
-        </StackPanel>
-    </Grid>
+    </local:ActivityPanel>
 </UserControl>

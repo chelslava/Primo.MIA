@@ -28,25 +28,7 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
-    <Grid Background="{DynamicResource {x:Static SystemColors.ScrollBarBrushKey}}">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
-
-        <!-- Иконка активности -->
-        <Image Grid.Column="0"
-               Width="32" Height="32" Margin="5"
-               VerticalAlignment="Center"
-               Source="pack://application:,,,/Primo.MIA;component/images/calendar.png"/>
-
-        <!--
-            [FIX-6] Height="191" удалён — StackPanel теперь растягивается по содержимому.
-                    Фиксированная высота обрезала бы новые поля.
-        -->
-        <StackPanel Grid.Column="1"
-                    Margin="5,0,5,5"
-                    VerticalAlignment="Top">
+    <local:ActivityPanel IconSource="pack://application:,,,/Primo.MIA;component/images/calendar.png">
 
             <!-- Заголовок -->
             <TextBlock Style="{StaticResource ActivityHeader}">
@@ -150,7 +132,5 @@
                     </TextBox>
                 </StackPanel>
             </Grid>
-
-        </StackPanel>
-    </Grid>
+    </local:ActivityPanel>
 </UserControl>

@@ -36,22 +36,7 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
-    <Grid Background="{DynamicResource {x:Static SystemColors.ScrollBarBrushKey}}">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
-
-        <!-- Иконка активности -->
-        <Image Grid.Column="0"
-               Width="32" Height="32" Margin="5"
-               VerticalAlignment="Center"
-               Source="pack://application:,,,/Primo.MIA;component/images/calendar.png"/>
-
-        <!-- Поля активности -->
-        <StackPanel Grid.Column="1"
-                    VerticalAlignment="Top"
-                    Margin="5,0,5,5">
+    <local:ActivityPanel IconSource="pack://application:,,,/Primo.MIA;component/images/calendar.png">
 
             <!-- Заголовок с отображением текущего режима -->
             <TextBlock Style="{StaticResource ActivityHeader}">
@@ -103,7 +88,5 @@
                          Style="{StaticResource FieldBox}"
                          ToolTip="Количество рабочих дней для прибавления/вычитания"/>
             </StackPanel>
-
-        </StackPanel>
-    </Grid>
+    </local:ActivityPanel>
 </UserControl>

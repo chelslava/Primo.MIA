@@ -15,18 +15,7 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
-    <Grid Background="{DynamicResource {x:Static SystemColors.ScrollBarBrushKey}}">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
-
-        <!-- Иконка -->
-        <Image Grid.Column="0" Width="32" Height="32" Margin="5" VerticalAlignment="Center"
-               Source="pack://application:,,,/Primo.MIA;component/images/http.png"/>
-
-        <!-- Содержимое -->
-        <StackPanel Grid.Column="1" VerticalAlignment="Top" Margin="5,0,5,5">
+    <local:ActivityPanel IconSource="pack://application:,,,/Primo.MIA;component/images/http.png">
             <!-- Заголовок -->
             <TextBlock Text="HTTP: Пакетные запросы" Style="{StaticResource ActivityHeader}"/>
 
@@ -75,6 +64,5 @@
 
             <!-- Чекбоксы -->
             <CheckBox Style="{StaticResource FieldCheckBox}" Content="Остановить при ошибке" IsChecked="{Binding Prop_StopOnError}" Margin="0,2,0,0"/>
-        </StackPanel>
-    </Grid>
+    </local:ActivityPanel>
 </UserControl>

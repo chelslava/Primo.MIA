@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             mc:Ignorable="d" d:DesignHeight="220" Margin="0,0,0,5">
+             mc:Ignorable="d" xmlns:local="clr-namespace:Primo.MIA" d:DesignHeight="220" Margin="0,0,0,5">
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -11,14 +11,7 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
-    <Grid Background="{DynamicResource {x:Static SystemColors.ScrollBarBrushKey}}">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
-        <Image Grid.Column="0" Width="32" Height="32" Margin="5" VerticalAlignment="Center"
-               Source="pack://application:,,,/Primo.MIA;component/images/http.png"/>
-        <StackPanel Grid.Column="1" Margin="5,0,5,5">
+    <local:ActivityPanel IconSource="pack://application:,,,/Primo.MIA;component/images/http.png">
             <TextBlock Text="Почта: Разобрать EML" Style="{StaticResource ActivityHeader}"/>
 
             <TextBlock Text="Путь к EML:" Style="{StaticResource FieldLabel}"/>
@@ -49,6 +42,5 @@
             <TextBlock Text="Тело → файл:" Style="{StaticResource FieldLabel}"/>
             <TextBox Text="{Binding Prop_BodyToFile, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
                      ToolTip="Пусто — не сохранять (UTF-8)"/>
-        </StackPanel>
-    </Grid>
+    </local:ActivityPanel>
 </UserControl>

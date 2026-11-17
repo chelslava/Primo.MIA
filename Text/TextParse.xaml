@@ -25,22 +25,7 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
-    <Grid Background="{DynamicResource {x:Static SystemColors.ScrollBarBrushKey}}">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
-
-        <!-- Иконка активности -->
-        <Image Grid.Column="0"
-               Width="32" Height="32" Margin="5"
-               VerticalAlignment="Center"
-               Source="pack://application:,,,/Primo.MIA;component/images/text.png"/>
-
-        <!-- Поля активности -->
-        <StackPanel Grid.Column="1"
-                    VerticalAlignment="Top"
-                    Margin="5,0,5,8">
+    <local:ActivityPanel IconSource="pack://application:,,,/Primo.MIA;component/images/text.png">
 
             <!-- Заголовок с синтаксисом -->
             <TextBlock Style="{StaticResource ActivityHeader}">
@@ -107,7 +92,5 @@
                           Margin="4,2,0,2"
                           ToolTip="Найти все совпадения маски в тексте (заполняет «Все результаты»)"/>
             </Grid>
-
-        </StackPanel>
-    </Grid>
+    </local:ActivityPanel>
 </UserControl>

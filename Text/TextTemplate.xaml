@@ -26,22 +26,7 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
-    <Grid Background="{DynamicResource {x:Static SystemColors.ScrollBarBrushKey}}">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
-
-        <!-- Иконка активности -->
-        <Image Grid.Column="0"
-               Width="32" Height="32" Margin="5"
-               VerticalAlignment="Center"
-               Source="pack://application:,,,/Primo.MIA;component/images/template.png"/>
-
-        <!-- Поля активности -->
-        <StackPanel Grid.Column="1"
-                    VerticalAlignment="Top"
-                    Margin="5,0,5,8">
+    <local:ActivityPanel IconSource="pack://application:,,,/Primo.MIA;component/images/template.png">
 
             <!-- Заголовок -->
             <TextBlock Style="{StaticResource ActivityHeader}">
@@ -117,7 +102,5 @@
                              ToolTip="По умолчанию UTF-8"/>
                 </StackPanel>
             </Grid>
-
-        </StackPanel>
-    </Grid>
+    </local:ActivityPanel>
 </UserControl>

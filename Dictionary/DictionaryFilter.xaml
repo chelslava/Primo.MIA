@@ -27,20 +27,7 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
-    <Grid Background="{DynamicResource {x:Static SystemColors.ScrollBarBrushKey}}">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
-
-        <Image Grid.Column="0"
-               Width="32" Height="32" Margin="5"
-               VerticalAlignment="Center"
-               Source="pack://application:,,,/Primo.MIA;component/images/dict.png"/>
-
-        <StackPanel Grid.Column="1"
-                    VerticalAlignment="Top"
-                    Margin="5,0,5,5">
+    <local:ActivityPanel IconSource="pack://application:,,,/Primo.MIA;component/images/dict.png">
 
             <TextBlock Style="{StaticResource ActivityHeader}">
                 <Run Text="Словарь: Фильтровать ["/>
@@ -93,7 +80,5 @@
             <TextBox Text="{Binding Prop_Result, UpdateSourceTrigger=PropertyChanged}"
                      Style="{StaticResource FieldBox}"
                      ToolTip="Имя переменной для сохранения отфильтрованного словаря"/>
-
-        </StackPanel>
-    </Grid>
+    </local:ActivityPanel>
 </UserControl>
