@@ -191,6 +191,28 @@ namespace Primo.MIA
             set { _propHasPreviousPage = value; InvokePropertyChanged(this, nameof(Prop_HasPreviousPage)); }
         }
 
+                private string _propRetryCount;
+        /// <summary>Число повторов при транзиентной ошибке БД (0 — без повторов). Для read-операций.</summary>
+        [LTools.Common.Model.Serialization.StoringProperty]
+        [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
+        [System.ComponentModel.Category(ActivityStrings.Category_Settings), System.ComponentModel.DisplayName(ActivityStrings.Field_NetworkRetryCount)]
+        public string Prop_RetryCount
+        {
+            get => _propRetryCount;
+            set { _propRetryCount = value; InvokePropertyChanged(this, nameof(Prop_RetryCount)); }
+        }
+
+        private string _propRetryDelayMs;
+        /// <summary>Пауза между повторами, мс.</summary>
+        [LTools.Common.Model.Serialization.StoringProperty]
+        [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
+        [System.ComponentModel.Category(ActivityStrings.Category_Settings), System.ComponentModel.DisplayName(ActivityStrings.Field_NetworkRetryDelayMs)]
+        public string Prop_RetryDelayMs
+        {
+            get => _propRetryDelayMs;
+            set { _propRetryDelayMs = value; InvokePropertyChanged(this, nameof(Prop_RetryDelayMs)); }
+        }
+
         public DatabaseQueryPagedBack(IWFContainer container) : base(container)
         {
             sdkComponentName = ActivityStrings.Activity_DatabaseQueryPaged;
@@ -238,6 +260,12 @@ ORDER BY*: [String] Выражение сортировки для стабил�
                 PropertyBuilder.Variable<bool>("Prop_HasNextPage", "Есть ли следующая страница"),
                 PropertyBuilder.Variable<bool>("Prop_HasPreviousPage", "Есть ли предыдущая страница")
             };
+            // issue #43: повторы при транзиентных ошибках БД (read-операции)
+            sdkProperties.AddRange(new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
+            {
+                PropertyBuilder.Int("Prop_RetryCount", "Повторов при транзиентной ошибке БД (0 — без повторов)"),
+                PropertyBuilder.Int("Prop_RetryDelayMs", "Пауза между повторами, мс")
+            });
             InitClass(container);
         }
 
@@ -257,9 +285,13 @@ ORDER BY*: [String] Выражение сортировки для стабил�
 
                 var transactionId = DatabaseTransactionResolver.ResolveOptional(explicitTransactionId);
                 var transactionHandle = DatabaseTransactionManager.Get(transactionId);
-                var result = transactionHandle != null
-                    ? DatabaseHelper.ExecutePagedQuery(transactionHandle, commandText, orderByExpression, pageNumber, pageSize, timeout, parameters)
-                    : DatabaseHelper.ExecutePagedQuery(provider, connectionString, commandText, orderByExpression, pageNumber, pageSize, timeout, parameters);
+                var result = NetworkRetry.ExecuteDbRead(
+                    GetPropertyValue<string>(Prop_RetryCount, nameof(Prop_RetryCount), sd),
+                    GetPropertyValue<string>(Prop_RetryDelayMs, nameof(Prop_RetryDelayMs), sd),
+                    () => transactionHandle != null
+                        ? DatabaseHelper.ExecutePagedQuery(transactionHandle, commandText, orderByExpression, pageNumber, pageSize, timeout, parameters)
+                        : DatabaseHelper.ExecutePagedQuery(provider, connectionString, commandText, orderByExpression, pageNumber, pageSize, timeout, parameters),
+                    sdkComponentName);
 
                 SetVariableValue(Prop_ResultTable, result.ResultTable, sd);
                 SetVariableValue(Prop_RowCount, result.ResultTable.Rows.Count, sd);

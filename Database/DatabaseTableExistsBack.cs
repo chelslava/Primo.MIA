@@ -70,6 +70,28 @@ namespace Primo.MIA
         /// <summary>Таймаут операции в секундах.</summary>
         public string Prop_CommandTimeoutSeconds { get => _propCommandTimeoutSeconds; set { _propCommandTimeoutSeconds = value; InvokePropertyChanged(this, nameof(Prop_CommandTimeoutSeconds)); } }
 
+                private string _propRetryCount;
+        /// <summary>Число повторов при транзиентной ошибке БД (0 — без повторов). Для read-операций.</summary>
+        [LTools.Common.Model.Serialization.StoringProperty]
+        [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
+        [System.ComponentModel.Category(ActivityStrings.Category_Settings), System.ComponentModel.DisplayName(ActivityStrings.Field_NetworkRetryCount)]
+        public string Prop_RetryCount
+        {
+            get => _propRetryCount;
+            set { _propRetryCount = value; InvokePropertyChanged(this, nameof(Prop_RetryCount)); }
+        }
+
+        private string _propRetryDelayMs;
+        /// <summary>Пауза между повторами, мс.</summary>
+        [LTools.Common.Model.Serialization.StoringProperty]
+        [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
+        [System.ComponentModel.Category(ActivityStrings.Category_Settings), System.ComponentModel.DisplayName(ActivityStrings.Field_NetworkRetryDelayMs)]
+        public string Prop_RetryDelayMs
+        {
+            get => _propRetryDelayMs;
+            set { _propRetryDelayMs = value; InvokePropertyChanged(this, nameof(Prop_RetryDelayMs)); }
+        }
+
         public DatabaseTableExistsBack(IWFContainer container) : base(container)
         {
             sdkComponentName = ActivityStrings.Activity_DatabaseTableExists;
@@ -98,6 +120,12 @@ namespace Primo.MIA
                 PropertyBuilder.Int("Prop_CommandTimeoutSeconds", "Таймаут операции в секундах"),
                 PropertyBuilder.Variable<bool>("Prop_Exists", "Таблица существует")
             };
+            // issue #43: повторы при транзиентных ошибках БД (read-операции)
+            sdkProperties.AddRange(new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
+            {
+                PropertyBuilder.Int("Prop_RetryCount", "Повторов при транзиентной ошибке БД (0 — без повторов)"),
+                PropertyBuilder.Int("Prop_RetryDelayMs", "Пауза между повторами, мс")
+            });
             InitClass(container);
         }
 
@@ -110,7 +138,11 @@ namespace Primo.MIA
                 var tableName = GetPropertyValue<string>(Prop_TableName, nameof(Prop_TableName), sd);
                 var schemaName = GetPropertyValue<string>(Prop_SchemaName, nameof(Prop_SchemaName), sd);
 
-                var exists = DatabaseHelper.TableExists(provider, connectionString, tableName, schemaName, Prop_IncludeViews);
+                var exists = NetworkRetry.ExecuteDbRead(
+                    GetPropertyValue<string>(Prop_RetryCount, nameof(Prop_RetryCount), sd),
+                    GetPropertyValue<string>(Prop_RetryDelayMs, nameof(Prop_RetryDelayMs), sd),
+                    () => DatabaseHelper.TableExists(provider, connectionString, tableName, schemaName, Prop_IncludeViews),
+                    sdkComponentName);
                 SetVariableValue(Prop_Exists, exists, sd);
 
                 return new ExecutionResult { IsSuccess = true, SuccessMessage = exists ? "Таблица найдена" : "Таблица не найдена" };

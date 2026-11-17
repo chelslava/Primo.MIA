@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using FluentAssertions;
@@ -158,6 +159,101 @@ namespace Primo.MIA.Tests.Common
             NetworkRetry.IsTransient(null).Should().BeFalse();
             NetworkRetry.IsTransient(new InvalidOperationException("логика")).Should().BeFalse();
             NetworkRetry.IsTransient(new UnauthorizedAccessException("доступ")).Should().BeFalse();
+        }
+
+        #endregion
+
+        #region IsTransientDb (issue #43: DB read-операции)
+
+        [Fact(DisplayName = "IsTransientDb: SqlException транзиентных кодов → true (дедлок/таймаут/throttle)")]
+        public void IsTransientDb_SqlTransientNumbers()
+        {
+            foreach (var number in new[] { 1205, -2, 4060, 40197, 40501, 40613, 40664 })
+                NetworkRetry.IsTransientDb(MakeSqlException(number))
+                    .Should().BeTrue($"код {number} транзиентен");
+        }
+
+        [Fact(DisplayName = "IsTransientDb: SqlException детерминированных кодов → false (синтаксис/права)")]
+        public void IsTransientDb_SqlDeterministic()
+        {
+            foreach (var number in new[] { 208, 229, 102, 547 })
+                NetworkRetry.IsTransientDb(MakeSqlException(number))
+                    .Should().BeFalse($"код {number} детерминирован");
+        }
+
+        [Fact(DisplayName = "IsTransientDb: NpgsqlException делегирует IsTransient")]
+        public void IsTransientDb_Npgsql()
+        {
+            var transient = System.Runtime.Serialization.FormatterServices.GetUninitializedObject(typeof(Npgsql.NpgsqlException));
+            NetworkRetry.IsTransientDb((Exception)transient).Should().BeFalse();
+        }
+
+        [Fact(DisplayName = "IsTransientDb: прочие исключения → false")]
+        public void IsTransientDb_Others()
+        {
+            NetworkRetry.IsTransientDb(null).Should().BeFalse();
+            NetworkRetry.IsTransientDb(new InvalidOperationException("логика")).Should().BeFalse();
+        }
+
+        [Fact(DisplayName = "ExecuteDbRead: повторяет транзиентное исключение до успеха и возвращает результат")]
+        public void ExecuteDbRead_RetriesTransient()
+        {
+            int calls = 0;
+            var result = NetworkRetry.ExecuteDbRead(
+                "2", "0",
+                () =>
+                {
+                    calls++;
+                    if (calls == 1)
+                        throw MakeSqlException(1205); // дедлок — транзиентный
+                    return "ok";
+                },
+                "ТестАктивность");
+
+            calls.Should().Be(2);
+            result.Should().Be("ok");
+        }
+
+        [Fact(DisplayName = "ExecuteDbRead: детерминированное исключение пробрасывается сразу")]
+        public void ExecuteDbRead_FailFastDeterministic()
+        {
+            int calls = 0;
+            Action act = () => NetworkRetry.ExecuteDbRead<string>(
+                "5", "0",
+                () =>
+                {
+                    calls++;
+                    throw MakeSqlException(208); // объект не существует — детерминированный
+                },
+                "ТестАктивность");
+
+            act.Should().Throw<System.Data.SqlClient.SqlException>();
+            calls.Should().Be(1);
+        }
+
+        private static Exception MakeSqlException(int number)
+        {
+            // SqlException конструируется только через внутренние API ADO.NET
+            var collection = (System.Data.SqlClient.SqlErrorCollection)typeof(System.Data.SqlClient.SqlErrorCollection)
+                .GetConstructor(System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance,
+                    null, Type.EmptyTypes, null)
+                .Invoke(null);
+            var method = typeof(System.Data.SqlClient.SqlErrorCollection)
+                .GetMethod("Add", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            var error = (System.Data.SqlClient.SqlError)System.Runtime.Serialization.FormatterServices
+                .GetUninitializedObject(typeof(System.Data.SqlClient.SqlError));
+            typeof(System.Data.SqlClient.SqlError)
+                .GetField("number", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+                ?.SetValue(error, number);
+            method?.Invoke(collection, new object[] { error });
+
+            var ctor = typeof(System.Data.SqlClient.SqlException)
+                .GetConstructors(System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+                .First(c => c.GetParameters().Length == 4);
+            return (Exception)ctor.Invoke(new object[]
+            {
+                "Ошибка сервера", collection, null, Guid.NewGuid()
+            });
         }
 
         #endregion

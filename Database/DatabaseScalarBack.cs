@@ -200,6 +200,28 @@ namespace Primo.MIA
             set { _propDateTimeValue = value; InvokePropertyChanged(this, nameof(Prop_DateTimeValue)); }
         }
 
+                private string _propRetryCount;
+        /// <summary>Число повторов при транзиентной ошибке БД (0 — без повторов). Для read-операций.</summary>
+        [LTools.Common.Model.Serialization.StoringProperty]
+        [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
+        [System.ComponentModel.Category(ActivityStrings.Category_Settings), System.ComponentModel.DisplayName(ActivityStrings.Field_NetworkRetryCount)]
+        public string Prop_RetryCount
+        {
+            get => _propRetryCount;
+            set { _propRetryCount = value; InvokePropertyChanged(this, nameof(Prop_RetryCount)); }
+        }
+
+        private string _propRetryDelayMs;
+        /// <summary>Пауза между повторами, мс.</summary>
+        [LTools.Common.Model.Serialization.StoringProperty]
+        [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
+        [System.ComponentModel.Category(ActivityStrings.Category_Settings), System.ComponentModel.DisplayName(ActivityStrings.Field_NetworkRetryDelayMs)]
+        public string Prop_RetryDelayMs
+        {
+            get => _propRetryDelayMs;
+            set { _propRetryDelayMs = value; InvokePropertyChanged(this, nameof(Prop_RetryDelayMs)); }
+        }
+
         public DatabaseScalarBack(IWFContainer container) : base(container)
         {
             sdkComponentName = ActivityStrings.Activity_DatabaseScalar;
@@ -251,6 +273,12 @@ ID транзакции: [String] Идентификатор активной т
                 PropertyBuilder.Variable<bool>("Prop_BoolValue", "Результат как Boolean"),
                 PropertyBuilder.Variable<DateTime>("Prop_DateTimeValue", "Результат как DateTime")
             };
+            // issue #43: повторы при транзиентных ошибках БД (read-операции)
+            sdkProperties.AddRange(new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
+            {
+                PropertyBuilder.Int("Prop_RetryCount", "Повторов при транзиентной ошибке БД (0 — без повторов)"),
+                PropertyBuilder.Int("Prop_RetryDelayMs", "Пауза между повторами, мс")
+            });
             InitClass(container);
         }
 
@@ -271,7 +299,11 @@ ID транзакции: [String] Идентификатор активной т
                 var transactionId = DatabaseTransactionResolver.ResolveOptional(explicitTransactionId);
 
                 var logic = new DatabaseCommandLogic();
-                var scalarResult = logic.ExecuteScalar(provider, connectionString, Prop_CommandType, commandText, parameters, timeout, transactionId);
+                var scalarResult = NetworkRetry.ExecuteDbRead(
+                    GetPropertyValue<string>(Prop_RetryCount, nameof(Prop_RetryCount), sd),
+                    GetPropertyValue<string>(Prop_RetryDelayMs, nameof(Prop_RetryDelayMs), sd),
+                    () => logic.ExecuteScalar(provider, connectionString, Prop_CommandType, commandText, parameters, timeout, transactionId),
+                    sdkComponentName);
                 var rawValue = scalarResult.ScalarValue;
                 var hasValue = rawValue != null && rawValue != DBNull.Value;
                 var defaultValue = GetPropertyValue<string>(Prop_DefaultValue, nameof(Prop_DefaultValue), sd);

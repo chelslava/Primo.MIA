@@ -37,6 +37,17 @@ namespace Primo.MIA.Common
         /// <summary>Последнее исключение, если все попытки завершились ошибкой.</summary>
         public Exception LastException { get; }
 
+        /// <summary>
+        /// Возвращает последний результат или пробрасывает последнее исключение
+        /// (все попытки исчерпаны ошибкой).
+        /// </summary>
+        public T ResultOrThrow()
+        {
+            if (HasResult)
+                return LastResult;
+            throw LastException ?? new InvalidOperationException("RetryOutcome не содержит ни результата, ни исключения");
+        }
+
         internal RetryOutcome(int attempts, bool hasResult, T lastResult, Exception lastException)
         {
             Attempts = attempts;

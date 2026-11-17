@@ -13,6 +13,7 @@
 // =============================================================================
 
 using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 
@@ -125,6 +126,77 @@ namespace Primo.MIA.Common
                     // ProtocolError (530 логин / 550 путь) и прочее — детерминированные
                     return false;
             }
+        }
+
+        // =====================================================================
+        // База данных (issue #43): повторы ТОЛЬКО для read-операций —
+        // SELECT/метаданные идемпотентны; повтор NonQuery/StoredProcedure при
+        // потере ответа после коммита дал бы двойное исполнение.
+        // =====================================================================
+
+        /// <summary>
+        /// Числа ошибок SQL Server, транзиентные для ретрая
+        /// (типовой облачный список + дедлок 1205 + таймаут -2).
+        /// </summary>
+        private static readonly HashSet<int> TransientSqlNumbers = new HashSet<int>
+        {
+            4060,   // не удалось открыть базу (переконфигурация/failover)
+            40143,  // база недоступна
+            40197,  // служба занята, повторите
+            40501,  // занята (throttling)
+            40540,  // временная ошибка
+            40613,  // база Azure недоступна
+            40643,  // превышен порог
+            40664,  // внутренняя ошибка, повторите
+            4221,   // не удалось установить соединение
+            45317,  // потеря соединения с репликой
+            1205,   // дедлок (жертва)
+            -2      // таймаут сервера
+        };
+
+        /// <summary>
+        /// Транзиентная ли ошибка БД (для read-операций). Ошибки провайдеров:
+        /// Npgsql (IsTransient), SQL Server (список кодов, вкл. дедлок).
+        /// Прочее (синтаксис, права, отсутствие объекта) — детерминированное.
+        /// </summary>
+        public static bool IsTransientDb(Exception ex)
+        {
+            if (ex == null)
+                return false;
+
+            switch (ex)
+            {
+                case Npgsql.NpgsqlException npg:
+                    return npg.IsTransient;
+
+                case System.Data.SqlClient.SqlException sql:
+                    return TransientSqlNumbers.Contains(sql.Number);
+
+                default:
+                    return false;
+            }
+        }
+
+        /// <summary>
+        /// Выполняет read-операцию БД с опциональными повторами при транзиентных
+        /// ошибках. Возвращает результат или пробрасывает последнее исключение.
+        /// </summary>
+        /// <param name="retryCountRaw">Строковое значение Prop_RetryCount.</param>
+        /// <param name="retryDelayMsRaw">Строковое значение Prop_RetryDelayMs.</param>
+        /// <param name="operation">Read-операция.</param>
+        /// <param name="componentName">Имя активности для файлового лога.</param>
+        public static T ExecuteDbRead<T>(
+            string retryCountRaw, string retryDelayMsRaw, Func<T> operation, string componentName)
+        {
+            var outcome = RetryPolicy.Execute(
+                _ => operation(),
+                ParseRetryCount(retryCountRaw) + 1,
+                shouldRetryException: (ex, attemptNumber) => IsTransientDb(ex),
+                delayMs: ParseRetryDelayMs(retryDelayMsRaw),
+                failureCallback: (ex, attemptNumber) => ActivityFileLogger.Warning(
+                    componentName, $"Попытка {attemptNumber} не удалась: {ex.Message}"));
+
+            return outcome.ResultOrThrow();
         }
 
         private static int Clamp(int value, int min, int max)
