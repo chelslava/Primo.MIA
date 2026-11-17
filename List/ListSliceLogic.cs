@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Primo.MIA.Common;
 
 namespace Primo.MIA
 {
@@ -39,8 +40,7 @@ namespace Primo.MIA
             int toIndex = 0,
             int step = 1)
         {
-            if (source == null)
-                throw new ArgumentNullException(nameof(source));
+            Guard.NotNull(source, nameof(source));
 
             var result = new ListSliceResult
             {

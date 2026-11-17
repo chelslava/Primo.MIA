@@ -16,8 +16,8 @@ namespace Primo.MIA
             Dictionary<string, string> second,
             DictionaryMergeStrategy strategy)
         {
-            if (first == null) throw new ArgumentNullException(nameof(first));
-            if (second == null) throw new ArgumentNullException(nameof(second));
+            Guard.NotNull(first, nameof(first));
+            Guard.NotNull(second, nameof(second));
 
             var result = new Dictionary<string, string>(first);
 
@@ -66,7 +66,7 @@ namespace Primo.MIA
             DictionaryFilterMethod method,
             bool caseSensitive = false)
         {
-            if (source == null) throw new ArgumentNullException(nameof(source));
+            Guard.NotNull(source, nameof(source));
 
             var comparison = ComparisonHelper.GetStringComparison(caseSensitive);
 
@@ -95,7 +95,7 @@ namespace Primo.MIA
             Dictionary<string, string> source,
             bool throwOnDuplicates = false)
         {
-            if (source == null) throw new ArgumentNullException(nameof(source));
+            Guard.NotNull(source, nameof(source));
 
             var result = new Dictionary<string, string>();
             var duplicates = new List<string>();

@@ -19,8 +19,7 @@ namespace Primo.MIA
             int minLength = 0,
             int maxLength = int.MaxValue)
         {
-            if (source == null)
-                throw new ArgumentNullException(nameof(source));
+            Guard.NotNull(source, nameof(source));
 
             var predicate = BuildPredicate(pattern, mode, caseSensitive, minLength, maxLength);
             var lookup = source.ToLookup(predicate);

@@ -12,8 +12,7 @@ namespace Primo.MIA
     {
         public List<string> Sort(List<string> source, ListSortMode mode, int? randomSeed = null)
         {
-            if (source == null)
-                throw new ArgumentNullException(nameof(source));
+            Guard.NotNull(source, nameof(source));
 
             var result = new List<string>(source);
 

@@ -12,8 +12,7 @@ namespace Primo.MIA
     {
         public object CreateTuple(List<object> values, TupleKind kind)
         {
-            if (values == null)
-                throw new ArgumentNullException(nameof(values));
+            Guard.NotNull(values, nameof(values));
 
             if (values.Count < 1 || values.Count > 7)
                 throw new ArgumentException("Кортеж должен содержать от 1 до 7 элементов");
@@ -23,8 +22,7 @@ namespace Primo.MIA
 
         public object GetTupleItem(object tuple, TupleItemIndex index)
         {
-            if (tuple == null)
-                throw new ArgumentNullException(nameof(tuple));
+            Guard.NotNull(tuple, nameof(tuple));
 
             int arity = TupleHelper.GetArity(tuple);
             if (arity < 0)
@@ -39,8 +37,7 @@ namespace Primo.MIA
 
         public List<object> DestructureTuple(object tuple)
         {
-            if (tuple == null)
-                throw new ArgumentNullException(nameof(tuple));
+            Guard.NotNull(tuple, nameof(tuple));
 
             int arity = TupleHelper.GetArity(tuple);
             if (arity < 0)
@@ -63,8 +60,7 @@ namespace Primo.MIA
 
         public object SetTupleItem(object tuple, TupleItemIndex index, object newValue)
         {
-            if (tuple == null)
-                throw new ArgumentNullException(nameof(tuple));
+            Guard.NotNull(tuple, nameof(tuple));
 
             int arity = TupleHelper.GetArity(tuple);
             if (arity < 0)

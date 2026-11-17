@@ -51,7 +51,7 @@ namespace Primo.MIA
         /// <exception cref="UtilityException">Ошибка синтаксиса или неизвестная колонка.</exception>
         public static Func<DataRow, bool> Compile(DataTable table, string expression, bool caseSensitive = false)
         {
-            if (table == null) throw new ArgumentNullException(nameof(table));
+            Guard.NotNull(table, nameof(table));
             if (string.IsNullOrWhiteSpace(expression))
                 throw new UtilityException($"{ActivityStrings.Error_SqlQueryRequired}.");
 

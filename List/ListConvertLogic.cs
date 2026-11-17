@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Primo.MIA.Common;
 
 namespace Primo.MIA
 {
@@ -18,8 +19,7 @@ namespace Primo.MIA
             List<string> secondList = null,
             int chunkSize = 10)
         {
-            if (source == null)
-                throw new ArgumentNullException(nameof(source));
+            Guard.NotNull(source, nameof(source));
 
             switch (mode)
             {

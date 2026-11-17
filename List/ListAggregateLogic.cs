@@ -34,8 +34,7 @@ namespace Primo.MIA
             ListAggregateMode mode,
             string separator = ", ")
         {
-            if (source == null)
-                throw new ArgumentNullException(nameof(source));
+            Guard.NotNull(source, nameof(source));
 
             var numbers = source
                 .Where(s => !string.IsNullOrWhiteSpace(s))

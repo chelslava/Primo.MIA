@@ -16,8 +16,7 @@ namespace Primo.MIA
             ListSetOperation operation,
             bool caseSensitive = false)
         {
-            if (listA == null)
-                throw new ArgumentNullException(nameof(listA));
+            Guard.NotNull(listA, nameof(listA));
 
             var comparer = ComparisonHelper.GetStringComparer(caseSensitive);
 

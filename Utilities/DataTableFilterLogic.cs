@@ -42,7 +42,7 @@ namespace Primo.MIA
         /// <param name="caseSensitive">Учитывать регистр при сравнении строк.</param>
         public DataTableFilterResult Filter(DataTable source, string sqlExpression, bool caseSensitive = false)
         {
-            if (source == null) throw new ArgumentNullException(nameof(source));
+            Guard.NotNull(source, nameof(source));
 
             var predicate = DataTableSqlWhereParser.Compile(source, sqlExpression, caseSensitive);
             return Apply(source, predicate);
@@ -58,7 +58,7 @@ namespace Primo.MIA
         /// <param name="caseSensitive">Учитывать регистр при сравнении строк.</param>
         public DataTableFilterResult Filter(DataTable source, IReadOnlyList<DataTableFilterCondition> conditions, bool caseSensitive = false)
         {
-            if (source == null) throw new ArgumentNullException(nameof(source));
+            Guard.NotNull(source, nameof(source));
             if (conditions == null || conditions.Count == 0)
                 throw new UtilityException(ActivityStrings.Error_ConditionsRequired);
 

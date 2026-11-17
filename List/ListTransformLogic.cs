@@ -24,8 +24,7 @@ namespace Primo.MIA
             bool caseSensitive = false,
             bool preserveNullItems = true)
         {
-            if (source == null)
-                throw new ArgumentNullException(nameof(source));
+            Guard.NotNull(source, nameof(source));
 
             var transform = BuildTransform(
                 mode,
