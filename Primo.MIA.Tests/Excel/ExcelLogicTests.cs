@@ -239,6 +239,105 @@ namespace Primo.MIA.Tests.Excel
 
         #endregion
 
+        #region Формула на столбец (issue #47)
+
+        [Fact(DisplayName = "FillColumnFormula: {row} подставляется по строкам")]
+        public void FillColumnFormula_RowPlaceholder()
+        {
+            var table = new DataTable();
+            table.Columns.Add("a", typeof(double));
+            table.Columns.Add("b", typeof(double));
+            table.Rows.Add(2d, 3d);
+            table.Rows.Add(4d, 5d);
+            ExcelLogic.WriteRange(_filePath, null, "A1",
+                ExcelWriteMode.Overwrite, createIfMissing: true, writeHeaders: false, table: table);
+
+            int filled = ExcelLogic.FillColumnFormula(_filePath, null, "C", "=A{row}*B{row}", 1, 2);
+            filled.Should().Be(2);
+
+            using var wb = new XLWorkbook(_filePath);
+            wb.Worksheet(1).Cell("C1").FormulaA1.Should().Be("A1*B1");
+            wb.Worksheet(1).Cell("C2").FormulaA1.Should().Be("A2*B2");
+        }
+
+        [Fact(DisplayName = "FillColumnFormula: без {row} формула одинакова; без «=» добавляется")]
+        public void FillColumnFormula_NoPlaceholder_AutoEquals()
+        {
+            var table = new DataTable();
+            table.Columns.Add("x");
+            table.Rows.Add("v");
+            table.Rows.Add("v");
+            ExcelLogic.WriteRange(_filePath, null, "A1",
+                ExcelWriteMode.Overwrite, createIfMissing: true, writeHeaders: false, table: table);
+
+            ExcelLogic.FillColumnFormula(_filePath, null, "B", "СУММА", 1, 2);
+
+            using var wb = new XLWorkbook(_filePath);
+            wb.Worksheet(1).Cell("B1").FormulaA1.Should().Be("СУММА");
+            wb.Worksheet(1).Cell("B2").FormulaA1.Should().Be("СУММА");
+        }
+
+        [Fact(DisplayName = "FillColumnFormula: нижний регистр столбца нормализуется")]
+        public void FillColumnFormula_LowercaseColumn()
+        {
+            var table = new DataTable();
+            table.Columns.Add("x");
+            table.Rows.Add("v");
+            ExcelLogic.WriteRange(_filePath, null, "A1",
+                ExcelWriteMode.Overwrite, createIfMissing: true, writeHeaders: false, table: table);
+
+            int filled = ExcelLogic.FillColumnFormula(_filePath, null, "b", "=1", 1, 1);
+            filled.Should().Be(1);
+
+            using var wb = new XLWorkbook(_filePath);
+            wb.Worksheet(1).Cell("B1").HasFormula.Should().BeTrue();
+        }
+
+        [Fact(DisplayName = "FillColumnFormula: ошибки — некорректный столбец/строки/файл")]
+        public void FillColumnFormula_Errors()
+        {
+            var table = new DataTable();
+            table.Columns.Add("x");
+            table.Rows.Add("v");
+            ExcelLogic.WriteRange(_filePath, null, "A1",
+                ExcelWriteMode.Overwrite, createIfMissing: true, writeHeaders: false, table: table);
+
+            Action badColumn = () => ExcelLogic.FillColumnFormula(_filePath, null, "12C", "=1", 1, 2);
+            badColumn.Should().Throw<FormatException>();
+
+            Action badRows = () => ExcelLogic.FillColumnFormula(_filePath, null, "A", "=1", 5, 2);
+            badRows.Should().Throw<ArgumentOutOfRangeException>();
+
+            Action badStart = () => ExcelLogic.FillColumnFormula(_filePath, null, "A", "=1", 0, 2);
+            badStart.Should().Throw<ArgumentOutOfRangeException>();
+
+            Action missing = () => ExcelLogic.FillColumnFormula(
+                Path.Combine(_tempDir, "нет-файла.xlsx"), null, "A", "=1", 1, 2);
+            missing.Should().Throw<FileNotFoundException>();
+        }
+
+        [Fact(DisplayName = "Round-trip 10 000 строк — линейное время, целостность данных")]
+        public void RoundTrip_10kRows()
+        {
+            var table = new DataTable("Большой");
+            table.Columns.Add("Ид", typeof(int));
+            table.Columns.Add("Значение", typeof(double));
+            for (int i = 1; i <= 10_000; i++)
+                table.Rows.Add(i, i * 0.5);
+
+            int written = ExcelLogic.WriteRange(_filePath, "Большой", "A1",
+                ExcelWriteMode.Overwrite, createIfMissing: true, writeHeaders: false, table: table);
+            written.Should().Be(10_000);
+
+            var read = ExcelLogic.ReadRange(_filePath, "Большой", null, headerRow: false);
+            read.Rows.Count.Should().Be(10_000);
+            read.Rows[0][0].Should().Be(1d);
+            read.Rows[9_999][0].Should().Be(10_000d);
+            read.Rows[9_999][1].Should().Be(5_000d);
+        }
+
+        #endregion
+
         #region Ошибки
 
         [Fact(DisplayName = "Чтение: файл отсутствует → FileNotFoundException")]

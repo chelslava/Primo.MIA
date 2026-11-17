@@ -134,6 +134,73 @@ namespace Primo.MIA
         }
 
         // =====================================================================
+        // Формула на столбец (issue #47)
+        // =====================================================================
+
+        /// <summary>
+        /// Заполняет столбец формулой по шаблону для диапазона строк.
+        /// В шаблоне <paramref name="formulaTemplate"/> подстрока {row} заменяется
+        /// номером строки каждой ячейки («=A{row}*B{row}» → «=A2*B2», «=A3*B3»…);
+        /// без {row} формула одинакова во всех ячейках.
+        /// </summary>
+        /// <param name="filePath">Путь к .xlsx.</param>
+        /// <param name="sheetName">Имя листа; пусто — первый лист.</param>
+        /// <param name="columnLetter">Буква столбца (A…XFD).</param>
+        /// <param name="formulaTemplate">Шаблон формулы в A1-нотации, с {row} или без.</param>
+        /// <param name="startRow">Первая строка (≥ 1).</param>
+        /// <param name="endRow">Последняя строка (≥ startRow).</param>
+        /// <returns>Число заполненных ячеек.</returns>
+        public static int FillColumnFormula(
+            string filePath, string sheetName, string columnLetter,
+            string formulaTemplate, int startRow, int endRow)
+        {
+            Guard.NotNullOrWhiteSpace(filePath, nameof(filePath));
+            if (!File.Exists(filePath))
+                throw new FileNotFoundException($"Файл Excel не найден: {filePath}", filePath);
+            Guard.NotNullOrWhiteSpace(formulaTemplate, nameof(formulaTemplate));
+
+            if (string.IsNullOrWhiteSpace(columnLetter) ||
+                !System.Text.RegularExpressions.Regex.IsMatch(
+                    columnLetter.Trim(), @"^[A-Za-z]{1,3}$"))
+                throw new FormatException(
+                    $"{ActivityStrings.Error_ExcelStartCellInvalid}: столбец «{columnLetter?.Trim()}»");
+
+            if (startRow < 1)
+                throw new ArgumentOutOfRangeException(nameof(startRow), startRow, "Первая строка должна быть ≥ 1");
+            if (endRow < startRow)
+                throw new ArgumentOutOfRangeException(nameof(endRow), endRow, "Последняя строка не может быть меньше первой");
+
+            columnLetter = columnLetter.Trim().ToUpperInvariant();
+            string formula = formulaTemplate.Trim();
+            if (!formula.StartsWith("=", StringComparison.Ordinal))
+                formula = "=" + formula;
+
+            int filled = 0;
+            using (var workbook = new XLWorkbook(filePath))
+            {
+                IXLWorksheet worksheet = ResolveWorksheet(workbook, sheetName);
+                for (int row = startRow; row <= endRow; row++)
+                {
+                    var cellFormula = formula.Replace("{row}", row.ToString(CultureInfo.InvariantCulture));
+                    worksheet.Cell(row, ColumnNumber(columnLetter)).SetFormulaA1(cellFormula);
+                    filled++;
+                }
+                workbook.Save();
+            }
+
+            return filled;
+        }
+
+        /// <summary>Номер столбца по букве (A→1 … XFD→16384).</summary>
+        private static int ColumnNumber(string columnLetter)
+        {
+            int number = 0;
+            foreach (char c in columnLetter)
+                number = number * 26 + (c - 'A' + 1);
+            return number;
+        }
+
+        // =====================================================================
         // Запись
         // =====================================================================
 

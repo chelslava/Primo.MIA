@@ -1,0 +1,91 @@
+<UserControl x:Class="Primo.MIA.ExcelFillColumnFormula"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignHeight="330" Margin="0,0,0,5">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Primo.MIA;component/Common/Styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <Grid Background="{DynamicResource {x:Static SystemColors.ScrollBarBrushKey}}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Image Grid.Column="0" Width="32" Height="32" Margin="5" VerticalAlignment="Center"
+               Source="pack://application:,,,/Primo.MIA;component/images/excel.png"/>
+        <StackPanel Grid.Column="1" Margin="5,0,5,5">
+            <TextBlock Text="Excel: Формула на столбец" Style="{StaticResource ActivityHeader}"/>
+
+            <TextBlock Text="Файл (.xlsx):" Style="{StaticResource FieldLabel}"/>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBox x:Name="TxtFilePath"
+                         Grid.Column="0"
+                         Text="{Binding Prop_FilePath, UpdateSourceTrigger=PropertyChanged}"
+                         Style="{StaticResource FieldBox}"
+                         Margin="0,2,4,0"
+                         ToolTip="Путь к файлу .xlsx"/>
+                <Button Grid.Column="1"
+                        Style="{StaticResource BrowseButton}"
+                        Content=""
+                        Click="BtnBrowseXlsx_Click"
+                        ToolTip="Выбрать файл Excel...">
+                    <Button.Background>
+                        <ImageBrush ImageSource="/Primo.MIA;component/images/folder.png" TileMode="None"/>
+                    </Button.Background>
+                </Button>
+            </Grid>
+
+            <Grid Margin="0,2,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="Лист:" VerticalAlignment="Center" Style="{StaticResource FieldLabel}" Margin="0,0,4,0"/>
+                <TextBox Grid.Column="1" Text="{Binding Prop_SheetName, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                         ToolTip="Имя листа; пусто — первый лист книги"/>
+            </Grid>
+
+            <Grid Margin="0,2,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="Столбец (буква):" VerticalAlignment="Center" Style="{StaticResource FieldLabel}" Margin="0,0,4,0"/>
+                <TextBox Grid.Column="1" Text="{Binding Prop_ColumnLetter, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                         ToolTip="Буква столбца (A…XFD), например C"/>
+            </Grid>
+
+            <TextBlock Text="Формула (шаблон):" Style="{StaticResource FieldLabel}"/>
+            <TextBox Text="{Binding Prop_Formula, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                     ToolTip="Шаблон с {row}: =A{row}*B{row} — {row} заменяется номером строки; без {row} формула одинакова во всех ячейках"/>
+
+            <Grid Margin="0,2,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="Первая строка:" VerticalAlignment="Center" Style="{StaticResource FieldLabel}" Margin="0,0,4,0"/>
+                <TextBox Grid.Column="1" Text="{Binding Prop_StartRow, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                         ToolTip="По умолчанию 2 (после строки заголовков)"/>
+                <TextBlock Grid.Column="2" Text="Последняя:" VerticalAlignment="Center" Style="{StaticResource FieldLabel}" Margin="0,0,4,0"/>
+                <TextBox Grid.Column="3" Text="{Binding Prop_EndRow, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                         ToolTip="Включительно, например 1000"/>
+            </Grid>
+
+            <TextBlock Text="Заполнено ячеек:" Style="{StaticResource FieldLabel}"/>
+            <TextBox Text="{Binding Prop_FilledCells, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                     ToolTip="Переменная (Int32) для числа заполненных ячеек"/>
+        </StackPanel>
+    </Grid>
+</UserControl>
