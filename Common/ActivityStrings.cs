@@ -177,6 +177,8 @@ namespace Primo.MIA.Common
         public const string Error_DestinationTableRequired = "Таблица-приёмник обязательна";
         public const string Error_TransactionIdRequired = "ID транзакции обязателен";
         public const string Error_TableNameRequired = "Имя таблицы обязательно";
+        public const string Field_Password = "Пароль";
+        public const string Error_DbPasswordRequired = "Пароль подключения обязателен";
 
         // ═══════════════════════════════════════════════════════════════════════
         // НАЗВАНИЯ АКТИВНОСТЕЙ

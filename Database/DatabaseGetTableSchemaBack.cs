@@ -153,5 +153,13 @@ namespace Primo.MIA
                 return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Ошибка получения схемы таблицы: {ex.Message}" };
             }
         }
+
+        public override ValidationResult Validate()
+        {
+            var result = new ValidationResult();
+            result.ValidateRequired(Prop_ConnectionString, ActivityStrings.Field_ConnectionString, ActivityStrings.Error_ConnectionStringRequired);
+            result.ValidateRequired(Prop_TableName, ActivityStrings.Field_TableName, ActivityStrings.Error_TableNameRequired);
+            return result;
+        }
     }
 }

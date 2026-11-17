@@ -83,5 +83,12 @@ ID транзакции: [String] Идентификатор транзакци�
                 };
             }
         }
+
+        public override ValidationResult Validate()
+        {
+            var result = new ValidationResult();
+            result.ValidateRequired(Prop_TransactionId, ActivityStrings.Field_TransactionId, ActivityStrings.Error_TransactionIdRequired);
+            return result;
+        }
     }
 }

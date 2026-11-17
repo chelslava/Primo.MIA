@@ -108,5 +108,12 @@ namespace Primo.MIA
                 };
             }
         }
+
+        public override ValidationResult Validate()
+        {
+            var result = new ValidationResult();
+            result.ValidateRequired(Prop_Password, ActivityStrings.Field_Password, ActivityStrings.Error_DbPasswordRequired);
+            return result;
+        }
     }
 }

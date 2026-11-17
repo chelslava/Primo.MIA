@@ -160,5 +160,12 @@ namespace Primo.MIA
                 return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Ошибка получения списка таблиц: {ex.Message}" };
             }
         }
+
+        public override ValidationResult Validate()
+        {
+            var result = new ValidationResult();
+            result.ValidateRequired(Prop_ConnectionString, ActivityStrings.Field_ConnectionString, ActivityStrings.Error_ConnectionStringRequired);
+            return result;
+        }
     }
 }
