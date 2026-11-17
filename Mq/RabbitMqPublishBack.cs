@@ -71,14 +71,10 @@ Persistent: [Boolean] DeliveryMode=2 (переживает перезапуск 
 VirtualHost: [String] По умолчанию ""/"".
 TLS: [Boolean] Использовать amqps (порт по умолчанию 5671).";
             sdkComponentIcon = ActivityIcons.MessageQueue;
-            sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
+            var connProps = BuildConnectionProperties();
+            connProps.AddRange(BuildRetryProperties());
+            sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>(connProps)
             {
-                PropertyBuilder.String("Prop_Host", "Хост RabbitMQ"),
-                PropertyBuilder.Int("Prop_Port", "Порт (5672; TLS — 5671)"),
-                PropertyBuilder.String("Prop_UserName", "Имя пользователя"),
-                PropertyBuilder.String("Prop_Password", "Пароль"),
-                PropertyBuilder.String("Prop_VirtualHost", "VirtualHost (/ по умолчанию)"),
-                PropertyBuilder.BooleanObject("Prop_UseTls", "Использовать TLS"),
                 PropertyBuilder.String("Prop_Exchange", "Exchange (пусто = дефолтный)"),
                 PropertyBuilder.String("Prop_RoutingKey", "Routing Key"),
                 PropertyBuilder.String("Prop_Body", "Тело сообщения"),

@@ -55,14 +55,10 @@ namespace Primo.MIA
 Удалено сообщений: [Int32]";
             sdkComponentIcon = ActivityIcons.MessageQueue;
 
-            sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
+            var connProps = BuildConnectionProperties();
+            connProps.AddRange(BuildRetryProperties());
+            sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>(connProps)
             {
-                PropertyBuilder.String("Prop_Host", "Хост RabbitMQ"),
-                PropertyBuilder.Int("Prop_Port", "Порт (5672; TLS — 5671)"),
-                PropertyBuilder.String("Prop_UserName", "Имя пользователя"),
-                PropertyBuilder.String("Prop_Password", "Пароль"),
-                PropertyBuilder.String("Prop_VirtualHost", "VirtualHost (/ по умолчанию)"),
-                PropertyBuilder.BooleanObject("Prop_UseTls", "Использовать TLS"),
                 PropertyBuilder.String("Prop_Queue", "Имя очереди для очистки"),
                 PropertyBuilder.Variable<int>("Prop_PurgedCount", "Удалено сообщений")
             };

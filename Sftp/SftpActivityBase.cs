@@ -143,6 +143,46 @@ namespace Primo.MIA
             set { _propAllowAnyHostKey = value; InvokePropertyChanged(this, nameof(Prop_AllowAnyHostKey)); }
         }
 
+        private string _propRetryCount;
+        /// <summary>Число повторов при транзиентном сетевом сбое (0 — без повторов).</summary>
+        [LTools.Common.Model.Serialization.StoringProperty]
+        [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
+        [System.ComponentModel.Category(ActivityStrings.Category_Settings), System.ComponentModel.DisplayName(ActivityStrings.Field_NetworkRetryCount)]
+        public string Prop_RetryCount
+        {
+            get => _propRetryCount;
+            set { _propRetryCount = value; InvokePropertyChanged(this, nameof(Prop_RetryCount)); }
+        }
+
+        private string _propRetryDelayMs;
+        /// <summary>Пауза между повторами, мс.</summary>
+        [LTools.Common.Model.Serialization.StoringProperty]
+        [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
+        [System.ComponentModel.Category(ActivityStrings.Category_Settings), System.ComponentModel.DisplayName(ActivityStrings.Field_NetworkRetryDelayMs)]
+        public string Prop_RetryDelayMs
+        {
+            get => _propRetryDelayMs;
+            set { _propRetryDelayMs = value; InvokePropertyChanged(this, nameof(Prop_RetryDelayMs)); }
+        }
+
+        // ── Хелперы ──────────────────────────────────────────────────────
+
+        /// <summary>
+        /// Свойства подключения для панели Studio (общие для всех SFTP-активностей).
+        /// </summary>
+        protected static LTools.Common.Helpers.WFHelper.PropertiesItem[] ConnectionProperties()
+        {
+            return new[]
+            {
+                PropertyBuilder.String("Prop_Host", "Хост SFTP-сервера"),
+                PropertyBuilder.Int("Prop_Port", "Порт (по умолчанию 22)"),
+                PropertyBuilder.String("Prop_UserName", "Имя пользователя"),
+                PropertyBuilder.String("Prop_Password", "Пароль"),
+                PropertyBuilder.Int("Prop_RetryCount", "Повторов при сетевом сбое (0 — без повторов)"),
+                PropertyBuilder.Int("Prop_RetryDelayMs", "Пауза между повторами, мс")
+            };
+        }
+
         // ── Выполнение ───────────────────────────────────────────────────
 
         /// <summary>
@@ -167,21 +207,60 @@ namespace Primo.MIA
 
         /// <summary>
         /// Шаблон «подключить → выполнить → отключить» с маппингом исключений SSH.NET.
+        /// При Prop_RetryCount &gt; 0 транзиентные сетевые сбои (соединение, транспорт)
+        /// повторяются с новым подключением; детерминированные ошибки
+        /// (аутентификация, путь) не повторяются (issue #43).
         /// </summary>
         /// <param name="sd">Данные скрипта.</param>
         /// <param name="operation">Операция над подключённым SftpClient.</param>
         protected ExecutionResult ExecuteSftp(ScriptingData sd, Func<SftpClient, ExecutionResult> operation)
         {
             var settings = ResolveSettings(sd);
-            SftpClient client = null;
+
+            int retryCount = NetworkRetry.ParseRetryCount(
+                GetPropertyValue<string>(this.Prop_RetryCount, nameof(Prop_RetryCount), sd));
+            int retryDelayMs = NetworkRetry.ParseRetryDelayMs(
+                GetPropertyValue<string>(this.Prop_RetryDelayMs, nameof(Prop_RetryDelayMs), sd));
+
             try
             {
-                client = new SftpLogic().CreateClient(settings);
-                client.Connect();
-                if (!client.IsConnected)
-                    return new ExecutionResult { IsSuccess = false, ErrorMessage = ActivityStrings.Error_SftpConnectFailed };
+                var outcome = RetryPolicy.Execute(
+                    attempt =>
+                    {
+                        // каждая попытка — новое подключение: клиент предыдущей
+                        // мог остаться в разорванном состоянии
+                        SftpClient client = null;
+                        try
+                        {
+                            client = new SftpLogic().CreateClient(settings);
+                            client.Connect();
+                            if (!client.IsConnected)
+                                throw new Renci.SshNet.Common.SshConnectionException(ActivityStrings.Error_SftpConnectFailed);
 
-                return operation(client);
+                            return operation(client);
+                        }
+                        finally
+                        {
+                            // порядок сохранён: Disconnect → Dispose; исключение
+                            // освобождения уже разорванной сессии глушится
+                            SafeDispose.Quiet(
+                                () =>
+                                {
+                                    client?.Disconnect();
+                                    client?.Dispose();
+                                },
+                                "SFTP disconnect/dispose");
+                        }
+                    },
+                    retryCount + 1,
+                    shouldRetryException: (ex, attemptNumber) => NetworkRetry.IsTransient(ex),
+                    delayMs: retryDelayMs,
+                    failureCallback: (ex, attemptNumber) => Common.ActivityFileLogger.Warning(
+                        sdkComponentName, $"Попытка {attemptNumber} не удалась: {ex.Message}"));
+
+                if (outcome.LastException != null)
+                    throw outcome.LastException; // попытки исчерпаны — маппинг внешним catch
+                return outcome.LastResult;
             }
             catch (Renci.SshNet.Common.SshAuthenticationException ex)
             {
@@ -202,19 +281,6 @@ namespace Primo.MIA
             catch (Exception ex)
             {
                 return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Ошибка SFTP: {ex.Message}" };
-            }
-            finally
-            {
-                // порядок сохранён: Disconnect → Dispose; исключение освобождения
-                // уже разорванной сессии глушится (не критично), при включённом
-                // файловом логе фиксируется уровнем Debug
-                SafeDispose.Quiet(
-                    () =>
-                    {
-                        client?.Disconnect();
-                        client?.Dispose();
-                    },
-                    "SFTP disconnect/dispose");
             }
         }
 

@@ -91,6 +91,28 @@ namespace Primo.MIA
             set { _propConnectionTimeoutSeconds = value; InvokePropertyChanged(this, nameof(Prop_ConnectionTimeoutSeconds)); }
         }
 
+        private string _propRetryCount;
+        /// <summary>Число повторов при транзиентном сетевом сбое (0 — без повторов).</summary>
+        [LTools.Common.Model.Serialization.StoringProperty]
+        [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
+        [System.ComponentModel.Category(ActivityStrings.Category_Settings), System.ComponentModel.DisplayName(ActivityStrings.Field_NetworkRetryCount)]
+        public string Prop_RetryCount
+        {
+            get => _propRetryCount;
+            set { _propRetryCount = value; InvokePropertyChanged(this, nameof(Prop_RetryCount)); }
+        }
+
+        private string _propRetryDelayMs;
+        /// <summary>Пауза между повторами, мс.</summary>
+        [LTools.Common.Model.Serialization.StoringProperty]
+        [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
+        [System.ComponentModel.Category(ActivityStrings.Category_Settings), System.ComponentModel.DisplayName(ActivityStrings.Field_NetworkRetryDelayMs)]
+        public string Prop_RetryDelayMs
+        {
+            get => _propRetryDelayMs;
+            set { _propRetryDelayMs = value; InvokePropertyChanged(this, nameof(Prop_RetryDelayMs)); }
+        }
+
         // ── Выполнение ───────────────────────────────────────────────────
 
         /// <summary>
@@ -126,19 +148,51 @@ namespace Primo.MIA
         }
 
         /// <summary>
+        /// Свойства повторов при сетевом сбое (issue #43). Используются только
+        /// публикующими активностями — потребление повторами не покрывается.
+        /// </summary>
+        protected List<LTools.Common.Helpers.WFHelper.PropertiesItem> BuildRetryProperties()
+        {
+            return new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
+            {
+                PropertyBuilder.Int("Prop_RetryCount", "Повторов при сетевом сбое (0 — без повторов)"),
+                PropertyBuilder.Int("Prop_RetryDelayMs", "Пауза между повторами, мс")
+            };
+        }
+
+        /// <summary>
         /// Шаблон «создать продюсер → выполнить → закрыть» с маппингом
-        /// исключений Confluent.Kafka.
+        /// исключений Confluent.Kafka. При Prop_RetryCount &gt; 0 транзиентные
+        /// сбои доставки повторяются (issue #43).
         /// </summary>
         protected ExecutionResult ExecuteKafkaProducer(ScriptingData sd, Func<IProducer<string, string>, ExecutionResult> operation)
         {
+            int retryCount = NetworkRetry.ParseRetryCount(
+                GetPropertyValue<string>(this.Prop_RetryCount, nameof(Prop_RetryCount), sd));
+            int retryDelayMs = NetworkRetry.ParseRetryDelayMs(
+                GetPropertyValue<string>(this.Prop_RetryDelayMs, nameof(Prop_RetryDelayMs), sd));
+
             try
             {
-                var logic = new KafkaLogic();
-                var config = logic.BuildProducerConfig(ResolveSettings(sd));
-                using (var producer = new ProducerBuilder<string, string>(config).Build())
-                {
-                    return operation(producer);
-                }
+                var outcome = RetryPolicy.Execute(
+                    attempt =>
+                    {
+                        var logic = new KafkaLogic();
+                        var config = logic.BuildProducerConfig(ResolveSettings(sd));
+                        using (var producer = new ProducerBuilder<string, string>(config).Build())
+                        {
+                            return operation(producer);
+                        }
+                    },
+                    retryCount + 1,
+                    shouldRetryException: (ex, attemptNumber) => NetworkRetry.IsTransient(ex),
+                    delayMs: retryDelayMs,
+                    failureCallback: (ex, attemptNumber) => Common.ActivityFileLogger.Warning(
+                        sdkComponentName, $"Попытка {attemptNumber} не удалась: {ex.Message}"));
+
+                if (outcome.LastException != null)
+                    throw outcome.LastException; // попытки исчерпаны — маппинг внешним catch
+                return outcome.LastResult;
             }
             catch (ProduceException<string, string> ex)
             {

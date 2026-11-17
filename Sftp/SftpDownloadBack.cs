@@ -69,12 +69,8 @@ namespace Primo.MIA
 Выходные данные:
 Получено байт: [Int64] Размер скачанного файла.";
             sdkComponentIcon = ActivityIcons.Sftp;
-            sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
+            sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>(ConnectionProperties())
             {
-                PropertyBuilder.String("Prop_Host", "Хост SFTP-сервера"),
-                PropertyBuilder.Int("Prop_Port", "Порт (по умолчанию 22)"),
-                PropertyBuilder.String("Prop_UserName", "Имя пользователя"),
-                PropertyBuilder.String("Prop_Password", "Пароль"),
                 PropertyBuilder.String("Prop_RemotePath", "Удалённый путь к файлу"),
                 PropertyBuilder.FileSelector("Prop_LocalPath", "Локальный путь сохранения"),
                 PropertyBuilder.BooleanObject("Prop_Overwrite", "Перезаписать при существовании"),

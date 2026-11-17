@@ -9,6 +9,7 @@ using LTools.SDK;
 using RabbitMQ.Client;
 using Primo.MIA.Common;
 using System;
+using System.Collections.Generic;
 
 namespace Primo.MIA
 {
@@ -101,6 +102,28 @@ namespace Primo.MIA
             set { _propConnectionTimeoutSeconds = value; InvokePropertyChanged(this, nameof(Prop_ConnectionTimeoutSeconds)); }
         }
 
+        private string _propRetryCount;
+        /// <summary>Число повторов при транзиентном сетевом сбое (0 — без повторов).</summary>
+        [LTools.Common.Model.Serialization.StoringProperty]
+        [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
+        [System.ComponentModel.Category(ActivityStrings.Category_Settings), System.ComponentModel.DisplayName(ActivityStrings.Field_NetworkRetryCount)]
+        public string Prop_RetryCount
+        {
+            get => _propRetryCount;
+            set { _propRetryCount = value; InvokePropertyChanged(this, nameof(Prop_RetryCount)); }
+        }
+
+        private string _propRetryDelayMs;
+        /// <summary>Пауза между повторами, мс.</summary>
+        [LTools.Common.Model.Serialization.StoringProperty]
+        [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
+        [System.ComponentModel.Category(ActivityStrings.Category_Settings), System.ComponentModel.DisplayName(ActivityStrings.Field_NetworkRetryDelayMs)]
+        public string Prop_RetryDelayMs
+        {
+            get => _propRetryDelayMs;
+            set { _propRetryDelayMs = value; InvokePropertyChanged(this, nameof(Prop_RetryDelayMs)); }
+        }
+
         // ── Выполнение ───────────────────────────────────────────────────
 
         /// <summary>
@@ -121,22 +144,97 @@ namespace Primo.MIA
         }
 
         /// <summary>
+        /// Общий набор свойств подключения для панели свойств Studio.
+        /// </summary>
+        protected List<LTools.Common.Helpers.WFHelper.PropertiesItem> BuildConnectionProperties()
+        {
+            return new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
+            {
+                PropertyBuilder.String("Prop_Host", "Хост RabbitMQ"),
+                PropertyBuilder.Int("Prop_Port", "Порт (5672; TLS — 5671)"),
+                PropertyBuilder.String("Prop_UserName", "Имя пользователя"),
+                PropertyBuilder.String("Prop_Password", "Пароль"),
+                PropertyBuilder.String("Prop_VirtualHost", "VirtualHost (/ по умолчанию)"),
+                PropertyBuilder.BooleanObject("Prop_UseTls", "Использовать TLS")
+            };
+        }
+
+        /// <summary>
+        /// Свойства повторов при сетевом сбое (issue #43). Добавляются в панель
+        /// только теми активностями, чей путь выполнения поддерживает повторы.
+        /// </summary>
+        protected List<LTools.Common.Helpers.WFHelper.PropertiesItem> BuildRetryProperties()
+        {
+            return new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
+            {
+                PropertyBuilder.Int("Prop_RetryCount", "Повторов при сетевом сбое (0 — без повторов)"),
+                PropertyBuilder.Int("Prop_RetryDelayMs", "Пауза между повторами, мс")
+            };
+        }
+
+        /// <summary>
         /// Шаблон «подключить → открыть канал → выполнить → закрыть»
         /// с маппингом исключений RabbitMQ (API 6.x — синхронный).
+        /// При Prop_RetryCount &gt; 0 транзиентные сбои подключения повторяются
+        /// с новым соединением; детерминированные ошибки (аутентификация,
+        /// закрытие канала брокером) не повторяются (issue #43).
         /// </summary>
         protected ExecutionResult ExecuteRabbitMq(ScriptingData sd, Func<IModel, ExecutionResult> operation)
         {
             var settings = ResolveSettings(sd);
-            IConnection connection = null;
-            IModel channel = null;
+
+            int retryCount = NetworkRetry.ParseRetryCount(
+                GetPropertyValue<string>(this.Prop_RetryCount, nameof(Prop_RetryCount), sd));
+            int retryDelayMs = NetworkRetry.ParseRetryDelayMs(
+                GetPropertyValue<string>(this.Prop_RetryDelayMs, nameof(Prop_RetryDelayMs), sd));
+
             try
             {
-                var logic = new RabbitMqLogic();
-                var factory = logic.CreateFactory(settings);
-                connection = factory.CreateConnection();
-                channel = connection.CreateModel();
+                var outcome = RetryPolicy.Execute(
+                    attempt =>
+                    {
+                        // каждая попытка — новое соединение и канал
+                        IConnection connection = null;
+                        IModel channel = null;
+                        try
+                        {
+                            var logic = new RabbitMqLogic();
+                            var factory = logic.CreateFactory(settings);
+                            connection = factory.CreateConnection();
+                            channel = connection.CreateModel();
 
-                return operation(channel);
+                            return operation(channel);
+                        }
+                        finally
+                        {
+                            // порядок сохранён: сначала канал, затем подключение;
+                            // исключения освобождения уже закрытых ресурсов глушатся
+                            SafeDispose.Quiet(
+                                () =>
+                                {
+                                    channel?.Close();
+                                    channel?.Dispose();
+                                },
+                                "RabbitMQ channel close/dispose");
+
+                            SafeDispose.Quiet(
+                                () =>
+                                {
+                                    connection?.Close();
+                                    connection?.Dispose();
+                                },
+                                "RabbitMQ connection close/dispose");
+                        }
+                    },
+                    retryCount + 1,
+                    shouldRetryException: (ex, attemptNumber) => NetworkRetry.IsTransient(ex),
+                    delayMs: retryDelayMs,
+                    failureCallback: (ex, attemptNumber) => Common.ActivityFileLogger.Warning(
+                        sdkComponentName, $"Попытка {attemptNumber} не удалась: {ex.Message}"));
+
+                if (outcome.LastException != null)
+                    throw outcome.LastException; // попытки исчерпаны — маппинг внешним catch
+                return outcome.LastResult;
             }
             catch (RabbitMQ.Client.Exceptions.BrokerUnreachableException ex)
             {
@@ -149,28 +247,6 @@ namespace Primo.MIA
             catch (Exception ex)
             {
                 return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Ошибка RabbitMQ: {ex.Message}" };
-            }
-            finally
-            {
-                // порядок сохранён: сначала канал, затем подключение;
-                // Close → Dispose внутри каждого шага. Исключения освобождения
-                // уже закрытых ресурсов глушатся, при включённом файловом логе
-                // фиксируются уровнем Debug
-                SafeDispose.Quiet(
-                    () =>
-                    {
-                        channel?.Close();
-                        channel?.Dispose();
-                    },
-                    "RabbitMQ channel close/dispose");
-
-                SafeDispose.Quiet(
-                    () =>
-                    {
-                        connection?.Close();
-                        connection?.Dispose();
-                    },
-                    "RabbitMQ connection close/dispose");
             }
         }
     }

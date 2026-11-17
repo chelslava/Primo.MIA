@@ -94,6 +94,28 @@ namespace Primo.MIA
             set { _propOperationTimeoutSeconds = value; InvokePropertyChanged(this, nameof(Prop_OperationTimeoutSeconds)); }
         }
 
+        private string _propRetryCount;
+        /// <summary>Число повторов при транзиентном сетевом сбое (0 — без повторов).</summary>
+        [LTools.Common.Model.Serialization.StoringProperty]
+        [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
+        [System.ComponentModel.Category(ActivityStrings.Category_Settings), System.ComponentModel.DisplayName(ActivityStrings.Field_NetworkRetryCount)]
+        public string Prop_RetryCount
+        {
+            get => _propRetryCount;
+            set { _propRetryCount = value; InvokePropertyChanged(this, nameof(Prop_RetryCount)); }
+        }
+
+        private string _propRetryDelayMs;
+        /// <summary>Пауза между повторами, мс.</summary>
+        [LTools.Common.Model.Serialization.StoringProperty]
+        [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(int))]
+        [System.ComponentModel.Category(ActivityStrings.Category_Settings), System.ComponentModel.DisplayName(ActivityStrings.Field_NetworkRetryDelayMs)]
+        public string Prop_RetryDelayMs
+        {
+            get => _propRetryDelayMs;
+            set { _propRetryDelayMs = value; InvokePropertyChanged(this, nameof(Prop_RetryDelayMs)); }
+        }
+
         // ── Хелперы ──────────────────────────────────────────────────────
 
         /// <summary>
@@ -108,7 +130,9 @@ namespace Primo.MIA
                 PropertyBuilder.String("Prop_UserName", "Имя пользователя (пусто = anonymous)"),
                 PropertyBuilder.String("Prop_Password", "Пароль"),
                 PropertyBuilder.Int("Prop_ConnectionTimeoutSeconds", "Таймаут подключения, сек"),
-                PropertyBuilder.Int("Prop_OperationTimeoutSeconds", "Таймаут операции, сек")
+                PropertyBuilder.Int("Prop_OperationTimeoutSeconds", "Таймаут операции, сек"),
+                PropertyBuilder.Int("Prop_RetryCount", "Повторов при сетевом сбое (0 — без повторов)"),
+                PropertyBuilder.Int("Prop_RetryDelayMs", "Пауза между повторами, мс")
             };
         }
 
@@ -150,7 +174,25 @@ namespace Primo.MIA
                         ErrorMessage = ActivityStrings.Error_FtpHostRequired
                     };
 
-                return operation(settings, new FtpsLogic());
+                // issue #43: повторы только при транзиентных сетевых сбоях
+                // (соединение/DNS/таймаут транспорта); детерминированные ошибки
+                // (530 логин, 550 путь) пробрасываются с первой попытки
+                int retryCount = NetworkRetry.ParseRetryCount(
+                    GetPropertyValue<string>(this.Prop_RetryCount, nameof(Prop_RetryCount), sd));
+                int retryDelayMs = NetworkRetry.ParseRetryDelayMs(
+                    GetPropertyValue<string>(this.Prop_RetryDelayMs, nameof(Prop_RetryDelayMs), sd));
+
+                var outcome = RetryPolicy.Execute(
+                    attempt => operation(settings, new FtpsLogic()),
+                    retryCount + 1,
+                    shouldRetryException: (ex, attemptNumber) => NetworkRetry.IsTransient(ex),
+                    delayMs: retryDelayMs,
+                    failureCallback: (ex, attemptNumber) => Common.ActivityFileLogger.Warning(
+                        sdkComponentName, $"Попытка {attemptNumber} не удалась: {ex.Message}"));
+
+                if (outcome.LastException != null)
+                    throw outcome.LastException; // попытки исчерпаны — маппинг внешним catch
+                return outcome.LastResult;
             }
             catch (System.Net.WebException ex)
             {

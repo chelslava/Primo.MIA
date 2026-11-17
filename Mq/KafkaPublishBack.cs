@@ -90,6 +90,7 @@ SASL: механизм (PLAIN / SCRAM-SHA-256 / SCRAM-SHA-512), имя поль�
 Offset: [Int64] Offset сообщения.";
             sdkComponentIcon = ActivityIcons.MessageQueue;
             sdkProperties = BuildConnectionProperties();
+            sdkProperties.AddRange(BuildRetryProperties());
             sdkProperties.AddRange(new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
                 PropertyBuilder.String("Prop_Topic", "Топик"),

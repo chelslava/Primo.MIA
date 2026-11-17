@@ -1595,6 +1595,8 @@ namespace Primo.MIA.Common
         // ── Excel (issue #47) ──────────────────────────────────────────
         public const string Activity_ExcelReadRange   = "Excel: Прочитать диапазон";
         public const string Activity_ExcelWriteRange  = "Excel: Записать диапазон";
+        public const string Activity_ExcelSheetInfo   = "Excel: Сведения о книге";
+        public const string Activity_ExcelFillFormula = "Excel: Формула на столбец";
 
         public const string Field_ExcelFilePath        = "Файл (.xlsx)";
         public const string Field_ExcelSheetName       = "Лист";
@@ -1609,11 +1611,23 @@ namespace Primo.MIA.Common
         public const string Field_ExcelRowCount        = "Кол-во строк";
         public const string Field_ExcelColumnNames     = "Имена колонок";
         public const string Field_ExcelWrittenRows     = "Записано строк";
+        public const string Field_ExcelSheetNames      = "Листы";
+        public const string Field_ExcelSheetCount      = "Кол-во листов";
+        public const string Field_ExcelColumnLetter    = "Столбец (буква)";
+        public const string Field_ExcelFormula         = "Формула (шаблон)";
+        public const string Field_ExcelStartRow        = "Первая строка";
+        public const string Field_ExcelEndRow          = "Последняя строка";
+        public const string Field_ExcelFilledCells     = "Заполнено ячеек";
 
         public const string Error_ExcelFileRequired     = "Путь к файлу Excel не может быть пустым";
         public const string Error_ExcelTableRequired    = "Таблица (DataTable) не может быть пустой";
         public const string Error_ExcelRangeInvalid     = "Некорректный диапазон";
         public const string Error_ExcelStartCellInvalid = "Некорректная начальная ячейка";
+        public const string Error_ExcelFormulaRequired  = "Формула не может быть пустой";
+
+        // ── Сетевые повторы (issue #43: SFTP/FTPS/MQ) ──────────────────
+        public const string Field_NetworkRetryCount  = "Повторов при сбое";
+        public const string Field_NetworkRetryDelayMs = "Пауза между повторами (мс)";
     }
 
 }
