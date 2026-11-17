@@ -272,6 +272,7 @@ TLS: [String] StartTls / ImplicitTls / None (по умолчанию StartTls).
             }
             catch (Exception ex)
             {
+            Common.ActivityFileLogger.Error(sdkComponentName, ex.GetType().Name + ": " + ex.Message + Environment.NewLine + ex.StackTrace);
                 return new ExecutionResult
                 {
                     IsSuccess = false,

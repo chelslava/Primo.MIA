@@ -206,6 +206,7 @@ namespace Primo.MIA
             }
             catch (Exception ex)
             {
+            Common.ActivityFileLogger.Error(sdkComponentName, ex.GetType().Name + ": " + ex.Message + Environment.NewLine + ex.StackTrace);
                 return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Ошибка Kafka: {ex.Message}" };
             }
         }
@@ -227,14 +228,17 @@ namespace Primo.MIA
             }
             catch (ConsumeException ex)
             {
+            Common.ActivityFileLogger.Error(sdkComponentName, ex.GetType().Name + ": " + ex.Message + Environment.NewLine + ex.StackTrace);
                 return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Ошибка потребления: {ex.Error.Reason}" };
             }
             catch (KafkaException ex)
             {
+            Common.ActivityFileLogger.Error(sdkComponentName, ex.GetType().Name + ": " + ex.Message + Environment.NewLine + ex.StackTrace);
                 return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Ошибка Kafka: {ex.Error.Reason}" };
             }
             catch (Exception ex)
             {
+            Common.ActivityFileLogger.Error(sdkComponentName, ex.GetType().Name + ": " + ex.Message + Environment.NewLine + ex.StackTrace);
                 return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Ошибка Kafka: {ex.Message}" };
             }
         }

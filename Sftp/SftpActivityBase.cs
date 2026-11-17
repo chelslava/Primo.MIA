@@ -264,22 +264,27 @@ namespace Primo.MIA
             }
             catch (Renci.SshNet.Common.SshAuthenticationException ex)
             {
+            Common.ActivityFileLogger.Error(sdkComponentName, ex.GetType().Name + ": " + ex.Message + Environment.NewLine + ex.StackTrace);
                 return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Ошибка аутентификации: {ex.Message}" };
             }
             catch (Renci.SshNet.Common.SshConnectionException ex)
             {
+            Common.ActivityFileLogger.Error(sdkComponentName, ex.GetType().Name + ": " + ex.Message + Environment.NewLine + ex.StackTrace);
                 return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Ошибка подключения: {ex.Message}" };
             }
             catch (Renci.SshNet.Common.SftpPathNotFoundException ex)
             {
+            Common.ActivityFileLogger.Error(sdkComponentName, ex.GetType().Name + ": " + ex.Message + Environment.NewLine + ex.StackTrace);
                 return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Путь не найден: {ex.Message}" };
             }
             catch (System.Security.Cryptography.CryptographicException ex)
             {
+            Common.ActivityFileLogger.Error(sdkComponentName, ex.GetType().Name + ": " + ex.Message + Environment.NewLine + ex.StackTrace);
                 return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Ошибка приватного ключа: {ex.Message}" };
             }
             catch (Exception ex)
             {
+            Common.ActivityFileLogger.Error(sdkComponentName, ex.GetType().Name + ": " + ex.Message + Environment.NewLine + ex.StackTrace);
                 return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Ошибка SFTP: {ex.Message}" };
             }
         }

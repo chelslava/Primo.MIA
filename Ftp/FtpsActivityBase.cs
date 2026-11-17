@@ -207,10 +207,12 @@ namespace Primo.MIA
             }
             catch (InvalidOperationException ex)
             {
+            Common.ActivityFileLogger.Error(sdkComponentName, ex.GetType().Name + ": " + ex.Message + Environment.NewLine + ex.StackTrace);
                 return new ExecutionResult { IsSuccess = false, ErrorMessage = ex.Message };
             }
             catch (Exception ex)
             {
+            Common.ActivityFileLogger.Error(sdkComponentName, ex.GetType().Name + ": " + ex.Message + Environment.NewLine + ex.StackTrace);
                 return new ExecutionResult
                 {
                     IsSuccess = false,

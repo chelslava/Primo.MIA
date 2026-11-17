@@ -350,6 +350,7 @@ TLS: [String] ImplicitTls (995) / StartTls (110) / None. Таймаут: [Int32]
             }
             catch (Exception ex)
             {
+            Common.ActivityFileLogger.Error(sdkComponentName, ex.GetType().Name + ": " + ex.Message + Environment.NewLine + ex.StackTrace);
                 return new ExecutionResult
                 {
                     IsSuccess = false,

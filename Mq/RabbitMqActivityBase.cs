@@ -238,14 +238,17 @@ namespace Primo.MIA
             }
             catch (RabbitMQ.Client.Exceptions.BrokerUnreachableException ex)
             {
+            Common.ActivityFileLogger.Error(sdkComponentName, ex.GetType().Name + ": " + ex.Message + Environment.NewLine + ex.StackTrace);
                 return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Брокер недоступен: {ex.Message}" };
             }
             catch (RabbitMQ.Client.Exceptions.AuthenticationFailureException ex)
             {
+            Common.ActivityFileLogger.Error(sdkComponentName, ex.GetType().Name + ": " + ex.Message + Environment.NewLine + ex.StackTrace);
                 return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Ошибка аутентификации: {ex.Message}" };
             }
             catch (Exception ex)
             {
+            Common.ActivityFileLogger.Error(sdkComponentName, ex.GetType().Name + ": " + ex.Message + Environment.NewLine + ex.StackTrace);
                 return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Ошибка RabbitMQ: {ex.Message}" };
             }
         }
