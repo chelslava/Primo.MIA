@@ -99,6 +99,49 @@ namespace Primo.MIA
             set { _propEncoding = value; InvokePropertyChanged(this, nameof(Prop_Encoding)); }
         }
 
+        private string _propQuoteChar;
+        [LTools.Common.Model.Serialization.StoringProperty]
+        [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
+        [System.ComponentModel.Category(ActivityStrings.Category_Settings), System.ComponentModel.DisplayName(ActivityStrings.Field_CsvQuoteChar)]
+        /// <summary>Символ кавычек (один символ); пусто = ".</summary>
+        public string Prop_QuoteChar
+        {
+            get => _propQuoteChar;
+            set { _propQuoteChar = value; InvokePropertyChanged(this, nameof(Prop_QuoteChar)); }
+        }
+
+        private string _propEscapeChar;
+        [LTools.Common.Model.Serialization.StoringProperty]
+        [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
+        [System.ComponentModel.Category(ActivityStrings.Category_Settings), System.ComponentModel.DisplayName(ActivityStrings.Field_CsvEscapeChar)]
+        /// <summary>Символ экранирования кавычек (один символ, например \); пусто = удвоение кавычки.</summary>
+        public string Prop_EscapeChar
+        {
+            get => _propEscapeChar;
+            set { _propEscapeChar = value; InvokePropertyChanged(this, nameof(Prop_EscapeChar)); }
+        }
+
+        private string _propCommentChar;
+        [LTools.Common.Model.Serialization.StoringProperty]
+        [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
+        [System.ComponentModel.Category(ActivityStrings.Category_Settings), System.ComponentModel.DisplayName(ActivityStrings.Field_CsvCommentChar)]
+        /// <summary>Символ комментария: строки, начинающиеся с него, пропускаются; пусто = комментарии отключены.</summary>
+        public string Prop_CommentChar
+        {
+            get => _propCommentChar;
+            set { _propCommentChar = value; InvokePropertyChanged(this, nameof(Prop_CommentChar)); }
+        }
+
+        private bool _propStreaming;
+        [LTools.Common.Model.Serialization.StoringProperty]
+        [System.ComponentModel.Category(ActivityStrings.Category_Settings), System.ComponentModel.DisplayName(ActivityStrings.Field_CsvStreaming)]
+        /// <summary>Потоковое чтение больших файлов (только режим «Файл»; колонки остаются string).</summary>
+        public bool Prop_Streaming
+        {
+            get => _propStreaming;
+            set { _propStreaming = value; InvokePropertyChanged(this, nameof(Prop_Streaming)); }
+        }
+
         // ── Выходные параметры ─────────────────────────────────────────
 
         private string _propResultTable;
@@ -130,6 +173,10 @@ CSV (входной): [String] CSV-текст (для режима «Строк�
 Первая строка — заголовки: [Bool] имена колонок из файла (по умолчанию да).
 Определять типы колонок: [Bool] int/double/bool/DateTime (иначе все string).
 Кодировка: [String] utf-8, windows-1251, utf-16; пусто = utf-8.
+Символ кавычек: [String] один символ; пусто = "" (RFC 4180).
+Символ экранирования: [String] один символ (например \); пусто = удвоение кавычки.
+Символ комментария: [String] один символ; строки, начинающиеся с него, пропускаются; пусто = отключено.
+Потоковое чтение: [Bool] построчная подача записей (только режим «Файл»); колонки остаются string.
 
 Выходные данные:
 DataTable: [DataTable] Результат разбора.";
@@ -144,6 +191,10 @@ DataTable: [DataTable] Результат разбора.";
                 PropertyBuilder.BooleanObject("Prop_HasHeader", "Первая строка — заголовки колонок"),
                 PropertyBuilder.BooleanObject("Prop_TypeInference", "Определять типы колонок"),
                 PropertyBuilder.String("Prop_Encoding", "Кодировка файла, пусто = utf-8"),
+                PropertyBuilder.String("Prop_QuoteChar", "Символ кавычек, пусто = \""),
+                PropertyBuilder.String("Prop_EscapeChar", "Символ экранирования, пусто = удвоение"),
+                PropertyBuilder.String("Prop_CommentChar", "Символ комментария, пусто = отключено"),
+                PropertyBuilder.BooleanObject("Prop_Streaming", "Потоковое чтение больших файлов (режим «Файл»)"),
                 PropertyBuilder.Variable<DataTable>("Prop_ResultTable", "Результирующая DataTable")
             };
 
@@ -153,6 +204,9 @@ DataTable: [DataTable] Результат разбора.";
             this.Prop_FilePath = "\"\"";
             this.Prop_Delimiter = "\"\"";
             this.Prop_Encoding = "\"\"";
+            this.Prop_QuoteChar = "\"\"";
+            this.Prop_EscapeChar = "\"\"";
+            this.Prop_CommentChar = "\"\"";
         }
 
         // ── TimedAction — точка входа ──────────────────────────────────
@@ -164,17 +218,29 @@ DataTable: [DataTable] Результат разбора.";
             {
                 var delimiter = GetPropertyValue<string>(this.Prop_Delimiter, nameof(Prop_Delimiter), sd);
                 var encodingName = GetPropertyValue<string>(this.Prop_Encoding, nameof(Prop_Encoding), sd);
+                var options = CsvOptions.Parse(
+                    delimiter,
+                    GetPropertyValue<string>(this.Prop_QuoteChar, nameof(Prop_QuoteChar), sd),
+                    GetPropertyValue<string>(this.Prop_EscapeChar, nameof(Prop_EscapeChar), sd),
+                    GetPropertyValue<string>(this.Prop_CommentChar, nameof(Prop_CommentChar), sd));
 
                 DataTable table;
                 if (this.Prop_Source == CsvLocation.File)
                 {
                     var filePath = GetPropertyValue<string>(this.Prop_FilePath, nameof(Prop_FilePath), sd);
-                    table = logic.ParseFileToDataTable(filePath, delimiter, this.Prop_HasHeader, this.Prop_TypeInference, encodingName);
+                    table = this.Prop_Streaming
+                        // потоковое чтение: записи подаются по мере разбора,
+                        // весь текст в память не грузится (issue #48)
+                        ? logic.ParseFileStreaming(filePath, options, this.Prop_HasHeader, encodingName)
+                        : logic.ParseFileToDataTable(filePath, options, this.Prop_HasHeader, this.Prop_TypeInference, encodingName);
                 }
                 else
                 {
+                    if (this.Prop_Streaming)
+                        return new ExecutionResult { IsSuccess = false, ErrorMessage = ActivityStrings.Error_CsvStreamingRequiresFile };
+
                     var csv = GetPropertyValue<string>(this.Prop_Csv, nameof(Prop_Csv), sd);
-                    table = logic.ParseToDataTable(csv, delimiter, this.Prop_HasHeader, this.Prop_TypeInference);
+                    table = logic.ParseToDataTable(csv, options, this.Prop_HasHeader, this.Prop_TypeInference);
                 }
 
                 SetVariableValue(this.Prop_ResultTable, table, sd);

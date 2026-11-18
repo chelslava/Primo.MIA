@@ -147,7 +147,7 @@ namespace Primo.MIA.Tests.Utilities
         [Fact(DisplayName = "Parse: пустой разделитель → запятая по умолчанию")]
         public void Parse_EmptyDelimiter_DefaultsToComma()
         {
-            var table = _logic.ParseToDataTable("A,B\n1,2\n", null, true, false);
+            var table = _logic.ParseToDataTable("A,B\n1,2\n", (string)null, true, false);
             table.Columns.Count.Should().Be(2);
         }
 

@@ -96,6 +96,38 @@
                          ToolTip="utf-8 (по умолчанию), windows-1251, utf-16.&#xA;BOM определяется автоматически"/>
             </Grid>
 
+            <!-- Диалект: символы кавычек/экранирования/комментария (issue #48) -->
+            <Grid Margin="0,4,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="Символ кавычек:" VerticalAlignment="Center" Style="{StaticResource FieldLabel}" Margin="0,0,4,0"/>
+                <TextBox Grid.Column="1" Text="{Binding Prop_QuoteChar, UpdateSourceTrigger=PropertyChanged}"
+                         Style="{StaticResource FieldBox}"
+                         ToolTip="Один символ; пусто = &quot; (RFC 4180).&#xA;Например ' для файлов с одинарными кавычками"/>
+            </Grid>
+            <Grid Margin="0,2,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="Символ экранирования:" VerticalAlignment="Center" Style="{StaticResource FieldLabel}" Margin="0,0,4,0"/>
+                <TextBox Grid.Column="1" Text="{Binding Prop_EscapeChar, UpdateSourceTrigger=PropertyChanged}"
+                         Style="{StaticResource FieldBox}"
+                         ToolTip="Один символ; пусто = удвоение кавычки (RFC 4180).&#xA;Например \ — экранирует кавычку и сам себя"/>
+            </Grid>
+            <Grid Margin="0,2,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="Символ комментария:" VerticalAlignment="Center" Style="{StaticResource FieldLabel}" Margin="0,0,4,0"/>
+                <TextBox Grid.Column="1" Text="{Binding Prop_CommentChar, UpdateSourceTrigger=PropertyChanged}"
+                         Style="{StaticResource FieldBox}"
+                         ToolTip="Один символ; строки, начинающиеся с него, пропускаются (вне кавычек).&#xA;Пусто = комментарии отключены"/>
+            </Grid>
+
             <!-- Чекбоксы -->
             <CheckBox Style="{StaticResource FieldCheckBox}" Margin="0,6,6,2"
                       Content="Первая строка — заголовки колонок"
@@ -105,6 +137,13 @@
                       Content="Определять типы колонок"
                       IsChecked="{Binding Prop_TypeInference}"
                       ToolTip="int → double → bool → DateTime (InvariantCulture).&#xA;Выключить, если нужны все колонки как string"/>
+            <CheckBox Style="{StaticResource FieldCheckBox}"
+                      Content="Потоковое чтение (большие файлы)"
+                      IsChecked="{Binding Prop_Streaming}"
+                      Visibility="{Binding Prop_Source,
+                                   Converter={StaticResource EnumToVisConverter},
+                                   ConverterParameter=File}"
+                      ToolTip="Записи подаются по мере разбора — весь текст в память не грузится.&#xA;Только режим «Файл»; колонки остаются string"/>
 
             <!-- Выходные -->
             <Grid Margin="0,4,0,0">

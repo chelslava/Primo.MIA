@@ -1,0 +1,97 @@
+<UserControl x:Class="Primo.MIA.SftpSyncDirectories"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="clr-namespace:Primo.MIA"
+             mc:Ignorable="d" d:DesignHeight="330" Margin="0,0,0,5">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Primo.MIA;component/Common/Styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <local:ActivityPanel IconSource="pack://application:,,,/Primo.MIA;component/images/folder.png">
+
+            <!-- ── Заголовок с направлением ── -->
+            <TextBlock Style="{StaticResource ActivityHeader}">
+                <Run Text="SFTP: Синхронизация ["/>
+                <Run Text="{Binding Prop_Direction, Mode=OneWay, Converter={StaticResource EnumDisplayNameConverter}}" Foreground="{StaticResource AccentBrush}"/>
+                <Run Text="]"/>
+            </TextBlock>
+
+            <!-- ── Основные ── -->
+            <TextBlock Text="Удалённый каталог:" Style="{StaticResource FieldLabel}"/>
+            <TextBox Text="{Binding Prop_RemoteDir, UpdateSourceTrigger=PropertyChanged}"
+                     Style="{StaticResource FieldBox}"
+                     ToolTip="Корень синхронизации на SFTP, например /exports/reports (поддерживается ~)"/>
+
+            <TextBlock Text="Локальный каталог:" Style="{StaticResource FieldLabel}"/>
+            <TextBox Text="{Binding Prop_LocalDir, UpdateSourceTrigger=PropertyChanged}"
+                     Style="{StaticResource FieldBox}"
+                     ToolTip="Корень синхронизации локально, например D:\Reports"/>
+
+            <TextBlock Text="Направление:" Style="{StaticResource FieldLabel}"/>
+            <ComboBox ItemsSource="{local:EnumValues local:SftpSyncDirection}"
+                      SelectedValue="{Binding Prop_Direction}"
+                      SelectedValuePath="Key"
+                      DisplayMemberPath="Display"
+                      Style="{StaticResource FieldComboBox}"
+                      ToolTip="Push — локальный → удалённый (деплой);&#xA;Pull — удалённый → локальный (забор выгрузок)"/>
+
+            <!-- ── Настройки ── -->
+            <TextBlock Text="Сравнение:" Style="{StaticResource FieldLabel}" Margin="0,4,0,0"/>
+            <ComboBox ItemsSource="{local:EnumValues local:SftpSyncCompareMode}"
+                      SelectedValue="{Binding Prop_CompareMode}"
+                      SelectedValuePath="Key"
+                      DisplayMemberPath="Display"
+                      Style="{StaticResource FieldComboBox}"
+                      ToolTip="Размер + время — rsync-быстрая проверка (допуск 2 с);&#xA;Только размер — если время на сторонах ненадёжно"/>
+
+            <CheckBox Style="{StaticResource DangerCheckBox}"
+                      Content="Удалять лишнее на приёмнике"
+                      IsChecked="{Binding Prop_DeleteExtra}"
+                      ToolTip="Файлы и каталоги, которых нет в источнике, удаляются на приёмнике.&#xA;Осторожно: перед включением выполните сухой прогон"/>
+
+            <CheckBox Style="{StaticResource FieldCheckBox}"
+                      Content="Сухой прогон (только план)"
+                      IsChecked="{Binding Prop_DryRun}"
+                      ToolTip="Построить план и вернуть сводку, ничего не перенося и не удаляя"/>
+
+            <!-- ── Выходные ── -->
+            <Grid Margin="0,4,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="Перенесено (out):" VerticalAlignment="Center" Style="{StaticResource FieldLabel}" Margin="0,0,4,0"/>
+                <TextBox Grid.Column="1" Text="{Binding Prop_Transferred, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            </Grid>
+            <Grid Margin="0,2,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="Удалено (out):" VerticalAlignment="Center" Style="{StaticResource FieldLabel}" Margin="0,0,4,0"/>
+                <TextBox Grid.Column="1" Text="{Binding Prop_Deleted, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            </Grid>
+            <Grid Margin="0,2,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="Пропущено (out):" VerticalAlignment="Center" Style="{StaticResource FieldLabel}" Margin="0,0,4,0"/>
+                <TextBox Grid.Column="1" Text="{Binding Prop_Skipped, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            </Grid>
+            <Grid Margin="0,2,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="Сводка плана (out):" VerticalAlignment="Center" Style="{StaticResource FieldLabel}" Margin="0,0,4,0"/>
+                <TextBox Grid.Column="1" Text="{Binding Prop_PlanSummary, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
+            </Grid>
+    </local:ActivityPanel>
+</UserControl>

@@ -27,7 +27,7 @@
     <AssemblyVersion>$(Version.Split('-')[0])</AssemblyVersion>
     <FileVersion>$(Version.Split('-')[0])</FileVersion>
     <Authors>Chelslava</Authors>
-    <Description>Библиотека расширенных активностей для платформы Primo RPA (~166 активностей: Browser, Database, HTTP, SFTP, RabbitMQ, Kafka, Mail, Excel, Crypto, Collections, Files, Calendar, Text, и другие)</Description>
+    <Description>Библиотека расширенных активностей для платформы Primo RPA (~167 активностей: Browser, Database, HTTP, SFTP, RabbitMQ, Kafka, Mail, Excel, Crypto, Collections, Files, Calendar, Text, и другие)</Description>
     <PackageProjectUrl>https://github.com/chelslava/Primo.MIA</PackageProjectUrl>
     <RepositoryUrl>https://github.com/chelslava/Primo.MIA</RepositoryUrl>
     <RepositoryType>git</RepositoryType>

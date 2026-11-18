@@ -89,6 +89,28 @@
                          ToolTip="utf-8 без BOM (по умолчанию), windows-1251"/>
             </Grid>
 
+            <!-- Диалект: символы кавычек/экранирования (issue #48) -->
+            <Grid Margin="0,4,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="Символ кавычек:" VerticalAlignment="Center" Style="{StaticResource FieldLabel}" Margin="0,0,4,0"/>
+                <TextBox Grid.Column="1" Text="{Binding Prop_QuoteChar, UpdateSourceTrigger=PropertyChanged}"
+                         Style="{StaticResource FieldBox}"
+                         ToolTip="Один символ; пусто = &quot; (RFC 4180)"/>
+            </Grid>
+            <Grid Margin="0,2,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="Символ экранирования:" VerticalAlignment="Center" Style="{StaticResource FieldLabel}" Margin="0,0,4,0"/>
+                <TextBox Grid.Column="1" Text="{Binding Prop_EscapeChar, UpdateSourceTrigger=PropertyChanged}"
+                         Style="{StaticResource FieldBox}"
+                         ToolTip="Один символ; пусто = удвоение кавычки (RFC 4180).&#xA;Например \ — экранирует кавычку и сам себя"/>
+            </Grid>
+
             <!-- Чекбоксы -->
             <CheckBox Style="{StaticResource FieldCheckBox}" Margin="0,6,6,2"
                       Content="Заголовки колонок"
@@ -98,6 +120,13 @@
                       Content="DBNull как пустое поле"
                       IsChecked="{Binding Prop_DBNullToEmpty}"
                       ToolTip="NULL-значения записываются пустыми"/>
+            <CheckBox Style="{StaticResource FieldCheckBox}"
+                      Content="Дописывать в файл (append)"
+                      IsChecked="{Binding Prop_Append}"
+                      Visibility="{Binding Prop_Target,
+                                   Converter={StaticResource EnumToVisConverter},
+                                   ConverterParameter=File}"
+                      ToolTip="Дописать строки в конец существующего файла;&#xA;заголовок пишется только при создании файла"/>
 
             <!-- Выходные -->
             <Grid Margin="0,4,0,0"

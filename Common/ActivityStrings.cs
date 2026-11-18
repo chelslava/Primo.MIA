@@ -1214,6 +1214,18 @@ namespace Primo.MIA.Common
         public const string Error_CsvFileRequired  = "Путь к CSV-файлу обязателен (режим «Файл»)";
         public const string Error_CsvTableRequired = "Входная DataTable обязательна";
 
+        // Расширенные CSV-опции (issue #48): настраиваемый диалект,
+        // потоковое чтение, append. Все опциональны — дефолты не меняют
+        // поведение существующих процессов.
+        public const string Field_CsvQuoteChar     = "Символ кавычек";
+        public const string Field_CsvEscapeChar    = "Символ экранирования";
+        public const string Field_CsvCommentChar   = "Символ комментария";
+        public const string Field_CsvStreaming     = "Потоковое чтение (большие файлы)";
+        public const string Field_CsvAppend        = "Дописывать в файл (append)";
+
+        public const string Error_CsvStreamingRequiresFile = "Потоковое чтение доступно только в режиме «Файл»";
+        public const string Error_CsvAppendRequiresFile    = "Режим append доступен только для приёмника «Файл»";
+
         // ═══════════════════════════════════════════════════════════════════════
         // TEXT REGEX (issue #30)
         // ═══════════════════════════════════════════════════════════════════════
@@ -1506,6 +1518,22 @@ namespace Primo.MIA.Common
         public const string Error_SftpHostRequired = "Хост не может быть пустым";
         public const string Error_SftpRemotePathRequired = "Удалённый путь не может быть пустым";
         public const string Error_SftpLocalPathRequired = "Локальный путь не может быть пустым";
+
+        // Синхронизация каталогов (issue #48)
+        public const string Activity_SftpSyncDirectories = "SFTP: Синхронизация каталогов";
+        public const string Field_SftpSyncRemoteDir   = "Удалённый каталог";
+        public const string Field_SftpSyncLocalDir    = "Локальный каталог";
+        public const string Field_SftpSyncDirection   = "Направление";
+        public const string Field_SftpSyncCompareMode = "Сравнение";
+        public const string Field_SftpSyncDeleteExtra = "Удалять лишнее на приёмнике";
+        public const string Field_SftpSyncDryRun      = "Сухой прогон (только план)";
+        public const string Field_SftpSyncTransferred = "Перенесено файлов";
+        public const string Field_SftpSyncDeleted     = "Удалено";
+        public const string Field_SftpSyncSkipped     = "Пропущено файлов";
+        public const string Field_SftpSyncPlanSummary = "Сводка плана";
+
+        public const string Error_SftpSyncLocalDirRequired    = "Локальный каталог обязателен";
+        public const string Error_SftpSyncRemoteDirRequired   = "Удалённый каталог обязателен";
 
         // ═══════════════════════════════════════════════════════════════════════
         // ОЧЕРЕДИ СООБЩЕНИЙ (RabbitMQ)

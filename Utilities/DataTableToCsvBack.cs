@@ -99,6 +99,38 @@ namespace Primo.MIA
             set { _propEncoding = value; InvokePropertyChanged(this, nameof(Prop_Encoding)); }
         }
 
+        private string _propQuoteChar;
+        [LTools.Common.Model.Serialization.StoringProperty]
+        [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
+        [System.ComponentModel.Category(ActivityStrings.Category_Settings), System.ComponentModel.DisplayName(ActivityStrings.Field_CsvQuoteChar)]
+        /// <summary>Символ кавычек (один символ); пусто = ".</summary>
+        public string Prop_QuoteChar
+        {
+            get => _propQuoteChar;
+            set { _propQuoteChar = value; InvokePropertyChanged(this, nameof(Prop_QuoteChar)); }
+        }
+
+        private string _propEscapeChar;
+        [LTools.Common.Model.Serialization.StoringProperty]
+        [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
+        [System.ComponentModel.Category(ActivityStrings.Category_Settings), System.ComponentModel.DisplayName(ActivityStrings.Field_CsvEscapeChar)]
+        /// <summary>Символ экранирования кавычек (один символ, например \); пусто = удвоение кавычки.</summary>
+        public string Prop_EscapeChar
+        {
+            get => _propEscapeChar;
+            set { _propEscapeChar = value; InvokePropertyChanged(this, nameof(Prop_EscapeChar)); }
+        }
+
+        private bool _propAppend;
+        [LTools.Common.Model.Serialization.StoringProperty]
+        [System.ComponentModel.Category(ActivityStrings.Category_Settings), System.ComponentModel.DisplayName(ActivityStrings.Field_CsvAppend)]
+        /// <summary>Дописывать в файл: заголовок — только при создании файла (приёмник «Файл»).</summary>
+        public bool Prop_Append
+        {
+            get => _propAppend;
+            set { _propAppend = value; InvokePropertyChanged(this, nameof(Prop_Append)); }
+        }
+
         // ── Выходные параметры ─────────────────────────────────────────
 
         private string _propResult;
@@ -130,6 +162,9 @@ DataTable*: [DataTable] Входная таблица.
 Заголовки: [Bool] первая строка с именами колонок (по умолчанию да).
 DBNull как пустое: [Bool] NULL → пустое поле.
 Кодировка: [String] utf-8 (без BOM), windows-1251; пусто = utf-8.
+Символ кавычек: [String] один символ; пусто = "" (RFC 4180).
+Символ экранирования: [String] один символ (например \); пусто = удвоение кавычки.
+Append: [Bool] дописывать в конец файла; заголовок — только при создании файла (приёмник «Файл»).
 
 Выходные данные:
 CSV: [String] Текст CSV (режим «Строка»).";
@@ -144,6 +179,9 @@ CSV: [String] Текст CSV (режим «Строка»).";
                 PropertyBuilder.BooleanObject("Prop_IncludeHeader", "Включить строку заголовков"),
                 PropertyBuilder.BooleanObject("Prop_DBNullToEmpty", "DBNull → пустое поле"),
                 PropertyBuilder.String("Prop_Encoding", "Кодировка файла, пусто = utf-8"),
+                PropertyBuilder.String("Prop_QuoteChar", "Символ кавычек, пусто = \""),
+                PropertyBuilder.String("Prop_EscapeChar", "Символ экранирования, пусто = удвоение"),
+                PropertyBuilder.BooleanObject("Prop_Append", "Дописывать в файл (append)"),
                 PropertyBuilder.Variable<string>("Prop_Result", "CSV-текст (режим «Строка»)")
             };
 
@@ -153,6 +191,8 @@ CSV: [String] Текст CSV (режим «Строка»).";
             this.Prop_FilePath = "\"\"";
             this.Prop_Delimiter = "\"\"";
             this.Prop_Encoding = "\"\"";
+            this.Prop_QuoteChar = "\"\"";
+            this.Prop_EscapeChar = "\"\"";
         }
 
         // ── TimedAction — точка входа ──────────────────────────────────
@@ -167,20 +207,30 @@ CSV: [String] Текст CSV (режим «Строка»).";
                     this.Prop_Table, nameof(Prop_Table), sd);
                 var delimiter = GetPropertyValue<string>(this.Prop_Delimiter, nameof(Prop_Delimiter), sd);
                 var encodingName = GetPropertyValue<string>(this.Prop_Encoding, nameof(Prop_Encoding), sd);
+                var options = CsvOptions.Parse(
+                    delimiter,
+                    GetPropertyValue<string>(this.Prop_QuoteChar, nameof(Prop_QuoteChar), sd),
+                    GetPropertyValue<string>(this.Prop_EscapeChar, nameof(Prop_EscapeChar), sd),
+                    commentChar: null);
 
                 if (this.Prop_Target == CsvLocation.File)
                 {
                     var filePath = GetPropertyValue<string>(this.Prop_FilePath, nameof(Prop_FilePath), sd);
-                    logic.WriteCsvToFile(table, filePath, delimiter, this.Prop_IncludeHeader, this.Prop_DBNullToEmpty, encodingName);
+                    logic.WriteCsvToFile(table, filePath, options, this.Prop_IncludeHeader, this.Prop_DBNullToEmpty, encodingName, this.Prop_Append);
 
                     return new ExecutionResult
                     {
                         IsSuccess = true,
-                        SuccessMessage = $"[DataTable → CSV] {table.Rows.Count} строк → {filePath}"
+                        SuccessMessage = this.Prop_Append
+                            ? $"[DataTable → CSV] дописано {table.Rows.Count} строк → {filePath}"
+                            : $"[DataTable → CSV] {table.Rows.Count} строк → {filePath}"
                     };
                 }
 
-                var csv = logic.BuildCsv(table, delimiter, this.Prop_IncludeHeader, this.Prop_DBNullToEmpty);
+                if (this.Prop_Append)
+                    return new ExecutionResult { IsSuccess = false, ErrorMessage = ActivityStrings.Error_CsvAppendRequiresFile };
+
+                var csv = logic.BuildCsv(table, options, this.Prop_IncludeHeader, this.Prop_DBNullToEmpty);
                 SetVariableValue(this.Prop_Result, csv, sd);
 
                 return new ExecutionResult

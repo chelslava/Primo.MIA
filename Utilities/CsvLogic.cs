@@ -1,11 +1,22 @@
 // =============================================================================
-// CsvLogic.cs — чистая логика CSV ↔ DataTable (issue #29).
+// CsvLogic.cs — чистая логика CSV ↔ DataTable (issue #29, расширенные
+// опции диалекта — issue #48).
 //
 // RFC 4180: кавычки экранируются удвоением (""), кавычкованное поле может
 // содержать разделители и переводы строк; разделитель настраиваемый
 // (по умолчанию ','), переводы строк CRLF/LF/CR принимаются на чтении.
 // Опциональная типизация колонок (int → double → bool → DateTime → string)
 // по образцу JsonDataTable (Prop_TypeInference).
+//
+// Расширенные опции (issue #48, все опциональны — дефолты не меняют
+// поведение существующих вызовов):
+//   - настраиваемый символ кавычек (например, ') и экранирования (\);
+//   - пропуск строк-комментариев (задаваемый символ, только вне кавычек
+//     и только в начале записи);
+//   - потоковое чтение файла: записи отдаются по мере разбора, весь текст
+//     и список записей в память не грузятся (колонки остаются string —
+//     вывод типов требует полного прохода);
+//   - append-режим записи: заголовок пишется только при создании файла.
 // =============================================================================
 
 using Primo.MIA.Common;
@@ -19,6 +30,78 @@ using System.Text;
 
 namespace Primo.MIA
 {
+    /// <summary>
+    /// Опции CSV-диалекта (issue #48): символы кавычек/экранирования/комментария.
+    /// </summary>
+    public class CsvOptions
+    {
+        /// <summary>Символ кавычек по умолчанию (RFC 4180).</summary>
+        public const char DefaultQuoteChar = '"';
+
+        /// <summary>Разделитель полей (сырая строка студии; пусто → ','; поддерживаются tab/semicolon/pipe).</summary>
+        public string Delimiter { get; set; }
+
+        /// <summary>Символ кавычек.</summary>
+        public char QuoteChar { get; set; } = DefaultQuoteChar;
+
+        /// <summary>Символ экранирования (null — только удвоение кавычки, RFC 4180).</summary>
+        public char? EscapeChar { get; set; }
+
+        /// <summary>Символ комментария (null — комментарии отключены).</summary>
+        public char? CommentChar { get; set; }
+
+        /// <summary>
+        /// Разбирает обязательный односимвольный параметр; пусто → fallback,
+        /// не-одиночный символ → понятная ошибка.
+        /// </summary>
+        public static char ParseCharOption(string value, char fallback, string displayName)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                return fallback;
+
+            var trimmed = value.Trim();
+            if (trimmed.Length != 1)
+                throw new InvalidOperationException(
+                    $"«{displayName}»: ожидается один символ, получено «{value}»");
+            return trimmed[0];
+        }
+
+        /// <summary>
+        /// Разбирает опциональный односимвольный параметр; пусто → null (опция выключена).
+        /// </summary>
+        public static char? ParseOptionalCharOption(string value, string displayName)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                return null;
+
+            var trimmed = value.Trim();
+            if (trimmed.Length != 1)
+                throw new InvalidOperationException(
+                    $"«{displayName}»: ожидается один символ или пусто (отключено), получено «{value}»");
+            return trimmed[0];
+        }
+
+        /// <summary>
+        /// Собирает опции из строковых значений студии. Экранирование, совпадающее
+        /// с кавычкой, отключается (работает каноничное удвоение).
+        /// </summary>
+        public static CsvOptions Parse(string delimiter, string quoteChar, string escapeChar, string commentChar)
+        {
+            var quote = ParseCharOption(quoteChar, DefaultQuoteChar, ActivityStrings.Field_CsvQuoteChar);
+            var escape = ParseOptionalCharOption(escapeChar, ActivityStrings.Field_CsvEscapeChar);
+            if (escape == quote)
+                escape = null;
+
+            return new CsvOptions
+            {
+                Delimiter = delimiter,
+                QuoteChar = quote,
+                EscapeChar = escape,
+                CommentChar = ParseOptionalCharOption(commentChar, ActivityStrings.Field_CsvCommentChar)
+            };
+        }
+    }
+
     /// <summary>
     /// Парсер и райтер CSV по RFC 4180 без внешних зависимостей.
     /// </summary>
@@ -42,10 +125,25 @@ namespace Primo.MIA
             bool hasHeaderRow,
             bool typeInference)
         {
-            Guard.NotNull(csv, nameof(csv));
+            return ParseToDataTable(csv, new CsvOptions { Delimiter = delimiter }, hasHeaderRow, typeInference);
+        }
 
-            var delim = ResolveDelimiter(delimiter);
-            var rows = SplitRecords(csv, delim);
+        /// <summary>
+        /// Разбирает CSV-текст в DataTable с настройками диалекта (issue #48).
+        /// </summary>
+        public DataTable ParseToDataTable(
+            string csv,
+            CsvOptions options,
+            bool hasHeaderRow,
+            bool typeInference)
+        {
+            Guard.NotNull(csv, nameof(csv));
+            Guard.NotNull(options, nameof(options));
+
+            var splitter = new RecordSplitter(options);
+            splitter.Append(csv);
+            splitter.Finish();
+            var rows = splitter.TakeAll();
 
             var table = new DataTable(DefaultTableName);
             if (rows.Count == 0)
@@ -97,6 +195,20 @@ namespace Primo.MIA
             bool typeInference,
             string encodingName)
         {
+            return ParseFileToDataTable(
+                filePath, new CsvOptions { Delimiter = delimiter }, hasHeaderRow, typeInference, encodingName);
+        }
+
+        /// <summary>
+        /// Читает CSV из файла с настройками диалекта (issue #48).
+        /// </summary>
+        public DataTable ParseFileToDataTable(
+            string filePath,
+            CsvOptions options,
+            bool hasHeaderRow,
+            bool typeInference,
+            string encodingName)
+        {
             Guard.NotNullOrWhiteSpace(filePath, nameof(filePath));
 
             var encoding = ResolveEncoding(encodingName);
@@ -104,7 +216,86 @@ namespace Primo.MIA
             using (var reader = new StreamReader(filePath, encoding, detectEncodingFromByteOrderMarks: true))
                 csv = reader.ReadToEnd();
 
-            return ParseToDataTable(csv, delimiter, hasHeaderRow, typeInference);
+            return ParseToDataTable(csv, options, hasHeaderRow, typeInference);
+        }
+
+        /// <summary>
+        /// Потоковое чтение CSV из файла (issue #48): записи отдаются по мере
+        /// разбора — весь текст и список записей в память не грузятся.
+        /// Колонки остаются string: вывод типов требует полного прохода.
+        /// Число колонок задаёт заголовок (или первая запись без него);
+        /// «лишние» поля последующих записей игнорируются.
+        /// </summary>
+        public DataTable ParseFileStreaming(
+            string filePath,
+            CsvOptions options,
+            bool hasHeaderRow,
+            string encodingName)
+        {
+            Guard.NotNullOrWhiteSpace(filePath, nameof(filePath));
+            Guard.NotNull(options, nameof(options));
+
+            var encoding = ResolveEncoding(encodingName);
+            var table = new DataTable(DefaultTableName);
+            var columnsReady = false;
+
+            using (var reader = new StreamReader(filePath, encoding, detectEncodingFromByteOrderMarks: true))
+            {
+                ReadRecords(reader, options, record =>
+                {
+                    if (!columnsReady)
+                    {
+                        // Первая запись задаёт колонки: с заголовком — из него,
+                        // без — из первой записи данных (имена Column1..N)
+                        var source = hasHeaderRow ? record : null;
+                        for (int c = 0; c < record.Count; c++)
+                        {
+                            var name = source != null && c < source.Count
+                                && !string.IsNullOrWhiteSpace(source[c])
+                                ? source[c].Trim()
+                                : $"Column{c + 1}";
+                            table.Columns.Add(name, typeof(string));
+                        }
+                        columnsReady = true;
+
+                        if (hasHeaderRow)
+                            return; // запись-заголовок в данные не попадает
+                    }
+
+                    var row = table.NewRow();
+                    for (int c = 0; c < table.Columns.Count; c++)
+                        row[c] = c < record.Count ? record[c] : string.Empty;
+                    table.Rows.Add(row);
+                });
+            }
+
+            return table;
+        }
+
+        /// <summary>
+        /// Потоковое чтение записей CSV из произвольного TextReader (issue #48):
+        /// каждая завершённая запись отдаётся через <paramref name="onRecord"/>
+        /// сразу после разбора. Поддерживает переводы строк внутри
+        /// кавычкованных полей и комментарии (в начале записи, вне кавычек).
+        /// </summary>
+        public void ReadRecords(TextReader reader, CsvOptions options, Action<List<string>> onRecord)
+        {
+            Guard.NotNull(reader, nameof(reader));
+            Guard.NotNull(options, nameof(options));
+            Guard.NotNull(onRecord, nameof(onRecord));
+
+            var splitter = new RecordSplitter(options);
+            var buffer = new char[8192];
+            int read;
+            while ((read = reader.Read(buffer, 0, buffer.Length)) > 0)
+            {
+                splitter.Append(buffer, read);
+                foreach (var record in splitter.TakeFinished())
+                    onRecord(record);
+            }
+            splitter.Finish();
+            foreach (var record in splitter.TakeFinished())
+                onRecord(record);
         }
 
         // ── Запись: DataTable → CSV ────────────────────────────────────
@@ -119,14 +310,29 @@ namespace Primo.MIA
             bool includeHeader,
             bool convertDBNullToEmpty)
         {
-            Guard.NotNull(table, nameof(table));
+            return BuildCsv(table, new CsvOptions { Delimiter = delimiter }, includeHeader, convertDBNullToEmpty);
+        }
 
-            var delim = ResolveDelimiter(delimiter);
+        /// <summary>
+        /// Собирает CSV-текст из DataTable с настройками диалекта (issue #48).
+        /// Экранирование кавычки: удвоение (по умолчанию) или префикс
+        /// <see cref="CsvOptions.EscapeChar"/>.
+        /// </summary>
+        public string BuildCsv(
+            DataTable table,
+            CsvOptions options,
+            bool includeHeader,
+            bool convertDBNullToEmpty)
+        {
+            Guard.NotNull(table, nameof(table));
+            Guard.NotNull(options, nameof(options));
+
+            var delim = ResolveDelimiter(options.Delimiter);
             var sb = new StringBuilder();
 
             if (includeHeader)
             {
-                var headers = table.Columns.Cast<DataColumn>().Select(c => QuoteField(c.ColumnName, delim));
+                var headers = table.Columns.Cast<DataColumn>().Select(c => QuoteField(c.ColumnName, delim, options));
                 sb.AppendLine(string.Join(delim, headers));
             }
 
@@ -139,7 +345,7 @@ namespace Primo.MIA
                     var text = convertDBNullToEmpty && (value == null || value == DBNull.Value)
                         ? string.Empty
                         : value?.ToString() ?? string.Empty;
-                    fields.Add(QuoteField(text, delim));
+                    fields.Add(QuoteField(text, delim, options));
                 }
                 sb.AppendLine(string.Join(delim, fields));
             }
@@ -158,14 +364,57 @@ namespace Primo.MIA
             bool convertDBNullToEmpty,
             string encodingName)
         {
+            WriteCsvToFile(table, filePath, new CsvOptions { Delimiter = delimiter },
+                includeHeader, convertDBNullToEmpty, encodingName, append: false);
+        }
+
+        /// <summary>
+        /// Записывает CSV в файл с настройками диалекта (issue #48).
+        /// При <paramref name="append"/> = true дописывает в конец; заголовок
+        /// пишется только при создании нового (пустого) файла. Запись идёт
+        /// построчно — большой DataTable не собирается в одну строку.
+        /// </summary>
+        public void WriteCsvToFile(
+            DataTable table,
+            string filePath,
+            CsvOptions options,
+            bool includeHeader,
+            bool convertDBNullToEmpty,
+            string encodingName,
+            bool append)
+        {
+            Guard.NotNull(table, nameof(table));
             Guard.NotNullOrWhiteSpace(filePath, nameof(filePath));
+            Guard.NotNull(options, nameof(options));
 
             var dir = Path.GetDirectoryName(Path.GetFullPath(filePath));
             if (!string.IsNullOrEmpty(dir))
                 Directory.CreateDirectory(dir);
 
-            var csv = BuildCsv(table, delimiter, includeHeader, convertDBNullToEmpty);
-            File.WriteAllText(filePath, csv, ResolveEncoding(encodingName, bomForUtf8: false));
+            var delim = ResolveDelimiter(options.Delimiter);
+            var fileExists = File.Exists(filePath) && new FileInfo(filePath).Length > 0;
+            var writeHeader = includeHeader && (!append || !fileExists);
+
+            using (var writer = new StreamWriter(filePath, append, ResolveEncoding(encodingName, bomForUtf8: false)))
+            {
+                if (writeHeader)
+                    writer.WriteLine(string.Join(delim,
+                        table.Columns.Cast<DataColumn>().Select(c => QuoteField(c.ColumnName, delim, options))));
+
+                foreach (DataRow row in table.Rows)
+                {
+                    var fields = new List<string>(table.Columns.Count);
+                    foreach (var column in table.Columns.Cast<DataColumn>())
+                    {
+                        var value = row[column];
+                        var text = convertDBNullToEmpty && (value == null || value == DBNull.Value)
+                            ? string.Empty
+                            : value?.ToString() ?? string.Empty;
+                        fields.Add(QuoteField(text, delim, options));
+                    }
+                    writer.WriteLine(string.Join(delim, fields));
+                }
+            }
         }
 
         // ── RFC 4180: разбор записей ───────────────────────────────────
@@ -174,107 +423,278 @@ namespace Primo.MIA
         /// Разбивает CSV на записи (список полей). Состоянийная машина:
         /// в кавычках разделители и переводы строк — часть данных, "" — кавычка.
         /// </summary>
-        private static List<List<string>> SplitRecords(string csv, string delimiter)
+        private static List<List<string>> SplitRecords(string csv, CsvOptions options)
         {
-            var records = new List<List<string>>();
-            var fields = new List<string>();
-            var field = new StringBuilder();
-            var inQuotes = false;
-            var fieldStarted = false; // поле начато (для различения пустого поля и конца)
+            var splitter = new RecordSplitter(options);
+            splitter.Append(csv);
+            splitter.Finish();
+            return splitter.TakeAll();
+        }
 
-            int i = 0;
-            int delimLen = delimiter.Length;
+        /// <summary>
+        /// Инкрементальный разборщик записей CSV (issue #48): один и тот же
+        /// автомат обслуживает и разбор строки целиком, и потоковое чтение
+        /// по кускам — поведение идентично. Разделитель многосимвольный:
+        /// нерешённые хвостовые символы держатся в окне до набора длины.
+        /// </summary>
+        private sealed class RecordSplitter
+        {
+            private readonly string _delimiter;
+            private readonly char _quote;
+            private readonly char? _escape;
+            private readonly char? _comment;
 
-            void EndField()
+            // списки заменяются новыми (не Clear) — ссылки уходят в результаты
+            private List<List<string>> _finished = new List<List<string>>();
+            private List<string> _fields = new List<string>();
+            private readonly StringBuilder _field = new StringBuilder();
+            private readonly StringBuilder _pending = new StringBuilder(); // окно разделителя
+
+            private bool _inQuotes;
+            private bool _fieldStarted;
+            private bool _atRecordStart = true;
+            private bool _skipLine;      // строка комментария — пропускается до \n
+            private bool _skipLf;        // \n после \r — та же граница записи (CRLF)
+            private bool _escapePending; // ждём экранированный символ
+            private bool _quotePending;  // ждём: удвоение кавычки или закрытие поля
+            private char? _replay;       // символ, закрывший кавычки — подаётся повторно «вне кавычек»
+
+            public RecordSplitter(CsvOptions options)
             {
-                fields.Add(field.ToString());
-                field.Clear();
-                fieldStarted = false;
+                _delimiter = ResolveDelimiter(options?.Delimiter);
+                _quote = options?.QuoteChar ?? CsvOptions.DefaultQuoteChar;
+                _escape = options?.EscapeChar;
+                _comment = options?.CommentChar;
             }
 
-            void EndRecord()
+            public void Append(string text)
             {
-                EndField();
-                records.Add(fields);
-                fields = new List<string>();
+                if (text == null || text.Length == 0)
+                    return;
+                for (int i = 0; i < text.Length; i++)
+                    Step(text[i]);
             }
 
-            while (i < csv.Length)
+            public void Append(char[] buffer, int count)
             {
-                var ch = csv[i];
+                for (int i = 0; i < count; i++)
+                    Step(buffer[i]);
+            }
 
-                if (inQuotes)
+            /// <summary>Завершает разбор: последняя запись без перевода строки тоже отдаётся.</summary>
+            public void Finish()
+            {
+                // символ в реплее мог остаться без следующего Append
+                if (_replay != null)
                 {
-                    if (ch == '"')
+                    var replayed = _replay.Value;
+                    _replay = null;
+                    FeedOutside(replayed);
+                }
+
+                // окно разделителя могло держать хвостовые символы
+                while (_pending.Length > 0)
+                {
+                    if (MatchDelimiter(_pending.ToString(), 0))
                     {
-                        // "" внутри кавычек → буквальная кавычка
-                        if (i + 1 < csv.Length && csv[i + 1] == '"')
-                        {
-                            field.Append('"');
-                            i += 2;
-                            continue;
-                        }
-                        inQuotes = false;
-                        i++;
+                        EndField();
+                        _pending.Remove(0, _delimiter.Length);
                         continue;
                     }
-                    field.Append(ch);
-                    i++;
-                    continue;
+                    var ch = _pending[0];
+                    _pending.Remove(0, 1);
+                    StepCore(ch);
                 }
 
-                if (ch == '"' && field.Length == 0 && !fieldStarted)
-                {
-                    // Кавычка в начале поля → кавычкованный режим
-                    inQuotes = true;
-                    fieldStarted = true;
-                    i++;
-                    continue;
-                }
-
-                if (delimLen > 0 && MatchDelimiter(csv, i, delimiter))
-                {
-                    EndField();
-                    i += delimLen;
-                    continue;
-                }
-
-                if (ch == '\r' || ch == '\n')
-                {
+                if (_field.Length > 0 || _fieldStarted || _fields.Count > 0)
                     EndRecord();
-                    // CRLF / LF / CR — одна граница записи
-                    if (ch == '\r' && i + 1 < csv.Length && csv[i + 1] == '\n')
-                        i += 2;
-                    else
-                        i++;
-                    continue;
-                }
-
-                field.Append(ch);
-                fieldStarted = true;
-                i++;
             }
 
-            // Последняя запись (если файл не заканчивается переводом строки
-            // или заканчивается полем без переноса)
-            if (field.Length > 0 || fieldStarted || fields.Count > 0)
-                EndRecord();
+            /// <summary>Забирает все накопленные записи (строковый API).</summary>
+            public List<List<string>> TakeAll()
+            {
+                var result = _finished;
+                _finished = new List<List<string>>();
+                return result;
+            }
 
-            return records;
+            /// <summary>Забирает записи, завершённые с прошлого вызова (потоковый API).</summary>
+            public List<List<string>> TakeFinished()
+            {
+                return TakeAll();
+            }
+
+            private void Step(char ch)
+            {
+                // символ, на котором завершились кавычки, переподдаётся
+                // по правилам «вне кавычек» (разделитель/граница записи)
+                if (_replay != null)
+                {
+                    var replayed = _replay.Value;
+                    _replay = null;
+                    FeedOutside(replayed);
+                }
+
+                if (_inQuotes || _skipLine)
+                    StepCore(ch);
+                else
+                    FeedOutside(ch);
+            }
+
+            /// <summary>
+            /// Вне кавычек многосимвольный разделитель ищется через окно:
+            /// символ держится, пока не наберётся длина разделителя.
+            /// </summary>
+            private void FeedOutside(char ch)
+            {
+                if (_inQuotes || _skipLine)
+                {
+                    StepCore(ch);
+                    return;
+                }
+
+                _pending.Append(ch);
+                while (_pending.Length >= _delimiter.Length)
+                {
+                    if (MatchDelimiter(_pending.ToString(), 0))
+                    {
+                        EndField();
+                        _pending.Remove(0, _delimiter.Length);
+                        continue;
+                    }
+                    var head = _pending[0];
+                    _pending.Remove(0, 1);
+                    StepCore(head);
+                }
+            }
+
+            /// <summary>Обработка одного символа без оконной логики разделителя.</summary>
+            private void StepCore(char ch)
+            {
+                if (_skipLine)
+                {
+                    if (ch == '\n')
+                        _skipLine = false; // конец строки комментария; \r пропускается
+                    return;
+                }
+
+                if (_inQuotes)
+                {
+                    if (_escapePending)
+                    {
+                        // символ после экранирования — всегда литерал
+                        _field.Append(ch);
+                        _escapePending = false;
+                        return;
+                    }
+
+                    if (_escape != null && ch == _escape.Value)
+                    {
+                        _escapePending = true;
+                        return;
+                    }
+
+                    if (ch == _quote)
+                    {
+                        if (!_quotePending)
+                        {
+                            _quotePending = true; // кавычка: закрытие поля или удвоение
+                            return;
+                        }
+
+                        // удвоение → литеральная кавычка, режим кавычек сохраняется
+                        _quotePending = false;
+                        _field.Append(_quote);
+                        return;
+                    }
+
+                    if (_quotePending)
+                    {
+                        // не удвоение → кавычка закрыла поле; символ обрабатывается
+                        // заново по правилам «вне кавычек» (может быть \n или разделитель)
+                        _quotePending = false;
+                        _inQuotes = false;
+                        _replay = ch;
+                        return;
+                    }
+
+                    _field.Append(ch);
+                    return;
+                }
+
+                if (_skipLf)
+                {
+                    // CRLF: \n после \r — не новая граница, а часть прошлой
+                    _skipLf = false;
+                    if (ch == '\n')
+                        return;
+                }
+
+                if (_comment != null && _atRecordStart && ch == _comment.Value)
+                {
+                    _skipLine = true;
+                    return;
+                }
+
+                if (ch == _quote && _field.Length == 0 && !_fieldStarted)
+                {
+                    // Кавычка в начале поля → кавычкованный режим
+                    _inQuotes = true;
+                    _fieldStarted = true;
+                    _atRecordStart = false;
+                    return;
+                }
+
+                if (ch == '\r')
+                {
+                    EndRecord();
+                    _skipLf = true;
+                    return;
+                }
+
+                if (ch == '\n')
+                {
+                    EndRecord();
+                    return;
+                }
+
+                _field.Append(ch);
+                _fieldStarted = true;
+                _atRecordStart = false;
+            }
+
+            private void EndField()
+            {
+                _fields.Add(_field.ToString());
+                _field.Clear();
+                _fieldStarted = false;
+                _atRecordStart = false;
+            }
+
+            private void EndRecord()
+            {
+                EndField();
+                _finished.Add(_fields);
+                _fields = new List<string>(); // новая запись — новый список (ссылка ушла в результат)
+                _atRecordStart = true;
+            }
+
+            private bool MatchDelimiter(string text, int position)
+            {
+                if (position + _delimiter.Length > text.Length)
+                    return false;
+                return string.CompareOrdinal(text, position, _delimiter, 0, _delimiter.Length) == 0;
+            }
         }
 
-        private static bool MatchDelimiter(string csv, int position, string delimiter)
+        private static string QuoteField(string value, string delimiter, CsvOptions options)
         {
-            if (position + delimiter.Length > csv.Length)
-                return false;
-            return string.CompareOrdinal(csv, position, delimiter, 0, delimiter.Length) == 0;
-        }
+            var quoteChar = options?.QuoteChar ?? CsvOptions.DefaultQuoteChar;
+            var quoteText = quoteChar.ToString();
 
-        private static string QuoteField(string value, string delimiter)
-        {
             var needsQuoting = value != null && (
                 value.Contains(delimiter) ||
-                value.Contains('"') ||
+                value.Contains(quoteText) ||
                 value.Contains('\r') ||
                 value.Contains('\n') ||
                 value.StartsWith(" ") ||
@@ -285,7 +705,15 @@ namespace Primo.MIA
             if (!needsQuoting)
                 return value ?? string.Empty;
 
-            return "\"" + value.Replace("\"", "\"\"") + "\"";
+            var escape = options?.EscapeChar;
+            var escaped = escape != null
+                // диалект с экранированием: сам экранирующий символ тоже удваивается
+                ? value
+                    .Replace(escape.Value.ToString(), escape.Value.ToString() + escape.Value.ToString())
+                    .Replace(quoteText, escape.Value.ToString() + quoteText)
+                : value.Replace(quoteText, quoteText + quoteText); // RFC 4180: удвоение
+
+            return quoteText + escaped + quoteText;
         }
 
         // ── Типизация колонок ──────────────────────────────────────────
