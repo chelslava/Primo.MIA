@@ -207,32 +207,37 @@ namespace Primo.MIA
         public DataTableFilterBack(IWFContainer container) : base(container)
         {
             sdkComponentName = ActivityStrings.Activity_DataTableFilter;
-            sdkComponentHelp =
-                "Компонент \"DataTable: Фильтрация\" (DataTableFilterBack)\n" +
-                "Отбирает строки DataTable по условию. Порядок строк сохраняется,\n" +
-                "исходная таблица не изменяется. Возвращает ДВЕ таблицы:\n" +
-                "прошедшие фильтр и не прошедшие (остаток).\n\n" +
-                "── Режимы ─────────────────────────────────────────────\n" +
-                "SqlQuery — SQL-подобное выражение (аналог WHERE):\n" +
-                "  Age >= 18 AND Name LIKE 'Ив%' OR (City = 'Москва' AND Age < 30)\n" +
-                "  Операторы: =, ==, <>, !=, >, <, >=, <=, LIKE, IN (...), IS NULL, IS NOT NULL\n" +
-                "  Логика: AND (И), OR (ИЛИ), NOT (НЕ), скобки\n" +
-                "  Литералы: 'строка', \"строка\", числа, true/false; колонка — [Имя в скобках]\n\n" +
-                "ConditionBuilder — конструктор условий (форма):\n" +
-                "  строки «Колонка + Оператор + Значение» со связкой И/ИЛИ.\n" +
-                "  Операторы: =, <>, >, >=, <, <=, Contains, StartsWith, EndsWith,\n" +
-                "  Like (% и _), In (значения через запятую), IsNull, IsNotNull\n\n" +
-                "── Основные ───────────────────────────────────────────\n" +
-                "Таблица данных*: [DataTable] исходная таблица.\n" +
-                "Режим фильтрации: [DataTableFilterMode] SqlQuery / ConditionBuilder.\n" +
-                "SQL-выражение: [String] условие для режима SqlQuery.\n" +
-                "Условия: [String] DSL конструктора (Join|Column|Operator|Value).\n" +
-                "Учитывать регистр: [Boolean] при сравнении строк (по умолчанию нет).\n\n" +
-                "── Выходные данные ────────────────────────────────────\n" +
-                "Прошли фильтр: [DataTable] строки, прошедшие условие.\n" +
-                "Не прошли фильтр: [DataTable] остальные строки.\n" +
-                "Кол-во прошедших: [Int32].\n" +
-                "Кол-во отсеянных: [Int32].";
+            sdkComponentHelp = @"
+Компонент ""DataTable: Фильтрация""
+Отбирает строки DataTable по условию. Порядок строк сохраняется,
+исходная таблица не изменяется. Возвращает ДВЕ таблицы:
+прошедшие фильтр и не прошедшие (остаток).
+
+Режимы:
+SqlQuery — SQL-подобное выражение (аналог WHERE):
+  Age >= 18 AND Name LIKE 'Ив%' OR (City = 'Москва' AND Age < 30)
+  Операторы: =, ==, <>, !=, >, <, >=, <=, LIKE, IN (...), IS NULL, IS NOT NULL
+  Логика: AND (И), OR (ИЛИ), NOT (НЕ), скобки
+  Литералы: 'строка', ""строка"", числа, true/false; колонка — [Имя в скобках]
+
+ConditionBuilder — конструктор условий (форма):
+  строки «Колонка + Оператор + Значение» со связкой И/ИЛИ.
+  Операторы: =, <>, >, >=, <, <=, Contains, StartsWith, EndsWith,
+  Like (% и _), In (значения через запятую), IsNull, IsNotNull
+
+Основные:
+Таблица данных*: [DataTable] исходная таблица.
+Режим фильтрации: [DataTableFilterMode] SqlQuery / ConditionBuilder.
+SQL-выражение: [String] условие для режима SqlQuery.
+Условия: [String] DSL конструктора (Join|Column|Operator|Value).
+Учитывать регистр: [Boolean] при сравнении строк (по умолчанию нет).
+
+Выходные данные:
+Прошли фильтр: [DataTable] строки, прошедшие условие.
+Не прошли фильтр: [DataTable] остальные строки.
+Кол-во прошедших: [Int32].
+Кол-во отсеянных: [Int32].
+";
             sdkComponentIcon = ActivityIcons.Table;
 
             sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()

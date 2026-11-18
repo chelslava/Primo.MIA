@@ -100,14 +100,17 @@ namespace Primo.MIA
         public ListSetBack(IWFContainer container) : base(container)
         {
             sdkComponentName = "Список: Теория множеств";
-            sdkComponentHelp =
-                "Операции над двумя списками как над математическими множествами.\n\n" +
-                "Union         — A∪B: все уникальные элементы\n" +
-                "Intersect     — A∩B: только общие элементы\n" +
-                "Except        — A∖B: в A но не в B\n" +
-                "ExceptReverse — B∖A: в B но не в A\n" +
-                "SymmetricDiff — только в одном из списков (не в обоих)\n" +
-                "Distinct      — уникальные элементы A (дубли удаляются)";
+            sdkComponentHelp = @"
+Компонент ""Список: Теория множеств""
+Операции над двумя списками как над математическими множествами.
+
+Union         — A∪B: все уникальные элементы
+Intersect     — A∩B: только общие элементы
+Except        — A∖B: в A но не в B
+ExceptReverse — B∖A: в B но не в A
+SymmetricDiff — только в одном из списков (не в обоих)
+Distinct      — уникальные элементы A (дубли удаляются)
+";
             sdkComponentIcon = ActivityIcons.List;
 
             sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()

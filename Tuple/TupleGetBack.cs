@@ -95,14 +95,19 @@ namespace Primo.MIA
         public TupleGetBack(IWFContainer container) : base(container)
         {
             sdkComponentName = "Кортеж: Получить элемент";
-            sdkComponentHelp =
-                "Извлекает один элемент кортежа по номеру Item1–Item7.\n\n" +
-                "Выход «Значение» имеет тип object.\n" +
-                "Для приведения к конкретному типу используйте выражение:\n" +
-                "  (string)myVar    (int)myVar    Convert.ToInt32(myVar)\n\n" +
-                "Выход «Тип значения» содержит имя типа (String, Int32 и т.д.).\n\n" +
-                "Ошибка: если Номер элемента > арности кортежа.\n" +
-                "Пример: Item3 из Tuple<string,int> → ошибка (арность 2).";
+            sdkComponentHelp = @"
+Компонент ""Кортеж: Получить элемент""
+Извлекает один элемент кортежа по номеру Item1–Item7.
+
+Выход «Значение» имеет тип object.
+Для приведения к конкретному типу используйте выражение:
+  (string)myVar    (int)myVar    Convert.ToInt32(myVar)
+
+Выход «Тип значения» содержит имя типа (String, Int32 и т.д.).
+
+Ошибка: если Номер элемента > арности кортежа.
+Пример: Item3 из Tuple<string,int> → ошибка (арность 2).
+";
 
             sdkComponentIcon = ActivityIcons.Tuple;
 

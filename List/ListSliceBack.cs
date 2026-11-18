@@ -144,15 +144,18 @@ namespace Primo.MIA
         public ListSliceBack(IWFContainer container) : base(container)
         {
             sdkComponentName = "Список: Срез";
-            sdkComponentHelp =
-                "Возвращает подмножество элементов списка.\n\n" +
-                "FirstN    — первые N элементов\n" +
-                "LastN     — последние N элементов\n" +
-                "SkipFirst — пропустить первые N, вернуть остаток\n" +
-                "SkipLast  — пропустить последние N, вернуть начало\n" +
-                "Page      — пагинация: страница Page, размер PageSize\n" +
-                "Range     — элементы с индекса FromIndex до ToIndex (вкл.)\n" +
-                "EveryNth  — каждый N-й элемент (шаг N)";
+            sdkComponentHelp = @"
+Компонент ""Список: Срез""
+Возвращает подмножество элементов списка.
+
+FirstN    — первые N элементов
+LastN     — последние N элементов
+SkipFirst — пропустить первые N, вернуть остаток
+SkipLast  — пропустить последние N, вернуть начало
+Page      — пагинация: страница Page, размер PageSize
+Range     — элементы с индекса FromIndex до ToIndex (вкл.)
+EveryNth  — каждый N-й элемент (шаг N)
+";
             sdkComponentIcon = ActivityIcons.List;
 
             sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()

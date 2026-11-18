@@ -102,15 +102,18 @@ namespace Primo.MIA
         public ListAggregateBack(IWFContainer container) : base(container)
         {
             sdkComponentName = "Список: Агрегация";
-            sdkComponentHelp =
-                "Вычисляет агрегатное значение из List<string>.\n\n" +
-                "Count          — кол-во всех элементов\n" +
-                "CountDistinct  — кол-во уникальных непустых\n" +
-                "CountNonEmpty  — кол-во непустых\n" +
-                "Sum/Min/Max/Average — числовые агрегаты (нечисловые игнорируются)\n" +
-                "ShortestString — кратчайшая строка\n" +
-                "LongestString  — длиннейшая строка\n" +
-                "Join           — склеить все через разделитель";
+            sdkComponentHelp = @"
+Компонент ""Список: Агрегация""
+Вычисляет агрегатное значение из List<string>.
+
+Count          — кол-во всех элементов
+CountDistinct  — кол-во уникальных непустых
+CountNonEmpty  — кол-во непустых
+Sum/Min/Max/Average — числовые агрегаты (нечисловые игнорируются)
+ShortestString — кратчайшая строка
+LongestString  — длиннейшая строка
+Join           — склеить все через разделитель
+";
             sdkComponentIcon = ActivityIcons.List;
 
             sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()

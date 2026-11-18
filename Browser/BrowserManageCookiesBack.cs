@@ -110,24 +110,26 @@ namespace Primo.MIA
         public BrowserManageCookiesBack(IWFContainer container) : base(container)
         {
             sdkComponentName = ActivityStrings.Activity_BrowserManageCookies;
-            sdkComponentHelp =
-                "Управляет cookies браузера.\n" +
-                "\n" +
-                "── Основные параметры ────────────────────────\n" +
-                "ID сессии — идентификатор сессии браузера\n" +
-                "Операция  — действие с cookies\n" +
-                "Имя       — имя cookie (для Get, Set, Delete)\n" +
-                "Значение  — значение cookie (для Set)\n" +
-                "\n" +
-                "Операции:\n" +
-                "  Get       — получить cookie по имени\n" +
-                "  GetAll    — получить все cookies (JSON)\n" +
-                "  Set       — установить cookie\n" +
-                "  Delete    — удалить cookie\n" +
-                "  DeleteAll — удалить все cookies\n" +
-                "\n" +
-                "── Выходные параметры ─────────────────────────\n" +
-                "Результат — значение cookie или JSON всех cookies";
+            sdkComponentHelp = @"
+Компонент ""Браузер: Управление cookies""
+Управляет cookies браузера.
+
+Основные:
+ID сессии — идентификатор сессии браузера
+Операция  — действие с cookies
+Имя       — имя cookie (для Get, Set, Delete)
+Значение  — значение cookie (для Set)
+
+Операции:
+  Get       — получить cookie по имени
+  GetAll    — получить все cookies (JSON)
+  Set       — установить cookie
+  Delete    — удалить cookie
+  DeleteAll — удалить все cookies
+
+Выходные данные:
+Результат — значение cookie или JSON всех cookies
+";
 
             sdkComponentIcon = ActivityIcons.Browser;
 

@@ -288,30 +288,32 @@ namespace Primo.MIA
         public WebhookListenBack(IWFContainer container) : base(container)
         {
             sdkComponentName = "Webhook: Получить";
-            sdkComponentHelp =
-                "Поднимает локальный HTTP-сервер и ждёт один входящий запрос.\n" +
-                "\n" +
-                "── URL-префикс ─────────────────────────────────\n" +
-                "http://localhost:8080/webhook/   — только локально\n" +
-                "http://+:8080/webhook/           — все интерфейсы (нужны права)\n" +
-                "\n" +
-                "── Права на Windows ────────────────────────────\n" +
-                "Для localhost — права не нужны.\n" +
-                "Для http://+: или конкретного IP — нужна регистрация:\n" +
-                "  netsh http add urlacl url=http://+:8080/webhook/ user=DOMAIN\\User\n" +
-                "\n" +
-                "── Безопасность ────────────────────────────────\n" +
-                "SecretToken — сравнивается с заголовком X-Webhook-Secret\n" +
-                "IsTokenValid = false если токен не совпал (запрос всё равно принят)\n" +
-                "\n" +
-                "── Выходные данные ─────────────────────────────\n" +
-                "ReceivedBody    — тело запроса\n" +
-                "ReceivedHeaders — заголовки (Dict<string,string>)\n" +
-                "ReceivedMethod  — HTTP-метод (POST, GET...)\n" +
-                "ReceivedUrl     — полный URL запроса\n" +
-                "QueryParams     — query-параметры (Dict<string,string>)\n" +
-                "IsTimeout       — true если никто не постучал\n" +
-                "IsTokenValid    — true если токен прошёл проверку";
+            sdkComponentHelp = @"
+Компонент ""Webhook: Получить""
+Поднимает локальный HTTP-сервер и ждёт один входящий запрос.
+
+URL-префикс:
+http://localhost:8080/webhook/   — только локально
+http://+:8080/webhook/           — все интерфейсы (нужны права)
+
+Права на Windows:
+Для localhost — права не нужны.
+Для http://+: или конкретного IP — нужна регистрация:
+  netsh http add urlacl url=http://+:8080/webhook/ user=DOMAIN\User
+
+Безопасность:
+SecretToken — сравнивается с заголовком X-Webhook-Secret
+IsTokenValid = false если токен не совпал (запрос всё равно принят)
+
+Выходные данные:
+ReceivedBody    — тело запроса
+ReceivedHeaders — заголовки (Dict<string,string>)
+ReceivedMethod  — HTTP-метод (POST, GET...)
+ReceivedUrl     — полный URL запроса
+QueryParams     — query-параметры (Dict<string,string>)
+IsTimeout       — true если никто не постучал
+IsTokenValid    — true если токен прошёл проверку
+";
 
             sdkComponentIcon = ActivityIcons.Http;
 

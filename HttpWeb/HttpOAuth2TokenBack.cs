@@ -289,33 +289,35 @@ namespace Primo.MIA
         public HttpOAuth2TokenBack(IWFContainer container) : base(container)
         {
             sdkComponentName = "HTTP: OAuth2 токен";
-            sdkComponentHelp =
-                "Получает OAuth2 токен доступа.\n" +
-                "\n" +
-                "── Grant Types ────────────────────────────────\n" +
-                "ClientCredentials  — авторизация приложения\n" +
-                "Password           — авторизация по паролю\n" +
-                "AuthorizationCode  — авторизация по коду\n" +
-                "\n" +
-                "── Основные параметры ─────────────────────────\n" +
-                "Token URL     — endpoint для получения токена\n" +
-                "Client ID     — идентификатор клиента\n" +
-                "Client Secret — секрет клиента\n" +
-                "Scope         — область доступа (опционально)\n" +
-                "\n" +
-                "── Password Grant ─────────────────────────────\n" +
-                "Username — имя пользователя\n" +
-                "Password — пароль\n" +
-                "\n" +
-                "── Authorization Code Grant ───────────────────\n" +
-                "Code         — код авторизации\n" +
-                "Redirect URI — URI перенаправления\n" +
-                "\n" +
-                "── Выходные параметры ─────────────────────────\n" +
-                "Access Token  — токен доступа\n" +
-                "Refresh Token — токен обновления\n" +
-                "Expires In    — время жизни (сек)\n" +
-                "Token Type    — тип токена";
+            sdkComponentHelp = @"
+Компонент ""HTTP: OAuth2 токен""
+Получает OAuth2 токен доступа.
+
+Grant Types:
+ClientCredentials  — авторизация приложения
+Password           — авторизация по паролю
+AuthorizationCode  — авторизация по коду
+
+Основные:
+Token URL     — endpoint для получения токена
+Client ID     — идентификатор клиента
+Client Secret — секрет клиента
+Scope         — область доступа (опционально)
+
+Password Grant:
+Username — имя пользователя
+Password — пароль
+
+Authorization Code Grant:
+Code         — код авторизации
+Redirect URI — URI перенаправления
+
+Выходные данные:
+Access Token  — токен доступа
+Refresh Token — токен обновления
+Expires In    — время жизни (сек)
+Token Type    — тип токена
+";
 
             sdkComponentIcon = ActivityIcons.Http;
 

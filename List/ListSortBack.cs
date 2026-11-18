@@ -104,19 +104,22 @@ namespace Primo.MIA
         public ListSortBack(IWFContainer container) : base(container)
         {
             sdkComponentName = "Список: Сортировка";
-            sdkComponentHelp =
-                "Сортирует List<string> выбранным способом.\n" +
-                "Возвращает новый список — оригинал не изменяется.\n\n" +
-                "── Способы ─────────────────────────────────────────────\n" +
-                "Alphabetical        — A→Z (с учётом регистра)\n" +
-                "AlphabeticalDesc    — Z→A (с учётом регистра)\n" +
-                "CaseInsensitive     — A→Z без учёта регистра\n" +
-                "CaseInsensitiveDesc — Z→A без учёта регистра\n" +
-                "ByLength            — по длине, короткие первые\n" +
-                "ByLengthDesc        — по длине, длинные первые\n" +
-                "Natural             — file1, file2, file10 (не file10 после file1)\n" +
-                "Reverse             — обратный порядок (не сортирует)\n" +
-                "Random              — перемешивание Fisher–Yates";
+            sdkComponentHelp = @"
+Компонент ""Список: Сортировка""
+Сортирует List<string> выбранным способом.
+Возвращает новый список — оригинал не изменяется.
+
+Способы:
+Alphabetical        — A→Z (с учётом регистра)
+AlphabeticalDesc    — Z→A (с учётом регистра)
+CaseInsensitive     — A→Z без учёта регистра
+CaseInsensitiveDesc — Z→A без учёта регистра
+ByLength            — по длине, короткие первые
+ByLengthDesc        — по длине, длинные первые
+Natural             — file1, file2, file10 (не file10 после file1)
+Reverse             — обратный порядок (не сортирует)
+Random              — перемешивание Fisher–Yates
+";
 
             sdkComponentIcon = ActivityIcons.List;
 

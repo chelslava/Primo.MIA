@@ -109,14 +109,18 @@ namespace Primo.MIA
         public TupleDestructureBack(IWFContainer container) : base(container)
         {
             sdkComponentName = "Кортеж: Деструктуризация";
-            sdkComponentHelp =
-                "Раскладывает все элементы кортежа в отдельные переменные.\n" +
-                "Аналог C# 7: var (a, b, c) = tuple — для .NET Framework.\n\n" +
-                "Работает прозрачно с System.Tuple и System.ValueTuple.\n\n" +
-                "Правила:\n" +
-                "  • Задайте только нужные Out-переменные.\n" +
-                "  • Номер Out > арности кортежа — пропускается без ошибки.\n" +
-                "  • «Тип (имя)»: \"Tuple`3\" или \"ValueTuple`3\".";
+            sdkComponentHelp = @"
+Компонент ""Кортеж: Деструктуризация""
+Раскладывает все элементы кортежа в отдельные переменные.
+Аналог C# 7: var (a, b, c) = tuple — для .NET Framework.
+
+Работает прозрачно с System.Tuple и System.ValueTuple.
+
+Правила:
+  • Задайте только нужные Out-переменные.
+  • Номер Out > арности кортежа — пропускается без ошибки.
+  • «Тип (имя)»: ""Tuple`3"" или ""ValueTuple`3"".
+";
 
             sdkComponentIcon = ActivityIcons.Tuple;
 

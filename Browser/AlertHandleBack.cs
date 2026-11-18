@@ -95,21 +95,23 @@ namespace Primo.MIA
         public AlertHandleBack(IWFContainer container) : base(container)
         {
             sdkComponentName = ActivityStrings.Activity_AlertHandle;
-            sdkComponentHelp =
-                "Работает с JavaScript алертами, подтверждениями и промптами.\n" +
-                "\n" +
-                "── Основные параметры ────────────────────────\n" +
-                "ID сессии — идентификатор сессии браузера\n" +
-                "Действие  — операция с алертом\n" +
-                "\n" +
-                "Действия:\n" +
-                "  Accept   — принять (OK)\n" +
-                "  Dismiss  — отклонить (Cancel)\n" +
-                "  GetText  — получить текст\n" +
-                "  SendKeys — ввести текст в prompt\n" +
-                "\n" +
-                "── Выходные параметры ─────────────────────────\n" +
-                "Текст алерта — содержимое сообщения";
+            sdkComponentHelp = @"
+Компонент ""Браузер: Обработка алерта""
+Работает с JavaScript алертами, подтверждениями и промптами.
+
+Основные:
+ID сессии — идентификатор сессии браузера
+Действие  — операция с алертом
+
+Действия:
+  Accept   — принять (OK)
+  Dismiss  — отклонить (Cancel)
+  GetText  — получить текст
+  SendKeys — ввести текст в prompt
+
+Выходные данные:
+Текст алерта — содержимое сообщения
+";
 
             sdkComponentIcon = ActivityIcons.Browser;
 

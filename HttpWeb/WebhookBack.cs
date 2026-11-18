@@ -293,29 +293,31 @@ namespace Primo.MIA
         public WebhookBack(IWFContainer container) : base(container)
         {
             sdkComponentName = "Webhook: Отправить";
-            sdkComponentHelp =
-                "Отправляет POST-запрос с JSON на URL вебхука.\n" +
-                "Интеграция с Slack, Teams, Jira, Discord и любыми входящими вебхуками.\n" +
-                "\n" +
-                "── Режимы payload ──────────────────────────────\n" +
-                "Payload  — готовая JSON-строка\n" +
-                "Template — шаблон с {{плейсхолдерами}} + словарь переменных\n" +
-                "           Template имеет приоритет над Payload\n" +
-                "\n" +
-                "── Retry ───────────────────────────────────────\n" +
-                "RetryCount   — доп. попыток (0 = только одна)\n" +
-                "RetryDelayMs — пауза между попытками (мс)\n" +
-                "Повтор при: сетевой ошибке или ответе 5xx\n" +
-                "\n" +
-                "── Примеры шаблонов ────────────────────────────\n" +
-                "Slack:  {\"text\": \"{{Message}}\"}\n" +
-                "Teams:  {\"@type\":\"MessageCard\",\"text\":\"{{Message}}\"}\n" +
-                "\n" +
-                "── Выходные данные ─────────────────────────────\n" +
-                "StatusCode   — HTTP-код ответа\n" +
-                "ResponseBody — тело ответа\n" +
-                "IsSuccess    — true если код 2xx\n" +
-                "AttemptCount — сколько попыток выполнено";
+            sdkComponentHelp = @"
+Компонент ""Webhook: Отправить""
+Отправляет POST-запрос с JSON на URL вебхука.
+Интеграция с Slack, Teams, Jira, Discord и любыми входящими вебхуками.
+
+Режимы payload:
+Payload  — готовая JSON-строка
+Template — шаблон с {{плейсхолдерами}} + словарь переменных
+           Template имеет приоритет над Payload
+
+Retry:
+RetryCount   — доп. попыток (0 = только одна)
+RetryDelayMs — пауза между попытками (мс)
+Повтор при: сетевой ошибке или ответе 5xx
+
+Примеры:
+Slack:  {""text"": ""{{Message}}""}
+Teams:  {""@type"":""MessageCard"",""text"":""{{Message}}""}
+
+Выходные данные:
+StatusCode   — HTTP-код ответа
+ResponseBody — тело ответа
+IsSuccess    — true если код 2xx
+AttemptCount — сколько попыток выполнено
+";
 
             sdkComponentIcon = ActivityIcons.Http;
 

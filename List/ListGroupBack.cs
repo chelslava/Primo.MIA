@@ -111,14 +111,17 @@ namespace Primo.MIA
         public ListGroupBack(IWFContainer container) : base(container)
         {
             sdkComponentName = "Список: Группировка";
-            sdkComponentHelp =
-                "Группирует List<string> по выбранному ключу.\n" +
-                "Результат: Dictionary<string, List<string>>\n\n" +
-                "ByFirstChar  — по первому символу (A, B, ...)\n" +
-                "ByLength     — по длине строки (1, 2, 3, ...)\n" +
-                "ByPrefix     — по первым N символам\n" +
-                "ByRegexGroup — по первой capture-группе regex\n" +
-                "TopFrequent  — топ-N самых частых значений";
+            sdkComponentHelp = @"
+Компонент ""Список: Группировка""
+Группирует List<string> по выбранному ключу.
+Результат: Dictionary<string, List<string>>
+
+ByFirstChar  — по первому символу (A, B, ...)
+ByLength     — по длине строки (1, 2, 3, ...)
+ByPrefix     — по первым N символам
+ByRegexGroup — по первой capture-группе regex
+TopFrequent  — топ-N самых частых значений
+";
             sdkComponentIcon = ActivityIcons.List;
 
             sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()

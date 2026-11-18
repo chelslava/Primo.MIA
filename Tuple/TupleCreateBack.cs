@@ -146,19 +146,24 @@ namespace Primo.MIA
         public TupleCreateBack(IWFContainer container) : base(container)
         {
             sdkComponentName = "Кортеж: Создать";
-            sdkComponentHelp =
-                "Создаёт System.Tuple или System.ValueTuple из 1–7 элементов.\n\n" +
-                "── Тип кортежа ──────────────────────────────────────────\n" +
-                "ClassicTuple — System.Tuple, ссылочный тип (по умолчанию).\n" +
-                "               Не требует дополнительных NuGet-пакетов.\n" +
-                "ValueTuple   — System.ValueTuple, значимый тип (struct).\n" +
-                "               Выгоден для больших коллекций кортежей (меньше GC).\n" +
-                "               Требует NuGet: System.ValueTuple 4.5.0.\n\n" +
-                "── Правила ──────────────────────────────────────────────\n" +
-                "Item1 обязателен. Заполняйте поля без пропусков по порядку.\n" +
-                "Арность = последний заполненный ItemN.\n\n" +
-                "Все прочие активности группы прозрачно работают\n" +
-                "как с Tuple, так и с ValueTuple.";
+            sdkComponentHelp = @"
+Компонент ""Кортеж: Создать""
+Создаёт System.Tuple или System.ValueTuple из 1–7 элементов.
+
+Тип кортежа:
+ClassicTuple — System.Tuple, ссылочный тип (по умолчанию).
+               Не требует дополнительных NuGet-пакетов.
+ValueTuple   — System.ValueTuple, значимый тип (struct).
+               Выгоден для больших коллекций кортежей (меньше GC).
+               Требует NuGet: System.ValueTuple 4.5.0.
+
+Правила:
+Item1 обязателен. Заполняйте поля без пропусков по порядку.
+Арность = последний заполненный ItemN.
+
+Все прочие активности группы прозрачно работают
+как с Tuple, так и с ValueTuple.
+";
 
             sdkComponentIcon = ActivityIcons.Tuple;
 

@@ -95,18 +95,20 @@ namespace Primo.MIA
         public BrowserExecuteJavaScriptBack(IWFContainer container) : base(container)
         {
             sdkComponentName = ActivityStrings.Activity_BrowserExecuteJS;
-            sdkComponentHelp =
-                "Выполняет JavaScript код в контексте браузера.\n" +
-                "\n" +
-                "── Основные параметры ────────────────────────\n" +
-                "ID сессии — идентификатор сессии браузера\n" +
-                "JavaScript код — код для выполнения\n" +
-                "Аргументы — список аргументов (необязательно)\n" +
-                "\n" +
-                "── Выходные параметры ─────────────────────────\n" +
-                "Результат — возвращаемое значение скрипта\n" +
-                "\n" +
-                "ПРИМЕЧАНИЕ: Используйте 'arguments[0]', 'arguments[1]' для доступа к аргументам.";
+            sdkComponentHelp = @"
+Компонент ""Браузер: Выполнить JavaScript""
+Выполняет JavaScript код в контексте браузера.
+
+Основные:
+ID сессии — идентификатор сессии браузера
+JavaScript код — код для выполнения
+Аргументы — список аргументов (необязательно)
+
+Выходные данные:
+Результат — возвращаемое значение скрипта
+
+ПРИМЕЧАНИЕ: Используйте 'arguments[0]', 'arguments[1]' для доступа к аргументам.
+";
 
             sdkComponentIcon = ActivityIcons.Browser;
 

@@ -140,27 +140,29 @@ namespace Primo.MIA
         public BrowserStorageManageBack(IWFContainer container) : base(container)
         {
             sdkComponentName = "Браузер: Управление Web Storage";
-            sdkComponentHelp =
-                "Управляет localStorage и sessionStorage браузера.\n" +
-                "\n" +
-                "── Основные параметры ────────────────────────\n" +
-                "ID сессии — идентификатор сессии браузера\n" +
-                "Тип хранилища — localStorage или sessionStorage\n" +
-                "Операция — тип операции с хранилищем\n" +
-                "\n" +
-                "── Операции ──────────────────────────────────\n" +
-                "GetItem — получить значение по ключу\n" +
-                "SetItem — установить значение\n" +
-                "RemoveItem — удалить ключ\n" +
-                "Clear — очистить всё хранилище\n" +
-                "GetAllKeys — получить все ключи\n" +
-                "GetLength — получить количество элементов\n" +
-                "\n" +
-                "── Типы хранилищ ─────────────────────────────\n" +
-                "LocalStorage — данные сохраняются между сессиями\n" +
-                "SessionStorage — данные удаляются при закрытии вкладки\n" +
-                "\n" +
-                "ПРИМЕЧАНИЕ: Работает через JavaScript API браузера.";
+            sdkComponentHelp = @"
+Компонент ""Браузер: Управление Web Storage""
+Управляет localStorage и sessionStorage браузера.
+
+Основные:
+ID сессии — идентификатор сессии браузера
+Тип хранилища — localStorage или sessionStorage
+Операция — тип операции с хранилищем
+
+Операции:
+GetItem — получить значение по ключу
+SetItem — установить значение
+RemoveItem — удалить ключ
+Clear — очистить всё хранилище
+GetAllKeys — получить все ключи
+GetLength — получить количество элементов
+
+Типы хранилищ:
+LocalStorage — данные сохраняются между сессиями
+SessionStorage — данные удаляются при закрытии вкладки
+
+ПРИМЕЧАНИЕ: Работает через JavaScript API браузера.
+";
 
             sdkComponentIcon = ActivityIcons.Browser;
 

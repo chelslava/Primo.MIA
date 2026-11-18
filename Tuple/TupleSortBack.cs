@@ -97,16 +97,20 @@ namespace Primo.MIA
         public TupleSortBack(IWFContainer container) : base(container)
         {
             sdkComponentName = "Кортеж: Сортировка списка";
-            sdkComponentHelp =
-                "Сортирует List<Tuple<...>> по значению выбранного элемента.\n\n" +
-                "── Параметры ────────────────────────────────────────────\n" +
-                "Ключ сортировки — Item1, Item2... по значению которого сортируем.\n" +
-                "Направление     — Ascending (A→Z) или Descending (Z→A).\n" +
-                "Тип сортировки:\n" +
-                "  Alphabetical — без учёта регистра (по умолчанию)\n" +
-                "  Numeric      — числовая; нечисловые уходят в конец\n" +
-                "  Natural      — file2 < file10 (числа внутри строки)\n\n" +
-                "Оригинальный список не изменяется — возвращается новый.";
+            sdkComponentHelp = @"
+Компонент ""Кортеж: Сортировка списка""
+Сортирует List<Tuple<...>> по значению выбранного элемента.
+
+Параметры:
+Ключ сортировки — Item1, Item2... по значению которого сортируем.
+Направление     — Ascending (A→Z) или Descending (Z→A).
+Тип сортировки:
+  Alphabetical — без учёта регистра (по умолчанию)
+  Numeric      — числовая; нечисловые уходят в конец
+  Natural      — file2 < file10 (числа внутри строки)
+
+Оригинальный список не изменяется — возвращается новый.
+";
             sdkComponentIcon = ActivityIcons.Tuple;
 
             sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()

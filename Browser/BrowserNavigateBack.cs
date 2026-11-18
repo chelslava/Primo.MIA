@@ -75,19 +75,21 @@ namespace Primo.MIA
         public BrowserNavigateBack(IWFContainer container) : base(container)
         {
             sdkComponentName = ActivityStrings.Activity_BrowserNavigate;
-            sdkComponentHelp =
-                "Выполняет навигацию в браузере.\n" +
-                "\n" +
-                "── Режимы работы ──────────────────────────────\n" +
-                "ToUrl    — перейти по указанному URL\n" +
-                "Back     — назад в истории браузера\n" +
-                "Forward  — вперед в истории браузера\n" +
-                "Refresh  — обновить текущую страницу\n" +
-                "\n" +
-                "── Основные параметры ────────────────────────\n" +
-                "Режим     — тип навигации\n" +
-                "ID сессии — идентификатор сессии браузера\n" +
-                "URL       — адрес для перехода (только для ToUrl)";
+            sdkComponentHelp = @"
+Компонент ""Браузер: Навигация""
+Выполняет навигацию в браузере.
+
+Режимы работы:
+ToUrl    — перейти по указанному URL
+Back     — назад в истории браузера
+Forward  — вперед в истории браузера
+Refresh  — обновить текущую страницу
+
+Основные:
+Режим     — тип навигации
+ID сессии — идентификатор сессии браузера
+URL       — адрес для перехода (только для ToUrl)
+";
 
             sdkComponentIcon = ActivityIcons.Browser;
 

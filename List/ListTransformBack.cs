@@ -197,20 +197,23 @@ namespace Primo.MIA
         public ListTransformBack(IWFContainer container) : base(container)
         {
             sdkComponentName = "Список: Преобразование";
-            sdkComponentHelp =
-                "Применяет трансформацию к каждому элементу List<string>.\n" +
-                "Возвращает новый список — оригинал не изменяется.\n\n" +
-                "── Режимы ─────────────────────────────────────────────\n" +
-                "ToUpper / ToLower    — смена регистра\n" +
-                "Trim / TrimStart / TrimEnd — удаление пробелов\n" +
-                "Replace              — замена подстроки (Find → Replacement)\n" +
-                "RegexReplace         — замена по regex (Find → Replacement)\n" +
-                "Prefix / Suffix      — добавить текст до/после каждого элемента\n" +
-                "Wrap                 — Prefix + элемент + Suffix\n" +
-                "PadLeft / PadRight   — дополнить символом до указанной ширины\n" +
-                "Truncate             — обрезать до MaxLength символов\n" +
-                "RemoveNumbers        — удалить все цифры\n" +
-                "RemoveNonAlpha       — оставить только буквы и цифры";
+            sdkComponentHelp = @"
+Компонент ""Список: Преобразование""
+Применяет трансформацию к каждому элементу List<string>.
+Возвращает новый список — оригинал не изменяется.
+
+Режимы:
+ToUpper / ToLower    — смена регистра
+Trim / TrimStart / TrimEnd — удаление пробелов
+Replace              — замена подстроки (Find → Replacement)
+RegexReplace         — замена по regex (Find → Replacement)
+Prefix / Suffix      — добавить текст до/после каждого элемента
+Wrap                 — Prefix + элемент + Suffix
+PadLeft / PadRight   — дополнить символом до указанной ширины
+Truncate             — обрезать до MaxLength символов
+RemoveNumbers        — удалить все цифры
+RemoveNonAlpha       — оставить только буквы и цифры
+";
             sdkComponentIcon = ActivityIcons.List;
 
             sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()

@@ -165,31 +165,33 @@ namespace Primo.MIA
         public ElementSelectMultipleBack(IWFContainer container) : base(container)
         {
             sdkComponentName = "Элемент: Multiple Select";
-            sdkComponentHelp =
-                "Работа с множественным выбором в select[multiple].\n" +
-                "\n" +
-                "── Основные параметры ────────────────────────\n" +
-                "ID сессии — идентификатор сессии браузера\n" +
-                "ID элемента — идентификатор select элемента\n" +
-                "Операция — тип операции\n" +
-                "Значение — текст/value/индекс для выбора\n" +
-                "\n" +
-                "── Операции ──────────────────────────────────\n" +
-                "SelectByText — выбрать по тексту\n" +
-                "SelectByValue — выбрать по value\n" +
-                "SelectByIndex — выбрать по индексу\n" +
-                "DeselectByText — снять выбор по тексту\n" +
-                "DeselectByValue — снять выбор по value\n" +
-                "DeselectByIndex — снять выбор по индексу\n" +
-                "DeselectAll — снять все выборы\n" +
-                "GetAllOptions — получить все опции\n" +
-                "GetSelectedOptions — получить выбранные\n" +
-                "\n" +
-                "── Локатор (альтернатива ID элемента) ────────\n" +
-                "Тип локатора — способ поиска элемента\n" +
-                "Значение локатора — конкретное значение\n" +
-                "\n" +
-                "ПРИМЕЧАНИЕ: Элемент должен быть select[multiple].";
+            sdkComponentHelp = @"
+Компонент ""Элемент: Multiple Select""
+Работа с множественным выбором в select[multiple].
+
+Основные:
+ID сессии — идентификатор сессии браузера
+ID элемента — идентификатор select элемента
+Операция — тип операции
+Значение — текст/value/индекс для выбора
+
+Операции:
+SelectByText — выбрать по тексту
+SelectByValue — выбрать по value
+SelectByIndex — выбрать по индексу
+DeselectByText — снять выбор по тексту
+DeselectByValue — снять выбор по value
+DeselectByIndex — снять выбор по индексу
+DeselectAll — снять все выборы
+GetAllOptions — получить все опции
+GetSelectedOptions — получить выбранные
+
+Локатор (альтернатива ID элемента):
+Тип локатора — способ поиска элемента
+Значение локатора — конкретное значение
+
+ПРИМЕЧАНИЕ: Элемент должен быть select[multiple].
+";
 
             sdkComponentIcon = ActivityIcons.Browser;
 

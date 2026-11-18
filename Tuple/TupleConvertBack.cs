@@ -123,17 +123,21 @@ namespace Primo.MIA
         public TupleConvertBack(IWFContainer container) : base(container)
         {
             sdkComponentName = "Кортеж: Конвертация";
-            sdkComponentHelp =
-                "Преобразует кортеж в другие структуры данных и обратно.\n\n" +
-                "── Режимы ───────────────────────────────────────────────\n" +
-                "ToList       — Tuple → List<object> (по одному элементу)\n" +
-                "FromList     — List<object> → Tuple (первые 1–7 элементов)\n" +
-                "ToDictionary — Tuple → Dictionary<string,object>\n" +
-                "               ключи: \"Item1\", \"Item2\" ... \"ItemN\"\n" +
-                "ToString     — Tuple → строка\n" +
-                "               «Включать ключи»=true:  \"Item1=Иванов; Item2=42\"\n" +
-                "               «Включать ключи»=false: \"Иванов; 42\"\n\n" +
-                "Разделитель для ToString — по умолчанию \"; \".";
+            sdkComponentHelp = @"
+Компонент ""Кортеж: Конвертация""
+Преобразует кортеж в другие структуры данных и обратно.
+
+Режимы:
+ToList       — Tuple → List<object> (по одному элементу)
+FromList     — List<object> → Tuple (первые 1–7 элементов)
+ToDictionary — Tuple → Dictionary<string,object>
+               ключи: ""Item1"", ""Item2"" ... ""ItemN""
+ToString     — Tuple → строка
+               «Включать ключи»=true:  ""Item1=Иванов; Item2=42""
+               «Включать ключи»=false: ""Иванов; 42""
+
+Разделитель для ToString — по умолчанию ""; "".
+";
             sdkComponentIcon = ActivityIcons.Tuple;
 
             // Значения по умолчанию

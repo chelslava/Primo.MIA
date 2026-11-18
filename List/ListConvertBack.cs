@@ -152,15 +152,18 @@ namespace Primo.MIA
         public ListConvertBack(IWFContainer container) : base(container)
         {
             sdkComponentName = "Список: Конвертация";
-            sdkComponentHelp =
-                "Конвертирует List<string> в другие структуры данных.\n\n" +
-                "ToDict       — List<\"key=val\"> → Dictionary\n" +
-                "ToDictIndexed — List → Dictionary<\"0\",val>, <\"1\",val>...\n" +
-                "ToCSVRow     — List → CSV-строка \"a\",\"b\",\"c\"\n" +
-                "FromCSVRow   — CSV-строка → List\n" +
-                "ZipToDict    — zip двух List → Dictionary (ключи=ListA, знач=ListB)\n" +
-                "Flatten      — разбить каждый элемент по разделителю → плоский List\n" +
-                "Chunk        — разбить List на батчи по N элементов";
+            sdkComponentHelp = @"
+Компонент ""Список: Конвертация""
+Конвертирует List<string> в другие структуры данных.
+
+ToDict       — List<""key=val""> → Dictionary
+ToDictIndexed — List → Dictionary<""0"",val>, <""1"",val>...
+ToCSVRow     — List → CSV-строка ""a"",""b"",""c""
+FromCSVRow   — CSV-строка → List
+ZipToDict    — zip двух List → Dictionary (ключи=ListA, знач=ListB)
+Flatten      — разбить каждый элемент по разделителю → плоский List
+Chunk        — разбить List на батчи по N элементов
+";
             sdkComponentIcon = ActivityIcons.List;
 
             sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()

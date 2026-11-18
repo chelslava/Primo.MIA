@@ -97,27 +97,29 @@ namespace Primo.MIA
         public BrowserSwitchToBack(IWFContainer container) : base(container)
         {
             sdkComponentName = ActivityStrings.Activity_BrowserSwitchTo;
-            sdkComponentHelp =
-                "Переключает контекст браузера.\n" +
-                "\n" +
-                "── Основные параметры ────────────────────────\n" +
-                "ID сессии — идентификатор сессии браузера\n" +
-                "Тип       — куда переключиться\n" +
-                "Цель      — индекс/handle/локатор\n" +
-                "\n" +
-                "Типы переключения:\n" +
-                "  Frame          — iframe по индексу или локатору\n" +
-                "  Window         — окно/вкладка по handle\n" +
-                "  Alert          — JavaScript алерт\n" +
-                "  DefaultContent — основной контент страницы\n" +
-                "  ParentFrame    — родительский фрейм\n" +
-                "\n" +
-                "Примеры целей:\n" +
-                "  Frame: \"0\" (индекс) или \"iframe-id\" (локатор)\n" +
-                "  Window: handle из WindowHandles\n" +
-                "\n" +
-                "── Выходные параметры ─────────────────────────\n" +
-                "Window Handles — список handles всех окон";
+            sdkComponentHelp = @"
+Компонент ""Браузер: Переключить контекст""
+Переключает контекст браузера.
+
+Основные:
+ID сессии — идентификатор сессии браузера
+Тип       — куда переключиться
+Цель      — индекс/handle/локатор
+
+Типы переключения:
+  Frame          — iframe по индексу или локатору
+  Window         — окно/вкладка по handle
+  Alert          — JavaScript алерт
+  DefaultContent — основной контент страницы
+  ParentFrame    — родительский фрейм
+
+Примеры целей:
+  Frame: ""0"" (индекс) или ""iframe-id"" (локатор)
+  Window: handle из WindowHandles
+
+Выходные данные:
+Window Handles — список handles всех окон
+";
 
             sdkComponentIcon = ActivityIcons.Browser;
 

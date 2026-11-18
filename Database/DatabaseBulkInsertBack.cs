@@ -180,12 +180,16 @@ namespace Primo.MIA
         public DatabaseBulkInsertBack(IWFContainer container) : base(container)
         {
             sdkComponentName = ActivityStrings.Activity_DatabaseBulkInsert;
-            sdkComponentHelp =
-                "Массово записывает DataTable в БД.\n\n" +
-                "Режимы:\n" +
-                "  SQL Server (System.Data.SqlClient) -> SqlBulkCopy\n" +
-                "  Остальные провайдеры              -> batched insert через DbProviderFactory\n\n" +
-                "Если ColumnMappings не указаны, колонки маппятся по одинаковым именам.";
+            sdkComponentHelp = @"
+Компонент ""БД: Массовая запись из DataTable""
+Массово записывает DataTable в БД.
+
+Режимы:
+  SQL Server (System.Data.SqlClient) -> SqlBulkCopy
+  Остальные провайдеры              -> batched insert через DbProviderFactory
+
+Если ColumnMappings не указаны, колонки маппятся по одинаковым именам.
+";
             sdkComponentIcon = ActivityIcons.Base;
             sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {

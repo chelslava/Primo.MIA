@@ -363,31 +363,33 @@ namespace Primo.MIA
         public FileCleanupBack(IWFContainer container) : base(container)
         {
             sdkComponentName = ActivityStrings.Activity_FileCleanup;
-            sdkComponentHelp =
-                "Удаляет файлы и/или папки по временному критерию.\n" +
-                "\n" +
-                "── Временные атрибуты ─────────────────────────\n" +
-                "CreationTime   — дата создания\n" +
-                "LastWriteTime  — дата последнего изменения (рекомендуется)\n" +
-                "LastAccessTime — дата последнего доступа\n" +
-                "\n" +
-                "── Пороги ─────────────────────────────────────\n" +
-                "OlderThanDays — старше N дней от сейчас\n" +
-                "BeforeDate    — раньше указанной даты\n" +
-                "Both          — оба условия одновременно (И)\n" +
-                "\n" +
-                "── Что удалять ────────────────────────────────\n" +
-                "FilesOnly            — только файлы\n" +
-                "EmptyFoldersOnly     — только пустые папки\n" +
-                "FilesAndEmptyFolders — файлы + освободившиеся пустые папки\n" +
-                "FoldersWithContent   — папки целиком рекурсивно\n" +
-                "\n" +
-                "── Безопасность ───────────────────────────────\n" +
-                "DryRun = true — ничего не удаляет, только показывает список\n" +
-                "FilePattern   — маска: *.tmp, *.log, report_*.pdf\n" +
-                "MinSizeBytes  — не удалять файлы меньше N байт\n" +
-                "MaxItems      — ограничить количество удалений\n" +
-                "IgnoreErrors  — продолжать при ошибке удаления";
+            sdkComponentHelp = @"
+Компонент ""Файл: Очистка по времени""
+Удаляет файлы и/или папки по временному критерию.
+
+Временные атрибуты:
+CreationTime   — дата создания
+LastWriteTime  — дата последнего изменения (рекомендуется)
+LastAccessTime — дата последнего доступа
+
+Пороги:
+OlderThanDays — старше N дней от сейчас
+BeforeDate    — раньше указанной даты
+Both          — оба условия одновременно (И)
+
+Что удалять:
+FilesOnly            — только файлы
+EmptyFoldersOnly     — только пустые папки
+FilesAndEmptyFolders — файлы + освободившиеся пустые папки
+FoldersWithContent   — папки целиком рекурсивно
+
+Безопасность:
+DryRun = true — ничего не удаляет, только показывает список
+FilePattern   — маска: *.tmp, *.log, report_*.pdf
+MinSizeBytes  — не удалять файлы меньше N байт
+MaxItems      — ограничить количество удалений
+IgnoreErrors  — продолжать при ошибке удаления
+";
 
             sdkComponentIcon = ActivityIcons.Clean;
 

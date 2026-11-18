@@ -170,21 +170,24 @@ namespace Primo.MIA
         public ListFilterBack(IWFContainer container) : base(container)
         {
             sdkComponentName = "Список: Фильтрация";
-            sdkComponentHelp =
-                "Фильтрует List<string> по условию.\n" +
-                "Возвращает ДВА списка: прошедшие и не прошедшие фильтр.\n\n" +
-                "── Режимы ─────────────────────────────────────────────\n" +
-                "Contains    — строка содержит подстроку\n" +
-                "NotContains — строка НЕ содержит подстроку\n" +
-                "StartsWith  — начинается с подстроки\n" +
-                "EndsWith    — заканчивается подстрокой\n" +
-                "ExactMatch  — точное совпадение\n" +
-                "Regex       — соответствует регулярному выражению\n" +
-                "NotRegex    — НЕ соответствует регулярному выражению\n" +
-                "NotEmpty    — непустые строки\n" +
-                "EmptyOnly   — только пустые строки\n" +
-                "LengthRange — длина в диапазоне [Мин, Макс]\n" +
-                "NumericOnly — строки являющиеся числами";
+            sdkComponentHelp = @"
+Компонент ""Список: Фильтрация""
+Фильтрует List<string> по условию.
+Возвращает ДВА списка: прошедшие и не прошедшие фильтр.
+
+Режимы:
+Contains    — строка содержит подстроку
+NotContains — строка НЕ содержит подстроку
+StartsWith  — начинается с подстроки
+EndsWith    — заканчивается подстрокой
+ExactMatch  — точное совпадение
+Regex       — соответствует регулярному выражению
+NotRegex    — НЕ соответствует регулярному выражению
+NotEmpty    — непустые строки
+EmptyOnly   — только пустые строки
+LengthRange — длина в диапазоне [Мин, Макс]
+NumericOnly — строки являющиеся числами
+";
             sdkComponentIcon = ActivityIcons.List;
 
             sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()

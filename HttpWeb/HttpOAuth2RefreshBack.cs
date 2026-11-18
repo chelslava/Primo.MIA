@@ -165,19 +165,21 @@ namespace Primo.MIA
         public HttpOAuth2RefreshBack(IWFContainer container) : base(container)
         {
             sdkComponentName = "HTTP: OAuth2 обновление токена";
-            sdkComponentHelp =
-                "Обновляет OAuth2 токен доступа с использованием refresh token.\n" +
-                "\n" +
-                "── Входные параметры ──────────────────────────\n" +
-                "Token URL     — endpoint для обновления токена\n" +
-                "Client ID     — идентификатор клиента\n" +
-                "Client Secret — секрет клиента\n" +
-                "Refresh Token — токен обновления\n" +
-                "\n" +
-                "── Выходные параметры ─────────────────────────\n" +
-                "Access Token      — новый токен доступа\n" +
-                "New Refresh Token — новый токен обновления\n" +
-                "Expires In        — время жизни (сек)";
+            sdkComponentHelp = @"
+Компонент ""HTTP: OAuth2 обновление токена""
+Обновляет OAuth2 токен доступа с использованием refresh token.
+
+Входные параметры:
+Token URL     — endpoint для обновления токена
+Client ID     — идентификатор клиента
+Client Secret — секрет клиента
+Refresh Token — токен обновления
+
+Выходные данные:
+Access Token      — новый токен доступа
+New Refresh Token — новый токен обновления
+Expires In        — время жизни (сек)
+";
 
             sdkComponentIcon = ActivityIcons.Http;
 

@@ -268,33 +268,35 @@ namespace Primo.MIA
         public CalendarNextDayOfWeekBack(IWFContainer container) : base(container)
         {
             sdkComponentName = ActivityStrings.Activity_CalendarNextDayOfWeek;
-            sdkComponentHelp =
-                "Находит ближайшую дату указанного дня недели с учётом производственного календаря.\n" +
-                "\n" +
-                "── Режимы поиска ──────────────────────────────\n" +
-                "NextOccurrence        — просто следующее вхождение без проверки типа дня\n" +
-                "NextWorkingOccurrence — следующее вхождение, которое является рабочим днём\n" +
-                "NearestWorkday        — следующее вхождение + коррекция если выходной\n" +
-                "\n" +
-                "── Параметры ──────────────────────────────────\n" +
-                "ID календаря — GUID из активности «Календарь: Загрузить»\n" +
-                "Начальная дата — дата отсчёта поиска\n" +
-                "День недели — Monday / Tuesday / ... / Sunday\n" +
-                "Режим поиска — см. выше\n" +
-                "При выходном — NextWorkday / PrevWorkday / AsIs (для NearestWorkday)\n" +
-                "Включать стартовую дату — вернуть startDate если она уже нужный день\n" +
-                "Макс. дней поиска — защита от бесконечного цикла (по умолчанию 30)\n" +
-                "\n" +
-                "── Выходные данные ────────────────────────────\n" +
-                "Результат (дата) — найденная дата\n" +
-                "Дней вперёд — количество дней от StartDate до результата\n" +
-                "Тип дня — Workday / Weekend / Holiday / ShortWorkday\n" +
-                "Найден — false если не найдено за MaxLookAhead дней\n" +
-                "\n" +
-                "── Примеры ────────────────────────────────────\n" +
-                "Monday / NextWorkingOccurrence → первый рабочий понедельник\n" +
-                "Friday / NearestWorkday / PrevWorkday → пятница или четверг если праздник\n" +
-                "Wednesday / NextOccurrence → следующая среда без проверки типа дня";
+            sdkComponentHelp = @"
+Компонент ""Календарь: Следующий день недели""
+Находит ближайшую дату указанного дня недели с учётом производственного календаря.
+
+Режимы поиска:
+NextOccurrence        — просто следующее вхождение без проверки типа дня
+NextWorkingOccurrence — следующее вхождение, которое является рабочим днём
+NearestWorkday        — следующее вхождение + коррекция если выходной
+
+Параметры:
+ID календаря — GUID из активности «Календарь: Загрузить»
+Начальная дата — дата отсчёта поиска
+День недели — Monday / Tuesday / ... / Sunday
+Режим поиска — см. выше
+При выходном — NextWorkday / PrevWorkday / AsIs (для NearestWorkday)
+Включать стартовую дату — вернуть startDate если она уже нужный день
+Макс. дней поиска — защита от бесконечного цикла (по умолчанию 30)
+
+Выходные данные:
+Результат (дата) — найденная дата
+Дней вперёд — количество дней от StartDate до результата
+Тип дня — Workday / Weekend / Holiday / ShortWorkday
+Найден — false если не найдено за MaxLookAhead дней
+
+Примеры:
+Monday / NextWorkingOccurrence → первый рабочий понедельник
+Friday / NearestWorkday / PrevWorkday → пятница или четверг если праздник
+Wednesday / NextOccurrence → следующая среда без проверки типа дня
+";
 
             sdkComponentIcon = ActivityIcons.Calendar;
 

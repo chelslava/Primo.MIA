@@ -86,15 +86,19 @@ namespace Primo.MIA
         public DictionaryContainsValueBack(IWFContainer container) : base(container)
         {
             sdkComponentName = "Словарь: Проверить значение";
-            sdkComponentHelp =
-                "Проверяет наличие значения в Dictionary<string, string> (точное совпадение).\n\n" +
-                "Входные параметры:\n" +
-                "  Словарь*        — Dictionary<string, string>\n" +
-                "  Искомое значение* — строка для поиска\n" +
-                "  Учитывать регистр — false (по умолчанию) = регистронезависимый поиск\n\n" +
-                "Выходные параметры:\n" +
-                "  Значение найдено      — true если есть хотя бы одно совпадение\n" +
-                "  Ключи с таким значением — List<string> ключей с совпавшим значением";
+            sdkComponentHelp = @"
+Компонент ""Словарь: Проверить значение""
+Проверяет наличие значения в Dictionary<string, string> (точное совпадение).
+
+Входные параметры:
+  Словарь*        — Dictionary<string, string>
+  Искомое значение* — строка для поиска
+  Учитывать регистр — false (по умолчанию) = регистронезависимый поиск
+
+Выходные параметры:
+  Значение найдено      — true если есть хотя бы одно совпадение
+  Ключи с таким значением — List<string> ключей с совпавшим значением
+";
 
             sdkComponentIcon = ActivityIcons.Dictionary;
 
