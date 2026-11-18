@@ -100,6 +100,13 @@ namespace Primo.MIA.Tests.Back
             // RabbitMQ ack-паттерн (issue #49): сессия/tag/DLQ — обязательные входы
             yield return new object[] { typeof(RabbitMqAckBack), true };
             yield return new object[] { typeof(RabbitMqCloseSessionBack), true };
+
+            // Циклы MIA (ForEach-контейнеры): таблица/файл — обязательные входы;
+            // Break/Continue без входов — легитимно валидны
+            yield return new object[] { typeof(ForEachRowBack), true };
+            yield return new object[] { typeof(ForEachExcelRowBack), true };
+            yield return new object[] { typeof(LoopBreakBack), false };
+            yield return new object[] { typeof(LoopContinueBack), false };
         }
 
         [Theory(DisplayName = "Смоук Back: Validate() на пустых свойствах не бросает и валидирует")]

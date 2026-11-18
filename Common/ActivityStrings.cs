@@ -1218,6 +1218,28 @@ namespace Primo.MIA.Common
         // потоковое чтение, append. Все опциональны — дефолты не меняют
         // поведение существующих процессов.
         public const string Field_CsvQuoteChar     = "Символ кавычек";
+
+        // Циклы (ForEach-контейнеры MIA, быстрые аналоги Studio)
+        public const string Activity_ForEachRow      = "Таблица: Для каждой строки";
+        public const string Activity_ForEachExcelRow = "Excel: Для каждой строки";
+        public const string Activity_LoopBreak       = "Цикл: Прервать";
+        public const string Activity_LoopContinue    = "Цикл: Продолжить";
+
+        public const string Field_LoopTable       = "Таблица";
+        public const string Field_LoopCurrentRow  = "Текущая строка";
+        public const string Field_LoopRowIndex    = "Индекс строки";
+        public const string Field_LoopSkipRows    = "Пропустить строк";
+        public const string Field_LoopMaxRows     = "Максимум строк";
+        public const string Field_LoopFilePath    = "Путь к файлу Excel";
+        public const string Field_LoopSheet       = "Лист";
+        public const string Field_LoopHasHeader   = "Первая строка — заголовки";
+        public const string Field_LoopColumns     = "Колонки (из заголовков)";
+        public const string Field_LoopRowValues   = "Значения строки";
+        public const string Field_LoopCellCount   = "Колонок в строке";
+
+        public const string Error_LoopTableRequired     = "Таблица обязательна (переменная DataTable)";
+        public const string Error_LoopFilePathRequired  = "Путь к файлу Excel обязателен";
+        public const string Error_LoopFileNotFound      = "Файл Excel не найден";
         public const string Field_CsvEscapeChar    = "Символ экранирования";
         public const string Field_CsvCommentChar   = "Символ комментария";
         public const string Field_CsvStreaming     = "Потоковое чтение (большие файлы)";

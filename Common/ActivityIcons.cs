@@ -37,6 +37,9 @@
         /// <summary>Иконка для активностей поиска файлов</summary>
         public const string FileSearch = BasePath + "file_search.png";
 
+        /// <summary>Иконка для циклов (ForEach-контейнеры MIA, Break/Continue)</summary>
+        public const string Loop = BasePath + "loop.png";
+
         /// <summary>Иконка для активностей ожидания файлов</summary>
         public const string FileWait = BasePath + "file_wait.png";
 
