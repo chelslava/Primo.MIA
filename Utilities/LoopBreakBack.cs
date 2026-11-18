@@ -1,7 +1,12 @@
 // =============================================================================
 // LoopBreakBack.cs — активность «Цикл: Прервать».
-// Ставит флаг Break в кадре ближайшего цикла MIA; ForEachRow/ForEachExcelRow
-// проверяют флаг после каждого ребёнка и завершают перебор.
+//
+// Прерывает ближайший цикл MIA НЕМЕДЛЕННО: выставляет флаг Break в кадре
+// LoopControl и бросает маркер-исключение — движок останавливает остаток
+// тела, ForEach перехватывает по флагу и завершает перебор штатно.
+// База PrimoComponentSimple (не TO): SimpleAction выполняется ОДИН раз,
+// исключение не ретраится (иначе.retry-петля sdkTimeOut давила бы маркер).
+// Элемент завершается ошибкой-маркером в логе — штатное поведение.
 // =============================================================================
 
 using LTools.Common.Model;
@@ -14,30 +19,34 @@ using System.Collections.Generic;
 namespace Primo.MIA
 {
     /// <summary>Прервать ближайший цикл MIA (выход из всех итераций).</summary>
-    public class LoopBreakBack : PrimoComponentTO<LoopBreak>
+    public class LoopBreakBack : PrimoComponentSimple<LoopBreak>
     {
         public override string GroupName { get => ActivityCategories.Utilities; protected set { } }
-
-        protected override int sdkTimeOut { get => 10000; set { } }
 
         public LoopBreakBack(IWFContainer container) : base(container)
         {
             sdkComponentName = ActivityStrings.Activity_LoopBreak;
             sdkComponentHelp = @"Компонент ""Цикл: Прервать""
-Немедленно прекращает выполнение ближайшего цикла MIA («Таблица: Для каждой строки», «Excel: Для каждой строки») — выход из всех итераций.
+Немедленно прекращает выполнение ближайшего цикла MIA («Таблица: Для каждой строки», «Excel: Для каждой строки») — выход из всех итераций; остаток тела текущей итерации не выполняется.
 
 Размещение: внутри тела ForEach-контейнера MIA. Вложенные циклы: прерывает ближайший (внутренний).
 
-Примечание: работает только с циклами MIA; студийные циклы не прерывает.";
+Примечания:
+- Элемент фиксирует в логе ошибку-маркер прерывания — это штатное поведение.
+- Работает только с циклами MIA; студийные циклы не прерывает.";
             sdkComponentIcon = ActivityIcons.Loop;
             sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>();
             InitClass(container);
         }
 
-        public override ExecutionResult TimedAction(ScriptingData sd)
+        /// <summary>Флаг + маркер-исключение: движок останавливает остаток тела немедленно.</summary>
+        public override ExecutionResult SimpleAction(ScriptingData sd)
         {
-            LoopControl.Break();
-            return new ExecutionResult { IsSuccess = true, SuccessMessage = "Цикл прерван" };
+            var frame = LoopControl.Current
+                ?? throw new InvalidOperationException(
+                    "Цикл: Прервать — вне тела цикла. Разместите активность внутри ForEach-контейнера MIA.");
+            frame.BreakRequested = true;
+            throw new InvalidOperationException("Прервано пользователем: Цикл: Прервать");
         }
 
         public override ValidationResult Validate()

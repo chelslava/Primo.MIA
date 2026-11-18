@@ -16,6 +16,7 @@
 using LTools.Common.Helpers;
 using LTools.Common.Model;
 using LTools.Common.UIElements;
+using LTools.Common.WFItems;
 using LTools.SDK;
 using LTools.Common.Exceptions;
 using Primo.MIA.Common;
@@ -171,8 +172,8 @@ namespace Primo.MIA
 
             this.Prop_FilePath = "\"\"";
             this.Prop_Sheet = "\"\"";
-            this.Prop_SkipRows = "\"0\"";
-            this.Prop_MaxRows = "\"0\"";
+            this.Prop_SkipRows = "0";
+            this.Prop_MaxRows = "0";
             this.Prop_RowValues = "\"\"";
             this.Prop_Columns = "\"\"";
         }
@@ -183,7 +184,9 @@ namespace Primo.MIA
             return new ExecutionResult { IsSuccess = true, SuccessMessage = "Ленивый цикл по строкам Excel" };
         }
 
-        /// <summary>Точка входа: ленивый перебор строк файла.</summary>
+        /// <summary>Точка входа: ленивый перебор строк файла; тело — через
+        /// body.Execute (движковая цепочка: пошаговая отладка Studio работает
+        /// внутри цикла).</summary>
         public override void Execute(ProcessContext context)
         {
             try
@@ -198,6 +201,9 @@ namespace Primo.MIA
                 int skip = GetInt(sd, this.Prop_SkipRows, nameof(Prop_SkipRows), 0);
                 int max = GetInt(sd, this.Prop_MaxRows, nameof(Prop_MaxRows), 0);
 
+                // тело из вида: тот же WFContainerBase, что нашёл InitClass
+                var body = ((ForEachExcelRow)this.UIControl).Body;
+
                 int index = 0;
                 var frame = new LoopFrame();
                 using (LoopControl.Push(frame))
@@ -211,11 +217,12 @@ namespace Primo.MIA
                         if (reader.Columns != null)
                             SetVariableValue(this.Prop_Columns, new List<string>(reader.Columns), sd);
 
-                        if (!RunBody(context, $"строка Excel {index}"))
+                        var status = RunIteration(body, context, frame, $"строка Excel {index}");
+                        if (status == IterationStatus.Fatal)
+                            return; // EndProcess уже вызван с ошибкой
+                        if (status == IterationStatus.Break)
                             break;
-                        if (frame.BreakRequested)
-                            break;
-                        frame.ContinueRequested = false;
+                        // Continue → следующая итерация
                         index++;
                     }
                 }
@@ -230,45 +237,56 @@ namespace Primo.MIA
         }
 
         /// <summary>
-        /// Исполняет тело цикла; ошибки детей — как в ForEachRowBack:
-        /// ContinueOnException → продолжить, иначе EndProcess(ошибка) и стоп.
+        /// Одна итерация тела: body.Execute (движковая цепочка детей) +
+        /// разбор результата — как в ForEachRowBack.
         /// </summary>
-        private bool RunBody(ProcessContext context, string iterationLabel)
+        private IterationStatus RunIteration(WFContainerBase body, ProcessContext context, LoopFrame frame, string iterationLabel)
         {
-            foreach (var child in Components)
+            ElementExecutionResults result = null;
+            ElementExecutionFinishedDelegate handler = (s, r) => result = r;
+            body.ElementExecutionFinished += handler;
+            try
             {
-                ElementExecutionResults result = null;
-                ElementExecutionFinishedDelegate handler = (s, r) => result = r;
-                child.ElementExecutionFinished += handler;
-                try
-                {
-                    child.Execute(context);
-                }
-                finally
-                {
-                    child.ElementExecutionFinished -= handler;
-                }
-
-                if (result != null && !result.IsSuccess)
-                {
-                    if (!this.ContinueOnException)
-                    {
-                        EndProcess(new ElementExecutionResults(
-                            new ExecutionException(
-                                $"[{sdkComponentName}] ошибка тела ({iterationLabel}): {result.ExceptionData?.Message ?? "неизвестная ошибка"}",
-                                result.ExceptionData),
-                            context));
-                        return false;
-                    }
-                    Common.ActivityFileLogger.Warning(
-                        sdkComponentName,
-                        $"Ошибка вложенной активности ({iterationLabel}, Продолжить при ошибке): {result.ExceptionData?.Message}");
-                }
-
-                if (LoopControl.Current?.BreakRequested == true || LoopControl.Current?.ContinueRequested == true)
-                    return true;
+                body.Execute(context);
             }
-            return true;
+            finally
+            {
+                body.ElementExecutionFinished -= handler;
+            }
+
+            if (LoopControl.Current?.BreakRequested == true)
+            {
+                frame.BreakRequested = true;
+                return IterationStatus.Break;
+            }
+            if (LoopControl.Current?.ContinueRequested == true)
+                return IterationStatus.Continue;
+
+            if (result != null && !result.IsSuccess)
+            {
+                if (!this.ContinueOnException)
+                {
+                    EndProcess(new ElementExecutionResults(
+                        new ExecutionException(
+                            $"[{sdkComponentName}] ошибка тела ({iterationLabel}): {result.ExceptionData?.Message ?? "неизвестная ошибка"}",
+                            result.ExceptionData),
+                        context));
+                    return IterationStatus.Fatal;
+                }
+                Common.ActivityFileLogger.Warning(
+                    sdkComponentName,
+                    $"Ошибка вложенной активности ({iterationLabel}, Продолжить при ошибке): {result.ExceptionData?.Message}");
+            }
+            return IterationStatus.Success;
+        }
+
+        /// <summary>Итог итерации тела.</summary>
+        private enum IterationStatus
+        {
+            Success,
+            Break,
+            Continue,
+            Fatal
         }
 
         private int GetInt(ScriptingData sd, string prop, string name, int fallback)

@@ -1,7 +1,10 @@
 // =============================================================================
 // LoopContinueBack.cs — активность «Цикл: Продолжить».
-// Ставит флаг Continue в кадре ближайшего цикла MIA; остаток тела текущей
-// итерации пропускается, цикл переходит к следующей строке.
+//
+// Переход к следующей итерации ближайшего цикла MIA НЕМЕДЛЕННО: флаг
+// Continue в кадре LoopControl + маркер-исключение — остаток тела текущей
+// итерации не выполняется. База PrimoComponentSimple (без retry-петли
+// sdkTimeOut — иначе маркер давился повторами).
 // =============================================================================
 
 using LTools.Common.Model;
@@ -14,30 +17,34 @@ using System.Collections.Generic;
 namespace Primo.MIA
 {
     /// <summary>Перейти к следующей итерации ближайшего цикла MIA.</summary>
-    public class LoopContinueBack : PrimoComponentTO<LoopContinue>
+    public class LoopContinueBack : PrimoComponentSimple<LoopContinue>
     {
         public override string GroupName { get => ActivityCategories.Utilities; protected set { } }
-
-        protected override int sdkTimeOut { get => 10000; set { } }
 
         public LoopContinueBack(IWFContainer container) : base(container)
         {
             sdkComponentName = ActivityStrings.Activity_LoopContinue;
             sdkComponentHelp = @"Компонент ""Цикл: Продолжить""
-Пропускает остаток тела текущей итерации ближайшего цикла MIA и переходит к следующей строке.
+Пропускает остаток тела текущей итерации ближайшего цикла MIA и немедленно переходит к следующей строке.
 
 Размещение: внутри тела ForEach-контейнера MIA. Вложенные циклы: адресует ближайший (внутренний).
 
-Примечание: работает только с циклами MIA; студийные циклы не обслуживает.";
+Примечания:
+- Элемент фиксирует в логе ошибку-маркер перехода — это штатное поведение.
+- Работает только с циклами MIA; студийные циклы не обслуживает.";
             sdkComponentIcon = ActivityIcons.Loop;
             sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>();
             InitClass(container);
         }
 
-        public override ExecutionResult TimedAction(ScriptingData sd)
+        /// <summary>Флаг + маркер-исключение: остаток тела не выполняется.</summary>
+        public override ExecutionResult SimpleAction(ScriptingData sd)
         {
-            LoopControl.Continue();
-            return new ExecutionResult { IsSuccess = true, SuccessMessage = "Переход к следующей итерации" };
+            var frame = LoopControl.Current
+                ?? throw new InvalidOperationException(
+                    "Цикл: Продолжить — вне тела цикла. Разместите активность внутри ForEach-контейнера MIA.");
+            frame.ContinueRequested = true;
+            throw new InvalidOperationException("Переход к следующей итерации: Цикл: Продолжить");
         }
 
         public override ValidationResult Validate()
