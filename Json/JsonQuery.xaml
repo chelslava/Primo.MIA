@@ -14,7 +14,7 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
-    <local:ActivityPanel IconSource="pack://application:,,,/Primo.MIA;component/images/http.png">
+    <local:ActivityPanel IconSource="pack://application:,,,/Primo.MIA;component/images/json.png">
 
             <!-- Заголовок -->
             <TextBlock Style="{StaticResource ActivityHeader}">

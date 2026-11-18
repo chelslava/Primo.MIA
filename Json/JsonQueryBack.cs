@@ -179,27 +179,29 @@ namespace Primo.MIA
         public JsonQueryBack(IWFContainer container) : base(container)
         {
             sdkComponentName = "JSON: Запрос";
-            sdkComponentHelp =
-                "Извлекает данные из JSON по JSONPath выражениям.\n" +
-                "\n" +
-                "── Примеры JSONPath ───────────────────────────\n" +
-                "$.store.book[*].author     — все авторы книг\n" +
-                "$.store.book[0].title      — название первой книги\n" +
-                "$.store.book[?(@.price<10)]— книги дешевле 10\n" +
-                "$..author                  — все авторы на любом уровне\n" +
-                "$.store.*                  — все в разделе store\n" +
-                "\n" +
-                "── Входные параметры ──────────────────────────\n" +
-                "JSON-строка   — исходный JSON\n" +
-                "JSONPath      — выражение для поиска\n" +
-                "Только первое — вернуть только первое совпадение\n" +
-                "\n" +
-                "── Выходные параметры ─────────────────────────\n" +
-                "Результат     — найденное значение или список\n" +
-                "Количество    — число найденных элементов\n" +
-                "Найдено       — признак наличия результатов";
+            sdkComponentHelp = @"
+Компонент ""JSON: Запрос""
+Извлекает данные из JSON по JSONPath выражениям.
 
-            sdkComponentIcon = ActivityIcons.Http;
+Примеры:
+$.store.book[*].author     — все авторы книг
+$.store.book[0].title      — название первой книги
+$.store.book[?(@.price<10)]— книги дешевле 10
+$..author                  — все авторы на любом уровне
+$.store.*                  — все в разделе store
+
+Входные параметры:
+JSON-строка   — исходный JSON
+JSONPath      — выражение для поиска
+Только первое — вернуть только первое совпадение
+
+Выходные данные:
+Результат     — найденное значение или список
+Количество    — число найденных элементов
+Найдено       — признак наличия результатов
+";
+
+            sdkComponentIcon = ActivityIcons.Json;
 
             sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {

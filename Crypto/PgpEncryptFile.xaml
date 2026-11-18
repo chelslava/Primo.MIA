@@ -12,7 +12,7 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
-    <local:ActivityPanel IconSource="pack://application:,,,/Primo.MIA;component/images/sharp.png">
+    <local:ActivityPanel IconSource="pack://application:,,,/Primo.MIA;component/images/crypto.png">
             <TextBlock Text="Крипто: PGP Шифровать файл" Style="{StaticResource ActivityHeader}"/>
             <TextBlock Text="Исходный файл:" Style="{StaticResource FieldLabel}"/>
             <Grid>

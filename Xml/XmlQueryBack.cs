@@ -188,20 +188,22 @@ namespace Primo.MIA
         public XmlQueryBack(IWFContainer container) : base(container)
         {
             sdkComponentName = "XML: XPath запрос";
-            sdkComponentHelp =
-                "Выполняет XPath запросы к XML-документу.\n" +
-                "\n" +
-                "── Режимы ──────────────────────────────────────\n" +
-                "Одно значение — возвращает первое совпадение\n" +
-                "Список       — возвращает все совпадения\n" +
-                "Количество   — возвращает число совпадений\n" +
-                "\n" +
-                "── Параметры ───────────────────────────────────\n" +
-                "XML-строка — исходный XML\n" +
-                "XPath      — выражение для поиска\n" +
-                "Namespace  — пространство имён (опционально)";
+            sdkComponentHelp = @"
+Компонент ""XML: XPath запрос""
+Выполняет XPath запросы к XML-документу.
 
-            sdkComponentIcon = ActivityIcons.Http;
+Режимы:
+Одно значение — возвращает первое совпадение
+Список       — возвращает все совпадения
+Количество   — возвращает число совпадений
+
+Параметры:
+XML-строка — исходный XML
+XPath      — выражение для поиска
+Namespace  — пространство имён (опционально)
+";
+
+            sdkComponentIcon = ActivityIcons.Xml;
 
             sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {

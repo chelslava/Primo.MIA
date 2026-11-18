@@ -172,26 +172,28 @@ namespace Primo.MIA
         public JsonParseBack(IWFContainer container) : base(container)
         {
             sdkComponentName = "JSON: Парсинг";
-            sdkComponentHelp =
-                "Парсит JSON-строки в структурированные данные.\n" +
-                "\n" +
-                "── Режимы работы ──────────────────────────────\n" +
-                "ToDictionary — преобразовать в Dictionary\n" +
-                "ToList       — преобразовать в List\n" +
-                "Validate     — только валидация\n" +
-                "Format       — форматирование (pretty print)\n" +
-                "\n" +
-                "── Входные параметры ──────────────────────────\n" +
-                "JSON-строка  — исходный JSON\n" +
-                "Режим        — режим обработки\n" +
-                "Строгий режим — строгая валидация\n" +
-                "\n" +
-                "── Выходные параметры ─────────────────────────\n" +
-                "Результат    — Dictionary или List\n" +
-                "Валиден      — признак валидного JSON\n" +
-                "Ошибки       — список ошибок валидации";
+            sdkComponentHelp = @"
+Компонент ""JSON: Парсинг""
+Парсит JSON-строки в структурированные данные.
 
-            sdkComponentIcon = ActivityIcons.Http;
+Режимы работы:
+ToDictionary — преобразовать в Dictionary
+ToList       — преобразовать в List
+Validate     — только валидация
+Format       — форматирование (pretty print)
+
+Входные параметры:
+JSON-строка  — исходный JSON
+Режим        — режим обработки
+Строгий режим — строгая валидация
+
+Выходные данные:
+Результат    — Dictionary или List
+Валиден      — признак валидного JSON
+Ошибки       — список ошибок валидации
+";
+
+            sdkComponentIcon = ActivityIcons.Json;
 
             sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {

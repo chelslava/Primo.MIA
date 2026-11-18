@@ -13,14 +13,7 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
-    <Grid Background="{DynamicResource {x:Static SystemColors.ScrollBarBrushKey}}">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
-        <Image Grid.Column="0" Width="32" Height="32" Margin="5" VerticalAlignment="Center"
-               Source="pack://application:,,,/Primo.MIA;component/images/excel.png"/>
-        <StackPanel Grid.Column="1" Margin="5,0,5,5">
+    <local:ActivityPanel IconSource="pack://application:,,,/Primo.MIA;component/images/excel.png">
             <TextBlock Style="{StaticResource ActivityHeader}">
                 <Run Text="Excel: Записать диапазон ["/>
                 <Run Text="{Binding Prop_Mode, Mode=OneWay, Converter={StaticResource EnumDisplayNameConverter}}" Foreground="{StaticResource AccentBrush}"/>
@@ -94,6 +87,5 @@
             <TextBlock Text="Записано строк:" Style="{StaticResource FieldLabel}"/>
             <TextBox Text="{Binding Prop_WrittenRows, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
                      ToolTip="Переменная (Int32) для числа записанных строк данных (без заголовков)"/>
-        </StackPanel>
-    </Grid>
+        </local:ActivityPanel>
 </UserControl>

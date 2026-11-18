@@ -15,7 +15,7 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
-    <local:ActivityPanel IconSource="pack://application:,,,/Primo.MIA;component/images/folder.png">
+    <local:ActivityPanel IconSource="pack://application:,,,/Primo.MIA;component/images/archive.png">
 
             <TextBlock Style="{StaticResource ActivityHeader}">
                 <Run Text="Архив: Распаковать ZIP"/>
@@ -40,7 +40,7 @@
                         Click="BtnBrowseZip_Click"
                         ToolTip="Выбрать файл...">
                     <Button.Background>
-                        <ImageBrush ImageSource="/Primo.MIA;component/images/folder.png" TileMode="None"/>
+                        <ImageBrush ImageSource="/Primo.MIA;component/images/archive.png" TileMode="None"/>
                     </Button.Background>
                 </Button>
             </Grid>

@@ -14,7 +14,7 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
-    <local:ActivityPanel IconSource="pack://application:,,,/Primo.MIA;component/images/http.png">
+    <local:ActivityPanel IconSource="pack://application:,,,/Primo.MIA;component/images/mail.png">
             <TextBlock Text="Почта: Отправить письмо" Style="{StaticResource ActivityHeader}"/>
 
             <TextBlock Text="Хост:" Style="{StaticResource FieldLabel}"/>

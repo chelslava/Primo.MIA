@@ -24,7 +24,7 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
-    <local:ActivityPanel IconSource="pack://application:,,,/Primo.MIA;component/images/sharp.png">
+    <local:ActivityPanel IconSource="pack://application:,,,/Primo.MIA;component/images/file_wait.png">
 
             <TextBlock Style="{StaticResource ActivityHeader}"
                        Text="Файлы: Ожидание"/>

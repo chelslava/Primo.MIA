@@ -12,7 +12,7 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
-    <local:ActivityPanel IconSource="pack://application:,,,/Primo.MIA;component/images/folder.png">
+    <local:ActivityPanel IconSource="pack://application:,,,/Primo.MIA;component/images/sftp.png">
             <TextBlock Text="SFTP: Создать папку" Style="{StaticResource ActivityHeader}"/>
             <TextBlock Text="Хост:" Style="{StaticResource FieldLabel}"/>
             <TextBox Text="{Binding Prop_Host, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"

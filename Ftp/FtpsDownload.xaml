@@ -12,7 +12,7 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
-    <local:ActivityPanel IconSource="pack://application:,,,/Primo.MIA;component/images/folder.png">
+    <local:ActivityPanel IconSource="pack://application:,,,/Primo.MIA;component/images/ftp.png">
             <TextBlock Text="FTPS: Скачать файл" Style="{StaticResource ActivityHeader}"/>
             <TextBlock Text="Хост:" Style="{StaticResource FieldLabel}"/>
             <TextBox Text="{Binding Prop_Host, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
@@ -46,7 +46,7 @@
                         Click="BtnBrowseFile_Click"
                         ToolTip="Выбрать файл...">
                     <Button.Background>
-                        <ImageBrush ImageSource="/Primo.MIA;component/images/folder.png" TileMode="None"/>
+                        <ImageBrush ImageSource="/Primo.MIA;component/images/ftp.png" TileMode="None"/>
                     </Button.Background>
                 </Button>
             </Grid>

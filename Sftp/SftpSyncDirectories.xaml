@@ -13,7 +13,7 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
-    <local:ActivityPanel IconSource="pack://application:,,,/Primo.MIA;component/images/folder.png">
+    <local:ActivityPanel IconSource="pack://application:,,,/Primo.MIA;component/images/sftp.png">
 
             <!-- ── Заголовок с направлением ── -->
             <TextBlock Style="{StaticResource ActivityHeader}">

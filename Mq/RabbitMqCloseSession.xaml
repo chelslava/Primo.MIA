@@ -13,7 +13,7 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
-    <local:ActivityPanel IconSource="pack://application:,,,/Primo.MIA;component/images/http.png">
+    <local:ActivityPanel IconSource="pack://application:,,,/Primo.MIA;component/images/queue.png">
 
             <TextBlock Text="RabbitMQ: Закрыть сессию" Style="{StaticResource ActivityHeader}"/>
 

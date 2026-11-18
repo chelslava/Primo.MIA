@@ -12,7 +12,7 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
-    <local:ActivityPanel IconSource="pack://application:,,,/Primo.MIA;component/images/folder.png">
+    <local:ActivityPanel IconSource="pack://application:,,,/Primo.MIA;component/images/sftp.png">
             <TextBlock Text="SFTP: Удалить" Style="{StaticResource ActivityHeader}"/>
             <TextBlock Style="{StaticResource DangerHint}"
                        Text="⚠ Необратимо: файлы и папки удаляются с сервера мимо корзины"/>

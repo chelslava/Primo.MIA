@@ -24,7 +24,7 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
-    <local:ActivityPanel IconSource="pack://application:,,,/Primo.MIA;component/images/sharp.png">
+    <local:ActivityPanel IconSource="pack://application:,,,/Primo.MIA;component/images/tuple.png">
 
             <TextBlock Style="{StaticResource ActivityHeader}"
                        Text="Кортеж: Анализ"/>

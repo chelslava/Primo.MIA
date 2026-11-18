@@ -168,19 +168,21 @@ namespace Primo.MIA
         public XmlParseBack(IWFContainer container) : base(container)
         {
             sdkComponentName = "XML: Парсинг";
-            sdkComponentHelp =
-                "Парсит XML-строку в структуру данных.\n" +
-                "\n" +
-                "── Режимы ──────────────────────────────────────\n" +
-                "В структуру   — преобразует в Dictionary/List\n" +
-                "Валидация     — проверяет корректность XML\n" +
-                "Форматирование — форматирует с отступами\n" +
-                "\n" +
-                "── Параметры ───────────────────────────────────\n" +
-                "XML-строка     — исходный XML для обработки\n" +
-                "Символы отступа — отступ для форматирования";
+            sdkComponentHelp = @"
+Компонент ""XML: Парсинг""
+Парсит XML-строку в структуру данных.
 
-            sdkComponentIcon = ActivityIcons.Http;
+Режимы:
+В структуру   — преобразует в Dictionary/List
+Валидация     — проверяет корректность XML
+Форматирование — форматирует с отступами
+
+Параметры:
+XML-строка     — исходный XML для обработки
+Символы отступа — отступ для форматирования
+";
+
+            sdkComponentIcon = ActivityIcons.Xml;
 
             sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {

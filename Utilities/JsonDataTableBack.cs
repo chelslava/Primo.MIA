@@ -256,26 +256,28 @@ namespace Primo.MIA
         public JsonDataTableBack(IWFContainer container) : base(container)
         {
             sdkComponentName = "JSON: DataTable конвертер";
-            sdkComponentHelp =
-                "Конвертирует DataTable ↔ JSON без сторонних библиотек.\n" +
-                "\n" +
-                "── Форматы DataTable → JSON ──────────────────────\n" +
-                "ArrayOfObjects — [{\"Id\":1,\"Name\":\"Иван\"},...]\n" +
-                "ArrayOfArrays  — [[1,\"Иван\"],...]\n" +
-                "WithHeaders    — {\"columns\":[...],\"rows\":[[...]]}\n" +
-                "\n" +
-                "── Настройки ─────────────────────────────────────\n" +
-                "Колонки      — список через запятую (пусто = все)\n" +
-                "Формат дат   — yyyy-MM-dd, dd.MM.yyyy и т.п.\n" +
-                "NULL как     — null / \"\" / \"0\" / пропуск\n" +
-                "Типы колонок — автоопределение int/double/bool/DateTime\n" +
-                "\n" +
-                "── Выходные данные ───────────────────────────────\n" +
-                "ResultJson  (string)    при DataTableToJson\n" +
-                "ResultTable (DataTable) при JsonToDataTable\n" +
-                "RowCount    (int)";
+            sdkComponentHelp = @"
+Компонент ""JSON: DataTable конвертер""
+Конвертирует DataTable ↔ JSON без сторонних библиотек.
 
-            sdkComponentIcon = ActivityIcons.Table;
+Форматы DataTable → JSON:
+ArrayOfObjects — [{""Id"":1,""Name"":""Иван""},...]
+ArrayOfArrays  — [[1,""Иван""],...]
+WithHeaders    — {""columns"":[...],""rows"":[[...]]}
+
+Настройки:
+Колонки      — список через запятую (пусто = все)
+Формат дат   — yyyy-MM-dd, dd.MM.yyyy и т.п.
+NULL как     — null / """" / ""0"" / пропуск
+Типы колонок — автоопределение int/double/bool/DateTime
+
+Выходные данные:
+ResultJson  (string)    при DataTableToJson
+ResultTable (DataTable) при JsonToDataTable
+RowCount    (int)
+";
+
+            sdkComponentIcon = ActivityIcons.Json;
 
             sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {

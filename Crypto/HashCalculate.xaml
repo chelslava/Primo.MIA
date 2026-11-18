@@ -28,7 +28,7 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
-    <local:ActivityPanel IconSource="pack://application:,,,/Primo.MIA;component/images/sharp.png">
+    <local:ActivityPanel IconSource="pack://application:,,,/Primo.MIA;component/images/crypto.png">
 
             <TextBlock Style="{StaticResource ActivityHeader}"
                        Text="Крипто: Хэширование"/>
