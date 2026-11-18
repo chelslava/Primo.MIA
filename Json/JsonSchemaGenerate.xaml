@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="Primo.MIA.JsonSchemaGenerate"
+<UserControl x:Class="Primo.MIA.JsonSchemaGenerate"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -13,20 +13,20 @@
         </ResourceDictionary>
     </UserControl.Resources>
     <local:ActivityPanel IconSource="pack://application:,,,/Primo.MIA;component/images/json.png">
-            <TextBlock Text="JSON: РЎС…РµРјР° РёР· РїСЂРёРјРµСЂР°" Style="{StaticResource ActivityHeader}"/>
-            <TextBlock Text="РџСЂРёРјРµСЂ JSON:" Style="{StaticResource FieldLabel}"/>
+            <TextBlock Text="JSON: Схема из примера" Style="{StaticResource ActivityHeader}"/>
+            <TextBlock Text="Пример JSON:" Style="{StaticResource FieldLabel}"/>
             <TextBox Text="{Binding Prop_SampleJson, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
                      AcceptsReturn="True" TextWrapping="Wrap" Height="52"
-                     ToolTip="Р’Р°Р»РёРґРЅС‹Р№ JSON-РґРѕРєСѓРјРµРЅС‚ вЂ” РїРѕ РЅРµРјСѓ СЃС‚СЂРѕРёС‚СЃСЏ СЃС…РµРјР°"/>
-            <TextBlock Text="Р—Р°РіРѕР»РѕРІРѕРє (title):" Style="{StaticResource FieldLabel}"/>
+                     ToolTip="Валидный JSON-документ — по нему строится схема"/>
+            <TextBlock Text="Заголовок (title):" Style="{StaticResource FieldLabel}"/>
             <TextBox Text="{Binding Prop_Title, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
-                     ToolTip="Р—Р°РіРѕР»РѕРІРѕРє СЃС…РµРјС‹; РїСѓСЃС‚Рѕ вЂ” Р±РµР· Р·Р°РіРѕР»РѕРІРєР°"/>
+                     ToolTip="Заголовок схемы; пусто — без заголовка"/>
             <CheckBox Style="{StaticResource FieldCheckBox}" Margin="0,6,6,2"
-                      Content="Р¤РѕСЂРјР°С‚РёСЂРѕРІР°С‚СЊ (РѕС‚СЃС‚СѓРїС‹)"
+                      Content="Форматировать (отступы)"
                       IsChecked="{Binding Prop_PrettyPrint}"/>
             <TextBlock Text="Schema (out):" Style="{StaticResource FieldLabel}"/>
             <TextBox Text="{Binding Prop_Result, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
                      AcceptsReturn="True" TextWrapping="Wrap" Height="52"
-                     ToolTip="РЎРіРµРЅРµСЂРёСЂРѕРІР°РЅРЅР°СЏ JSON Schema. РџСЂРѕРІРµСЂСЊС‚Рµ required/minLength вЂ” РіРµРЅРµСЂР°С‚РѕСЂ РІС‹РІРѕРґРёС‚ С‚РёРїС‹ Рё СЃС‚СЂСѓРєС‚СѓСЂСѓ, РЅРѕ РЅРµ Р±РёР·РЅРµСЃ-РїСЂР°РІРёР»Р°"/>
+                     ToolTip="Сгенерированная JSON Schema. Проверьте required/minLength — генератор выводит типы и структуру, но не бизнес-правила"/>
     </local:ActivityPanel>
 </UserControl>

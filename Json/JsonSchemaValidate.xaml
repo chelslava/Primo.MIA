@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="Primo.MIA.JsonSchemaValidate"
+<UserControl x:Class="Primo.MIA.JsonSchemaValidate"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -13,21 +13,21 @@
         </ResourceDictionary>
     </UserControl.Resources>
     <local:ActivityPanel IconSource="pack://application:,,,/Primo.MIA;component/images/json.png">
-            <TextBlock Text="JSON: Р’Р°Р»РёРґР°С†РёСЏ РїРѕ СЃС…РµРјРµ" Style="{StaticResource ActivityHeader}"/>
+            <TextBlock Text="JSON: Валидация по схеме" Style="{StaticResource ActivityHeader}"/>
             <TextBlock Text="JSON:" Style="{StaticResource FieldLabel}"/>
             <TextBox Text="{Binding Prop_Json, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
                      AcceptsReturn="True" TextWrapping="Wrap" Height="52"
-                     ToolTip="РџСЂРѕРІРµСЂСЏРµРјС‹Р№ JSON (РѕС‚РІРµС‚ API, payload РІРµР±С…СѓРєР°)"/>
+                     ToolTip="Проверяемый JSON (ответ API, payload вебхука)"/>
             <TextBlock Text="JSON Schema:" Style="{StaticResource FieldLabel}"/>
             <TextBox Text="{Binding Prop_Schema, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
                      AcceptsReturn="True" TextWrapping="Wrap" Height="52"
-                     ToolTip="РЎС…РµРјР° РґРѕРєСѓРјРµРЅС‚Р° (draft-07 РїРѕРґРјРЅРѕР¶РµСЃС‚РІРѕ). РЎРіРµРЅРµСЂРёСЂРѕРІР°С‚СЊ РёР· РїСЂРёРјРµСЂР° вЂ” Р°РєС‚РёРІРЅРѕСЃС‚СЊ В«JSON: РЎС…РµРјР° РёР· РїСЂРёРјРµСЂР°В»"/>
-            <TextBlock Text="Р’Р°Р»РёРґРµРЅ (out):" Style="{StaticResource FieldLabel}"/>
+                     ToolTip="Схема документа (draft-07 подмножество). Сгенерировать из примера — активность «JSON: Схема из примера»"/>
+            <TextBlock Text="Валиден (out):" Style="{StaticResource FieldLabel}"/>
             <TextBox Text="{Binding Prop_IsValid, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
-            <TextBlock Text="РћС€РёР±РѕРє (out):" Style="{StaticResource FieldLabel}"/>
+            <TextBlock Text="Ошибок (out):" Style="{StaticResource FieldLabel}"/>
             <TextBox Text="{Binding Prop_ErrorCount, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
-            <TextBlock Text="РћС€РёР±РєРё (out):" Style="{StaticResource FieldLabel}"/>
+            <TextBlock Text="Ошибки (out):" Style="{StaticResource FieldLabel}"/>
             <TextBox Text="{Binding Prop_Errors, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
-                     ToolTip="DataTable: path (РїСѓС‚СЊ РІ РґР°РЅРЅС‹С…), error (РІРёРґ РЅР°СЂСѓС€РµРЅРёСЏ)"/>
+                     ToolTip="DataTable: path (путь в данных), error (вид нарушения)"/>
     </local:ActivityPanel>
 </UserControl>

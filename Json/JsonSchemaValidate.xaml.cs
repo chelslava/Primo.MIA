@@ -1,9 +1,9 @@
-﻿using System.Windows.Controls;
+using System.Windows.Controls;
 
 namespace Primo.MIA
 {
     /// <summary>
-    /// Р›РѕРіРёРєР° РІР·Р°РёРјРѕРґРµР№СЃС‚РІРёСЏ РґР»СЏ JsonSchemaValidate.xaml (issue #34).
+    /// Логика взаимодействия для JsonSchemaValidate.xaml (issue #34).
     /// </summary>
     public partial class JsonSchemaValidate : UserControl
     {

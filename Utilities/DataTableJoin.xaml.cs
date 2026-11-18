@@ -1,9 +1,9 @@
-﻿using System.Windows.Controls;
+using System.Windows.Controls;
 
 namespace Primo.MIA
 {
     /// <summary>
-    /// Р›РѕРіРёРєР° РІР·Р°РёРјРѕРґРµР№СЃС‚РІРёСЏ РґР»СЏ DataTableJoin.xaml (issue #36).
+    /// Логика взаимодействия для DataTableJoin.xaml (issue #36).
     /// </summary>
     public partial class DataTableJoin : UserControl
     {

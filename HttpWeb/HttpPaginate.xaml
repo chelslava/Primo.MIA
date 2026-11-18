@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="Primo.MIA.HttpPaginate"
+<UserControl x:Class="Primo.MIA.HttpPaginate"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -14,29 +14,29 @@
     </UserControl.Resources>
     <local:ActivityPanel IconSource="pack://application:,,,/Primo.MIA;component/images/http.png">
             <TextBlock Style="{StaticResource ActivityHeader}">
-                <Run Text="HTTP: РџР°РіРёРЅР°С†РёСЏ ["/>
+                <Run Text="HTTP: Пагинация ["/>
                 <Run Text="{Binding Prop_Mode, Mode=OneWay, Converter={StaticResource EnumDisplayNameConverter}}" Foreground="{StaticResource AccentBrush}"/>
                 <Run Text="]"/>
             </TextBlock>
-            <TextBlock Text="Р РµР¶РёРј:" Style="{StaticResource FieldLabel}"/>
+            <TextBlock Text="Режим:" Style="{StaticResource FieldLabel}"/>
             <ComboBox ItemsSource="{common:EnumValues common:HttpPaginationMode}"
                       SelectedValue="{Binding Prop_Mode}"
                       SelectedValuePath="Key"
                       DisplayMemberPath="Display"
                       Style="{StaticResource FieldComboBox}"
-                      ToolTip="РџРѕ РЅРѕРјРµСЂСѓ СЃС‚СЂР°РЅРёС†С‹ вЂ” {page} РІ С€Р°Р±Р»РѕРЅРµ;&#xA;РџРѕ РєСѓСЂСЃРѕСЂСѓ вЂ” {cursor} + JSONPath РєСѓСЂСЃРѕСЂР°"/>
-            <TextBlock Text="РЁР°Р±Р»РѕРЅ URL:" Style="{StaticResource FieldLabel}"/>
+                      ToolTip="По номеру страницы — {page} в шаблоне;&#xA;По курсору — {cursor} + JSONPath курсора"/>
+            <TextBlock Text="Шаблон URL:" Style="{StaticResource FieldLabel}"/>
             <TextBox Text="{Binding Prop_UrlTemplate, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
                      ToolTip="https://api/x?page={page}&amp;size=50&#xA;https://api/x?cursor={cursor}"/>
-            <TextBlock Text="JSONPath СЌР»РµРјРµРЅС‚РѕРІ:" Style="{StaticResource FieldLabel}"/>
+            <TextBlock Text="JSONPath элементов:" Style="{StaticResource FieldLabel}"/>
             <TextBox Text="{Binding Prop_ItemsPath, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
-                     ToolTip="РџСѓС‚СЊ Рє РјР°СЃСЃРёРІСѓ СЌР»РµРјРµРЅС‚РѕРІ СЃС‚СЂР°РЅРёС†С‹: $.data.items[*]"/>
+                     ToolTip="Путь к массиву элементов страницы: $.data.items[*]"/>
             <StackPanel Visibility="{Binding Prop_Mode,
                                     Converter={StaticResource EnumToVisConverter},
                                     ConverterParameter=Cursor}">
-                <TextBlock Text="JSONPath РєСѓСЂСЃРѕСЂР°:" Style="{StaticResource FieldLabel}"/>
+                <TextBlock Text="JSONPath курсора:" Style="{StaticResource FieldLabel}"/>
                 <TextBox Text="{Binding Prop_CursorPath, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
-                         ToolTip="РџСѓС‚СЊ Рє СЃР»РµРґСѓСЋС‰РµРјСѓ РєСѓСЂСЃРѕСЂСѓ: $.meta.next_cursor"/>
+                         ToolTip="Путь к следующему курсору: $.meta.next_cursor"/>
             </StackPanel>
             <Grid Margin="0,4,0,0">
                 <Grid.ColumnDefinitions>
@@ -45,27 +45,27 @@
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <TextBlock Grid.Column="0" Text="РЎС‚Р°СЂС‚. СЃС‚СЂР°РЅРёС†Р°:" VerticalAlignment="Center" Style="{StaticResource FieldLabel}" Margin="0,0,4,0"/>
+                <TextBlock Grid.Column="0" Text="Старт. страница:" VerticalAlignment="Center" Style="{StaticResource FieldLabel}" Margin="0,0,4,0"/>
                 <TextBox Grid.Column="1" Text="{Binding Prop_StartPage, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
-                         ToolTip="Р”Р»СЏ СЂРµР¶РёРјР° В«РџРѕ РЅРѕРјРµСЂСѓВ» (РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ 1)"/>
-                <TextBlock Grid.Column="2" Text="Р›РёРјРёС‚ СЃС‚СЂР°РЅРёС†:" VerticalAlignment="Center" Style="{StaticResource FieldLabel}" Margin="0,0,4,0"/>
+                         ToolTip="Для режима «По номеру» (по умолчанию 1)"/>
+                <TextBlock Grid.Column="2" Text="Лимит страниц:" VerticalAlignment="Center" Style="{StaticResource FieldLabel}" Margin="0,0,4,0"/>
                 <TextBox Grid.Column="3" Text="{Binding Prop_MaxPages, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
-                         ToolTip="Р—Р°С‰РёС‚Р° РѕС‚ Р±РµСЃРєРѕРЅРµС‡РЅРѕРіРѕ С†РёРєР»Р° (РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ 100)"/>
+                         ToolTip="Защита от бесконечного цикла (по умолчанию 100)"/>
             </Grid>
             <CheckBox Style="{StaticResource FieldCheckBox}" Margin="0,6,6,2"
-                      Content="РЎС‚РѕРї РЅР° РїСѓСЃС‚РѕР№ СЃС‚СЂР°РЅРёС†Рµ"
+                      Content="Стоп на пустой странице"
                       IsChecked="{Binding Prop_StopOnEmptyPage}"
-                      ToolTip="РћСЃС‚Р°РЅРѕРІРёС‚СЊСЃСЏ, РєРѕРіРґР° СЃС‚СЂР°РЅРёС†Р° Р±РµР· СЌР»РµРјРµРЅС‚РѕРІ"/>
+                      ToolTip="Остановиться, когда страница без элементов"/>
             <CheckBox Style="{StaticResource DangerCheckBox}"
-                      Content="РРіРЅРѕСЂРёСЂРѕРІР°С‚СЊ РѕС€РёР±РєРё SSL"
+                      Content="Игнорировать ошибки SSL"
                       IsChecked="{Binding Prop_IgnoreSslErrors}"
-                      ToolTip="РўРѕР»СЊРєРѕ РґР»СЏ С‚РµСЃС‚РѕРІС‹С… СЃСЂРµРґ!"/>
+                      ToolTip="Только для тестовых сред!"/>
             <Grid Margin="0,4,0,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <TextBlock Grid.Column="0" Text="Р­Р»РµРјРµРЅС‚С‹ (out): " VerticalAlignment="Center" Style="{StaticResource FieldLabel}" Margin="0,0,4,0"/>
+                <TextBlock Grid.Column="0" Text="Элементы (out): " VerticalAlignment="Center" Style="{StaticResource FieldLabel}" Margin="0,0,4,0"/>
                 <TextBox Grid.Column="1" Text="{Binding Prop_Items, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
             </Grid>
             <Grid Margin="0,2,0,0">
@@ -73,7 +73,7 @@
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <TextBlock Grid.Column="0" Text="РЎС‚СЂР°РЅРёС† (out): " VerticalAlignment="Center" Style="{StaticResource FieldLabel}" Margin="0,0,4,0"/>
+                <TextBlock Grid.Column="0" Text="Страниц (out): " VerticalAlignment="Center" Style="{StaticResource FieldLabel}" Margin="0,0,4,0"/>
                 <TextBox Grid.Column="1" Text="{Binding Prop_PageCount, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
             </Grid>
             <Grid Margin="0,2,0,0"
@@ -84,7 +84,7 @@
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <TextBlock Grid.Column="0" Text="РљСѓСЂСЃРѕСЂ (out): " VerticalAlignment="Center" Style="{StaticResource FieldLabel}" Margin="0,0,4,0"/>
+                <TextBlock Grid.Column="0" Text="Курсор (out): " VerticalAlignment="Center" Style="{StaticResource FieldLabel}" Margin="0,0,4,0"/>
                 <TextBox Grid.Column="1" Text="{Binding Prop_NextCursor, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"/>
             </Grid>
     </local:ActivityPanel>
