@@ -239,17 +239,36 @@ namespace Primo.MIA
             catch (RabbitMQ.Client.Exceptions.BrokerUnreachableException ex)
             {
             Common.ActivityFileLogger.Error(sdkComponentName, ex.GetType().Name + ": " + ex.Message + Environment.NewLine + ex.StackTrace);
-                return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Брокер недоступен: {ex.Message}" };
+                return new ExecutionResult { IsSuccess = false, ErrorMessage = MapRabbitMqException(ex) };
             }
             catch (RabbitMQ.Client.Exceptions.AuthenticationFailureException ex)
             {
             Common.ActivityFileLogger.Error(sdkComponentName, ex.GetType().Name + ": " + ex.Message + Environment.NewLine + ex.StackTrace);
-                return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Ошибка аутентификации: {ex.Message}" };
+                return new ExecutionResult { IsSuccess = false, ErrorMessage = MapRabbitMqException(ex) };
             }
             catch (Exception ex)
             {
             Common.ActivityFileLogger.Error(sdkComponentName, ex.GetType().Name + ": " + ex.Message + Environment.NewLine + ex.StackTrace);
-                return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Ошибка RabbitMQ: {ex.Message}" };
+                return new ExecutionResult { IsSuccess = false, ErrorMessage = MapRabbitMqException(ex) };
+            }
+        }
+
+        /// <summary>
+        /// Маппинг исключений RabbitMQ в понятные сообщения (общий для шаблонов
+        /// выполнения, включая сессионный путь consume — issue #49).
+        /// </summary>
+        protected static string MapRabbitMqException(Exception ex)
+        {
+            switch (ex)
+            {
+                case RabbitMQ.Client.Exceptions.BrokerUnreachableException _:
+                    return $"Брокер недоступен: {ex.Message}";
+                case RabbitMQ.Client.Exceptions.AuthenticationFailureException _:
+                    return $"Ошибка аутентификации: {ex.Message}";
+                case RabbitMQ.Client.Exceptions.OperationInterruptedException _:
+                    return $"Операция прервана брокером: {ex.Message}";
+                default:
+                    return $"Ошибка RabbitMQ: {ex.Message}";
             }
         }
     }

@@ -1579,6 +1579,23 @@ namespace Primo.MIA.Common
         public const string Error_MqQueueRequired = "Очередь не может быть пустой";
         public const string Error_MqBodyRequired = "Тело сообщения не может быть пустым";
 
+        // Ack-паттерн: ручное подтверждение (issue #49)
+        public const string Activity_RabbitMqAck          = "RabbitMQ: Подтверждение сообщения";
+        public const string Activity_RabbitMqCloseSession = "RabbitMQ: Закрыть сессию";
+
+        public const string Field_MqKeepSession   = "Держать сессию (ручной ack)";
+        public const string Field_MqSessionId     = "ID сессии";
+        public const string Field_MqAckAction     = "Действие";
+        public const string Field_MqDlqQueue      = "Очередь DLQ";
+        public const string Field_MqRetryCount    = "Повторов (x-retry-count)";
+        public const string Field_MqNewRetryCount = "Новый счётчик повторов";
+        public const string Field_MqClosed        = "Сессия закрыта";
+
+        public const string Error_MqSessionRequired           = "ID сессии обязателен (выход RabbitMQ: Получить сообщение в режиме «Держать сессию»)";
+        public const string Error_MqDeliveryTagRequired       = "Delivery Tag обязателен (выход RabbitMQ: Получить сообщение)";
+        public const string Error_MqDlqQueueRequired          = "Очередь DLQ обязательна для действия «Nack → DLQ»";
+        public const string Error_MqKeepSessionRequiresManual = "«Держать сессию» несовместима с Auto Ack: подтверждение делается активностью «RabbitMQ: Подтверждение сообщения»";
+
         // ═══════════════════════════════════════════════════════════════════
         // ОЧЕРЕДИ СООБЩЕНИЙ (Kafka, issue #19)
         // ═══════════════════════════════════════════════════════════════════

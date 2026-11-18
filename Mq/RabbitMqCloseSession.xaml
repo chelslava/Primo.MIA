@@ -1,0 +1,35 @@
+<UserControl x:Class="Primo.MIA.RabbitMqCloseSession"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="clr-namespace:Primo.MIA"
+             mc:Ignorable="d" d:DesignHeight="120" Margin="0,0,0,5">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Primo.MIA;component/Common/Styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <local:ActivityPanel IconSource="pack://application:,,,/Primo.MIA;component/images/http.png">
+
+            <TextBlock Text="RabbitMQ: Закрыть сессию" Style="{StaticResource ActivityHeader}"/>
+
+            <TextBlock Text="ID сессии:" Style="{StaticResource FieldLabel}"/>
+            <TextBox Text="{Binding Prop_SessionId, UpdateSourceTrigger=PropertyChanged}"
+                     Style="{StaticResource FieldBox}"
+                     ToolTip="Выход «RabbitMQ: Получить сообщение» в режиме «Держать сессию».&#xA;При закрытии без подтверждения брокер вернёт сообщение в очередь"/>
+
+            <Grid Margin="0,4,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="Закрыта (out):" VerticalAlignment="Center" Style="{StaticResource FieldLabel}" Margin="0,0,4,0"/>
+                <TextBox Grid.Column="1" Text="{Binding Prop_Closed, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                         ToolTip="True — сессия была открыта и закрыта; False — не найдена (идемпотентный успех)"/>
+            </Grid>
+    </local:ActivityPanel>
+</UserControl>

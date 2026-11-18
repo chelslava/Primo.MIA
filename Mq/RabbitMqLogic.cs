@@ -7,6 +7,7 @@ using Primo.MIA.Common;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -42,6 +43,13 @@ namespace Primo.MIA
         public string RoutingKey { get; set; }
         public string ContentType { get; set; }
         public ulong DeliveryTag { get; set; }
+
+        /// <summary>Заголовки сообщения (issue #49: x-retry-count и пр.).</summary>
+        public IDictionary<string, object> Headers { get; set; }
+
+        /// <summary>Счётчик повторов x-retry-count (0 — не задан).</summary>
+        public long RetryCount { get; set; }
+
         public DateTime ReceivedAtUtc { get; set; } = DateTime.UtcNow;
     }
 
@@ -169,13 +177,16 @@ namespace Primo.MIA
             {
                 try
                 {
+                    var headers = args.BasicProperties?.Headers;
                     received.TrySetResult(new RabbitMqMessage
                     {
                         Body = System.Text.Encoding.UTF8.GetString(args.Body.ToArray()),
                         Exchange = args.Exchange,
                         RoutingKey = args.RoutingKey,
                         ContentType = args.BasicProperties?.ContentType,
-                        DeliveryTag = args.DeliveryTag
+                        DeliveryTag = args.DeliveryTag,
+                        Headers = headers,
+                        RetryCount = TryGetRetryCount(headers, out var retryCount) ? retryCount : 0
                     });
                 }
                 catch
@@ -226,6 +237,121 @@ namespace Primo.MIA
             if (preview.Length > 60)
                 preview = preview.Substring(0, 60) + "...";
             return $"routingKey='{message.RoutingKey}' body='{preview}'";
+        }
+
+        // ── Ack-паттерн (issue #49) ────────────────────────────────────
+
+        /// <summary>Заголовок счётчика повторов.</summary>
+        public const string RetryCountHeaderKey = "x-retry-count";
+
+        /// <summary>
+        /// Достаёт счётчик повторов из заголовков. RabbitMQ-клиент декодирует
+        /// AMQP-числа в int/long/sbyte/short — принимаем всё числовое и
+        /// строковое; byte[] (нестандартные клиенты) — через UTF-8 строку.
+        /// </summary>
+        public static bool TryGetRetryCount(IDictionary<string, object> headers, out long retryCount)
+        {
+            retryCount = 0;
+            if (headers == null || !headers.TryGetValue(RetryCountHeaderKey, out var raw) || raw == null)
+                return false;
+
+            switch (raw)
+            {
+                case sbyte v: retryCount = v; return true;
+                case short v: retryCount = v; return true;
+                case int v: retryCount = v; return true;
+                case long v: retryCount = v; return true;
+                case byte[] bytes:
+                    return long.TryParse(System.Text.Encoding.UTF8.GetString(bytes), out retryCount);
+                default:
+                    return long.TryParse(raw.ToString(), out retryCount);
+            }
+        }
+
+        /// <summary>Заголовки для requeue/DLQ-копии: инкрементированный счётчик повторов.</summary>
+        public static IDictionary<string, object> BuildRetryHeaders(long retryCount)
+        {
+            return new Dictionary<string, object>
+            {
+                [RetryCountHeaderKey] = retryCount
+            };
+        }
+
+        /// <summary>
+        /// Свойства для requeue/DLQ-копии: persistent + счётчик повторов.
+        /// Прочие заголовки исходного сообщения не сохраняются (ограничение
+        /// задокументировано в help активности Ack).
+        /// </summary>
+        public IBasicProperties BuildRetryProperties(IModel channel, long retryCount)
+        {
+            if (channel == null)
+                throw new ArgumentNullException(nameof(channel));
+
+            var properties = channel.CreateBasicProperties();
+            properties.DeliveryMode = 2; // persistent
+            properties.ContentType = "text/plain; charset=utf-8";
+            properties.Headers = BuildRetryHeaders(retryCount);
+            return properties;
+        }
+
+        /// <summary>Подтверждает доставку (сообщение удаляется из очереди).</summary>
+        public void AckMessage(IModel channel, ulong deliveryTag)
+        {
+            if (channel == null)
+                throw new ArgumentNullException(nameof(channel));
+            if (deliveryTag == 0)
+                throw new ArgumentException("Delivery tag должен быть положительным", nameof(deliveryTag));
+
+            channel.BasicAck(deliveryTag, multiple: false);
+        }
+
+        /// <summary>
+        /// Возвращает сообщение в очередь с инкрементом x-retry-count:
+        /// копия публикуется в ту же очередь (persistent), оригинал
+        /// подтверждается. Возвращает новый счётчик.
+        /// </summary>
+        public long RequeueMessage(IModel channel, string queue, ulong deliveryTag, string body, long retryCount)
+        {
+            if (channel == null)
+                throw new ArgumentNullException(nameof(channel));
+            Guard.NotNullOrWhiteSpace(queue, nameof(queue));
+            if (body == null)
+                throw new ArgumentNullException(nameof(body));
+
+            var nextRetryCount = retryCount + 1;
+            // интерфейсная перегрузка (не extension): обязательная часть
+            // контракта клиента, удобна и для верификации в тестах
+            channel.BasicPublish(
+                string.Empty,
+                queue,
+                mandatory: false,
+                basicProperties: BuildRetryProperties(channel, nextRetryCount),
+                body: System.Text.Encoding.UTF8.GetBytes(body));
+            channel.BasicAck(deliveryTag, multiple: false);
+            return nextRetryCount;
+        }
+
+        /// <summary>
+        /// Отправляет сообщение в очередь мёртвых писем и подтверждает
+        /// оригинал. DLQ должна существовать (QueueDeclarePassive — fail-closed:
+        /// без проверки копия молча потерялась бы через default exchange).
+        /// </summary>
+        public void SendToDlq(IModel channel, string dlqQueue, ulong deliveryTag, string body, long retryCount)
+        {
+            if (channel == null)
+                throw new ArgumentNullException(nameof(channel));
+            Guard.NotNullOrWhiteSpace(dlqQueue, nameof(dlqQueue));
+            if (body == null)
+                throw new ArgumentNullException(nameof(body));
+
+            channel.QueueDeclarePassive(dlqQueue);
+            channel.BasicPublish(
+                string.Empty,
+                dlqQueue,
+                mandatory: false,
+                basicProperties: BuildRetryProperties(channel, retryCount),
+                body: System.Text.Encoding.UTF8.GetBytes(body));
+            channel.BasicAck(deliveryTag, multiple: false);
         }
     }
 }

@@ -1,0 +1,72 @@
+<UserControl x:Class="Primo.MIA.RabbitMqAck"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="clr-namespace:Primo.MIA"
+             mc:Ignorable="d" d:DesignHeight="240" Margin="0,0,0,5">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Primo.MIA;component/Common/Styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <local:ActivityPanel IconSource="pack://application:,,,/Primo.MIA;component/images/http.png">
+
+            <!-- ── Заголовок с действием ── -->
+            <TextBlock Style="{StaticResource ActivityHeader}">
+                <Run Text="RabbitMQ: Подтверждение ["/>
+                <Run Text="{Binding Prop_Action, Mode=OneWay, Converter={StaticResource EnumDisplayNameConverter}}" Foreground="{StaticResource AccentBrush}"/>
+                <Run Text="]"/>
+            </TextBlock>
+
+            <!-- ── Основные ── -->
+            <TextBlock Text="ID сессии:" Style="{StaticResource FieldLabel}"/>
+            <TextBox Text="{Binding Prop_SessionId, UpdateSourceTrigger=PropertyChanged}"
+                     Style="{StaticResource FieldBox}"
+                     ToolTip="Выход «RabbitMQ: Получить сообщение» в режиме «Держать сессию»"/>
+
+            <TextBlock Text="Delivery Tag:" Style="{StaticResource FieldLabel}"/>
+            <TextBox Text="{Binding Prop_DeliveryTag, UpdateSourceTrigger=PropertyChanged}"
+                     Style="{StaticResource FieldBox}"
+                     ToolTip="Выход «RabbitMQ: Получить сообщение»"/>
+
+            <TextBlock Text="Действие:" Style="{StaticResource FieldLabel}"/>
+            <ComboBox ItemsSource="{local:EnumValues local:RabbitMqAckAction}"
+                      SelectedValue="{Binding Prop_Action}"
+                      SelectedValuePath="Key"
+                      DisplayMemberPath="Display"
+                      Style="{StaticResource FieldComboBox}"
+                      ToolTip="Ack — удалить из очереди (успешная обработка);&#xA;Requeue — копия в очередь с x-retry-count +1;&#xA;Nack → DLQ — копия в очередь отказов (оригинал подтверждается)"/>
+
+            <!-- Очередь DLQ — только для действия Nack → DLQ -->
+            <Grid Margin="0,4,0,0"
+                  Visibility="{Binding Prop_Action,
+                               Converter={StaticResource EnumToVisConverter},
+                               ConverterParameter=NackDlq}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="Очередь DLQ:" VerticalAlignment="Center" Style="{StaticResource FieldLabel}" Margin="0,0,4,0"/>
+                <TextBox Grid.Column="1" Text="{Binding Prop_DlqQueue, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                         ToolTip="Должна существовать — проверяется перед отправкой (иначе сообщение не теряется)"/>
+            </Grid>
+
+            <!-- ── Выходные ── -->
+            <Grid Margin="0,4,0,0"
+                  Visibility="{Binding Prop_Action,
+                               Converter={StaticResource EnumToVisConverter},
+                               ConverterParameter=Requeue}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="Новый счётчик (out):" VerticalAlignment="Center" Style="{StaticResource FieldLabel}" Margin="0,0,4,0"/>
+                <TextBox Grid.Column="1" Text="{Binding Prop_NewRetryCount, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                         ToolTip="Значение x-retry-count requeue-копии"/>
+            </Grid>
+    </local:ActivityPanel>
+</UserControl>

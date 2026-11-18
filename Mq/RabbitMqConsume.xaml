@@ -28,8 +28,30 @@
             <TextBlock Text="Очередь:" Style="{StaticResource FieldLabel}"/>
             <TextBox Text="{Binding Prop_Queue, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
                      ToolTip="Имя очереди, из которой читается сообщение"/>
+            <CheckBox Style="{StaticResource FieldCheckBox}"
+                      Content="Держать сессию (ручной ack)"
+                      IsChecked="{Binding Prop_KeepSession}"
+                      ToolTip="При Auto Ack = False канал не закрывается: сообщение остаётся неподтверждённым до активности&#xA;«RabbitMQ: Подтверждение сообщения» (Ack / Requeue / DLQ).&#xA;При таймауте (без сообщения) канал закрывается как обычно"/>
             <TextBlock Text="Тело сообщения:" Style="{StaticResource FieldLabel}"/>
             <TextBox Text="{Binding Prop_MessageBody, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
                      ToolTip="Переменная (String) для тела полученного сообщения"/>
+            <Grid Margin="0,4,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="ID сессии (out):" VerticalAlignment="Center" Style="{StaticResource FieldLabel}" Margin="0,0,4,0"/>
+                <TextBox Grid.Column="1" Text="{Binding Prop_SessionId, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                         ToolTip="Для активностей «RabbitMQ: Подтверждение сообщения» и «RabbitMQ: Закрыть сессию» (режим Держать сессию)"/>
+            </Grid>
+            <Grid Margin="0,2,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="Повторов (out):" VerticalAlignment="Center" Style="{StaticResource FieldLabel}" Margin="0,0,4,0"/>
+                <TextBox Grid.Column="1" Text="{Binding Prop_RetryCount, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldBox}"
+                         ToolTip="Заголовок x-retry-count полученного сообщения (0 — не задан)"/>
+            </Grid>
     </local:ActivityPanel>
 </UserControl>

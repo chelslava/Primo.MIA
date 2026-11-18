@@ -36,6 +36,12 @@ namespace Primo.MIA
         [System.ComponentModel.Category(ActivityStrings.Mq_Category_Consume), System.ComponentModel.DisplayName(ActivityStrings.Field_MqAutoAck)]
         public bool Prop_AutoAck { get => _propAutoAck; set { _propAutoAck = value; InvokePropertyChanged(this, nameof(Prop_AutoAck)); } }
 
+        private bool _propKeepSession;
+        /// <summary>Держать сессию: канал не закрывается, подтверждение — активностью Ack (issue #49).</summary>
+        [LTools.Common.Model.Serialization.StoringProperty]
+        [System.ComponentModel.Category(ActivityStrings.Mq_Category_Consume), System.ComponentModel.DisplayName(ActivityStrings.Field_MqKeepSession)]
+        public bool Prop_KeepSession { get => _propKeepSession; set { _propKeepSession = value; InvokePropertyChanged(this, nameof(Prop_KeepSession)); } }
+
         private string _propTimeoutSeconds = "30";
         /// <summary>Таймаут ожидания сообщения в секундах.</summary>
         [LTools.Common.Model.Serialization.StoringProperty]
@@ -71,6 +77,20 @@ namespace Primo.MIA
         [System.ComponentModel.Category(ActivityStrings.Mq_Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_MqHasMessage)]
         public string Prop_HasMessage { get => _propHasMessage; set { _propHasMessage = value; InvokePropertyChanged(this, nameof(Prop_HasMessage)); } }
 
+        private string _propSessionId;
+        /// <summary>ID сессии manual-ack (для RabbitMQ: Подтверждение/Закрыть сессию).</summary>
+        [LTools.Common.Model.Serialization.StoringProperty]
+        [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(string))]
+        [System.ComponentModel.Category(ActivityStrings.Mq_Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_MqSessionId)]
+        public string Prop_SessionId { get => _propSessionId; set { _propSessionId = value; InvokePropertyChanged(this, nameof(Prop_SessionId)); } }
+
+        private string _propRetryCount;
+        /// <summary>Счётчик повторов x-retry-count полученного сообщения.</summary>
+        [LTools.Common.Model.Serialization.StoringProperty]
+        [LTools.Common.Model.Studio.ValidateReturnScript(DataType = typeof(long))]
+        [System.ComponentModel.Category(ActivityStrings.Mq_Category_Output), System.ComponentModel.DisplayName(ActivityStrings.Field_MqRetryCount)]
+        public string Prop_RetryCount { get => _propRetryCount; set { _propRetryCount = value; InvokePropertyChanged(this, nameof(Prop_RetryCount)); } }
+
         public RabbitMqConsumeBack(IWFContainer container) : base(container)
         {
             sdkComponentName = ActivityStrings.Activity_RabbitMqConsume;
@@ -85,12 +105,15 @@ namespace Primo.MIA
 
 Получение:
 Auto Ack: [Boolean] True — сообщение подтверждается и УДАЛЯЕТСЯ из очереди сразу при доставке (по умолчанию False). False — подтверждения нет: после завершения активности сообщение ВОЗВРАЩАЕТСЯ В ОЧЕРЕДЬ (режим «прочитать без удаления»; Delivery Tag в этом режиме не используется).
+Держать сессию: [Boolean] Ручной ack (issue #49): при Auto Ack = False канал не закрывается, сообщение остаётся неподтверждённым до активности «RabbitMQ: Подтверждение сообщения» (Ack / Requeue с счётчиком / DLQ). При таймауте (без сообщения) канал закрывается как обычно. Несовместимо с Auto Ack = True.
 Таймаут ожидания: [Int32] Секунды; по истечении HasMessage = False.
 
 Выходные данные:
 Тело сообщения: [String] Текст сообщения.
 Routing Key: [String] Routing key сообщения.
-Delivery Tag: [UInt64] Тег доставки (при Auto Ack = True).
+Delivery Tag: [UInt64] Тег доставки (при Auto Ack = True или Держать сессию).
+ID сессии: [String] Для «RabbitMQ: Подтверждение сообщения» (режим Держать сессию).
+Повторов: [Int64] Заголовок x-retry-count (0 — не задан).
 Сообщение получено: [Boolean] True — сообщение доставлено до таймаута.";
             sdkComponentIcon = ActivityIcons.MessageQueue;
             sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
@@ -103,10 +126,13 @@ Delivery Tag: [UInt64] Тег доставки (при Auto Ack = True).
                 PropertyBuilder.BooleanObject("Prop_UseTls", "Использовать TLS"),
                 PropertyBuilder.String("Prop_Queue", "Имя очереди"),
                 PropertyBuilder.BooleanObject("Prop_AutoAck", "Auto Ack"),
+                PropertyBuilder.BooleanObject("Prop_KeepSession", "Держать сессию (ручной ack, только с Auto Ack = False)"),
                 PropertyBuilder.Int("Prop_TimeoutSeconds", "Таймаут ожидания в секундах"),
                 PropertyBuilder.Variable<string>("Prop_MessageBody", "Тело полученного сообщения"),
                 PropertyBuilder.Variable<string>("Prop_MessageRoutingKey", "Routing Key сообщения"),
                 PropertyBuilder.Variable<ulong>("Prop_DeliveryTag", "Delivery Tag"),
+                PropertyBuilder.Variable<string>("Prop_SessionId", "ID сессии (ручной ack)"),
+                PropertyBuilder.Variable<long>("Prop_RetryCount", "Повторов (x-retry-count)"),
                 PropertyBuilder.Variable<bool>("Prop_HasMessage", "Сообщение получено")
             };
             InitClass(container);
@@ -120,10 +146,17 @@ Delivery Tag: [UInt64] Тег доставки (при Auto Ack = True).
                 if (string.IsNullOrWhiteSpace(queue))
                     return new ExecutionResult { IsSuccess = false, ErrorMessage = ActivityStrings.Error_MqQueueRequired };
 
+                if (this.Prop_KeepSession && this.Prop_AutoAck)
+                    return new ExecutionResult { IsSuccess = false, ErrorMessage = ActivityStrings.Error_MqKeepSessionRequiresManual };
+
                 int timeout; int.TryParse(GetPropertyValue<string>(this.Prop_TimeoutSeconds, nameof(Prop_TimeoutSeconds), sd), out timeout);
                 if (timeout <= 0) timeout = 30;
 
                 var logic = new RabbitMqLogic();
+
+                if (this.Prop_KeepSession)
+                    return ConsumeWithSession(logic, sd, queue, timeout);
+
                 return ExecuteRabbitMq(sd, channel =>
                 {
                     var message = logic.WaitForMessage(channel, queue, this.Prop_AutoAck, timeout);
@@ -137,6 +170,7 @@ Delivery Tag: [UInt64] Тег доставки (при Auto Ack = True).
                     SetVariableValue(this.Prop_MessageBody, message.Body, sd);
                     SetVariableValue(this.Prop_MessageRoutingKey, message.RoutingKey, sd);
                     SetVariableValue(this.Prop_DeliveryTag, message.DeliveryTag, sd);
+                    SetVariableValue(this.Prop_RetryCount, message.RetryCount, sd);
                     SetVariableValue(this.Prop_HasMessage, true, sd);
 
                     return new ExecutionResult
@@ -152,11 +186,88 @@ Delivery Tag: [UInt64] Тег доставки (при Auto Ack = True).
             }
         }
 
+        /// <summary>
+        /// Режим «Держать сессию» (issue #49): сообщение доставляется без ack,
+        /// канал регистрируется в RabbitMqSessionRegistry и переживает
+        /// активность — подтверждение делается «RabbitMQ: Подтверждение
+        /// сообщения» на том же канале (delivery tag действителен только на
+        /// канале-получателе). Отдельный шаблон: ExecuteRabbitMq закрывает
+        /// соединение в finally, что для manual-ack недопустимо.
+        /// </summary>
+        private ExecutionResult ConsumeWithSession(RabbitMqLogic logic, ScriptingData sd, string queue, int timeout)
+        {
+            var settings = ResolveSettings(sd);
+            IConnection connection = null;
+            IModel channel = null;
+            try
+            {
+                connection = logic.CreateFactory(settings).CreateConnection();
+                channel = connection.CreateModel();
+
+                var message = logic.WaitForMessage(channel, queue, autoAck: false, timeoutSeconds: timeout);
+
+                if (message == null)
+                {
+                    // таймаут: неподтверждений нет, сессию открывать нечего
+                    SafeDispose.Quiet(
+                        () =>
+                        {
+                            channel.Close();
+                            channel.Dispose();
+                            connection.Close();
+                            connection.Dispose();
+                        },
+                        "RabbitMQ session consume (timeout)");
+                    SetVariableValue(this.Prop_HasMessage, false, sd);
+                    return new ExecutionResult { IsSuccess = true, SuccessMessage = $"Очередь '{queue}' пуста (таймаут {timeout} с)" };
+                }
+
+                var handle = RabbitMqSessionRegistry.Register(
+                    connection, channel, queue, message.DeliveryTag, message.Body, message.RetryCount);
+
+                SetVariableValue(this.Prop_MessageBody, message.Body, sd);
+                SetVariableValue(this.Prop_MessageRoutingKey, message.RoutingKey, sd);
+                SetVariableValue(this.Prop_DeliveryTag, message.DeliveryTag, sd);
+                SetVariableValue(this.Prop_RetryCount, message.RetryCount, sd);
+                SetVariableValue(this.Prop_SessionId, handle.SessionId, sd);
+                SetVariableValue(this.Prop_HasMessage, true, sd);
+
+                return new ExecutionResult
+                {
+                    IsSuccess = true,
+                    SuccessMessage = $"Сообщение получено: {logic.DescribeMessage(message)}; сессия '{handle.SessionId}' — подтвердите «RabbitMQ: Подтверждение сообщения»"
+                };
+            }
+            catch (Exception ex)
+            {
+                // сессия не зарегистрирована — ресурсы не должны утекать
+                SafeDispose.Quiet(
+                    () =>
+                    {
+                        channel?.Close();
+                        channel?.Dispose();
+                        connection?.Close();
+                        connection?.Dispose();
+                    },
+                    "RabbitMQ session consume (failure)");
+                Common.ActivityFileLogger.Error(sdkComponentName, ex.GetType().Name + ": " + ex.Message + Environment.NewLine + ex.StackTrace);
+                return new ExecutionResult { IsSuccess = false, ErrorMessage = MapRabbitMqException(ex) };
+            }
+        }
+
         public override ValidationResult Validate()
         {
             var ret = new ValidationResult();
             ret.ValidateRequired(this.Prop_Host, ActivityStrings.Field_MqHost, ActivityStrings.Error_MqHostRequired);
             ret.ValidateRequired(this.Prop_Queue, ActivityStrings.Field_MqQueue, ActivityStrings.Error_MqQueueRequired);
+            if (this.Prop_KeepSession && this.Prop_AutoAck)
+            {
+                ret.Items.Add(new ValidationResult.ValidationItem()
+                {
+                    PropertyName = ActivityStrings.Field_MqKeepSession,
+                    Error = ActivityStrings.Error_MqKeepSessionRequiresManual
+                });
+            }
             return ret;
         }
     }

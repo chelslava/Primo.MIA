@@ -96,6 +96,10 @@ namespace Primo.MIA.Tests.Back
             yield return new object[] { typeof(ElementSelectMultipleBack), true };
             yield return new object[] { typeof(ElementSubmitBack), true };
             yield return new object[] { typeof(ElementUploadFileBack), true };
+
+            // RabbitMQ ack-паттерн (issue #49): сессия/tag/DLQ — обязательные входы
+            yield return new object[] { typeof(RabbitMqAckBack), true };
+            yield return new object[] { typeof(RabbitMqCloseSessionBack), true };
         }
 
         [Theory(DisplayName = "Смоук Back: Validate() на пустых свойствах не бросает и валидирует")]
