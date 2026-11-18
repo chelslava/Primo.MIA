@@ -64,38 +64,32 @@
             </Grid>
 
             <!-- Замена пробелов -->
+            <!-- Постобработка: по одной на строку (узкая панель Studio) -->
+            <TextBlock Text="Постобработка:" Style="{StaticResource FieldLabel}" Margin="0,4,0,0"/>
+            <CheckBox Style="{StaticResource FieldCheckBox}" Margin="0,2,6,2"
+                      Content="Сохранять регистр"
+                      IsChecked="{Binding Prop_PreserveCase}"
+                      ToolTip="Сохранять регистр оригинального символа"/>
+            <CheckBox Style="{StaticResource FieldCheckBox}"
+                      Content="К верхнему регистру"
+                      IsChecked="{Binding Prop_ToUpperCase}"
+                      ToolTip="Привести результат к верхнему регистру"/>
+            <CheckBox Style="{StaticResource FieldCheckBox}"
+                      Content="К нижнему регистру"
+                      IsChecked="{Binding Prop_ToLowerCase}"
+                      ToolTip="Привести результат к нижнему регистру"/>
+
+            <!-- Замена пробелов -->
             <Grid Margin="0,4,0,0">
                 <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="80"/>
                 </Grid.ColumnDefinitions>
-
-                <!-- Опции регистра -->
-                <StackPanel Grid.Column="0" Margin="0,0,4,0">
-                    <TextBlock Text="Постобработка:" Style="{StaticResource FieldLabel}"/>
-                    <StackPanel Orientation="Horizontal">
-                        <CheckBox Style="{StaticResource FieldCheckBox}" Content="Сохр. регистр"
-                                  IsChecked="{Binding Prop_PreserveCase}"
-                                  Margin="0,0,10,0"
-                                  ToolTip="Сохранять регистр оригинального символа"/>
-                        <CheckBox Style="{StaticResource FieldCheckBox}" Content="К верхнему"
-                                  IsChecked="{Binding Prop_ToUpperCase}"
-                                  Margin="0,0,10,0"
-                                  ToolTip="Привести результат к верхнему регистру"/>
-                        <CheckBox Style="{StaticResource FieldCheckBox}" Content="К нижнему"
-                                  IsChecked="{Binding Prop_ToLowerCase}"
-                                  ToolTip="Привести результат к нижнему регистру"/>
-                    </StackPanel>
-                </StackPanel>
-
-                <!-- Замена пробелов -->
-                <StackPanel Grid.Column="1">
-                    <TextBlock Text="Замена пробелов:" Style="{StaticResource FieldLabel}"
-                               ToolTip="Заменить пробелы: _ для файлов, . для логинов, пусто = оставить"/>
-                    <TextBox Text="{Binding Prop_ReplaceSpaces, UpdateSourceTrigger=PropertyChanged}"
-                             Style="{StaticResource FieldBox}"
-                             ToolTip="Пусто = оставить пробелы без изменений"/>
-                </StackPanel>
+                <TextBlock Grid.Column="0" Text="Замена пробелов:" VerticalAlignment="Center" Style="{StaticResource FieldLabel}" Margin="0,0,4,0"
+                           ToolTip="Заменить пробелы: _ для файлов, . для логинов, пусто = оставить"/>
+                <TextBox Grid.Column="1" Text="{Binding Prop_ReplaceSpaces, UpdateSourceTrigger=PropertyChanged}"
+                         Style="{StaticResource FieldBox}"
+                         ToolTip="Пусто = оставить пробелы без изменений"/>
             </Grid>
 
             <!-- Сохранять нетранслитерируемые символы -->

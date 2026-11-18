@@ -92,10 +92,10 @@
                               IsChecked="{Binding Prop_ExtractGUID}"
                               Margin="0,1,0,1"
                               ToolTip="UUID/GUID"/>
-                    <CheckBox Style="{StaticResource FieldCheckBox}" Content="Custom (свой паттерн)"
+                    <CheckBox Style="{StaticResource FieldCheckBox}" Content="Custom"
                               IsChecked="{Binding Prop_ExtractCustom}"
                               Margin="0,1,0,1"
-                              ToolTip="Включить поиск по пользовательскому Regex"/>
+                              ToolTip="Свой паттерн: включить поиск по пользовательскому Regex (поле ниже)"/>
                 </StackPanel>
             </Grid>
 
@@ -126,24 +126,21 @@
             <Grid Margin="0,6,0,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="80"/>
                 </Grid.ColumnDefinitions>
 
-                <StackPanel Grid.Column="0" Margin="0,0,4,0">
+                <StackPanel Grid.Column="0">
                     <TextBlock Text="Настройки:" Style="{StaticResource FieldLabel}"/>
-                    <StackPanel Orientation="Horizontal">
-                        <CheckBox Style="{StaticResource FieldCheckBox}" Content="Нормализация"
-                                  IsChecked="{Binding Prop_NormalizeResults}"
-                                  Margin="0,0,10,0"
-                                  ToolTip="Привести найденные значения к стандартному виду"/>
-                        <CheckBox Style="{StaticResource FieldCheckBox}" Content="Валидация ИНН"
-                                  IsChecked="{Binding Prop_ValidateINN}"
-                                  ToolTip="Проверять контрольные цифры ИНН"/>
-                    </StackPanel>
-                </StackPanel>
+                    <CheckBox Style="{StaticResource FieldCheckBox}" Content="Нормализация"
+                              IsChecked="{Binding Prop_NormalizeResults}"
+                              Margin="0,2,6,2"
+                              ToolTip="Привести найденные значения к стандартному виду"/>
+                    <CheckBox Style="{StaticResource FieldCheckBox}" Content="Валидация ИНН"
+                              IsChecked="{Binding Prop_ValidateINN}"
+                              Margin="0,2,6,2"
+                              ToolTip="Проверять контрольные цифры ИНН"/>
 
-                <StackPanel Grid.Column="1">
                     <TextBlock Text="Мин. уверенность:" Style="{StaticResource FieldLabel}"
+                               Margin="0,4,0,0"
                                ToolTip="0–100. 0 = все паттерны, 80 = только надёжные"/>
                     <TextBox Text="{Binding Prop_MinConfidence, UpdateSourceTrigger=PropertyChanged}"
                              Style="{StaticResource FieldBox}"/>

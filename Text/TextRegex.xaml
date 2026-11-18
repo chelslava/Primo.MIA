@@ -57,36 +57,27 @@
                          ToolTip="Подстановки: $1 — группа 1, ${name} — именованная группа, $$ — литеральный знак доллара"/>
             </StackPanel>
 
-            <!-- Опции в две колонки -->
-            <Grid Margin="0,4,0,0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                <CheckBox Grid.Column="0" Style="{StaticResource FieldCheckBox}"
-                          Content="Игнорировать регистр"
-                          IsChecked="{Binding Prop_IgnoreCase}"
-                          ToolTip="RegexOptions.IgnoreCase"/>
-                <CheckBox Grid.Column="1" Style="{StaticResource FieldCheckBox}"
-                          Content="Multiline"
-                          IsChecked="{Binding Prop_Multiline}"
-                          ToolTip="^ и $ соответствуют границам строк, а не всего текста"/>
-            </Grid>
+            <!-- Опции: по одной на строку (узкая панель Studio) -->
+            <CheckBox Style="{StaticResource FieldCheckBox}" Margin="0,6,6,2"
+                      Content="Игнорировать регистр"
+                      IsChecked="{Binding Prop_IgnoreCase}"
+                      ToolTip="RegexOptions.IgnoreCase"/>
+            <CheckBox Style="{StaticResource FieldCheckBox}"
+                      Content="Multiline"
+                      IsChecked="{Binding Prop_Multiline}"
+                      ToolTip="^ и $ соответствуют границам строк, а не всего текста"/>
+            <CheckBox Style="{StaticResource FieldCheckBox}"
+                      Content="Singleline"
+                      IsChecked="{Binding Prop_Singleline}"
+                      ToolTip="Точка (. ) захватывает и переводы строк"/>
+
             <Grid Margin="0,2,0,0">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <CheckBox Grid.Column="0" Style="{StaticResource FieldCheckBox}"
-                          Content="Singleline"
-                          IsChecked="{Binding Prop_Singleline}"
-                          ToolTip="Точка (. ) захватывает и переводы строк"/>
-                <TextBlock Grid.Column="1" Text="Таймаут (мс):" VerticalAlignment="Center" Style="{StaticResource FieldLabel}" Margin="0,0,4,0"/>
-                <TextBox Width="50"
-                         VerticalAlignment="Center"
-                         Margin="0"
-                         Grid.Column="1"
-                         Text="{Binding Prop_TimeoutMs, UpdateSourceTrigger=PropertyChanged}"
+                <TextBlock Grid.Column="0" Text="Таймаут (мс):" VerticalAlignment="Center" Style="{StaticResource FieldLabel}" Margin="0,0,4,0"/>
+                <TextBox Grid.Column="1" Text="{Binding Prop_TimeoutMs, UpdateSourceTrigger=PropertyChanged}"
                          Style="{StaticResource FieldBox}"
                          ToolTip="Максимальное время на поиск (ReDoS-защита).&#xA;0 = 1000 мс, максимум 60000"/>
             </Grid>

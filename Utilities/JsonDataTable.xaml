@@ -116,26 +116,19 @@
             </StackPanel>
 
             <!-- Чекбоксы -->
-            <Grid Margin="0,6,0,0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
+            <!-- По одной на строку (узкая панель Studio) -->
+            <CheckBox Style="{StaticResource FieldCheckBox}" Margin="0,6,6,2"
+                      Content="Форматировать (отступы)"
+                      IsChecked="{Binding Prop_Indent}"
+                      ToolTip="Форматировать JSON с отступами (human-readable). Увеличивает размер."/>
 
-                <CheckBox Style="{StaticResource FieldCheckBox}" Grid.Column="0"
-                          Content="Форматировать (отступы)"
-                          IsChecked="{Binding Prop_Indent}"
-                          ToolTip="Форматировать JSON с отступами (human-readable). Увеличивает размер."/>
-
-                <!-- Определять типы — только при JsonToDataTable -->
-                <StackPanel Grid.Column="1"
-                            Visibility="{Binding Prop_Direction,
-                            Converter={StaticResource EnumToVisConverter},
-                            ConverterParameter=JsonToDataTable}">
-                    <CheckBox Style="{StaticResource FieldCheckBox}" Content="Определять типы колонок"
-                              IsChecked="{Binding Prop_TypeInference}"
-                              ToolTip="Автоматически определять типы: int, double, bool, DateTime.&#xA;Выключить если нужны все колонки как string."/>
-                </StackPanel>
-            </Grid>
+            <!-- Определять типы — только при JsonToDataTable -->
+            <CheckBox Style="{StaticResource FieldCheckBox}"
+                      Content="Определять типы колонок"
+                      IsChecked="{Binding Prop_TypeInference}"
+                      Visibility="{Binding Prop_Direction,
+                                   Converter={StaticResource EnumToVisConverter},
+                                   ConverterParameter=JsonToDataTable}"
+                      ToolTip="Автоматически определять типы: int, double, bool, DateTime.&#xA;Выключить если нужны все колонки как string."/>
     </local:ActivityPanel>
 </UserControl>

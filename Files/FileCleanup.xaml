@@ -52,27 +52,27 @@
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
-                <CheckBox Style="{StaticResource FieldCheckBox}" Grid.Column="0"
-                          Content="Файлы"
-                          IsChecked="{Binding Prop_DeleteFiles}"
-                          Margin="0,1,0,1"
-                          ToolTip="Удалять файлы по временному критерию и маске"/>
+                <StackPanel Grid.Column="0">
+                    <CheckBox Style="{StaticResource FieldCheckBox}"
+                              Content="Файлы"
+                              IsChecked="{Binding Prop_DeleteFiles}"
+                              Margin="0,1,0,1"
+                              ToolTip="Удалять файлы по временному критерию и маске"/>
 
-                <CheckBox Style="{StaticResource FieldCheckBox}" Grid.Column="1"
-                          Content="Пустые папки"
-                          IsChecked="{Binding Prop_DeleteEmptyFolders}"
-                          Margin="0,1,0,1"
-                          ToolTip="Удалять папки у которых нет содержимого"/>
+                    <CheckBox Style="{StaticResource FieldCheckBox}"
+                              Content="Пустые папки"
+                              IsChecked="{Binding Prop_DeleteEmptyFolders}"
+                              Margin="0,1,0,1"
+                              ToolTip="Удалять папки у которых нет содержимого"/>
 
-                <CheckBox Style="{StaticResource DangerCheckBox}" Grid.Column="2"
-                          Content="Папки целиком"
-                          IsChecked="{Binding Prop_DeleteFoldersWithContent}"
-                          Margin="0,1,0,1"
-                          ToolTip="Удалять папки вместе со всем содержимым. Необратимо — используйте DryRun."/>
+                    <CheckBox Style="{StaticResource DangerCheckBox}"
+                              Content="Папки целиком"
+                              IsChecked="{Binding Prop_DeleteFoldersWithContent}"
+                              Margin="0,1,0,1"
+                              ToolTip="Удалять папки вместе со всем содержимым. Необратимо — используйте DryRun."/>
+                </StackPanel>
             </Grid>
 
             <!-- ── МАСКА ФАЙЛОВ — видна только при Prop_DeleteFiles = true -->
