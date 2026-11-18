@@ -165,7 +165,7 @@ namespace Primo.MIA
                 PropertyBuilder.Variable<string>("Prop_ElementId", "ID элемента (если уже найден)"),
                 PropertyBuilder.Enum<ElementLocatorType>("Prop_LocatorType", "Тип локатора"),
                 PropertyBuilder.String("Prop_LocatorValue", "Значение локатора"),
-                PropertyBuilder.String("Prop_FilePath", "Путь к файлу"),
+                PropertyBuilder.FileSelector("Prop_FilePath", "Путь к файлу"),
                 PropertyBuilder.Enum<ElementWaitMode>("Prop_WaitMode", "Режим ожидания"),
                 PropertyBuilder.Int("Prop_WaitTimeout", "Таймаут ожидания элемента (сек)"),
                 PropertyBuilder.BooleanObject("Prop_VerifyFileExists", "Проверить существование файла")

@@ -164,7 +164,7 @@ namespace Primo.MIA
             sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>(ConnectionProperties())
             {
                 PropertyBuilder.String("Prop_RemoteDir", "Удалённый каталог (корень синхронизации)"),
-                PropertyBuilder.FileSelector("Prop_LocalDir", "Локальный каталог (корень синхронизации)"),
+                PropertyBuilder.FolderSelector("Prop_LocalDir", "Локальный каталог (корень синхронизации)"),
                 PropertyBuilder.Enum<SftpSyncDirection>("Prop_Direction", "Направление: Push/Pull"),
                 PropertyBuilder.Enum<SftpSyncCompareMode>("Prop_CompareMode", "Критерий сравнения файлов"),
                 PropertyBuilder.BooleanObject("Prop_DeleteExtra", "Удалять лишнее на приёмнике"),

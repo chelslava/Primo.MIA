@@ -146,7 +146,7 @@ namespace Primo.MIA
 
             sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
-                PropertyBuilder.String("Prop_FilePath", "Путь к файлу .xlsx"),
+                PropertyBuilder.FileSelector("Prop_FilePath", "Путь к файлу .xlsx"),
                 PropertyBuilder.String("Prop_SheetName", "Имя листа; пусто — первый лист; создаётся при отсутствии"),
                 PropertyBuilder.String("Prop_Table", "Переменная (DataTable) для записи"),
                 PropertyBuilder.Enum<ExcelWriteMode>("Prop_Mode", "Перезапись от начальной ячейки / дописывание после последней строки"),

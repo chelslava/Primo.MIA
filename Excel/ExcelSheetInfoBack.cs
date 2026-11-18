@@ -72,7 +72,7 @@ namespace Primo.MIA
 
             sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
-                PropertyBuilder.String("Prop_FilePath", "Путь к файлу .xlsx"),
+                PropertyBuilder.FileSelector("Prop_FilePath", "Путь к файлу .xlsx"),
                 PropertyBuilder.Variable<List<string>>("Prop_SheetNames", "Переменная (List<string>) для списка листов"),
                 PropertyBuilder.Variable<int>("Prop_SheetCount", "Переменная (Int32) для числа листов"),
             };

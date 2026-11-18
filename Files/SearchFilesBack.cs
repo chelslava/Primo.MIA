@@ -200,15 +200,7 @@ FilesAndFolders - Искать и файлы, и папки одновремен
 
             sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
-                new LTools.Common.Helpers.WFHelper.PropertiesItem()
-                {
-                    PropName = "Prop_DirectoryPath",
-                    PropertyType = PropertyTypes.SCRIPT,
-                    EditorType = ScriptEditorTypes.FOLDER_SELECTOR,
-                    DataType = typeof(string),
-                    ToolTip = "Путь к директории для поиска файлов и папок",
-                    IsReadOnly = false
-                },
+                PropertyBuilder.FolderSelector("Prop_DirectoryPath", "Путь к директории для поиска файлов и папок"),
                 PropertyBuilder.Enum<SearchFilterType>("FilterType", "Тип фильтрации: Wildcard (*.txt) или Regex паттерн"),
                 PropertyBuilder.String("Prop_Pattern", "Паттерн для поиска (wildcard: *.txt или regex: ^file_\\d{4}\\.txt$)"),
                 PropertyBuilder.Enum<SearchType>("SearchTypeValue", "Что искать: только файлы, только папки или оба типа"),

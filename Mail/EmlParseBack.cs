@@ -142,9 +142,9 @@ namespace Primo.MIA
 
             sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
-                PropertyBuilder.String("Prop_EmlPath", "Путь к EML-файлу"),
-                PropertyBuilder.String("Prop_AttachmentsDir", "Папка для сохранения вложений"),
-                PropertyBuilder.String("Prop_BodyToFile", "Файл для тела письма"),
+                PropertyBuilder.FileSelector("Prop_EmlPath", "Путь к EML-файлу"),
+                PropertyBuilder.FolderSelector("Prop_AttachmentsDir", "Папка для сохранения вложений"),
+                PropertyBuilder.FileSelector("Prop_BodyToFile", "Файл для тела письма"),
                 PropertyBuilder.Variable<string>("Prop_SubjectOut", "Тема письма"),
                 PropertyBuilder.Variable<string>("Prop_FromOut", "Отправитель"),
                 PropertyBuilder.Variable<string>("Prop_ToOut", "Получатели, через ;"),
