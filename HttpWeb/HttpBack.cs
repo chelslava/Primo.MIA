@@ -336,6 +336,10 @@ URL              — адрес запроса (обязательно)
                 string timeoutStr = GetPropertyValue<string>(this.Prop_Timeout, "Prop_Timeout", sd) ?? "100";
                 int timeout = HttpLogic.ParseTimeout(timeoutStr, 100);
 
+                // тело запроса в лог не пишется (может содержать секреты) — только размер
+                ActivityFileLogger.Debug(sdkComponentName,
+                    $"запрос {this.Prop_Method} {url}, таймаут {timeout}с, заголовков {HttpLogic.ParseHeaders(headersJson).Count}, тело {body.Length} байт");
+
                 // ── Создание HttpClient с настройками ──────────────────
                 using (var client = CreateHttpClient(sd, timeout))
                 {
@@ -346,12 +350,17 @@ URL              — адрес запроса (обязательно)
                                     .ForEach(h => client.DefaultRequestHeaders.TryAddWithoutValidation(h.Key, h.Value));
 
                     // ── Выполнение запроса ─────────────────────────────────
+                    var sw = System.Diagnostics.Stopwatch.StartNew();
                     var response = ExecuteRequest(client, url, body, sd).ConfigureAwait(false).GetAwaiter().GetResult();
+                    sw.Stop();
 
                     // ── Обработка ответа ───────────────────────────────────
                     int statusCode = (int)response.StatusCode;
                     string responseContent = response.Content.ReadAsStringAsync().ConfigureAwait(false).GetAwaiter().GetResult();
                     string responseHeaders = HttpLogic.SerializeResponseHeaders(response.Headers, response.Content.Headers);
+
+                    ActivityFileLogger.Info(sdkComponentName,
+                        $"{this.Prop_Method} {url} → {statusCode} за {sw.ElapsedMilliseconds} мс, ответ {responseContent.Length} байт");
 
                     // Запись результатов в выходные переменные
                     if (!string.IsNullOrWhiteSpace(this.Prop_StatusCode))
@@ -372,6 +381,7 @@ URL              — адрес запроса (обязательно)
             }
             catch (System.Net.Http.HttpRequestException ex)
             {
+                ActivityFileLogger.Error(sdkComponentName, $"ошибка HTTP: {ex.Message}");
                 return new ExecutionResult
                 {
                     IsSuccess = false,

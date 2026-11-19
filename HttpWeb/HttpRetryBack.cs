@@ -405,6 +405,10 @@ Exponential — задержка * 2^(попытка-1)
                 string retryCodesStr = GetPropertyValue<string>(this.Prop_RetryStatusCodes, nameof(Prop_RetryStatusCodes), sd);
                 int[] retryCodes = HttpHelper.ParseRetryStatusCodes(retryCodesStr);
 
+                // тело запроса в лог не пишется (может содержать секреты) — только размер
+                ActivityFileLogger.Debug(sdkComponentName,
+                    $"запрос {this.Prop_Method} {url}, до {maxRetries} попыток, задержка {baseDelayMs}мс ({this.Prop_DelayStrategy}), таймаут {timeout}с, коды повтора {retryCodesStr}");
+
                 // ── Создание HttpClient ───────────────────────────────────
                 using (var client = CreateHttpClient(sd, timeout))
                 {
@@ -440,12 +444,16 @@ Exponential — задержка * 2^(попытка-1)
                             attemptLogs.Add(statusCode.HasValue
                                 ? $"Попытка {attempt}: HTTP {statusCode}"
                                 : $"Попытка {attempt}: Ошибка — {error.Message}");
+                            ActivityFileLogger.Warning(sdkComponentName,
+                                $"попытка {attempt}/{maxRetries} неуспешна: "
+                                + (statusCode.HasValue ? $"HTTP {statusCode} — повтор" : error?.Message ?? "ошибка сети — повтор"));
                         })
                         .ConfigureAwait(false).GetAwaiter().GetResult();
 
                     // ── Обработка финального ответа ────────────────────────
                     if (response == null)
                     {
+                        ActivityFileLogger.Error(sdkComponentName, $"все {attemptsCount} попыток завершились ошибкой: {url}");
                         return new ExecutionResult
                         {
                             IsSuccess = false,
@@ -472,6 +480,9 @@ Exponential — задержка * 2^(попытка-1)
 
                     if (!string.IsNullOrWhiteSpace(this.Prop_Success))
                         SetVariableValue(this.Prop_Success, response.IsSuccessStatusCode, sd);
+
+                    ActivityFileLogger.Info(sdkComponentName,
+                        $"{this.Prop_Method} {url} → {finalStatusCode} за {attemptsCount} попыт(ки), ответ {responseContent.Length} байт");
 
                     if (response.IsSuccessStatusCode)
                     {

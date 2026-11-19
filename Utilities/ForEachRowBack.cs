@@ -257,6 +257,9 @@ namespace Primo.MIA
 
                 SetVariableValue(this.Prop_ColumnCount, table.Columns.Count, sd);
 
+                ActivityFileLogger.Debug(sdkComponentName,
+                    $"цикл по DataTable: строк {rowCount}, skip {started}, максимум {limit}, колонок {table.Columns.Count}");
+
                 // Тело: дети из this.Components (модель контейнера) исполняются
                 // напрямую — подтверждено рабочим прогоном. Движковая цепочка
                 // cont.ExecuteNext в robot-режиме не содержит детей.

@@ -348,7 +348,9 @@ URL              — адрес файла для скачивания
                     }
 
                     // ── Скачивание файла ───────────────────────────────────
+                    ActivityFileLogger.Debug(sdkComponentName, $"скачивание {url} → {finalPath} (HTTP {statusCode})");
                     long fileSize = DownloadFile(response, finalPath, bufferSize);
+                    ActivityFileLogger.Info(sdkComponentName, $"файл сохранён: {finalPath} ({FormatFileSize(fileSize)})");
 
                     // ── Запись выходных параметров ────────────────────────
                     if (!string.IsNullOrWhiteSpace(this.Prop_OutputPath))
@@ -369,6 +371,7 @@ URL              — адрес файла для скачивания
             }
             catch (System.Net.Http.HttpRequestException ex)
             {
+                ActivityFileLogger.Error(sdkComponentName, $"ошибка HTTP при скачивании: {ex.Message}");
                 return new ExecutionResult
                 {
                     IsSuccess = false,

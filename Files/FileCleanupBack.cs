@@ -517,6 +517,12 @@ IgnoreErrors  — продолжать при ошибке удаления
                     ? $", ошибок: {result.Errors.Count}"
                     : string.Empty;
 
+                ActivityFileLogger.Info(sdkComponentName,
+                    $"{dryRunPrefix}очистка \"{folderPath}\": удалено {result.DeletedCount}, освобождено {freedStr}{errStr}");
+                if (result.Errors.Count > 0)
+                    ActivityFileLogger.Warning(sdkComponentName,
+                        $"ошибки очистки ({result.Errors.Count}): {string.Join("; ", result.Errors.Take(5))}");
+
                 return new ExecutionResult
                 {
                     IsSuccess      = true,

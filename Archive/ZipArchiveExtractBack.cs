@@ -160,6 +160,9 @@ namespace Primo.MIA
                 SetVariableValue(this.Prop_SkippedCount, result.SkippedCount, sd);
                 SetVariableValue(this.Prop_ResultFolder, result.DestinationFolder, sd);
 
+                ActivityFileLogger.Info(sdkComponentName,
+                    $"ZIP распакован: {result.ExtractedCount} файлов (пропущено {result.SkippedCount}) → {result.DestinationFolder}");
+
                 return new ExecutionResult
                 {
                     IsSuccess = true,

@@ -41,6 +41,15 @@ namespace Primo.MIA.Common
         public static bool Enabled { get; set; } = IsEnabledFromEnvironment();
 
         /// <summary>
+        /// Минимальный уровень сообщений, попадающих в лог (консоль и файл).
+        /// Debug — всё; Info — Info/Warn/Error; None — логирование выключено.
+        /// По умолчанию — из переменной окружения PRIMO_MIA_LOG_LEVEL
+        /// ("debug"/"info"/"none"), иначе Info. Меняется активностью
+        /// «Лог: Настройки».
+        /// </summary>
+        public static ActivityLogLevel MinLevel { get; set; } = MinLevelFromEnvironment();
+
+        /// <summary>
         /// Каталог файлов лога. По умолчанию %LOCALAPPDATA%\Primo.MIA\logs.
         /// </summary>
         public static string LogDirectory { get; set; } = DefaultLogDirectory();
@@ -63,10 +72,14 @@ namespace Primo.MIA.Common
 
         /// <summary>
         /// Записывает строку в консоль и (при Enabled) в файл лога.
+        /// Сообщения ниже MinLevel отбрасываются; None отключает лог целиком.
         /// Никогда не бросает исключений.
         /// </summary>
         public static void Write(string level, string source, string message)
         {
+            if (!PassesMinLevel(level))
+                return;
+
             var line = $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}] [{level}] [{source}] {message}";
 
             try
@@ -113,6 +126,30 @@ namespace Primo.MIA.Common
         {
             var value = Environment.GetEnvironmentVariable("PRIMO_MIA_LOG_FILE");
             return value == "1" || string.Equals(value, "true", StringComparison.OrdinalIgnoreCase);
+        }
+
+        /// <summary>Парсинг уровня из PRIMO_MIA_LOG_LEVEL (debug/info/none).
+        /// Нераспознанное/пустое значение — Info.</summary>
+        private static ActivityLogLevel MinLevelFromEnvironment()
+        {
+            var value = Environment.GetEnvironmentVariable("PRIMO_MIA_LOG_LEVEL");
+            if (string.Equals(value, "debug", StringComparison.OrdinalIgnoreCase))
+                return ActivityLogLevel.Debug;
+            if (string.Equals(value, "none", StringComparison.OrdinalIgnoreCase))
+                return ActivityLogLevel.None;
+            return ActivityLogLevel.Info;
+        }
+
+        /// <summary>Ранг строки уровня: DEBUG → Debug, INFO/WARN/ERROR → Info.
+        /// Сообщение проходит, если ранг не ниже ранга MinLevel.</summary>
+        private static bool PassesMinLevel(string level)
+        {
+            var messageRank = string.Equals(level, LevelDebug, StringComparison.OrdinalIgnoreCase)
+                ? (int)ActivityLogLevel.Debug
+                : (int)ActivityLogLevel.Info;
+            if (MinLevel == ActivityLogLevel.None)
+                return false;
+            return messageRank >= (int)MinLevel;
         }
 
         private static string DefaultLogDirectory()

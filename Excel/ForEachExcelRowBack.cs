@@ -274,6 +274,8 @@ namespace Primo.MIA
                 using (LoopControl.Push(frame))
                 using (var reader = new ExcelLazyReader(filePath, sheet, this.Prop_HasHeader, skip, max))
                 {
+                    ActivityFileLogger.Debug(sdkComponentName,
+                        $"открытие \"{filePath}\", лист \"{sheet ?? "(первый)"}\", заголовки {this.Prop_HasHeader}, skip {skip}, max {max}");
                     foreach (var row in reader)
                     {
                         SetVariableValue(this.Prop_RowValues, new List<string>(row), sd);
@@ -301,6 +303,7 @@ namespace Primo.MIA
                     }
                 }
 
+                ActivityFileLogger.Info(sdkComponentName, $"цикл завершён: итераций {index}");
                 EndProcess(new ElementExecutionResults(context));
             }
             catch (Exception ex)

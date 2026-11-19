@@ -44,6 +44,7 @@ namespace Primo.MIA
                 ?? throw new InvalidOperationException(
                     "Цикл: Продолжить — вне тела цикла. Разместите активность внутри ForEach-контейнера MIA.");
             frame.ContinueRequested = true;
+            ActivityFileLogger.Debug(sdkComponentName, "маркер «Продолжить» установлен — переход к следующей итерации");
             throw new InvalidOperationException("Переход к следующей итерации: Цикл: Продолжить");
         }
 

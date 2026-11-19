@@ -246,18 +246,27 @@ ID транзакции: [String] Идентификатор активной т
 
                 var transactionId = DatabaseTransactionResolver.ResolveOptional(explicitTransactionId);
 
+                // строка подключения в лог не пишется (секреты) — только провайдер
+                ActivityFileLogger.Debug(sdkComponentName,
+                    $"запрос: провайдер {provider}, тип {Prop_CommandType}, параметры {parameters?.Count ?? 0}, таймаут {timeout}с, транзакция {transactionId ?? "нет"}, длина команды {commandText?.Length ?? 0}");
+
                 var logic = new DatabaseQueryLogic();
+                var sw = System.Diagnostics.Stopwatch.StartNew();
                 var result = NetworkRetry.ExecuteDbRead(
                     GetPropertyValue<string>(Prop_RetryCount, nameof(Prop_RetryCount), sd),
                     GetPropertyValue<string>(Prop_RetryDelayMs, nameof(Prop_RetryDelayMs), sd),
                     () => logic.Execute(provider, connectionString, Prop_CommandType, commandText, parameters, timeout, transactionId),
                     sdkComponentName);
+                sw.Stop();
 
                 SetVariableValue(Prop_ResultTable, result.Table, sd);
                 SetVariableValue(Prop_RowCount, result.RowCount, sd);
                 SetVariableValue(Prop_ColumnCount, result.ColumnCount, sd);
                 SetVariableValue(Prop_ColumnNames, result.ColumnNames, sd);
                 SetVariableValue(Prop_HasRows, result.HasRows, sd);
+
+                ActivityFileLogger.Info(sdkComponentName,
+                    $"запрос выполнен за {sw.ElapsedMilliseconds} мс: строк {result.RowCount}, столбцов {result.ColumnCount}");
 
                 return new ExecutionResult
                 {
@@ -267,6 +276,7 @@ ID транзакции: [String] Идентификатор активной т
             }
             catch (System.Data.Common.DbException ex)
             {
+                ActivityFileLogger.Error(sdkComponentName, $"ошибка БД (запрос): {ex.Message}");
                 return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Ошибка БД: {ex.Message}" };
             }
             catch (InvalidOperationException ex)

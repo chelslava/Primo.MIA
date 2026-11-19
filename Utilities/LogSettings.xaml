@@ -1,0 +1,47 @@
+﻿<!--
+    LogSettings.xaml
+    Визуальный интерфейс активности "Лог: Настройки".
+-->
+<UserControl x:Class="Primo.MIA.LogSettings"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="clr-namespace:Primo.MIA"
+             mc:Ignorable="d"
+             d:DesignHeight="150"
+             Margin="0,0,0,5">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Primo.MIA;component/Common/Styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <local:ActivityPanel IconSource="pack://application:,,,/Primo.MIA;component/images/log.png">
+
+        <TextBlock Style="{StaticResource ActivityHeader}"
+                   Text="Лог: Настройки"/>
+
+        <TextBlock Text="Уровень логирования:" Style="{StaticResource FieldLabel}"/>
+        <ComboBox ItemsSource="{local:EnumValues local:ActivityLogLevel}"
+                  SelectedValue="{Binding Prop_Level}"
+                  SelectedValuePath="Key"
+                  DisplayMemberPath="Display"
+                  Style="{StaticResource FieldComboBox}"
+                  ToolTip="Debug — вся диагностика; Info — ключевые события; None — логирование выключено"/>
+
+        <CheckBox Content="Файловый лог"
+                  IsChecked="{Binding Prop_FileLog}"
+                  Style="{StaticResource FieldCheckBox}"
+                  Margin="0,6,0,0"
+                  ToolTip="Дублировать лог в файл %LOCALAPPDATA%\Primo.MIA\logs (или указанный каталог)"/>
+
+        <TextBlock Text="Директория логов:" Style="{StaticResource FieldLabel}"/>
+        <TextBox Text="{Binding Prop_LogDirectory, UpdateSourceTrigger=PropertyChanged}"
+                 Style="{StaticResource FieldBox}"
+                 ToolTip="Каталог файла лога; пусто — %LOCALAPPDATA%\Primo.MIA\logs"/>
+    </local:ActivityPanel>
+</UserControl>

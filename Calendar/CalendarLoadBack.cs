@@ -378,6 +378,11 @@ ID календаря — GUID для активности «Календарь:
                                   : loadedFromStr == "Cache"    ? "из кэша"
                                   :                               "из файла";
 
+                ActivityFileLogger.Info(sdkComponentName,
+                    $"календарь {calendar.Year} ({regionName}) загружен {sourceMsg}: {actualFilePath}");
+                ActivityFileLogger.Debug(sdkComponentName,
+                    $"праздников: {calendar.Holidays?.Count ?? 0}, особых дней: {calendar.SpecialDays?.Count ?? 0}, переносов: {calendar.Transitions?.Count ?? 0}");
+
                 return new ExecutionResult
                 {
                     IsSuccess      = true,

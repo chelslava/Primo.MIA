@@ -135,6 +135,9 @@ namespace Primo.MIA
                 SetVariableValue(this.Prop_ResultPath, result.ArchivePath, sd);
                 SetVariableValue(this.Prop_EntryCount, result.EntryCount, sd);
 
+                ActivityFileLogger.Info(sdkComponentName,
+                    $"ZIP создан: {result.EntryCount} файлов, {result.ArchiveSizeBytes} байт → {result.ArchivePath}");
+
                 return new ExecutionResult
                 {
                     IsSuccess = true,

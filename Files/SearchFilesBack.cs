@@ -229,11 +229,15 @@ FilesAndFolders - Искать и файлы, и папки одновремен
                 var parameters = GetAndValidateParameters(sd);
 
                 // Поиск файлов и папок
+                ActivityFileLogger.Debug(sdkComponentName,
+                    $"поиск: путь \"{parameters.DirectoryPath}\", шаблон \"{parameters.Pattern}\", вложенные папки {parameters.SearchInSubfolders}");
                 var foundItems = SearchItems(parameters);
 
                 // Установка выходных параметров
                 SetVariableValue(this.Prop_FoundItems, foundItems, sd);
                 SetVariableValue(this.Prop_ItemsCount, foundItems.Count, sd);
+
+                ActivityFileLogger.Info(sdkComponentName, $"найдено элементов: {foundItems.Count}");
 
                 return new ExecutionResult()
                 {

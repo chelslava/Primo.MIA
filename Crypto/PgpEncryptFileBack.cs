@@ -119,6 +119,9 @@ ASCII-armored: [Boolean] Текстовый выход .asc (для почты);
 
                 SetVariableValue(this.Prop_ResultPath, System.IO.Path.GetFullPath(output), sd);
 
+                // passphrase и ключи в лог не пишутся — только имена файлов
+                ActivityFileLogger.Info(sdkComponentName, $"файл зашифрован: {input} → {output} ({bytes} байт)");
+
                 return new ExecutionResult
                 {
                     IsSuccess = true,

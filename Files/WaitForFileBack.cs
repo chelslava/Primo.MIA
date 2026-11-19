@@ -300,6 +300,8 @@ Regex - Использование регулярных выражений. На
             try
             {
                 var parameters = GetAndValidateParameters(sd);
+                ActivityFileLogger.Debug(sdkComponentName,
+                    $"ожидание файла: \"{parameters.DirectoryPath}\", маска \"{parameters.FilePattern}\", таймаут {parameters.TimeoutMs}мс");
                 var result = new WaitForFileLogic().WaitForFile(
                     parameters.DirectoryPath,
                     parameters.FilePattern,
@@ -318,6 +320,8 @@ Regex - Использование регулярных выражений. На
 
                 if (result.FileFound)
                 {
+                    ActivityFileLogger.Info(sdkComponentName,
+                        $"файл обнаружен за {result.WaitTimeMs}мс: {result.FilePath}");
                     return new ExecutionResult
                     {
                         IsSuccess = true,

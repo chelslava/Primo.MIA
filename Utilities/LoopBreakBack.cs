@@ -46,6 +46,7 @@ namespace Primo.MIA
                 ?? throw new InvalidOperationException(
                     "Цикл: Прервать — вне тела цикла. Разместите активность внутри ForEach-контейнера MIA.");
             frame.BreakRequested = true;
+            ActivityFileLogger.Debug(sdkComponentName, "маркер «Прервать» установлен — остаток тела не выполняется");
             throw new InvalidOperationException("Прервано пользователем: Цикл: Прервать");
         }
 

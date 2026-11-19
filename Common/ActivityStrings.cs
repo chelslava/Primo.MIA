@@ -1230,6 +1230,11 @@ namespace Primo.MIA.Common
         public const string LoopPauseContinue     = "Продолжить";
         public const string LoopPauseBreak        = "Прервать цикл";
 
+        // Общее логирование (ActivityFileLogger + «Лог: Настройки»)
+        public const string Activity_LogSettings = "Лог: Настройки";
+        public const string Field_LogLevel       = "Уровень логирования";
+        public const string Field_LogFileEnabled = "Файловый лог";
+
         public const string Field_LoopTable       = "Таблица";
         public const string Field_LoopCurrentRow  = "Текущая строка";
         public const string Field_LoopRowIndex    = "Индекс строки";

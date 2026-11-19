@@ -227,13 +227,23 @@ Identity: [String] Значение последнего вставленног�
 
                 var transactionId = DatabaseTransactionResolver.ResolveOptional(explicitTransactionId);
 
+                // строка подключения в лог не пишется (секреты) — только провайдер
+                ActivityFileLogger.Debug(sdkComponentName,
+                    $"выполнение: провайдер {provider}, тип {Prop_CommandType}, параметры {parameters?.Count ?? 0}, таймаут {timeout}с, транзакция {transactionId ?? "нет"}, длина команды {commandText?.Length ?? 0}");
+
                 var logic = new DatabaseCommandLogic();
+                var sw = System.Diagnostics.Stopwatch.StartNew();
                 var executionResult = logic.ExecuteNonQuery(provider, connectionString, Prop_CommandType, commandText, parameters, timeout, transactionId, Prop_SplitByGoBatches, Prop_ReturnIdentity);
+                sw.Stop();
 
                 SetVariableValue(Prop_AffectedRows, executionResult.RowsAffected, sd);
                 SetVariableValue(Prop_HasAffectedRows, executionResult.RowsAffected > 0, sd);
                 SetVariableValue(Prop_BatchCount, executionResult.BatchCount, sd);
                 SetVariableValue(Prop_IdentityValue, executionResult.IdentityValue ?? string.Empty, sd);
+
+                ActivityFileLogger.Info(sdkComponentName,
+                    $"команда выполнена за {sw.ElapsedMilliseconds} мс: затронуто {executionResult.RowsAffected}, batch {executionResult.BatchCount}" +
+                    (string.IsNullOrWhiteSpace(executionResult.IdentityValue) ? string.Empty : $", identity получено"));
 
                 return new ExecutionResult
                 {
@@ -245,6 +255,7 @@ Identity: [String] Значение последнего вставленног�
             }
             catch (System.Data.Common.DbException ex)
             {
+                ActivityFileLogger.Error(sdkComponentName, $"ошибка БД (non-query): {ex.Message}");
                 return new ExecutionResult { IsSuccess = false, ErrorMessage = $"Ошибка БД: {ex.Message}" };
             }
             catch (InvalidOperationException ex)
