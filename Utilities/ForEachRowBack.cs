@@ -166,9 +166,22 @@ namespace Primo.MIA
             {
                 var sd = ScriptingHelper.PrepareScripting(this, context);
 
-                var table = (DataTable)GetPropertyValue<object>(this.Prop_Table, nameof(Prop_Table), sd);
-                if (table == null)
-                    throw new InvalidOperationException(ActivityStrings.Error_LoopTableRequired);
+                var tableObj = GetPropertyValue<object>(this.Prop_Table, nameof(Prop_Table), sd);
+                DataTable table;
+                if (tableObj is DataTable dt)
+                {
+                    table = dt;
+                }
+                else if (tableObj == null || (tableObj is string st && string.IsNullOrWhiteSpace(st)))
+                {
+                    throw new InvalidOperationException(
+                        ActivityStrings.Error_LoopTableRequired + " (переменная не привязана или пуста)");
+                }
+                else
+                {
+                    throw new InvalidOperationException(
+                        $"{ActivityStrings.Error_LoopTableRequired}: получен тип {tableObj.GetType().Name}, ожидался DataTable");
+                }
 
                 int skip = GetInt(sd, this.Prop_SkipRows, nameof(Prop_SkipRows), 0);
                 int max = GetInt(sd, this.Prop_MaxRows, nameof(Prop_MaxRows), 0);
@@ -181,7 +194,9 @@ namespace Primo.MIA
                 SetVariableValue(this.Prop_ColumnCount, table.Columns.Count, sd);
 
                 // тело из вида: тот же WFContainerBase, что нашёл InitClass
-                var body = ((ForEachRow)this.UIControl).Body;
+                var view = this.UIControl as ForEachRow
+                    ?? throw new InvalidOperationException("Тело цикла не найдено: представление контейнера недоступно");
+                var body = view.Body ?? throw new InvalidOperationException("Тело цикла не найдено: WFContainerBase не создан");
 
                 var frame = new LoopFrame();
                 using (LoopControl.Push(frame))
@@ -206,7 +221,9 @@ namespace Primo.MIA
             catch (Exception ex)
             {
                 Common.ActivityFileLogger.Error(sdkComponentName, ex.GetType().Name + ": " + ex.Message + Environment.NewLine + ex.StackTrace);
-                EndProcess(new ElementExecutionResults(new ExecutionException(ex.Message, ex), context));
+                EndProcess(new ElementExecutionResults(
+                    new ExecutionException($"{ex.GetType().Name}: {ex.Message}", ex),
+                    context));
             }
         }
 

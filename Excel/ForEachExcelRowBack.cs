@@ -202,7 +202,9 @@ namespace Primo.MIA
                 int max = GetInt(sd, this.Prop_MaxRows, nameof(Prop_MaxRows), 0);
 
                 // тело из вида: тот же WFContainerBase, что нашёл InitClass
-                var body = ((ForEachExcelRow)this.UIControl).Body;
+                var view = this.UIControl as ForEachExcelRow
+                    ?? throw new InvalidOperationException("Тело цикла не найдено: представление контейнера недоступно");
+                var body = view.Body ?? throw new InvalidOperationException("Тело цикла не найдено: WFContainerBase не создан");
 
                 int index = 0;
                 var frame = new LoopFrame();
@@ -232,7 +234,9 @@ namespace Primo.MIA
             catch (Exception ex)
             {
                 Common.ActivityFileLogger.Error(sdkComponentName, ex.GetType().Name + ": " + ex.Message + Environment.NewLine + ex.StackTrace);
-                EndProcess(new ElementExecutionResults(new ExecutionException(ex.Message, ex), context));
+                EndProcess(new ElementExecutionResults(
+                    new ExecutionException($"{ex.GetType().Name}: {ex.Message}", ex),
+                    context));
             }
         }
 
