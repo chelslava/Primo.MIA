@@ -171,6 +171,11 @@ namespace Primo.MIA
             };
             InitClass(container);
 
+            // Тело цикла захватывается ОДИН РАЗ в конструкторе: в robot-режиме
+            // Studio отсоединяет визуалы (element.Container обнуляется) —
+            // доступ через UIControl в момент Execute даёт NRE.
+            _body = ((ForEachExcelRow)this.UIControl).Body;
+
             this.Prop_FilePath = "\"\"";
             this.Prop_Sheet = "\"\"";
             this.Prop_SkipRows = "0";
@@ -178,6 +183,9 @@ namespace Primo.MIA
             this.Prop_RowValues = "\"\"";
             this.Prop_Columns = "\"\"";
         }
+
+        /// <summary>Тело цикла (WFContainerBase из вида), захваченное в конструкторе.</summary>
+        private WFContainerBase _body;
 
         /// <summary>Движком не вызывается: Execute перекрывает стандартную цепочку.</summary>
         public override ExecutionResult SimpleAction(ScriptingData sd)
@@ -202,10 +210,8 @@ namespace Primo.MIA
                 int skip = GetInt(sd, this.Prop_SkipRows, nameof(Prop_SkipRows), 0);
                 int max = GetInt(sd, this.Prop_MaxRows, nameof(Prop_MaxRows), 0);
 
-                // тело из вида: тот же WFContainerBase, что нашёл InitClass
-                var view = this.UIControl as ForEachExcelRow
-                    ?? throw new InvalidOperationException("Тело цикла не найдено: представление контейнера недоступно");
-                var body = view.Body ?? throw new InvalidOperationException("Тело цикла не найдено: WFContainerBase не создан");
+                var body = _body ?? throw new InvalidOperationException(
+                    "Тело цикла не найдено: WFContainerBase не создан");
 
                 int index = 0;
                 var frame = new LoopFrame();

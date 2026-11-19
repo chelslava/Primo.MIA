@@ -141,6 +141,12 @@ namespace Primo.MIA
             };
             InitClass(container);
 
+            // Тело цикла захватывается ОДИН РАЗ в конструкторе: в robot-режиме
+            // Studio отсоединяет визуалы (element.Container обнуляется) —
+            // доступ через UIControl в момент Execute даёт NRE. Тот же смысл,
+            // что у приватного cont в базовом классе.
+            _body = ((ForEachRow)this.UIControl).Body;
+
             // значения по умолчанию: строковые переменные — "" (в кавычках),
             // числовые — БЕЗ кавычек (тип должен совпадать с ValidateReturnScript)
             this.Prop_Table = "\"\"";
@@ -148,6 +154,9 @@ namespace Primo.MIA
             this.Prop_SkipRows = "0";
             this.Prop_MaxRows = "0";
         }
+
+        /// <summary>Тело цикла (WFContainerBase из вида), захваченное в конструкторе.</summary>
+        private WFContainerBase _body;
 
         /// <summary>Движком не вызывается: Execute перекрывает стандартную цепочку. Тривиально для контракта.</summary>
         public override ExecutionResult SimpleAction(ScriptingData sd)
@@ -195,9 +204,8 @@ namespace Primo.MIA
                 SetVariableValue(this.Prop_ColumnCount, table.Columns.Count, sd);
 
                 // тело из вида: тот же WFContainerBase, что нашёл InitClass
-                var view = this.UIControl as ForEachRow
-                    ?? throw new InvalidOperationException("Тело цикла не найдено: представление контейнера недоступно");
-                var body = view.Body ?? throw new InvalidOperationException("Тело цикла не найдено: WFContainerBase не создан");
+                var body = _body ?? throw new InvalidOperationException(
+                    "Тело цикла не найдено: WFContainerBase не создан");
 
                 var frame = new LoopFrame();
                 using (LoopControl.Push(frame))
