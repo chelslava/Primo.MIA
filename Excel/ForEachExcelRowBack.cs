@@ -221,16 +221,21 @@ namespace Primo.MIA
                 int skip = GetInt(sd, this.Prop_SkipRows, nameof(Prop_SkipRows), 0);
                 int max = GetInt(sd, this.Prop_MaxRows, nameof(Prop_MaxRows), 0);
 
+                // Тело: приоритет — движковая цепочка модельного контейнера
+                // (cont.ExecuteNext — работает пошаговая отладка Studio);
+                // fallback — тело из вида/конструктора, затем прямые вызовы.
                 var children = this.Components;
-                var body = children == null || children.Count == 0
+                int childCount = children?.Count ?? 0;
+                var cont = childCount > 0
+                    ? children[0].WFContainer as WFContainerBase
+                    : null;
+                var body = cont == null
                     ? (_body ?? ForEachExcelRow.LastInstance?.Body)
                     : null;
 
-                int childCount = children?.Count ?? 0;
-                if (childCount == 0 && body == null)
+                if (cont == null && body == null && childCount == 0)
                     throw new InvalidOperationException(
-                        $"Тело цикла пусто: помещайте вложенные активности ВНУТРЬ контейнера"
-                        + $" (детей в модели: {children?.Count ?? 0}, тело вида недоступно)");
+                        "Тело цикла пусто: помещайте вложенные активности ВНУТРЬ контейнера");
 
                 int index = 0;
                 var frame = new LoopFrame();
@@ -246,12 +251,14 @@ namespace Primo.MIA
                             SetVariableValue(this.Prop_Columns, new List<string>(reader.Columns), sd);
 
                         IterationStatus status;
-                        if (childCount > 0)
-                            status = RunBodyDirect(children, context, frame, $"строка Excel {index}")
-                            ? IterationStatus.Success
-                            : IterationStatus.Fatal;
-                        else
+                        if (cont != null)
+                            status = RunBodyPass(cont, context, frame, $"строка Excel {index}");
+                        else if (body != null)
                             status = RunIteration(body, context, frame, $"строка Excel {index}");
+                        else
+                            status = RunBodyDirect(children, context, frame, $"строка Excel {index}")
+                                ? IterationStatus.Success
+                                : IterationStatus.Fatal;
 
                         index++;
                         if (status == IterationStatus.Fatal)
@@ -317,6 +324,50 @@ namespace Primo.MIA
                     return true;
             }
             return true;
+        }
+
+        /// <summary>
+        /// Один проход тела движковой цепочкой: cont.ExecuteNext(null, context)
+        /// — с поддержкой пошаговой отладки Studio (как в ForEachRowBack).
+        /// </summary>
+        private IterationStatus RunBodyPass(WFContainerBase cont, ProcessContext context, LoopFrame frame, string iterationLabel)
+        {
+            ElementExecutionResults result = null;
+            ElementExecutionFinishedDelegate handler = (s, r) => result = r;
+            cont.ElementExecutionFinished += handler;
+            try
+            {
+                cont.ExecuteNext(null, context);
+            }
+            finally
+            {
+                cont.ElementExecutionFinished -= handler;
+            }
+
+            if (LoopControl.Current?.BreakRequested == true)
+            {
+                frame.BreakRequested = true;
+                return IterationStatus.Break;
+            }
+            if (LoopControl.Current?.ContinueRequested == true)
+                return IterationStatus.Continue;
+
+            if (result != null && !result.IsSuccess)
+            {
+                if (!this.ContinueOnException)
+                {
+                    EndProcess(new ElementExecutionResults(
+                        new ExecutionException(
+                            $"[{sdkComponentName}] ошибка тела ({iterationLabel}): {result.ExceptionData?.Message ?? "неизвестная ошибка"}",
+                            result.ExceptionData),
+                        context));
+                    return IterationStatus.Fatal;
+                }
+                Common.ActivityFileLogger.Warning(
+                    sdkComponentName,
+                    $"Ошибка вложенной активности ({iterationLabel}, Продолжить при ошибке): {result.ExceptionData?.Message}");
+            }
+            return IterationStatus.Success;
         }
 
         /// <summary>

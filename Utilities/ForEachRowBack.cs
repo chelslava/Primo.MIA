@@ -218,19 +218,23 @@ namespace Primo.MIA
 
                 SetVariableValue(this.Prop_ColumnCount, table.Columns.Count, sd);
 
-                // дети: приоритет — модельный контейнер (Components → cont.Components,
-                // Studio загружает сохранённых детей именно туда); fallback — тело
-                // из вида, если модель пуста
+                // Тело: приоритет — движковая цепочка модельного контейнера
+                // (cont = WFContainerBase детей, Studio грузит детей именно туда;
+                // cont.ExecuteNext гоняет детей событийной цепочкой — работает
+                // пошаговая отладка Studio как в стандартных контейнерах).
+                // Fallback: тело из вида/конструктора, затем прямые вызовы детей.
                 var children = this.Components;
-                var body = children == null || children.Count == 0
+                int childCount = children?.Count ?? 0;
+                var cont = childCount > 0
+                    ? children[0].WFContainer as WFContainerBase
+                    : null;
+                var body = cont == null
                     ? (_body ?? ForEachRow.LastInstance?.Body)
                     : null;
 
-                int childCount = children?.Count ?? 0;
-                if (childCount == 0 && body == null)
+                if (cont == null && body == null && childCount == 0)
                     throw new InvalidOperationException(
-                        $"Тело цикла пусто: помещайте вложенные активности ВНУТРЬ контейнера"
-                        + $" (детей в модели: {children?.Count ?? 0}, тело вида недоступно)");
+                        "Тело цикла пусто: помещайте вложенные активности ВНУТРЬ контейнера");
 
                 var frame = new LoopFrame();
                 int iterations = 0;
@@ -243,12 +247,14 @@ namespace Primo.MIA
                         SetVariableValue(this.Prop_RowIndex, started + i, sd);
 
                         IterationStatus status;
-                        if (childCount > 0)
-                            status = RunBodyDirect(children, context, frame, $"строка {started + i}")
-                            ? IterationStatus.Success
-                            : IterationStatus.Fatal;
-                        else
+                        if (cont != null)
+                            status = RunBodyPass(cont, context, frame, $"строка {started + i}");
+                        else if (body != null)
                             status = RunIteration(body, context, frame, $"строка {started + i}");
+                        else
+                            status = RunBodyDirect(children, context, frame, $"строка {started + i}")
+                                ? IterationStatus.Success
+                                : IterationStatus.Fatal;
 
                         iterations++;
                         if (status == IterationStatus.Fatal)
@@ -261,7 +267,7 @@ namespace Primo.MIA
 
                 EndProcess(new ElementExecutionResults(context));
                 Common.ActivityFileLogger.Info(sdkComponentName,
-                    $"цикл завершён: итераций {iterations}, активностей в теле {childCount}");
+                    $"цикл завершён: итераций {iterations}, активностей в теле {childCount}, режим {(cont != null ? "движковый" : body != null ? "тело вида" : "прямые вызовы")}");
             }
             catch (Exception ex)
             {
@@ -354,6 +360,53 @@ namespace Primo.MIA
                 if (!this.ContinueOnException)
                 {
                     // пробрасываем ошибку вверх — цикл останавливается
+                    EndProcess(new ElementExecutionResults(
+                        new ExecutionException(
+                            $"[{sdkComponentName}] ошибка тела ({iterationLabel}): {result.ExceptionData?.Message ?? "неизвестная ошибка"}",
+                            result.ExceptionData),
+                        context));
+                    return IterationStatus.Fatal;
+                }
+                Common.ActivityFileLogger.Warning(
+                    sdkComponentName,
+                    $"Ошибка вложенной активности ({iterationLabel}, Продолжить при ошибке): {result.ExceptionData?.Message}");
+            }
+            return IterationStatus.Success;
+        }
+
+        /// <summary>
+        /// Один проход тела движковой цепочкой: cont.ExecuteNext(null, context)
+        /// исполняет первого ребёнка и через события движка продолжает до конца
+        /// тела — с поддержкой пошаговой отладки Studio. Ошибка ребёнка
+        /// останавливает проход; Break/Continue-маркеры обрывают немедленно.
+        /// </summary>
+        private IterationStatus RunBodyPass(WFContainerBase cont, ProcessContext context, LoopFrame frame, string iterationLabel)
+        {
+            ElementExecutionResults result = null;
+            ElementExecutionFinishedDelegate handler = (s, r) => result = r;
+            cont.ElementExecutionFinished += handler;
+            try
+            {
+                cont.ExecuteNext(null, context);
+            }
+            finally
+            {
+                cont.ElementExecutionFinished -= handler;
+            }
+
+            // управляемые флаги имеют приоритет над ошибкой-маркером
+            if (LoopControl.Current?.BreakRequested == true)
+            {
+                frame.BreakRequested = true;
+                return IterationStatus.Break;
+            }
+            if (LoopControl.Current?.ContinueRequested == true)
+                return IterationStatus.Continue;
+
+            if (result != null && !result.IsSuccess)
+            {
+                if (!this.ContinueOnException)
+                {
                     EndProcess(new ElementExecutionResults(
                         new ExecutionException(
                             $"[{sdkComponentName}] ошибка тела ({iterationLabel}): {result.ExceptionData?.Message ?? "неизвестная ошибка"}",
