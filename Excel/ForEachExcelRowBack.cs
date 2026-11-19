@@ -180,8 +180,9 @@ namespace Primo.MIA
             }
             catch (Exception ex)
             {
+                _bodyCaptureError = $"{ex.GetType().Name}: {ex.Message}";
                 Primo.MIA.Common.ActivityFileLogger.Warning(
-                    sdkComponentName, $"Тело цикла не захвачено при создании (будет взято при исполнении): {ex.Message}");
+                    sdkComponentName, $"Тело цикла не захвачено при создании (будет взято при исполнении): {_bodyCaptureError}");
             }
 
             this.Prop_FilePath = "\"\"";
@@ -194,6 +195,9 @@ namespace Primo.MIA
 
         /// <summary>Тело цикла (WFContainerBase из вида), захваченное в конструкторе.</summary>
         private WFContainerBase _body;
+
+        /// <summary>Причина неудачи захвата тела в конструкторе (диагностика).</summary>
+        private string _bodyCaptureError;
 
         /// <summary>Движком не вызывается: Execute перекрывает стандартную цепочку.</summary>
         public override ExecutionResult SimpleAction(ScriptingData sd)
@@ -218,8 +222,10 @@ namespace Primo.MIA
                 int skip = GetInt(sd, this.Prop_SkipRows, nameof(Prop_SkipRows), 0);
                 int max = GetInt(sd, this.Prop_MaxRows, nameof(Prop_MaxRows), 0);
 
-                var body = _body ?? throw new InvalidOperationException(
-                    "Тело цикла не найдено: WFContainerBase не создан");
+                var body = _body ?? ForEachExcelRow.LastInstance?.Body;
+                if (body == null)
+                    throw new InvalidOperationException(
+                        $"Тело цикла не найдено (WFContainerBase). Причина захвата при создании: {_bodyCaptureError ?? "Body вернул null"}");
 
                 int index = 0;
                 var frame = new LoopFrame();

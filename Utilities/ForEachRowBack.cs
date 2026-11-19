@@ -152,8 +152,11 @@ namespace Primo.MIA
             }
             catch (Exception ex)
             {
+                // причина захвата попадёт в ошибку Execute, если тело не
+                // удастся взять из LastInstance (диагностика robot-режима)
+                _bodyCaptureError = $"{ex.GetType().Name}: {ex.Message}";
                 Common.ActivityFileLogger.Warning(
-                    sdkComponentName, $"Тело цикла не захвачено при создании (будет взято при исполнении): {ex.Message}");
+                    sdkComponentName, $"Тело цикла не захвачено при создании (будет взято при исполнении): {_bodyCaptureError}");
             }
 
             // значения по умолчанию: строковые переменные — "" (в кавычках),
@@ -166,6 +169,9 @@ namespace Primo.MIA
 
         /// <summary>Тело цикла (WFContainerBase из вида), захваченное в конструкторе.</summary>
         private WFContainerBase _body;
+
+        /// <summary>Причина неудачи захвата тела в конструкторе (диагностика).</summary>
+        private string _bodyCaptureError;
 
         /// <summary>Движком не вызывается: Execute перекрывает стандартную цепочку. Тривиально для контракта.</summary>
         public override ExecutionResult SimpleAction(ScriptingData sd)
@@ -213,8 +219,12 @@ namespace Primo.MIA
                 SetVariableValue(this.Prop_ColumnCount, table.Columns.Count, sd);
 
                 // тело из вида: тот же WFContainerBase, что нашёл InitClass
-                var body = _body ?? throw new InvalidOperationException(
-                    "Тело цикла не найдено: WFContainerBase не создан");
+                // тело: из конструктора; fallback — последнее созданное
+                // представление (экземпляр текущего прогона)
+                var body = _body ?? ForEachRow.LastInstance?.Body;
+                if (body == null)
+                    throw new InvalidOperationException(
+                        $"Тело цикла не найдено (WFContainerBase). Причина захвата при создании: {_bodyCaptureError ?? "Body вернул null"}");
 
                 var frame = new LoopFrame();
                 using (LoopControl.Push(frame))

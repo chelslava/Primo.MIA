@@ -14,11 +14,19 @@ namespace Primo.MIA
     {
         private WFContainerBase _cntBody;
 
+        /// <summary>
+        /// Последнее созданное представление этого типа. В robot-режиме это
+        /// экземпляр текущего прогона — Back использует его как fallback
+        /// для получения тела цикла.
+        /// </summary>
+        public static ForEachExcelRow LastInstance;
+
         /// <summary>Тело цикла: поле из XAML (Studio) либо созданное кодом (робот).</summary>
         public WFContainerBase Body => cntBody ?? _cntBody;
 
         public ForEachExcelRow()
         {
+            LastInstance = this;
             if (WFHelper.DoRender)
                 InitializeComponent();
             else
