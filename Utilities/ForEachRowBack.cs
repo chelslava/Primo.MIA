@@ -218,15 +218,22 @@ namespace Primo.MIA
 
                 SetVariableValue(this.Prop_ColumnCount, table.Columns.Count, sd);
 
-                // тело из вида: тот же WFContainerBase, что нашёл InitClass
-                // тело: из конструктора; fallback — последнее созданное
-                // представление (экземпляр текущего прогона)
-                var body = _body ?? ForEachRow.LastInstance?.Body;
-                if (body == null)
+                // дети: приоритет — модельный контейнер (Components → cont.Components,
+                // Studio загружает сохранённых детей именно туда); fallback — тело
+                // из вида, если модель пуста
+                var children = this.Components;
+                var body = children == null || children.Count == 0
+                    ? (_body ?? ForEachRow.LastInstance?.Body)
+                    : null;
+
+                int childCount = children?.Count ?? 0;
+                if (childCount == 0 && body == null)
                     throw new InvalidOperationException(
-                        $"Тело цикла не найдено (WFContainerBase). Причина захвата при создании: {_bodyCaptureError ?? "Body вернул null"}");
+                        $"Тело цикла пусто: помещайте вложенные активности ВНУТРЬ контейнера"
+                        + $" (детей в модели: {children?.Count ?? 0}, тело вида недоступно)");
 
                 var frame = new LoopFrame();
+                int iterations = 0;
                 using (LoopControl.Push(frame))
                 {
                     for (int i = 0; i < limit; i++)
@@ -235,7 +242,15 @@ namespace Primo.MIA
                         SetVariableValue(this.Prop_CurrentRow, row, sd);
                         SetVariableValue(this.Prop_RowIndex, started + i, sd);
 
-                        var status = RunIteration(body, context, frame, $"строка {started + i}");
+                        IterationStatus status;
+                        if (childCount > 0)
+                            status = RunBodyDirect(children, context, frame, $"строка {started + i}")
+                            ? IterationStatus.Success
+                            : IterationStatus.Fatal;
+                        else
+                            status = RunIteration(body, context, frame, $"строка {started + i}");
+
+                        iterations++;
                         if (status == IterationStatus.Fatal)
                             return; // EndProcess уже вызван с ошибкой
                         if (status == IterationStatus.Break)
@@ -245,6 +260,8 @@ namespace Primo.MIA
                 }
 
                 EndProcess(new ElementExecutionResults(context));
+                Common.ActivityFileLogger.Info(sdkComponentName,
+                    $"цикл завершён: итераций {iterations}, активностей в теле {childCount}");
             }
             catch (Exception ex)
             {
@@ -259,10 +276,55 @@ namespace Primo.MIA
         }
 
         /// <summary>
+        /// Прямое исполнение тела: дети из модельного контейнера
+        /// (this.Components) вызываются напрямую. Ошибка ребёнка: при
+        /// ContinueOnException — продолжить, иначе — остановить цикл.
+        /// Возврат false — тело прервано ошибкой (цикл завершается).
+        /// </summary>
+        private bool RunBodyDirect(IList<IWFComponent> children, ProcessContext context, LoopFrame frame, string iterationLabel)
+        {
+            foreach (var child in children)
+            {
+                ElementExecutionResults result = null;
+                ElementExecutionFinishedDelegate handler = (s, r) => result = r;
+                child.ElementExecutionFinished += handler;
+                try
+                {
+                    child.Execute(context);
+                }
+                finally
+                {
+                    child.ElementExecutionFinished -= handler;
+                }
+
+                if (result != null && !result.IsSuccess)
+                {
+                    if (!this.ContinueOnException)
+                    {
+                        // пробрасываем ошибку вверх — цикл останавливается
+                        EndProcess(new ElementExecutionResults(
+                            new ExecutionException(
+                                $"[{sdkComponentName}] ошибка тела ({iterationLabel}): {result.ExceptionData?.Message ?? "неизвестная ошибка"}",
+                                result.ExceptionData),
+                            context));
+                        return false;
+                    }
+                    Common.ActivityFileLogger.Warning(
+                        sdkComponentName,
+                        $"Ошибка вложенной активности ({iterationLabel}, Продолжить при ошибке): {result.ExceptionData?.Message}");
+                }
+
+                if (LoopControl.Current?.BreakRequested == true || LoopControl.Current?.ContinueRequested == true)
+                    return true; // флаги обрабатывает внешний цикл
+            }
+            return true;
+        }
+
+        /// <summary>
         /// Одна итерация тела: body.Execute (движковая цепочка детей) +
         /// разбор результата: управляемые Break/Continue (флаги кадра,
-        /// выставленные активностями до маркер-исключения), ошибка ребёнка
-        /// (ContinueOnException контейнера), успех.
+        /// выставленные активностями до маркер-исключения) / ошибка ребёнка
+        /// (ContinueOnException контейнера) / успех.
         /// </summary>
         private IterationStatus RunIteration(WFContainerBase body, ProcessContext context, LoopFrame frame, string iterationLabel)
         {
