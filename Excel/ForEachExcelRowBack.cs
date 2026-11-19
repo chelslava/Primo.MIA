@@ -236,8 +236,7 @@ namespace Primo.MIA
                 Common.ActivityFileLogger.Error(sdkComponentName, ex.GetType().Name + ": " + ex.Message + Environment.NewLine + ex.StackTrace);
                 // стек в сообщении — диагностика циклов MIA (Studio показывает первую
                 // строку в колонке «Сообщение», полный текст — в деталях строки)
-                var stack = string.Join(" | ", ex.StackTrace.Split("
-").Take(6));
+                var stack = string.Join(" | ", ex.StackTrace.Split('\n').Take(6));
                 EndProcess(new ElementExecutionResults(
                     new ExecutionException($"{ex.GetType().Name}: {ex.Message} [{stack}]", ex),
                     context));
