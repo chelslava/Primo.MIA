@@ -174,7 +174,15 @@ namespace Primo.MIA
             // Тело цикла захватывается ОДИН РАЗ в конструкторе: в robot-режиме
             // Studio отсоединяет визуалы (element.Container обнуляется) —
             // доступ через UIControl в момент Execute даёт NRE.
-            _body = ((ForEachExcelRow)this.UIControl).Body;
+            try
+            {
+                _body = ((ForEachExcelRow)this.UIControl).Body;
+            }
+            catch (Exception ex)
+            {
+                Primo.MIA.Common.ActivityFileLogger.Warning(
+                    sdkComponentName, $"Тело цикла не захвачено при создании (будет взято при исполнении): {ex.Message}");
+            }
 
             this.Prop_FilePath = "\"\"";
             this.Prop_Sheet = "\"\"";

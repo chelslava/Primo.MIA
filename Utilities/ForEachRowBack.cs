@@ -144,8 +144,17 @@ namespace Primo.MIA
             // Тело цикла захватывается ОДИН РАЗ в конструкторе: в robot-режиме
             // Studio отсоединяет визуалы (element.Container обнуляется) —
             // доступ через UIControl в момент Execute даёт NRE. Тот же смысл,
-            // что у приватного cont в базовом классе.
-            _body = ((ForEachRow)this.UIControl).Body;
+            // что у приватного cont в базовом классе. Захват отказоустойчив:
+            // падение не должно лишать активности палитры.
+            try
+            {
+                _body = ((ForEachRow)this.UIControl).Body;
+            }
+            catch (Exception ex)
+            {
+                Common.ActivityFileLogger.Warning(
+                    sdkComponentName, $"Тело цикла не захвачено при создании (будет взято при исполнении): {ex.Message}");
+            }
 
             // значения по умолчанию: строковые переменные — "" (в кавычках),
             // числовые — БЕЗ кавычек (тип должен совпадать с ValidateReturnScript)
