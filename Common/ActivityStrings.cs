@@ -1225,6 +1225,11 @@ namespace Primo.MIA.Common
         public const string Activity_LoopBreak       = "Цикл: Прервать";
         public const string Activity_LoopContinue    = "Цикл: Продолжить";
 
+        public const string Field_LoopDebugPause  = "Отладочная пауза";
+        public const string LoopPauseCaption      = "MIA: Для каждой строки";
+        public const string LoopPauseContinue     = "Продолжить";
+        public const string LoopPauseBreak        = "Прервать цикл";
+
         public const string Field_LoopTable       = "Таблица";
         public const string Field_LoopCurrentRow  = "Текущая строка";
         public const string Field_LoopRowIndex    = "Индекс строки";

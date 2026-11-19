@@ -85,6 +85,16 @@ namespace Primo.MIA
             set { _propMaxRows = value; InvokePropertyChanged(this, nameof(Prop_MaxRows)); }
         }
 
+        private bool _propDebugPause;
+        /// <summary>Отладочная пауза: диалог перед каждой итерацией (Продолжить/Прервать).</summary>
+        [LTools.Common.Model.Serialization.StoringProperty]
+        [System.ComponentModel.Category(ActivityStrings.Category_Settings), System.ComponentModel.DisplayName(ActivityStrings.Field_LoopDebugPause)]
+        public bool Prop_DebugPause
+        {
+            get => _propDebugPause;
+            set { _propDebugPause = value; InvokePropertyChanged(this, nameof(Prop_DebugPause)); }
+        }
+
         // ── Выходные ────────────────────────────────────────────────────
 
         private string _propRowValues;
@@ -145,6 +155,7 @@ namespace Primo.MIA
 Настройки:
 Пропустить строк: [Int32] Начать с индекса N (0 — с первой строки данных).
 Максимум строк: [Int32] Ограничение итераций (0 — все).
+Отладочная пауза: [Bool] Окно «Продолжить / Прервать цикл» перед каждой итерацией — замена брейкпоинта внутри тела (студийная отладка внутрь тела цикла не заходит).
 
 Выходные данные:
 Значения строки: [List<String>] Ячейки текущей строки.
@@ -272,6 +283,11 @@ namespace Primo.MIA
                             SetVariableValue(this.Prop_Columns, new List<string>(reader.Columns), sd);
 
                         FireExecutionInfo(context, $"итерация {index}");
+
+                        // отладочная пауза: диалог «Продолжить/Прервать»
+                        if (this.Prop_DebugPause && DebugPause(row, index, reader.Columns))
+                            break;
+
                         var status = RunBodyDirect(children, context, frame, $"строка Excel {index}")
                             ? IterationStatus.Success
                             : IterationStatus.Fatal;
@@ -297,6 +313,26 @@ namespace Primo.MIA
                     new ExecutionException($"{ex.GetType().Name}: {ex.Message} [{stack}]", ex),
                     context));
             }
+        }
+
+        /// <summary>
+        /// Отладочная пауза: окно с индексом итерации и значениями ячеек
+        /// строки (с именами колонок из заголовков, если есть).
+        /// Возврат true — пользователь выбрал «Прервать цикл».
+        /// </summary>
+        private static bool DebugPause(IReadOnlyList<string> row, int rowIndex, IReadOnlyList<string> columns)
+        {
+            string values;
+            if (columns != null && columns.Count > 0)
+                values = string.Join(";  ", row.Select((v, i) =>
+                    $"{(i < columns.Count ? columns[i] : $"[{i}]")} = {v}"));
+            else
+                values = string.Join(";  ", row.Select((v, i) => $"[{i}] = {v}"));
+            if (values.Length > 1200)
+                values = values.Substring(0, 1200) + " …";
+            return LoopDebugPause.Show(
+                $"Итерация {rowIndex}{Environment.NewLine}{Environment.NewLine}{values}",
+                ActivityStrings.LoopPauseCaption);
         }
 
         /// <summary>

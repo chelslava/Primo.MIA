@@ -63,6 +63,11 @@
                       IsChecked="{Binding Prop_HasHeader}"
                       ToolTip="Первая строка расходуется на имена колонок (выход «Колонки»); в тело не попадает"/>
 
+            <CheckBox Style="{StaticResource FieldCheckBox}" Margin="0,4,6,2"
+                      Content="Отладочная пауза"
+                      IsChecked="{Binding Prop_DebugPause}"
+                      ToolTip="Перед каждой итерацией — окно «Продолжить / Прервать цикл» со значениями строки"/>
+
             <TextBlock Text="Значения строки (out):" Style="{StaticResource FieldLabel}" Margin="0,4,0,0"/>
             <TextBox Text="{Binding Prop_RowValues, UpdateSourceTrigger=PropertyChanged}"
                      Style="{StaticResource FieldBox}"

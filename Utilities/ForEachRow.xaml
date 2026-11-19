@@ -70,6 +70,11 @@
                          ToolTip="Ограничить число итераций (0 — без ограничения)"/>
             </Grid>
 
+            <CheckBox Content="Отладочная пауза" Margin="0,6,0,0"
+                      IsChecked="{Binding Prop_DebugPause}"
+                      Style="{StaticResource FieldCheckBox}"
+                      ToolTip="Перед каждой итерацией — окно «Продолжить / Прервать цикл» со значениями строки"/>
+
             <!-- Контейнер дочерних активностей (тело цикла) -->
             <Grid Margin="0,10,0,0">
                 <Border BorderThickness="1"
