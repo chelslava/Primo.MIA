@@ -246,21 +246,12 @@ namespace Primo.MIA
 
                 SetVariableValue(this.Prop_ColumnCount, table.Columns.Count, sd);
 
-                // Тело: приоритет — движковая цепочка модельного контейнера
-                // (cont = WFContainerBase детей, Studio грузит детей именно туда;
-                // cont.ExecuteNext гоняет детей событийной цепочкой — работает
-                // пошаговая отладка Studio как в стандартных контейнерах).
-                // Fallback: тело из вида/конструктора, затем прямые вызовы детей.
+                // Тело: дети из this.Components (модель контейнера) исполняются
+                // напрямую — подтверждено рабочим прогоном. Движковая цепочка
+                // cont.ExecuteNext в robot-режиме не содержит детей.
                 var children = this.Components;
                 int childCount = children?.Count ?? 0;
-                var cont = childCount > 0
-                    ? children[0].WFContainer as WFContainerBase
-                    : null;
-                var body = cont == null
-                    ? (_body ?? ForEachRow.LastInstance?.Body)
-                    : null;
-
-                if (cont == null && body == null && childCount == 0)
+                if (childCount == 0)
                     throw new InvalidOperationException(
                         "Тело цикла пусто: помещайте вложенные активности ВНУТРЬ контейнера");
 
@@ -274,15 +265,14 @@ namespace Primo.MIA
                         SetVariableValue(this.Prop_CurrentRow, row, sd);
                         SetVariableValue(this.Prop_RowIndex, started + i, sd);
 
-                        IterationStatus status;
-                        if (cont != null)
-                            status = RunBodyPass(cont, context, frame, $"строка {started + i}");
-                        else if (body != null)
-                            status = RunIteration(body, context, frame, $"строка {started + i}");
-                        else
-                            status = RunBodyDirect(children, context, frame, $"строка {started + i}")
-                                ? IterationStatus.Success
-                                : IterationStatus.Fatal;
+                        // прогресс итерации в отладочный лог Studio (событие
+                        // ElementExecutionInfo поднимается рефлексией — базовый
+                        // класс не даёт подклассам бросать свои события)
+                        FireExecutionInfo(context, $"итерация {started + i} из {limit}");
+
+                        var status = RunBodyDirect(children, context, frame, $"строка {started + i}")
+                            ? IterationStatus.Success
+                            : IterationStatus.Fatal;
 
                         iterations++;
                         if (status == IterationStatus.Fatal)
@@ -295,7 +285,7 @@ namespace Primo.MIA
 
                 EndProcess(new ElementExecutionResults(context));
                 Common.ActivityFileLogger.Info(sdkComponentName,
-                    $"цикл завершён: итераций {iterations}, активностей в теле {childCount}, режим {(cont != null ? "движковый" : body != null ? "тело вида" : "прямые вызовы")}");
+                    $"цикл завершён: итераций {iterations}, активностей в теле {childCount}");
             }
             catch (Exception ex)
             {
@@ -403,50 +393,32 @@ namespace Primo.MIA
         }
 
         /// <summary>
-        /// Один проход тела движковой цепочкой: cont.ExecuteNext(null, context)
-        /// исполняет первого ребёнка и через события движка продолжает до конца
-        /// тела — с поддержкой пошаговой отладки Studio. Ошибка ребёнка
-        /// останавливает проход; Break/Continue-маркеры обрывают немедленно.
+        /// Прогресс итерации в отладочный лог Studio: поднимает событие
+        /// ElementExecutionInfo базового класса через рефлексию (событие
+        /// объявлено в базовом классе — подкласс не может бросить напрямую).
         /// </summary>
-        private IterationStatus RunBodyPass(WFContainerBase cont, ProcessContext context, LoopFrame frame, string iterationLabel)
+        private void FireExecutionInfo(ProcessContext context, string text)
         {
-            ElementExecutionResults result = null;
-            ElementExecutionFinishedDelegate handler = (s, r) => result = r;
-            cont.ElementExecutionFinished += handler;
             try
             {
-                cont.ExecuteNext(null, context);
-            }
-            finally
-            {
-                cont.ElementExecutionFinished -= handler;
-            }
-
-            // управляемые флаги имеют приоритет над ошибкой-маркером
-            if (LoopControl.Current?.BreakRequested == true)
-            {
-                frame.BreakRequested = true;
-                return IterationStatus.Break;
-            }
-            if (LoopControl.Current?.ContinueRequested == true)
-                return IterationStatus.Continue;
-
-            if (result != null && !result.IsSuccess)
-            {
-                if (!this.ContinueOnException)
+                var field = typeof(PrimoContainerCustom<ForEachRow>).GetField(
+                    "ElementExecutionInfo", BindingFlags.NonPublic | BindingFlags.Instance);
+                var del = field?.GetValue(this) as MulticastDelegate;
+                if (del == null)
+                    return;
+                var args = new LTools.Common.Model.ElementExecutionInfoArgs
                 {
-                    EndProcess(new ElementExecutionResults(
-                        new ExecutionException(
-                            $"[{sdkComponentName}] ошибка тела ({iterationLabel}): {result.ExceptionData?.Message ?? "неизвестная ошибка"}",
-                            result.ExceptionData),
-                        context));
-                    return IterationStatus.Fatal;
-                }
-                Common.ActivityFileLogger.Warning(
-                    sdkComponentName,
-                    $"Ошибка вложенной активности ({iterationLabel}, Продолжить при ошибке): {result.ExceptionData?.Message}");
+                    MessageType = LTools.Enums.LogMessageType.Debug,
+                    Text = text,
+                    Context = context
+                };
+                foreach (var d in del.GetInvocationList())
+                    d.Method.Invoke(d.Target, new object[] { this, args });
             }
-            return IterationStatus.Success;
+            catch
+            {
+                // прогресс-событие не критично
+            }
         }
 
         /// <summary>Итог итерации тела.</summary>

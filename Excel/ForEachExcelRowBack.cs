@@ -250,19 +250,11 @@ namespace Primo.MIA
                 int skip = GetInt(sd, this.Prop_SkipRows, nameof(Prop_SkipRows), 0);
                 int max = GetInt(sd, this.Prop_MaxRows, nameof(Prop_MaxRows), 0);
 
-                // Тело: приоритет — движковая цепочка модельного контейнера
-                // (cont.ExecuteNext — работает пошаговая отладка Studio);
-                // fallback — тело из вида/конструктора, затем прямые вызовы.
+                // Тело: дети из this.Components (модель контейнера) исполняются
+                // напрямую — подтверждено рабочим прогоном ForEachRow.
                 var children = this.Components;
                 int childCount = children?.Count ?? 0;
-                var cont = childCount > 0
-                    ? children[0].WFContainer as WFContainerBase
-                    : null;
-                var body = cont == null
-                    ? (_body ?? ForEachExcelRow.LastInstance?.Body)
-                    : null;
-
-                if (cont == null && body == null && childCount == 0)
+                if (childCount == 0)
                     throw new InvalidOperationException(
                         "Тело цикла пусто: помещайте вложенные активности ВНУТРЬ контейнера");
 
@@ -279,15 +271,10 @@ namespace Primo.MIA
                         if (reader.Columns != null)
                             SetVariableValue(this.Prop_Columns, new List<string>(reader.Columns), sd);
 
-                        IterationStatus status;
-                        if (cont != null)
-                            status = RunBodyPass(cont, context, frame, $"строка Excel {index}");
-                        else if (body != null)
-                            status = RunIteration(body, context, frame, $"строка Excel {index}");
-                        else
-                            status = RunBodyDirect(children, context, frame, $"строка Excel {index}")
-                                ? IterationStatus.Success
-                                : IterationStatus.Fatal;
+                        FireExecutionInfo(context, $"итерация {index}");
+                        var status = RunBodyDirect(children, context, frame, $"строка Excel {index}")
+                            ? IterationStatus.Success
+                            : IterationStatus.Fatal;
 
                         index++;
                         if (status == IterationStatus.Fatal)
@@ -356,91 +343,32 @@ namespace Primo.MIA
         }
 
         /// <summary>
-        /// Один проход тела движковой цепочкой: cont.ExecuteNext(null, context)
-        /// — с поддержкой пошаговой отладки Studio (как в ForEachRowBack).
+        /// Прогресс итерации в отладочный лог Studio: поднимает событие
+        /// ElementExecutionInfo базового класса через рефлексию (событие
+        /// объявлено в базовом классе — подкласс не может бросить напрямую).
         /// </summary>
-        private IterationStatus RunBodyPass(WFContainerBase cont, ProcessContext context, LoopFrame frame, string iterationLabel)
+        private void FireExecutionInfo(ProcessContext context, string text)
         {
-            ElementExecutionResults result = null;
-            ElementExecutionFinishedDelegate handler = (s, r) => result = r;
-            cont.ElementExecutionFinished += handler;
             try
             {
-                cont.ExecuteNext(null, context);
-            }
-            finally
-            {
-                cont.ElementExecutionFinished -= handler;
-            }
-
-            if (LoopControl.Current?.BreakRequested == true)
-            {
-                frame.BreakRequested = true;
-                return IterationStatus.Break;
-            }
-            if (LoopControl.Current?.ContinueRequested == true)
-                return IterationStatus.Continue;
-
-            if (result != null && !result.IsSuccess)
-            {
-                if (!this.ContinueOnException)
+                var field = typeof(PrimoContainerCustom<ForEachExcelRow>).GetField(
+                    "ElementExecutionInfo", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                var del = field?.GetValue(this) as MulticastDelegate;
+                if (del == null)
+                    return;
+                var args = new LTools.Common.Model.ElementExecutionInfoArgs
                 {
-                    EndProcess(new ElementExecutionResults(
-                        new ExecutionException(
-                            $"[{sdkComponentName}] ошибка тела ({iterationLabel}): {result.ExceptionData?.Message ?? "неизвестная ошибка"}",
-                            result.ExceptionData),
-                        context));
-                    return IterationStatus.Fatal;
-                }
-                Common.ActivityFileLogger.Warning(
-                    sdkComponentName,
-                    $"Ошибка вложенной активности ({iterationLabel}, Продолжить при ошибке): {result.ExceptionData?.Message}");
+                    MessageType = LTools.Enums.LogMessageType.Debug,
+                    Text = text,
+                    Context = context
+                };
+                foreach (var d in del.GetInvocationList())
+                    d.Method.Invoke(d.Target, new object[] { this, args });
             }
-            return IterationStatus.Success;
-        }
-
-        /// <summary>
-        /// Одна итерация тела: body.Execute (движковая цепочка детей) +
-        /// разбор результата — как в ForEachRowBack.
-        /// </summary>
-        private IterationStatus RunIteration(WFContainerBase body, ProcessContext context, LoopFrame frame, string iterationLabel)
-        {
-            ElementExecutionResults result = null;
-            ElementExecutionFinishedDelegate handler = (s, r) => result = r;
-            body.ElementExecutionFinished += handler;
-            try
+            catch
             {
-                body.Execute(context);
+                // прогресс-событие не критично
             }
-            finally
-            {
-                body.ElementExecutionFinished -= handler;
-            }
-
-            if (LoopControl.Current?.BreakRequested == true)
-            {
-                frame.BreakRequested = true;
-                return IterationStatus.Break;
-            }
-            if (LoopControl.Current?.ContinueRequested == true)
-                return IterationStatus.Continue;
-
-            if (result != null && !result.IsSuccess)
-            {
-                if (!this.ContinueOnException)
-                {
-                    EndProcess(new ElementExecutionResults(
-                        new ExecutionException(
-                            $"[{sdkComponentName}] ошибка тела ({iterationLabel}): {result.ExceptionData?.Message ?? "неизвестная ошибка"}",
-                            result.ExceptionData),
-                        context));
-                    return IterationStatus.Fatal;
-                }
-                Common.ActivityFileLogger.Warning(
-                    sdkComponentName,
-                    $"Ошибка вложенной активности ({iterationLabel}, Продолжить при ошибке): {result.ExceptionData?.Message}");
-            }
-            return IterationStatus.Success;
         }
 
         /// <summary>Итог итерации тела.</summary>
