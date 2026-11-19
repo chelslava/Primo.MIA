@@ -25,5 +25,20 @@ namespace Primo.MIA
 
             return ActivityFileLogger.LogDirectory;
         }
+
+        /// <summary>
+        /// Уровень сообщения активности «Логирование» проходит глобальный
+        /// фильтр? None подавляет всё; Info скрывает «Отладка»; Debug — все.
+        /// Warning/Error/Critical имеют ранг Info (как в ActivityFileLogger).
+        /// </summary>
+        public static bool PassesMessageLevel(LogLevel messageLevel)
+        {
+            if (ActivityFileLogger.MinLevel == ActivityLogLevel.None)
+                return false;
+            var messageRank = messageLevel == LogLevel.Debug
+                ? (int)ActivityLogLevel.Debug
+                : (int)ActivityLogLevel.Info;
+            return messageRank >= (int)ActivityFileLogger.MinLevel;
+        }
     }
 }

@@ -264,6 +264,7 @@ namespace Primo.MIA
 Сообщение*: [String] Текст сообщения, который будет записан в лог.
 Уровень: [LogLevel] Степень важности сообщения. Определяет цвет в логе Primo и может использоваться для фильтрации.
 Варианты: Debug, Info (по умолчанию), Warning, Error, Critical.
+Также сообщение фильтруется глобальным уровнем «Лог: Настройки»: None — не пишется вовсе; Info — сообщения «Отладка» подавляются; Debug — пишутся все.
 Режим вывода: [LogOutputMode] Куда направлять лог.
 Варианты: FileOnly (только в файл), ConsoleOnly (только в лог Primo), FileAndConsole (в оба места, по умолчанию).
 
@@ -338,6 +339,19 @@ Custom – пользовательский паттерн (по умолчан�
                 var parameters = GetAndValidateParameters(sd);
                 string formattedMessage = FormatMessage(parameters);
                 string actualLogFile = null;
+
+                // глобальный уровень («Лог: Настройки») фильтрует и эту активность:
+                // None — ничего не пишется; Info — сообщения «Отладка» подавляются
+                if (!LogSettingsLogic.PassesMessageLevel(parameters.Level))
+                {
+                    SetVariableValue(this.Prop_ActualLogFile, string.Empty, sd);
+                    SetVariableValue(this.Prop_FormattedMessage, formattedMessage, sd);
+                    return new ExecutionResult
+                    {
+                        IsSuccess = true,
+                        SuccessMessage = $"Подавлено уровнем логирования ({ActivityFileLogger.MinLevel}): {parameters.Level}"
+                    };
+                }
 
                 switch (parameters.OutputMode)
                 {

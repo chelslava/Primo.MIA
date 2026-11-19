@@ -185,5 +185,47 @@ namespace Primo.MIA.Tests.Common
         }
 
         #endregion
+
+        #region PassesMessageLevel — фильтрация сообщений «Логирование»
+
+        [Fact]
+        public void PassesMessageLevel_DebugLevel_PassesDebugMessages()
+        {
+            // Arrange
+            LogSettingsLogic.Apply(ActivityLogLevel.Debug, false, null);
+
+            // Act + Assert
+            LogSettingsLogic.PassesMessageLevel(LogLevel.Debug).Should().BeTrue();
+            LogSettingsLogic.PassesMessageLevel(LogLevel.Info).Should().BeTrue();
+            LogSettingsLogic.PassesMessageLevel(LogLevel.Critical).Should().BeTrue();
+        }
+
+        [Fact]
+        public void PassesMessageLevel_InfoLevel_SuppressesDebugOnly()
+        {
+            // Arrange
+            LogSettingsLogic.Apply(ActivityLogLevel.Info, false, null);
+
+            // Act + Assert
+            LogSettingsLogic.PassesMessageLevel(LogLevel.Debug).Should().BeFalse();
+            LogSettingsLogic.PassesMessageLevel(LogLevel.Info).Should().BeTrue();
+            LogSettingsLogic.PassesMessageLevel(LogLevel.Warning).Should().BeTrue();
+            LogSettingsLogic.PassesMessageLevel(LogLevel.Error).Should().BeTrue();
+            LogSettingsLogic.PassesMessageLevel(LogLevel.Critical).Should().BeTrue();
+        }
+
+        [Fact]
+        public void PassesMessageLevel_NoneLevel_SuppressesEverything()
+        {
+            // Arrange
+            LogSettingsLogic.Apply(ActivityLogLevel.None, false, null);
+
+            // Act + Assert
+            LogSettingsLogic.PassesMessageLevel(LogLevel.Critical).Should().BeFalse();
+            LogSettingsLogic.PassesMessageLevel(LogLevel.Error).Should().BeFalse();
+            LogSettingsLogic.PassesMessageLevel(LogLevel.Info).Should().BeFalse();
+        }
+
+        #endregion
     }
 }
