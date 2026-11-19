@@ -170,7 +170,7 @@ namespace Primo.MIA
             sdkComponentIcon = ActivityIcons.Loop;
             sdkProperties = new List<LTools.Common.Helpers.WFHelper.PropertiesItem>()
             {
-                PropertyBuilder.Variable<string>("Prop_FilePath", "Путь к файлу .xlsx"),
+                PropertyBuilder.FileSelector("Prop_FilePath", "Путь к файлу .xlsx"),
                 PropertyBuilder.String("Prop_Sheet", "Лист (пусто — первый)"),
                 PropertyBuilder.BooleanObject("Prop_HasHeader", "Первая строка — заголовки"),
                 PropertyBuilder.Int("Prop_SkipRows", "Пропустить первые N строк данных"),
