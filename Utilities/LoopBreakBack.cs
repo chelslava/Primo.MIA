@@ -42,6 +42,8 @@ namespace Primo.MIA
         /// <summary>Флаг + маркер-исключение: движок останавливает остаток тела немедленно.</summary>
         public override ExecutionResult SimpleAction(ScriptingData sd)
         {
+            // контекст для дублирования сообщений в консоль Studio
+            ActivityFileLogger.BeginConsole(sd);
             var frame = LoopControl.Current
                 ?? throw new InvalidOperationException(
                     "Цикл: Прервать — вне тела цикла. Разместите активность внутри ForEach-контейнера MIA.");

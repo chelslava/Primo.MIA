@@ -63,7 +63,7 @@ namespace Primo.MIA
         {
             sdkComponentName = ActivityStrings.Activity_LogSettings;
             sdkComponentHelp = @"Компонент ""Лог: Настройки""
-Настройка общего логирования активностей MIA. Ставится в начало сценария; действует на все активности процесса.
+Настройка общего логирования активностей MIA. Ставится в начало сценария; действует на все активности процесса. Сообщения видны в консоли Studio (журнал робота); при включённом файловом логе — также в файле. Для отображения отладочных сообщений в консоли Studio включите показ уровня «Отладка» в панели журнала.
 
 Основные:
 Уровень логирования: [Enum] Debug — вся диагностика (параметры запросов, критерии, тайминги, решения); Info — ключевые события (по умолчанию); None — логирование выключено.
@@ -79,7 +79,7 @@ namespace Primo.MIA
             {
                 PropertyBuilder.Enum<ActivityLogLevel>("Prop_Level", "Уровень логирования (Debug/Info/None)"),
                 PropertyBuilder.BooleanObject("Prop_FileLog", "Файловый лог"),
-                PropertyBuilder.String("Prop_LogDirectory", "Директория логов (пусто — по умолчанию)")
+                PropertyBuilder.FolderSelector("Prop_LogDirectory", "Директория логов (пусто — по умолчанию)")
             };
             InitClass(container);
 
@@ -88,6 +88,8 @@ namespace Primo.MIA
 
         public override ExecutionResult TimedAction(ScriptingData sd)
         {
+            // контекст для дублирования сообщений в консоль Studio
+            ActivityFileLogger.BeginConsole(sd);
             try
             {
                 var directory = GetPropertyValue<string>(this.Prop_LogDirectory, nameof(Prop_LogDirectory), sd);

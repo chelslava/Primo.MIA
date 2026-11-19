@@ -443,6 +443,8 @@ IgnoreErrors  — продолжать при ошибке удаления
 
         public override ExecutionResult TimedAction(ScriptingData sd)
         {
+            // контекст для дублирования сообщений в консоль Studio
+            ActivityFileLogger.BeginConsole(sd);
             try
             {
                 string folderPath = GetPropertyValue<string>(

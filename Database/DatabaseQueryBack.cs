@@ -232,6 +232,8 @@ ID транзакции: [String] Идентификатор активной т
 
         public override ExecutionResult TimedAction(ScriptingData sd)
         {
+            // контекст для дублирования сообщений в консоль Studio
+            ActivityFileLogger.BeginConsole(sd);
             try
             {
                 var provider = GetPropertyValue<string>(Prop_ProviderInvariantName, nameof(Prop_ProviderInvariantName), sd);

@@ -252,6 +252,8 @@ namespace Primo.MIA
             try
             {
                 var sd = ScriptingHelper.PrepareScripting(this, context);
+                // контекст для дублирования сообщений (в т.ч. детей цикла) в консоль Studio
+                ActivityFileLogger.BeginConsole(sd);
 
                 var filePath = GetPropertyValue<string>(this.Prop_FilePath, nameof(Prop_FilePath), sd);
                 if (string.IsNullOrWhiteSpace(filePath))

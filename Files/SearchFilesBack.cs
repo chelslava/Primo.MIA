@@ -223,6 +223,8 @@ FilesAndFolders - Искать и файлы, и папки одновремен
         /// </summary>
         public override ExecutionResult TimedAction(ScriptingData sd)
         {
+            // контекст для дублирования сообщений в консоль Studio
+            ActivityFileLogger.BeginConsole(sd);
             try
             {
                 // Получение и валидация параметров

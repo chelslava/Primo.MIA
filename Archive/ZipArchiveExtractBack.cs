@@ -147,6 +147,8 @@ namespace Primo.MIA
 
         public override ExecutionResult TimedAction(ScriptingData sd)
         {
+            // контекст для дублирования сообщений в консоль Studio
+            ActivityFileLogger.BeginConsole(sd);
             var logic = new ArchiveLogic();
             try
             {

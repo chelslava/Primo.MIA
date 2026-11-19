@@ -229,6 +229,8 @@ namespace Primo.MIA
             try
             {
                 var sd = ScriptingHelper.PrepareScripting(this, context);
+                // контекст для дублирования сообщений (в т.ч. детей цикла) в консоль Studio
+                ActivityFileLogger.BeginConsole(sd);
 
                 var tableObj = GetPropertyValue<object>(this.Prop_Table, nameof(Prop_Table), sd);
                 DataTable table;

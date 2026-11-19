@@ -297,6 +297,8 @@ Regex - Использование регулярных выражений. На
         /// </summary>
         public override ExecutionResult SimpleAction(ScriptingData sd)
         {
+            // контекст для дублирования сообщений в консоль Studio
+            ActivityFileLogger.BeginConsole(sd);
             try
             {
                 var parameters = GetAndValidateParameters(sd);

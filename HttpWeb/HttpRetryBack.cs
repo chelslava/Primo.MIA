@@ -383,6 +383,8 @@ Exponential — задержка * 2^(попытка-1)
         /// </summary>
         public override ExecutionResult TimedAction(ScriptingData sd)
         {
+            // контекст для дублирования сообщений в консоль Studio
+            ActivityFileLogger.BeginConsole(sd);
             try
             {
                 // ── Чтение входных параметров ──────────────────────────────

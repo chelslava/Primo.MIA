@@ -314,6 +314,8 @@ ID календаря — GUID для активности «Календарь:
 
         public override ExecutionResult TimedAction(ScriptingData sd)
         {
+            // контекст для дублирования сообщений в консоль Studio
+            ActivityFileLogger.BeginConsole(sd);
             try
             {
                 string calendarPath = GetPropertyValue<string>(

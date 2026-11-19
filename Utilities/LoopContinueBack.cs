@@ -40,6 +40,8 @@ namespace Primo.MIA
         /// <summary>Флаг + маркер-исключение: остаток тела не выполняется.</summary>
         public override ExecutionResult SimpleAction(ScriptingData sd)
         {
+            // контекст для дублирования сообщений в консоль Studio
+            ActivityFileLogger.BeginConsole(sd);
             var frame = LoopControl.Current
                 ?? throw new InvalidOperationException(
                     "Цикл: Продолжить — вне тела цикла. Разместите активность внутри ForEach-контейнера MIA.");

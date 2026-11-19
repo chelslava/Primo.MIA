@@ -16,6 +16,9 @@
 
 using System;
 using System.IO;
+using LTools.Common.Model;
+using LTools.Enums;
+using LTools.Workflow.Model;
 
 namespace Primo.MIA.Common
 {
@@ -30,6 +33,14 @@ namespace Primo.MIA.Common
         private const string LevelDebug = "DEBUG";
 
         private static readonly object SyncRoot = new object();
+
+        /// <summary>
+        /// Контекст сценария текущего потока (WorkflowData) — задействуется
+        /// для дублирования сообщений в консоль Studio (PrimoApp.AddToLog).
+        /// Регистрируется активностями через BeginConsole на время выполнения.
+        /// </summary>
+        [ThreadStatic]
+        private static object _studioWorkflow;
 
         /// <summary>Лимит размера файла лога до ротации (10 МБ).</summary>
         private const long MaxFileBytes = 10 * 1024 * 1024;
@@ -71,6 +82,39 @@ namespace Primo.MIA.Common
             => Write(LevelDebug, source, message);
 
         /// <summary>
+        /// Регистрирует контекст сценария для дублирования сообщений в
+        /// консоль Studio (журнал робота) до конца выполнения активности.
+        /// Возврат — освободитель (Dispose восстанавливает предыдущий
+        /// контекст потока; вложенные вызовы безопасны).
+        /// </summary>
+        public static IDisposable BeginConsole(ScriptingData sd)
+            => new ConsoleGuard(sd?.WorkflowVar);
+
+        /// <summary>Уровень строки → тип сообщения в консоли Studio.
+        /// В LogMessageType нет Warning — WARN идёт как Info.</summary>
+        private static LogMessageType MapStudioType(string level)
+        {
+            switch (level)
+            {
+                case LevelDebug: return LogMessageType.Debug;
+                case LevelError: return LogMessageType.Error;
+                default: return LogMessageType.Info;
+            }
+        }
+
+        /// <summary>Восстановимый контекст консоли (nested-safe).</summary>
+        private sealed class ConsoleGuard : IDisposable
+        {
+            private readonly object _previous;
+            public ConsoleGuard(object workflow)
+            {
+                _previous = _studioWorkflow;
+                _studioWorkflow = workflow;
+            }
+            public void Dispose() => _studioWorkflow = _previous;
+        }
+
+        /// <summary>
         /// Записывает строку в консоль и (при Enabled) в файл лога.
         /// Сообщения ниже MinLevel отбрасываются; None отключает лог целиком.
         /// Никогда не бросает исключений.
@@ -89,6 +133,21 @@ namespace Primo.MIA.Common
             catch
             {
                 // консоль может быть недоступна — не критично
+            }
+
+            // дублирование в консоль Studio (журнал робота): контекст
+            // регистрируется активностью на время выполнения; AddToLog
+            // доступен только внутри сценария — вне Studio контекста нет
+            try
+            {
+                var workflow = _studioWorkflow as WorkflowData;
+                if (workflow != null)
+                    LTools.Workflow.PrimoApp.AddToLog(
+                        workflow, $"{source}: {message}", MapStudioType(level));
+            }
+            catch
+            {
+                // консоль Studio недоступна — не критично
             }
 
             if (!Enabled)
