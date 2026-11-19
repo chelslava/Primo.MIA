@@ -171,19 +171,10 @@ namespace Primo.MIA
             };
             InitClass(container);
 
-            // Тело цикла захватывается ОДИН РАЗ в конструкторе: в robot-режиме
-            // Studio отсоединяет визуалы (element.Container обнуляется) —
-            // доступ через UIControl в момент Execute даёт NRE.
-            try
-            {
-                _body = ((ForEachExcelRow)this.UIControl).Body;
-            }
-            catch (Exception ex)
-            {
-                _bodyCaptureError = $"{ex.GetType().Name}: {ex.Message}";
-                Primo.MIA.Common.ActivityFileLogger.Warning(
-                    sdkComponentName, $"Тело цикла не захвачено при создании (будет взято при исполнении): {_bodyCaptureError}");
-            }
+            // Тело цикла = модельный контейнер (приватное поле cont базового
+            // класса — движок грузит сохранённых детей именно туда). Захват
+            // в конструкторе: в robot-режиме element.Container обнуляется.
+            _body = ResolveBody();
 
             this.Prop_FilePath = "\"\"";
             this.Prop_Sheet = "\"\"";
@@ -193,7 +184,45 @@ namespace Primo.MIA
             this.Prop_Columns = "\"\"";
         }
 
-        /// <summary>Тело цикла (WFContainerBase из вида), захваченное в конструкторе.</summary>
+        /// <summary>
+        /// Модельный контейнер тела: 1) приватное поле cont базового класса
+        /// (рефлексия); 2) тело вида; 3) тело последнего экземпляра вида.
+        /// </summary>
+        private WFContainerBase ResolveBody()
+        {
+            try
+            {
+                var field = typeof(PrimoContainerCustom<ForEachExcelRow>).GetField(
+                    "cont", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                var viaReflection = field?.GetValue(this) as WFContainerBase;
+                if (viaReflection != null)
+                    return viaReflection;
+            }
+            catch (Exception ex)
+            {
+                Primo.MIA.Common.ActivityFileLogger.Warning(sdkComponentName, $"cont через рефлексию: {ex.Message}");
+            }
+
+            try
+            {
+                var viaView = ((ForEachExcelRow)this.UIControl).Body;
+                if (viaView != null)
+                    return viaView;
+            }
+            catch (Exception ex)
+            {
+                Primo.MIA.Common.ActivityFileLogger.Warning(sdkComponentName, $"cont через вид: {ex.Message}");
+            }
+
+            var last = ForEachExcelRow.LastInstance?.Body;
+            if (last != null)
+                return last;
+
+            _bodyCaptureError = "не найден ни одним из способов (рефлексия/вид/LastInstance)";
+            return null;
+        }
+
+        /// <summary>Тело цикла (WFContainerBase), захваченное в конструкторе.</summary>
         private WFContainerBase _body;
 
         /// <summary>Причина неудачи захвата тела в конструкторе (диагностика).</summary>

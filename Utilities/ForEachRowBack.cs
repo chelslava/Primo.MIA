@@ -28,6 +28,7 @@ using Primo.MIA.Common;
 using System;
 using System.Linq;
 using System.Data;
+using System.Reflection;
 using System.Collections.Generic;
 
 namespace Primo.MIA
@@ -141,30 +142,57 @@ namespace Primo.MIA
             };
             InitClass(container);
 
-            // Тело цикла захватывается ОДИН РАЗ в конструкторе: в robot-режиме
-            // Studio отсоединяет визуалы (element.Container обнуляется) —
-            // доступ через UIControl в момент Execute даёт NRE. Тот же смысл,
-            // что у приватного cont в базовом классе. Захват отказоустойчив:
-            // падение не должно лишать активности палитры.
-            try
-            {
-                _body = ((ForEachRow)this.UIControl).Body;
-            }
-            catch (Exception ex)
-            {
-                // причина захвата попадёт в ошибку Execute, если тело не
-                // удастся взять из LastInstance (диагностика robot-режима)
-                _bodyCaptureError = $"{ex.GetType().Name}: {ex.Message}";
-                Common.ActivityFileLogger.Warning(
-                    sdkComponentName, $"Тело цикла не захвачено при создании (будет взято при исполнении): {_bodyCaptureError}");
-            }
-
+            // Тело цикла = модельный контейнер (приватное поле cont базового
+            // класса — именно в него движок загружает сохранённых детей).
+            // Захват в конструкторе: в robot-режиме element.Container
+            // обнуляется, UIControl в Execute даёт NRE. Цепочка источников:
+            // рефлексия cont → вид → LastInstance.
+            _body = ResolveBody();
             // значения по умолчанию: строковые переменные — "" (в кавычках),
             // числовые — БЕЗ кавычек (тип должен совпадать с ValidateReturnScript)
             this.Prop_Table = "\"\"";
             this.Prop_CurrentRow = "\"\"";
             this.Prop_SkipRows = "0";
             this.Prop_MaxRows = "0";
+        }
+
+        /// <summary>
+        /// Модельный контейнер тела: 1) приватное поле cont базового класса
+        /// (рефлексия — ровно тот экземпляр, в который движок грузит детей);
+        /// 2) тело вида; 3) тело последнего экземпляра вида.
+        /// </summary>
+        private WFContainerBase ResolveBody()
+        {
+            try
+            {
+                var field = typeof(PrimoContainerCustom<ForEachRow>).GetField(
+                    "cont", BindingFlags.NonPublic | BindingFlags.Instance);
+                var viaReflection = field?.GetValue(this) as WFContainerBase;
+                if (viaReflection != null)
+                    return viaReflection;
+            }
+            catch (Exception ex)
+            {
+                Common.ActivityFileLogger.Warning(sdkComponentName, $"cont через рефлексию: {ex.Message}");
+            }
+
+            try
+            {
+                var viaView = ((ForEachRow)this.UIControl).Body;
+                if (viaView != null)
+                    return viaView;
+            }
+            catch (Exception ex)
+            {
+                Common.ActivityFileLogger.Warning(sdkComponentName, $"cont через вид: {ex.Message}");
+            }
+
+            var last = ForEachRow.LastInstance?.Body;
+            if (last != null)
+                return last;
+
+            _bodyCaptureError = "не найден ни одним из способов (reflexion/вид/LastInstance)";
+            return null;
         }
 
         /// <summary>Тело цикла (WFContainerBase из вида), захваченное в конструкторе.</summary>
